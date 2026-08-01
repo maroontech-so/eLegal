@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>eLegal - Document Reader</title>
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --app-bg: #F8FAF9;
+      --surface-bg: #FFFFFF;
+      --text-primary: #1A2E26;
+      --text-secondary: #52665E;
+      --accent-green: #0D5C3A;
+      --accent-gold: #C5A059;
+      --border-color: rgba(13, 92, 58, 0.12);
+      --font-body: 'Plus Jakarta Sans', -apple-system, sans-serif;
+      --font-legal: 'Source Serif 4', Georgia, serif;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--app-bg);
+      color: var(--text-primary);
+      overflow: hidden;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* TOP NAVIGATION TOOLBAR */
+    .toolbar {
+      height: 56px;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border-color);
+      padding: 0 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 100;
+      flex-shrink: 0;
+    }
+
+    .toolbar-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      min-width: 0;
+    }
+
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--accent-green);
+      text-decoration: none;
+      font-size: 0.875rem;
+      font-weight: 600;
+      padding: 6px 12px;
+      border-radius: 8px;
+      background: rgba(13, 92, 58, 0.08);
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
+
+    .back-btn:hover {
+      background: rgba(13, 92, 58, 0.15);
+      transform: translateX(-1px);
+    }
+
+    .doc-title {
+      font-weight: 700;
+      font-size: 0.9375rem;
+      color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 450px;
+    }
+
+    .toolbar-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+
+    /* BADGES */
+    .badge {
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 6px;
+      background: #EAF2ED;
+      color: var(--accent-green);
+      border: 1px solid rgba(13, 92, 58, 0.15);
+      white-space: nowrap;
+    }
+
+    .badge-year {
+      background: #FDF6E2;
+      color: #946900;
+      border-color: rgba(197, 160, 89, 0.3);
+    }
+
+    .badge-type {
+      background: #EBF3FA;
+      color: #0055A5;
+      border-color: rgba(0, 85, 165, 0.2);
+    }
+
+    .source-btn {
+      color: var(--text-secondary);
+      font-size: 0.8125rem;
+      font-weight: 500;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 6px 10px;
+      border-radius: 6px;
+      border: 1px solid var(--border-color);
+      background: var(--surface-bg);
+      transition: all 0.15s ease;
+    }
+
+    .source-btn:hover {
+      color: var(--text-primary);
+      border-color: rgba(13, 92, 58, 0.3);
+      background: #F4F8F5;
+    }
+
+    .btn-icon-text {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 6px 10px;
+      border-radius: 6px;
+      border: 1px solid var(--border-color);
+      background: var(--surface-bg);
+      color: var(--text-primary);
+      font-size: 0.8125rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .btn-icon-text:hover {
+      background: #F4F8F5;
+      border-color: var(--accent-green);
+    }
+
+    /* VIEWER CONTAINER */
+    .viewer-container {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 24px 16px;
+      position: relative;
+    }
+
+    /* PDF PAGE STYLING */
+    .page-wrapper {
+      margin-bottom: 24px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+      background: white;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .page-wrapper canvas {
+      display: block;
+      max-width: 100%;
+      height: auto;
+    }
+
+    /* TEXT READER CARD STYLING */
+    .reader-card {
+      width: 100%;
+      max-width: 860px;
+      background: var(--surface-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+      padding: 40px;
+      margin-bottom: 40px;
+      font-family: var(--font-legal);
+      font-size: 1.0625rem;
+      line-height: 1.75;
+      color: #222;
+    }
+
+    .reader-header {
+      display: none !important;
+      border-bottom: 2px solid var(--accent-gold);
+      padding-bottom: 20px;
+      margin-bottom: 28px;
+      font-family: var(--font-body);
+    }
+
+    .reader-meta-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .reader-title {
+      font-family: 'Cinzel', serif;
+      font-size: 1.625rem;
+      font-weight: 700;
+      color: var(--accent-green);
+      line-height: 1.3;
+      margin-bottom: 8px;
+    }
+
+    .reader-citation {
+      font-size: 0.9375rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      font-style: italic;
+    }
+
+    .reader-controls-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 16px;
+      padding-top: 12px;
+      border-top: 1px solid rgba(0, 0, 0, 0.06);
+    }
+
+    .search-input {
+      padding: 6px 12px;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      font-size: 0.8125rem;
+      width: 240px;
+      outline: none;
+    }
+
+    .search-input:focus {
+      border-color: var(--accent-green);
+      box-shadow: 0 0 0 2px rgba(13, 92, 58, 0.15);
+    }
+
+    .reader-body p {
+      margin-bottom: 1.25em;
+      text-align: justify;
+    }
+
+    .reader-body h1, .reader-body h2, .reader-body h3 {
+      font-family: var(--font-body);
+      color: var(--accent-green);
+      margin-top: 1.5em;
+      margin-bottom: 0.6em;
+      line-height: 1.3;
+    }
+
+    mark.highlight {
+      background-color: #FFE699;
+      color: #000;
+      padding: 1px 3px;
+      border-radius: 2px;
+    }
+
+    /* FAB FLOATING ACTION BUTTON FOR GET SUMMARY */
+    .fab-summary-btn {
+      position: fixed;
+      bottom: 28px;
+      right: 28px;
+      z-index: 990;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(135deg, #0D5C3A 0%, #084028 100%);
+      color: #FFFFFF;
+      font-family: var(--font-body);
+      font-size: 0.9375rem;
+      font-weight: 700;
+      padding: 12px 22px;
+      border-radius: 9999px;
+      border: 1.5px solid #C5A059;
+      box-shadow: 0 10px 25px -5px rgba(13, 92, 58, 0.45), 0 4px 10px rgba(0, 0, 0, 0.1);
+      cursor: pointer;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      letter-spacing: 0.01em;
+    }
+
+    .fab-summary-btn:hover {
+      transform: translateY(-3px) scale(1.03);
+      box-shadow: 0 14px 30px -4px rgba(13, 92, 58, 0.55), 0 6px 14px rgba(0, 0, 0, 0.15);
+      background: linear-gradient(135deg, #0F6B43 0%, #0A4A2F 100%);
+      border-color: #E2C278;
+    }
+
+    .fab-summary-btn:active {
+      transform: translateY(-1px) scale(0.98);
+    }
+
+    /* SUMMARY MODAL DRAWER OVERLAY */
+    .summary-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 20, 0.45);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      z-index: 1000;
+      display: flex;
+      justify-content: flex-end;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+    }
+
+    .summary-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .summary-drawer {
+      width: 100%;
+      max-width: 520px;
+      height: 100%;
+      background: #FFFFFF;
+      box-shadow: -10px 0 35px rgba(0, 0, 0, 0.15);
+      display: flex;
+      flex-direction: column;
+      transform: translateX(100%);
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .summary-overlay.active .summary-drawer {
+      transform: translateX(0);
+    }
+
+    .summary-header {
+      padding: 18px 24px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #F9FBF9;
+    }
+
+    .summary-drawer-title {
+      font-family: 'Cinzel', serif;
+      font-size: 1.125rem;
+      font-weight: 700;
+      color: var(--accent-green);
+    }
+
+    .summary-close-btn {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      color: var(--text-secondary);
+      cursor: pointer;
+      line-height: 1;
+      padding: 4px;
+      border-radius: 6px;
+      transition: color 0.15s ease;
+    }
+
+    .summary-close-btn:hover {
+      color: var(--text-primary);
+      background: rgba(0, 0, 0, 0.05);
+    }
+
+    .summary-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px;
+      font-family: var(--font-body);
+      font-size: 0.9375rem;
+      line-height: 1.65;
+      color: var(--text-primary);
+    }
+
+    .summary-body h4 {
+      font-family: 'Cinzel', serif;
+      font-size: 1rem;
+      color: var(--accent-green);
+      margin-top: 20px;
+      margin-bottom: 8px;
+      border-bottom: 1px solid rgba(13, 92, 58, 0.1);
+      padding-bottom: 4px;
+    }
+
+    .summary-body h4:first-child {
+      margin-top: 0;
+    }
+
+    .summary-body p {
+      margin-bottom: 12px;
+    }
+
+    .summary-body ul {
+      margin-bottom: 12px;
+      padding-left: 20px;
+    }
+
+    .summary-body li {
+      margin-bottom: 6px;
+    }
+
+    .summary-footer {
+      padding: 16px 24px;
+      border-top: 1px solid var(--border-color);
+      background: #F9FBF9;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 12px;
+    }
+
+    /* STATE MESSAGES */
+    .state-message {
+      text-align: center;
+      padding: 80px 20px;
+      color: var(--text-secondary);
+      max-width: 500px;
+      margin: auto;
+    }
+
+    .state-message h3 {
+      font-size: 1.125rem;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+      font-family: var(--font-body);
+    }
+
+    .error-msg {
+      color: #DC2626;
+    }
+
+    @media (max-width: 640px) {
+      .toolbar {
+        padding: 0 10px;
+      }
+      .doc-title {
+        max-width: 140px;
+      }
+      .reader-card {
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="toolbar">
+    <div class="toolbar-left">
+      <a href="/" class="back-btn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+        Back to search
+      </a>
+      <span class="doc-title" id="docTitle">Loading document...</span>
+    </div>
+    <div class="toolbar-right">
+      <span class="badge badge-year" id="badgeYear" style="display:none;">Year</span>
+      <span class="badge badge-type" id="badgeType" style="display:none;">Type</span>
+      <span class="badge" id="badgeSource" style="display:none;">Source</span>
+      <span class="badge" id="pageInfo">Loading...</span>
+      <button id="btnBookmark" class="source-btn" style="cursor: pointer; display: inline-flex; align-items: center; gap: 4px;" title="Save document to bookmarks">
+        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/></svg>
+        <span id="btnBookmarkText">Save</span>
+      </button>
+      <a href="#" id="externalLink" class="source-btn" style="display:none;" target="_blank" rel="noopener noreferrer">
+        Original source
+        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+      </a>
+    </div>
+  </div>
+
+  <div class="viewer-container" id="viewerContainer">
+    <div id="loading" class="state-message">
+      <h3>Loading document</h3>
+      <p>Fetching legal document and metadata...</p>
+    </div>
+    <div id="pagesContainer" style="width: 100%; display: flex; flex-direction: column; align-items: center;"></div>
+    <div id="textReaderContainer" style="width: 100%; display: none; justify-content: center;"></div>
+    <div id="error" class="state-message error-msg" style="display:none;"></div>
+  </div>
+
+  <!-- FLOATING ACTION BUTTON FOR AI SUMMARY -->
+  <button class="fab-summary-btn" id="fabSummaryBtn" title="Get Legal AI Summary">
+    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#C5A059" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3z"/></svg>
+    Get Summary
+  </button>
+
+  <!-- SUMMARY MODAL DRAWER OVERLAY -->
+  <div class="summary-overlay" id="summaryOverlay">
+    <div class="summary-drawer">
+      <div class="summary-header">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0D5C3A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3z"/></svg>
+          <span class="summary-drawer-title">Legal Brief & Summary</span>
+        </div>
+        <button class="summary-close-btn" id="summaryCloseBtn">&times;</button>
+      </div>
+      <div class="summary-body" id="summaryContent">
+        <div class="state-message" style="padding: 40px 0;">
+          <h3>Generating Legal Brief</h3>
+          <p>Analyzing document structure, ratio decidendi, and legal provisions...</p>
+        </div>
+      </div>
+      <div class="summary-footer">
+        <button class="btn-icon-text" id="btnCopySummary">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          Copy Brief
+        </button>
+        <button class="btn-icon-text" id="btnCloseDrawer">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/lib/pdf.min.js"></script>
+  <script>
+    pdfjsLib.GlobalWorkerOptions.workerSrc = '/lib/pdf.worker.min.js';
+
+    let loadedDocData = null;
+    let cachedSummaryHtml = null;
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const titleParam = urlParams.get('title');
+    const sourceUrl = urlParams.get('sourceUrl') || urlParams.get('url');
+    const reqYear = urlParams.get('year') || '';
+    const reqType = urlParams.get('type') || '';
+    const reqSource = urlParams.get('source') || '';
+    let filename = urlParams.get('file') || decodeURIComponent(window.location.pathname.replace(/^\/read\/?/, '').replace('read.html', ''));
+    if (!filename || filename === '/' || filename === 'read.html') filename = 'document.pdf';
+
+    const loadingEl = document.getElementById('loading');
+    const errorEl = document.getElementById('error');
+    const pageInfoEl = document.getElementById('pageInfo');
+    const docTitleEl = document.getElementById('docTitle');
+    const pagesContainer = document.getElementById('pagesContainer');
+    const textReaderContainer = document.getElementById('textReaderContainer');
+    const externalLink = document.getElementById('externalLink');
+    const badgeYear = document.getElementById('badgeYear');
+    const badgeType = document.getElementById('badgeType');
+    const badgeSource = document.getElementById('badgeSource');
+
+    const fabSummaryBtn = document.getElementById('fabSummaryBtn');
+    const summaryOverlay = document.getElementById('summaryOverlay');
+    const summaryContent = document.getElementById('summaryContent');
+    const summaryCloseBtn = document.getElementById('summaryCloseBtn');
+    const btnCloseDrawer = document.getElementById('btnCloseDrawer');
+    const btnCopySummary = document.getElementById('btnCopySummary');
+
+    function closeSummaryDrawer() {
+      summaryOverlay.classList.remove('active');
+    }
+
+    summaryCloseBtn.addEventListener('click', closeSummaryDrawer);
+    btnCloseDrawer.addEventListener('click', closeSummaryDrawer);
+    summaryOverlay.addEventListener('click', (e) => {
+      if (e.target === summaryOverlay) closeSummaryDrawer();
+    });
+
+    btnCopySummary.addEventListener('click', () => {
+      if (summaryContent) {
+        navigator.clipboard.writeText(summaryContent.innerText);
+        alert('Legal Brief copied to clipboard!');
+      }
+    });
+
+    fabSummaryBtn.addEventListener('click', async () => {
+      summaryOverlay.classList.add('active');
+      if (cachedSummaryHtml) {
+        summaryContent.innerHTML = cachedSummaryHtml;
+        return;
+      }
+
+      summaryContent.innerHTML = `
+        <div class="state-message" style="padding: 40px 0;">
+          <h3>Generating Legal Brief</h3>
+          <p>Analyzing holdings, ratio decidendi, and statutory provisions...</p>
+        </div>
+      `;
+
+      try {
+        const res = await fetch('/api/summarize-doc', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            title: loadedDocData?.title || displayTitle,
+            sourceUrl: sourceUrl || '',
+            text: loadedDocData?.text || '',
+            year: reqYear || loadedDocData?.year || '',
+            type: reqType || loadedDocData?.type || '',
+            citation: loadedDocData?.citation || ''
+          })
+        });
+
+        const data = await res.json();
+        if (data.success && data.summaryHtml) {
+          cachedSummaryHtml = data.summaryHtml;
+          summaryContent.innerHTML = cachedSummaryHtml;
+        } else {
+          summaryContent.innerHTML = `<p class="error-msg">Could not generate summary at this moment.</p>`;
+        }
+      } catch (e) {
+        summaryContent.innerHTML = `<p class="error-msg">Error generating summary: ${e.message}</p>`;
+      }
+    });
+
+    const displayTitle = titleParam ? decodeURIComponent(titleParam) : filename.replace('.pdf', '');
+    docTitleEl.textContent = displayTitle;
+    document.title = `${displayTitle} | eLegal Reader`;
+
+    /* ─── BOOKMARK LOCAL STORAGE LOGIC ─── */
+    const SAVED_DOCS_KEY = 'elegal_saved_documents';
+    const btnBookmark = document.getElementById('btnBookmark');
+    const btnBookmarkText = document.getElementById('btnBookmarkText');
+
+    function getSavedDocs() {
+      try {
+        const raw = localStorage.getItem(SAVED_DOCS_KEY);
+        return raw ? JSON.parse(raw) : [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function getDocKey() {
+      const key = window.location.search || sourceUrl || displayTitle;
+      return String(key).toLowerCase().trim();
+    }
+
+    function isDocSaved() {
+      const key = getDocKey();
+      if (!key) return false;
+      const docs = getSavedDocs();
+      return docs.some(d => {
+        const dKey = d.readUrl || d.url || d.title || d.citation || '';
+        return String(dKey).toLowerCase().trim() === key || (d.title && d.title.toLowerCase().trim() === displayTitle.toLowerCase().trim());
+      });
+    }
+
+    function updateBookmarkButtonUI() {
+      const saved = isDocSaved();
+      if (saved) {
+        btnBookmarkText.textContent = 'Saved';
+        btnBookmark.style.background = '#eff6ff';
+        btnBookmark.style.color = '#2563eb';
+        btnBookmark.style.borderColor = '#bfdbfe';
+      } else {
+        btnBookmarkText.textContent = 'Save';
+        btnBookmark.style.background = '';
+        btnBookmark.style.color = '';
+        btnBookmark.style.borderColor = '';
+      }
+    }
+
+    btnBookmark.addEventListener('click', () => {
+      let docs = getSavedDocs();
+      const saved = isDocSaved();
+      if (saved) {
+        docs = docs.filter(d => {
+          const dKey = d.readUrl || d.url || d.title || d.citation || '';
+          return String(dKey).toLowerCase().trim() !== getDocKey() && d.title?.toLowerCase().trim() !== displayTitle.toLowerCase().trim();
+        });
+      } else {
+        docs.unshift({
+          title: displayTitle,
+          citation: loadedDocData?.citation || displayTitle,
+          year: reqYear || loadedDocData?.year || '',
+          type: reqType || loadedDocData?.type || '',
+          source: reqSource || loadedDocData?.source || '',
+          category: loadedDocData?.category || 'precedent',
+          url: sourceUrl || '',
+          readUrl: window.location.pathname + window.location.search,
+          isPdf: true,
+          isDocument: true,
+          savedAt: new Date().toISOString()
+        });
+      }
+      try {
+        localStorage.setItem(SAVED_DOCS_KEY, JSON.stringify(docs));
+      } catch (e) {
+        console.warn('Failed to save bookmark', e);
+      }
+      updateBookmarkButtonUI();
+    });
+
+    updateBookmarkButtonUI();
+
+    if (sourceUrl && sourceUrl.startsWith('http')) {
+      externalLink.href = sourceUrl;
+      externalLink.style.display = 'inline-flex';
+    }
+
+    if (reqYear) {
+      badgeYear.textContent = reqYear;
+      badgeYear.style.display = 'inline-block';
+    }
+    if (reqType) {
+      badgeType.textContent = reqType;
+      badgeType.style.display = 'inline-block';
+    }
+    if (reqSource) {
+      badgeSource.textContent = reqSource;
+      badgeSource.style.display = 'inline-block';
+    }
+
+    function showError(message) {
+      loadingEl.style.display = 'none';
+      errorEl.style.display = 'block';
+      errorEl.innerHTML = `<h3>Could not load document</h3><p>${message}</p>`;
+    }
+
+    let textFontSize = 1.0625;
+
+    function renderTextReader(data) {
+      loadingEl.style.display = 'none';
+      pagesContainer.style.display = 'none';
+      textReaderContainer.style.display = 'flex';
+      pageInfoEl.textContent = 'Text View';
+
+      if (data.year) {
+        badgeYear.textContent = data.year;
+        badgeYear.style.display = 'inline-block';
+      }
+      if (data.type) {
+        badgeType.textContent = data.type;
+        badgeType.style.display = 'inline-block';
+      }
+      if (data.source) {
+        badgeSource.textContent = data.source;
+        badgeSource.style.display = 'inline-block';
+      }
+
+      const card = document.createElement('div');
+      card.className = 'reader-card';
+
+      const header = document.createElement('div');
+      header.className = 'reader-header';
+      header.innerHTML = `
+        <div class="reader-meta-bar">
+          ${data.year ? `<span class="badge badge-year">${data.year}</span>` : ''}
+          ${data.type ? `<span class="badge badge-type">${data.type}</span>` : ''}
+          ${data.source ? `<span class="badge">${data.source}</span>` : ''}
+        </div>
+        <h1 class="reader-title">${data.title || displayTitle}</h1>
+        ${data.citation ? `<div class="reader-citation">${data.citation}</div>` : ''}
+        <div class="reader-controls-bar">
+          <input type="text" class="search-input" id="inDocSearch" placeholder="Find in document text...">
+          <div style="display:flex; gap:8px;">
+            <button class="btn-icon-text" id="btnFontDec">A-</button>
+            <button class="btn-icon-text" id="btnFontInc">A+</button>
+            <button class="btn-icon-text" id="btnCopyText">Copy text</button>
+            <button class="btn-icon-text" id="btnPrintDoc">Print</button>
+          </div>
+        </div>
+      `;
+
+      function cleanClientText(raw) {
+        if (!raw) return '';
+        let str = raw;
+        str = str
+          .replace(/<header[\s\S]*?<\/header>/gi, '')
+          .replace(/<footer[\s\S]*?<\/footer>/gi, '')
+          .replace(/<nav[\s\S]*?<\/nav>/gi, '')
+          .replace(/<aside[\s\S]*?<\/aside>/gi, '');
+
+        const skipMatch = str.match(/(?:Skip to document content|Skip to main content|Skip to content)/i);
+        if (skipMatch) {
+          const idx = str.indexOf(skipMatch[0]);
+          str = str.substring(idx + skipMatch[0].length);
+        }
+        str = str
+          .replace(/Download PDF \(\d+(\.\d+)? KB\)/gi, '')
+          .replace(/Report Report a problem/gi, '')
+          .replace(/Find in document text\.\.\./gi, '')
+          .replace(/A-\s*A\+\s*Copy text\s*Print/gi, '')
+          .replace(/Copy citation/gi, '')
+          .replace(/Media Neutral Citation/gi, '')
+          .replace(/©\s*\d{4}.*$/gi, '')
+          .replace(/All rights reserved.*$/gi, '');
+
+        return str.trim();
+      }
+
+      const body = document.createElement('div');
+      body.className = 'reader-body';
+      body.id = 'readerBody';
+      
+      const cleanedHtml = cleanClientText(data.html || '');
+      const cleanedText = cleanClientText(data.text || '');
+
+      if (cleanedHtml && cleanedHtml.length > 30) {
+        body.innerHTML = cleanedHtml;
+      } else if (cleanedText && cleanedText.length > 20) {
+        const paragraphs = cleanedText.split('\n\n').filter(p => p.trim());
+        body.innerHTML = paragraphs.length > 0 ? paragraphs.map(p => `<p>${p.trim()}</p>`).join('') : `<p>${cleanedText}</p>`;
+      } else {
+        body.innerHTML = `
+          <div style="padding: 24px; background: #FDFBF7; border: 1px solid rgba(197, 160, 89, 0.3); border-radius: 8px; margin-top: 16px;">
+            <h3 style="font-family: var(--font-legal); color: var(--accent-green); margin-bottom: 8px;">Legal Document Overview</h3>
+            <p style="margin-bottom: 12px; color: var(--text-secondary); line-height: 1.6;">
+              This legal record (<strong>${data.title || displayTitle}</strong>) is referenced in Kenya Law records. You can view the original court record directly or click "Get Summary" to generate an AI Legal Brief.
+            </p>
+            <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-top: 16px;">
+              ${sourceUrl ? `<a href="${sourceUrl}" target="_blank" rel="noopener noreferrer" class="back-btn" style="background: var(--accent-green); color: white;">Open Original Source ↗</a>` : ''}
+              <button class="btn-icon-text" onclick="document.getElementById('fabSummaryBtn').click()">✨ Generate Legal Brief</button>
+            </div>
+          </div>
+        `;
+      }
+
+      // Reader header removed as requested
+      card.appendChild(body);
+      textReaderContainer.appendChild(card);
+
+      document.getElementById('btnFontDec')?.addEventListener('click', () => {
+        textFontSize = Math.max(0.85, textFontSize - 0.1);
+        card.style.fontSize = textFontSize + 'rem';
+      });
+      document.getElementById('btnFontInc')?.addEventListener('click', () => {
+        textFontSize = Math.min(1.6, textFontSize + 0.1);
+        card.style.fontSize = textFontSize + 'rem';
+      });
+      document.getElementById('btnCopyText')?.addEventListener('click', () => {
+        navigator.clipboard.writeText(data.text || body.innerText);
+        alert('Document text copied to clipboard');
+      });
+      document.getElementById('btnPrintDoc')?.addEventListener('click', () => {
+        window.print();
+      });
+
+      const searchInput = document.getElementById('inDocSearch');
+      searchInput?.addEventListener('input', (e) => {
+        const val = e.target.value.trim();
+        if (!val) {
+          body.innerHTML = data.html || (data.text || '').split('\n\n').map(p => `<p>${p.trim()}</p>`).join('');
+          return;
+        }
+        const regex = new RegExp(`(${val.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+        const rawText = data.text || body.innerText;
+        const highlighted = rawText.split('\n\n').map(p => {
+          return `<p>${p.replace(regex, '<mark class="highlight">$1</mark>')}</p>`;
+        }).join('');
+        body.innerHTML = highlighted;
+      });
+    }
+
+    async function loadDocument() {
+      if (!sourceUrl && (!filename || filename === 'document.pdf')) {
+        showError('No source URL or file provided');
+        return;
+      }
+
+      try {
+        const fetchTarget = sourceUrl
+          ? `/api/document-content?sourceUrl=${encodeURIComponent(sourceUrl)}&title=${encodeURIComponent(displayTitle)}&year=${encodeURIComponent(reqYear)}&type=${encodeURIComponent(reqType)}&source=${encodeURIComponent(reqSource)}`
+          : `/read/${encodeURIComponent(filename)}?raw=1`;
+
+        const res = await fetch(fetchTarget);
+        if (!res.ok) {
+          throw new Error(`Failed to load document (${res.status})`);
+        }
+
+        const data = await res.json();
+        loadedDocData = data;
+
+        const preferPdf = !data.fallback && (data.isPdf || data.hasPdf || !!data.pdfUrl);
+
+        if (!preferPdf) {
+          renderTextReader(data);
+          return;
+        }
+
+        try {
+          const pdfUrl = data.pdfUrl || `/api/pdf-proxy?sourceUrl=${encodeURIComponent(sourceUrl)}`;
+          const pdfRes = await fetch(pdfUrl);
+          if (!pdfRes.ok) {
+            renderTextReader(data);
+            return;
+          }
+
+          const arrayBuffer = await pdfRes.arrayBuffer();
+          const bytes = new Uint8Array(arrayBuffer.slice(0, 5));
+          const pdfHeader = String.fromCharCode.apply(null, Array.from(bytes));
+          if (!pdfHeader.startsWith('%PDF')) {
+            console.warn('Response buffer is not raw PDF data, rendering Text Reader mode');
+            renderTextReader(data);
+            return;
+          }
+
+          const pdfDoc = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+          const totalPages = pdfDoc.numPages;
+          pageInfoEl.textContent = `${totalPages} page${totalPages !== 1 ? 's' : ''}`;
+          loadingEl.style.display = 'none';
+
+          const firstPage = await pdfDoc.getPage(1);
+          const firstViewport = firstPage.getViewport({ scale: 1 });
+          const availableWidth = Math.min(window.innerWidth - 40, 900);
+          const fitScale = Math.min(availableWidth / firstViewport.width, 1.8);
+
+          for (let i = 1; i <= totalPages; i++) {
+            const page = await pdfDoc.getPage(i);
+            const viewport = page.getViewport({ scale: fitScale });
+
+            const canvas = document.createElement('canvas');
+            canvas.height = viewport.height;
+            canvas.width = viewport.width;
+
+            const wrapper = document.createElement('div');
+            wrapper.className = 'page-wrapper';
+            wrapper.appendChild(canvas);
+            pagesContainer.appendChild(wrapper);
+
+            await page.render({ canvasContext: canvas.getContext('2d'), viewport }).promise;
+          }
+        } catch (pdfErr) {
+          console.warn('PDF rendering error, switching to Text Reader:', pdfErr.message);
+          renderTextReader(data);
+        }
+      } catch (e) {
+        showError(e.message);
+      }
+    }
+
+    loadDocument();
+  </script>
+</body>
+
+</html>

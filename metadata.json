@@ -1,0 +1,8 @@
+{
+  "name": "Remix eLegal",
+  "description": "Minimalistic eLegal statute search engine for Kenya law and legal records.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

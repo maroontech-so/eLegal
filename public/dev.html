@@ -1,0 +1,2206 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>eLegal | Developer API</title>
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=JetBrains+Mono:wght@400;500;700&display=swap"
+    rel="stylesheet">
+
+  <style>
+    :root {
+      /* Apple Light Theme for Left Panel */
+      --app-bg: #F5F5F7;
+      --surface-bg: #FFFFFF;
+      --surface-glass: rgba(255, 255, 255, 0.65);
+      --text-primary: #1D1D1F;
+      --text-secondary: #86868B;
+      --text-tertiary: #A1A1A6;
+      --accent-color: #10081a;
+      --accent-hover: #2a2a2a;
+      --border-color: rgba(0, 0, 0, 0.08);
+
+      /* Apple Dark Theme for Right Panel */
+      --dark-bg: #000000;
+      --code-bg: #1C1C1E;
+      --code-surface: #2C2C2E;
+      --code-text: #F5F5F7;
+      --code-border: #38383A;
+
+      /* Shadows & Radii */
+      --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.04);
+      --shadow-md: 0 12px 32px rgba(0, 0, 0, 0.08);
+      --shadow-float: 0 20px 40px rgba(0, 0, 0, 0.12);
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 20px;
+
+      --font-ui: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      --font-code: 'JetBrains Mono', ui-monospace, SFMono-Regular, Consolas, monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      background-color: var(--app-bg);
+      color: var(--text-primary);
+      font-family: var(--font-ui);
+      line-height: 1.5;
+      min-height: 100vh;
+      display: flex;
+      overflow-y: auto;
+    }
+
+    button,
+    input,
+    select {
+      font-family: inherit;
+      outline: none;
+      border: none;
+    }
+
+    button {
+      cursor: pointer;
+      transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    .workspace {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+    }
+
+    .panel {
+      height: auto;
+      overflow: visible;
+    }
+
+    .left-panel {
+      background: var(--app-bg);
+      padding: 0 40px 80px;
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+    }
+
+    .panel-noise {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 50%;
+      height: 100%;
+      z-index: 0;
+      opacity: 0.4;
+      pointer-events: none;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    }
+
+    .panel-mesh::before {
+      content: '';
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(80px);
+      z-index: 0;
+      pointer-events: none;
+      top: -10%;
+      left: -10%;
+      width: 40vw;
+      height: 40vw;
+      background: radial-gradient(circle, rgba(0, 0, 0, 0.03) 0%, transparent 70%);
+    }
+
+    .content-z {
+      position: relative;
+      z-index: 10;
+    }
+
+    .top-nav {
+      height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      background: rgba(245, 245, 247, 0.7);
+      backdrop-filter: saturate(180%) blur(20px);
+      -webkit-backdrop-filter: saturate(180%) blur(20px);
+      margin: 0 -40px;
+      padding: 0 40px;
+      z-index: 100;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .brand {
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .elegal-logo-mini {
+      display: flex;
+      align-items: center;
+      font-family: 'Fredoka', sans-serif;
+      font-size: 24px;
+      font-weight: 700;
+      color: #10081a;
+      user-select: none;
+    }
+
+    .logo-e-mini {
+      margin-right: 1px;
+      letter-spacing: -1px;
+    }
+
+    .logo-l-container-mini {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: #10081a;
+      color: #ffffff;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      margin: 0 4px;
+      font-size: 24px;
+      padding-bottom: 2px;
+      padding-left: 2px;
+    }
+
+    .logo-egal-mini {
+      letter-spacing: -1px;
+      margin-left: -1px;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 24px;
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    .nav-links a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover {
+      color: var(--text-primary);
+    }
+
+    .glass-card {
+      background: var(--surface-glass);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 28px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .card-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 8px;
+    }
+
+    .card-desc {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      margin-bottom: 20px;
+      line-height: 1.5;
+    }
+
+    .primary-btn {
+      background: var(--accent-color);
+      color: white;
+      font-weight: 600;
+      padding: 12px 24px;
+      border-radius: 99px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-size: 0.95rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      width: 100%;
+    }
+
+    .primary-btn:hover {
+      background: var(--accent-hover);
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .primary-btn:active {
+      transform: scale(0.98);
+    }
+
+    .auth-btn {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 12px 20px;
+      border-radius: 99px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin-bottom: 12px;
+      border: 1px solid transparent;
+    }
+
+    .auth-btn.google {
+      background: #FFFFFF;
+      color: #3C4043;
+      border-color: #DADCE0;
+    }
+
+    .auth-btn.google:hover {
+      background: #F8F9FA;
+    }
+
+    .auth-btn.github {
+      background: #24292F;
+      color: #FFFFFF;
+    }
+
+    .auth-btn.github:hover {
+      background: #1B1F23;
+    }
+
+    .auth-btn.email {
+      background: var(--app-bg);
+      color: var(--text-primary);
+      border-color: var(--border-color);
+    }
+
+    .auth-btn.email:hover {
+      background: #E5E5EA;
+    }
+
+    .divider {
+      display: flex;
+      align-items: center;
+      text-align: center;
+      margin: 16px 0;
+      color: var(--text-tertiary);
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .divider::before,
+    .divider::after {
+      content: '';
+      flex: 1;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .divider::before {
+      margin-right: .5em;
+    }
+
+    .divider::after {
+      margin-left: .5em;
+    }
+
+    .profile-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 24px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--text-primary);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 1.2rem;
+    }
+
+    .key-display {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--surface-bg);
+      border: 1px solid var(--border-color);
+      padding: 8px 8px 8px 16px;
+      border-radius: 99px;
+      margin-top: 16px;
+      font-family: var(--font-code);
+      font-size: 0.9rem;
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.02);
+    }
+
+    .key-value-wrap {
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      color: var(--accent-color);
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      flex: 1;
+    }
+
+    .key-actions {
+      display: flex;
+      gap: 6px;
+    }
+
+    .icon-btn {
+      background: #E5E5EA;
+      color: var(--text-primary);
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s;
+    }
+
+    .icon-btn:hover {
+      background: #D1D1D6;
+    }
+
+    .mini-btn {
+      background: transparent;
+      color: var(--text-secondary);
+      font-weight: 600;
+      font-size: 0.85rem;
+      padding: 6px 12px;
+      border-radius: 99px;
+    }
+
+    .mini-btn:hover {
+      background: rgba(0, 0, 0, 0.05);
+      color: var(--text-primary);
+    }
+
+    .control-row {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .styled-select {
+      flex: 1;
+      appearance: none;
+      background: var(--surface-bg);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 14px 40px 14px 16px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      box-shadow: var(--shadow-sm);
+      background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231D1D1F' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+      background-repeat: no-repeat;
+      background-position: right 16px center;
+      background-size: 16px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .styled-select:focus {
+      border-color: var(--accent-color);
+      box-shadow: 0 0 0 3px rgba(16, 8, 26, 0.1);
+    }
+
+    .endpoint-header {
+      margin-bottom: 24px;
+    }
+
+    .endpoint-meta {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-family: var(--font-code);
+      margin-bottom: 12px;
+    }
+
+    .method-badge {
+      background: #E8F5E9;
+      color: #2E7D32;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-weight: 700;
+      font-size: 0.85rem;
+    }
+
+    .method-badge.post {
+      background: #F3E5F5;
+      color: #7B1FA2;
+    }
+
+    .endpoint-url {
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    .param-row {
+      display: grid;
+      grid-template-columns: 140px 1fr;
+      gap: 16px;
+      align-items: center;
+      margin-bottom: 16px;
+      padding: 16px;
+      background: var(--surface-bg);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+    }
+
+    .param-name {
+      font-weight: 600;
+      font-family: var(--font-code);
+      font-size: 0.9rem;
+    }
+
+    .param-name.required::after {
+      content: ' *';
+      color: #ff0036;
+    }
+
+    .styled-input {
+      width: 100%;
+      background: #F5F5F7;
+      border: 1px solid transparent;
+      border-radius: var(--radius-sm);
+      padding: 10px 14px;
+      font-size: 0.95rem;
+      transition: all 0.2s;
+    }
+
+    .styled-input:focus {
+      background: var(--surface-bg);
+      border-color: var(--accent-color);
+      box-shadow: 0 0 0 3px rgba(16, 8, 26, 0.1);
+    }
+
+    .right-panel {
+      background: var(--dark-bg);
+      padding: 40px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      border-left: 1px solid var(--code-border);
+    }
+
+    .code-window {
+      background: var(--code-bg);
+      border: 1px solid var(--code-border);
+      border-radius: var(--radius-lg);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: var(--shadow-float);
+      flex: 1;
+    }
+
+    .code-header {
+      background: var(--code-surface);
+      border-bottom: 1px solid var(--code-border);
+      padding: 12px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .code-title {
+      color: #A1A1A6;
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .lang-select {
+      background: transparent;
+      color: var(--code-text);
+      font-size: 0.85rem;
+      cursor: pointer;
+      appearance: none;
+      padding-right: 16px;
+      background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23A1A1A6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+      background-repeat: no-repeat;
+      background-position: right center;
+      background-size: 14px;
+      font-weight: 600;
+    }
+
+    .code-actions {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .dark-btn {
+      background: #38383A;
+      color: white;
+      border-radius: 99px;
+      padding: 6px 14px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+
+    .dark-btn:hover {
+      background: #48484A;
+    }
+
+    .code-content {
+      padding: 24px;
+      overflow: auto;
+      flex: 1;
+    }
+
+    pre {
+      margin: 0;
+    }
+
+    code {
+      font-family: var(--font-code);
+      font-size: 0.9rem;
+      line-height: 1.6;
+      color: #0051ff;
+      background: #ffffff00;
+    }
+
+    /* Syntax Highlighting Colors */
+    .token.method {
+      color: #5AC8FA;
+    }
+
+    .token.string {
+      color: #FFCC00;
+    }
+
+    .token.url {
+      color: #34C759;
+    }
+
+    .token.keyword {
+      color: #AF52DE;
+    }
+
+    .token.comment {
+      color: #8E8E93;
+      font-style: italic;
+    }
+
+    .token.property {
+      color: #FF9500;
+    }
+
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .right-panel ::-webkit-scrollbar-thumb {
+      background: #48484A;
+      border-radius: 4px;
+    }
+
+    .left-panel ::-webkit-scrollbar-thumb {
+      background: #D1D1D6;
+      border-radius: 4px;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 32px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: var(--text-primary);
+      color: white;
+      padding: 14px 24px;
+      border-radius: 99px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+      z-index: 9999;
+      box-shadow: var(--shadow-float);
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .modal-overlay {
+      z-index: 2000;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .top-login-btn {
+      background: #000000;
+      color: #FFFFFF;
+      padding: 8px 18px;
+      border-radius: 99px;
+      font-weight: 700;
+      font-size: 0.8rem;
+      letter-spacing: 0.05em;
+      transition: background 0.2s;
+    }
+
+    .top-login-btn:hover {
+      background: #333333;
+    }
+
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      z-index: 2000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.3s ease;
+    }
+
+    .modal-overlay.show {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .modal-card {
+      width: 100%;
+      max-width: 400px;
+      transform: translateY(20px) scale(0.95);
+      transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+      position: relative;
+    }
+
+    .modal-overlay.show .modal-card {
+      transform: translateY(0) scale(1);
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: transparent;
+      border: none;
+      font-size: 1.5rem;
+      color: var(--text-secondary);
+      cursor: pointer;
+      line-height: 1;
+      padding: 4px;
+    }
+
+    .modal-close:hover {
+      color: var(--text-primary);
+    }
+
+    @media (max-width: 1024px) {
+      .workspace {
+        grid-template-columns: 1fr;
+      }
+
+      .left-panel,
+      .right-panel {
+        height: auto;
+        overflow: visible;
+        padding: 24px;
+      }
+
+      body {
+        overflow: auto;
+      }
+
+      .code-window {
+        max-height: 200px;
+      }
+
+      .panel-noise,
+      .panel-mesh::before {
+        width: 100%;
+      }
+    }
+
+    .lang-toggle {
+      display: inline-flex;
+      background: rgb(120, 120, 128);
+      border-radius: 99px;
+      padding: 3px;
+      gap: 2px;
+    }
+
+    .lang-toggle button {
+      background: transparent;
+      color: var(--code-text);
+      border: none;
+      padding: 6px 12px;
+      border-radius: 99px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .lang-toggle button.active {
+      background: #007AFF;
+      color: #ffffff;
+    }
+
+    .ep-pill {
+      background: transparent;
+      color: #A1A1A6;
+      border: 1px solid var(--code-border);
+      border-radius: 99px;
+      padding: 4px 10px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .ep-pill.active {
+      background: var(--accent-color);
+      color: white;
+      border-color: var(--accent-color);
+    }
+
+    .key-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .key-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      background: var(--surface-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      padding: 12px 14px;
+    }
+
+    .key-meta {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .key-id {
+      font-family: var(--font-code);
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--accent-color);
+    }
+
+    .key-details {
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+      margin-top: 4px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .key-actions-row {
+      display: flex;
+      gap: 8px;
+    }
+
+    .chip {
+      padding: 4px 10px;
+      border-radius: 99px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .chip.active {
+      background: #E8F5E9;
+      color: #2E7D32;
+    }
+
+    .chip.paused {
+      background: #FFF3E0;
+      color: #E65100;
+    }
+
+    .chip.inactive {
+      background: #FFEBEE;
+      color: #C62828;
+    }
+
+    .ghost-btn {
+      background: transparent;
+      color: var(--text-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 99px;
+      padding: 6px 10px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .ghost-btn:hover {
+      background: rgba(0, 0, 0, 0.04);
+      color: var(--text-primary);
+    }
+
+    .ghost-btn.danger {
+      color: #FF3B30;
+      border-color: #FFD7D7;
+    }
+
+    .ghost-btn.danger:hover {
+      background: #FFF5F5;
+    }
+
+    .explorer {
+      background: var(--dark-bg);
+      border: 1px solid var(--code-border);
+      overflow: hidden;
+      border-radius: 10px;
+    }
+
+    .explorer-meta {
+      background: var(--code-surface);
+      border-bottom: 1px solid var(--code-border);
+      padding: 4px 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      min-height: 32px;
+    }
+
+    .explorer-body {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1px;
+      background: var(--code-border);
+    }
+
+    .explorer-body .code-window {
+      border-radius: 0;
+      box-shadow: none;
+    }
+
+    .explorer-body .code-content {
+      min-height: 100px;
+    }
+
+    .docs-section {
+      margin-top: 32px;
+    }
+
+    .endpoint-card {
+      background: var(--surface-bg);
+      border: 1px solid var(--border-color);
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+
+    .endpoint-card header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .endpoint-card .method-badge {
+      padding: 4px 8px;
+      font-size: 0.75rem;
+    }
+
+    .endpoint-card h3 {
+      margin: 0;
+      font-size: 1.05rem;
+      font-weight: 700;
+    }
+
+    .endpoint-card p {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      line-height: 1.5;
+      margin: 0;
+    }
+
+    .endpoint-card .path {
+      font-family: var(--font-code);
+      color: var(--text-secondary);
+      margin-top: 6px;
+      font-size: 0.85rem;
+    }
+
+    @media (max-width: 1024px) {
+      .workspace {
+        grid-template-columns: 1fr;
+      }
+
+      .left-panel,
+      .right-panel {
+        height: auto;
+        overflow: visible;
+        padding: 24px;
+      }
+
+      body {
+        overflow: auto;
+      }
+
+      .code-window {
+        min-height: 50px;
+      }
+
+      .panel-noise,
+      .panel-mesh::before {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <main class="workspace">
+
+    <!-- LEFT PANEL: Documentation and Controls -->
+    <section class="panel left-panel">
+      <div class="panel-noise"></div>
+      <div class="panel-mesh"></div>
+
+      <div class="content-z">
+        <header class="top-nav">
+          <a href="/" class="brand">
+            <div class="elegal-logo-mini">
+              <span class="logo-e-mini">e</span>
+              <div class="logo-l-container-mini">L</div>
+              <span class="logo-egal-mini">egal</span>
+            </div>
+            <span
+              style="font-weight: 600; color: var(--text-secondary); letter-spacing: -0.01em; margin-left: 8px;">API</span>
+          </a>
+          <div class="nav-links">
+            <a href="/">App Home</a>
+            <a href="#" style="color: var(--text-primary);">Docs</a>
+            <button id="topLoginBtn" class="top-login-btn">LOGIN / SIGNUP</button>
+          </div>
+        </header>
+
+        <!-- Authentication & Profile State -->
+        <div class="glass-card" id="authManageState" style="margin-top: 40px;">
+          <div class="profile-header" id="profileHeader" style="display: none;">
+            <div class="avatar" id="userAvatar">A</div>
+            <div>
+              <div style="font-weight:700; font-size:1.1rem; color:var(--text-primary)" id="userName">Developer</div>
+              <div style="font-size:0.9rem; color:var(--text-secondary)" id="userEmail">dev@example.com</div>
+            </div>
+          </div>
+
+          <h2 class="card-title">API Keys</h2>
+          <p class="card-desc">Manage your keys below. Each key is tied to your account and rate-limited to 100
+            requests/min.</p>
+
+          <button class="primary-btn" id="generateKeyBtn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path
+                d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4" />
+            </svg>
+            Generate API Key
+          </button>
+
+          <!-- Current Key -->
+          <div class="key-display" id="keyDisplay" style="display: none;">
+            <div class="key-value-wrap">
+              <span id="keyValueMasked">el_••••••••••••••••••••••</span>
+              <span id="keyValuePlain" style="display: none;"></span>
+            </div>
+            <div class="key-actions">
+              <button class="icon-btn" id="toggleVisibilityBtn" title="Reveal Key">
+                <svg id="eyeIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                  stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                  <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+                <svg id="eyeOffIcon" style="display:none" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path
+                    d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24">
+                  </path>
+                  <line x1="1" y1="1" x2="23" y2="23"></line>
+                </svg>
+              </button>
+              <button class="icon-btn" id="copyKeyBtn" title="Copy Key">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Key List -->
+          <div id="keyList" class="key-list"></div>
+        </div>
+
+        <div class="glass-card" style="margin-top: 32px;">
+          <h2 class="card-title">Quick Start & Setup</h2>
+          <p class="card-desc">Integrate eLegal's powerful research engine into your own applications using our REST
+            API. Follow these guidelines to establish a connection:</p>
+
+          <div style="font-size: 0.95rem; color: var(--text-secondary); line-height: 1.6; margin-top: 16px;">
+            <p style="margin-bottom: 14px;"><strong style="color: var(--text-primary); font-weight: 700;">1.
+                Authentication:</strong> Pass your generated API key in the headers of every request as
+              <code>X-API-Key: your_key_here</code>. Unauthorized requests will be rejected with a 401 status.
+            </p>
+            <p style="margin-bottom: 14px;"><strong style="color: var(--text-primary); font-weight: 700;">2. Base
+                URL:</strong> When running the local eLegal daemon, all endpoints are relative to your local server,
+              typically <code>http://localhost:3000</code>.</p>
+            <p style="margin-bottom: 14px;"><strong style="color: var(--text-primary); font-weight: 700;">3. Rate
+                Limiting:</strong> To ensure local engine stability, requests are limited to 100 per minute per IP
+              address. Exceeding this returns a <code>429 Too Many Requests</code> status.</p>
+            <p><strong style="color: var(--text-primary); font-weight: 700;">4. Responses:</strong> All API responses
+              are returned as standard JSON. In the event of a failure, the payload will include a <code>status</code>
+              and detailed <code>message</code> field.</p>
+          </div>
+        </div>
+
+        <div class="glass-card" style="margin-top: 32px;">
+          <h2 class="card-title"></h2>
+          <p class="card-desc">Test endpoints directly in the browser.</p>
+
+          <div class="control-row" style="justify-content: space-between; align-items: center;">
+            <div style="display:flex; gap:4px;">
+              <button class="ep-pill active" data-ep="search">Search</button>
+              <button class="ep-pill" data-ep="library">Library</button>
+              <button class="ep-pill" data-ep="resolve">Resolve</button>
+              <button class="ep-pill" data-ep="health">Health</button>
+            </div>
+            <div style="display:flex; gap:8px; align-items:center;">
+              <div class="lang-toggle" id="langToggle">
+                <button data-lang="curl" class="active">cURL</button>
+                <button data-lang="js">Node</button>
+                <button data-lang="python">Py</button>
+              </div>
+              <button class="primary-btn" id="runBtn"
+                style="width: auto; padding: 8px 18px; font-size: 0.85rem;">Run</button>
+            </div>
+          </div>
+
+          <div class="explorer">
+            <div class="explorer-meta">
+              <div style="display:flex; gap:6px; align-items:center;">
+                <span id="epMethod" class="method-badge" style="padding:2px 8px; font-size:0.7rem;">GET</span>
+                <span id="epPath"
+                  style="color:#A1A1A6; font-family:var(--font-code); font-size:0.75rem;">/api/search</span>
+              </div>
+              <div id="paramsContainer"
+                style="display:flex; gap:6px; flex-wrap:wrap; align-items:center; margin-left:8px;">
+                <span style="color:#A1A1A6; font-size:0.75rem; font-weight:600; white-space:nowrap;">ENTER A PARAMETER
+                  TO SEARCH</span>
+              </div>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--code-border);">
+              <div class="code-window" style="border-radius:0px">
+                <div class="code-header" style="padding: 6px 10px;">
+                  <span class="code-title" style="font-size:0.7rem;">Request</span>
+                  <button class="dark-btn" id="copyReqBtn" style="padding:3px 8px; font-size:0.65rem;">Copy</button>
+                </div>
+                <div class="code-content">
+                  <pre><code id="requestCodeBox"></code></pre>
+                </div>
+              </div>
+
+              <div class="code-window" style="border-radius:0px">
+                <div class="code-header" style="padding: 6px 10px;">
+                  <span class="code-title" style="font-size:0.7rem;">Response</span>
+                  <div style="display:flex; gap:6px; align-items:center;">
+                    <span id="responseStatus"
+                      style="color: #34C759; font-size: 0.7rem; font-family: var(--font-code); display: none;">200
+                      OK</span>
+                  </div>
+                </div>
+                <div class="code-content">
+                  <pre><code id="responseCodeBox"><span class="token comment">// Ready to execute request...</span></code></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="docs-section">
+          <h2 class="card-title">API Documentation</h2>
+          <p class="card-desc">Detailed reference for every eLegal endpoint. Use this section to understand request
+            shape, expected responses, authentication requirements, and common integration patterns.</p>
+
+          <div class="endpoint-card">
+            <header><span class="method-badge" style="background:#E8F5E9; color:#2E7D32;">SETUP</span>
+              <h3>Environment Setup</h3>
+            </header>
+            <p>Before calling any data endpoint, make sure the local eLegal server is running on
+              <code>http://localhost:3000</code> or your deployed host. From the dev portal, sign in with Google,
+              GitHub, or Email/Password, then generate an API key. That key must be included in the
+              <code>X-API-Key</code> header of every request to protected endpoints. If you are building an external
+              application, install the <code>cors</code> package on the server so your frontend or mobile app can call
+              the API from another origin. Rate limits are enforced per API key at 100 requests per minute; exceeding
+              that returns HTTP 429.
+            </p>
+            <div class="path">Base URL: http://localhost:3000</div>
+            <p style="margin-top:10px; font-size:0.85rem; color:var(--text-secondary);">Headers: <code>X-API-Key</code>
+              for data endpoints, <code>Authorization</code> (Firebase ID token) for key management endpoints.</p>
+          </div>
+
+          <div class="endpoint-card">
+            <header>
+              <span class="method-badge">GET</span>
+              <h3>Search</h3>
+            </header>
+            <p>This is the primary research endpoint. It accepts a plain-text query and searches across three layers: a
+              local offline corpus of statutes and precedents, the live Kenya Law directory when local results are
+              insufficient, and the open internet for international case law and legal documents. For international
+              results, the server dynamically crawls web search results, follows links, extracts PDF document URLs, and
+              uses pattern-matching to infer case citations and court details. Results are ranked by relevance using
+              TF-IDF scoring on local content, heuristic matching for Kenya Law records, and a priority score that
+              favors direct PDF documents for international sources. Each result object includes a title, inferred
+              citation, source URL, document type, and a short excerpt so your application can render a preview before
+              opening the full document. Queries should be URL-encoded and are limited by server configuration for
+              response size.</p>
+            <div class="path">/api/search?q=land+act&amp;source=all</div>
+            <p style="margin-top:10px; font-size:0.85rem; color:var(--text-secondary);">Accepts optional
+              <code>source</code> query parameter: <code>all</code> (default), <code>kenya</code>, or
+              <code>international</code>. Requires <code>X-API-Key</code> header. Returns up to N ranked documents with
+              citations, source URLs, and metadata.</p>
+          </div>
+
+          <div class="endpoint-card">
+            <header>
+              <span class="method-badge">GET</span>
+              <h3>Library</h3>
+            </header>
+            <p>The library endpoint provides a complete inventory of locally cached documents that the server can serve
+              without hitting the network. This is useful when you want to build your own document browser, build a
+              search index on the client, or verify which statutes and case precedents are currently available offline.
+              The response is grouped into categories such as precedents and statutes, and each entry includes the
+              filename, file size, last modified timestamp, and the relative path needed to read or download the
+              document. Because this endpoint does not parse the file contents, it is fast and suitable for repeated
+              polling at startup.</p>
+            <div class="path">/api/library</div>
+            <p style="margin-top:10px; font-size:0.85rem; color:var(--text-secondary);">Requires <code>X-API-Key</code>
+              header. Useful for building your own document browser or validating offline availability.</p>
+          </div>
+
+          <div class="endpoint-card">
+            <header>
+              <span class="method-badge">GET</span>
+              <h3>Resolve</h3>
+            </header>
+            <p>Some Kenya Law URLs point to a case or statute page rather than the PDF itself. The resolve endpoint
+              follows those pages, extracts the official PDF document URL, and stores a local cached copy so subsequent
+              reads are faster and more reliable. This is especially useful for integrations that need the raw document
+              rather than the HTML wrapper. The server validates that the input URL belongs to kenyalaw.org, fetches the
+              page metadata, and returns both the original source and a local reader URL. If the PDF cannot be located,
+              the endpoint returns a 404 with a descriptive message.</p>
+            <div class="path">/api/resolve?url=https://kenyalaw.org/...</div>
+            <p style="margin-top:10px; font-size:0.85rem; color:var(--text-secondary);">Requires <code>X-API-Key</code>
+              header. Only accepts kenyalaw.org URLs. Returns a local <code>/read/...</code> URL when successful.</p>
+          </div>
+
+          <div class="endpoint-card">
+            <header>
+              <span class="method-badge" style="background:#E8F5E9; color:#2E7D32;">POST</span>
+              <h3>Create Key</h3>
+            </header>
+            <p>Each authenticated user account needs an API key before it can call protected data endpoints. The create
+              key endpoint generates a new random key, stores it in Firestore under the user's account, and returns the
+              key string. The key should be treated as a secret: store it securely on your server or in a secure backend
+              store, not in client-side code that others can read. eLegal enforces a one-active-key policy to reduce
+              blast radius from leaked keys. When you create a new key, any previously active key for that user is
+              automatically paused rather than deleted, so existing integrations can roll back if needed.</p>
+            <div class="path">/api/keys</div>
+            <p style="margin-top:10px; font-size:0.85rem; color:var(--text-secondary);">Requires Firebase
+              <code>Authorization</code> header. Each user can have one active key at a time; creating a new key
+              deactivates the previous one.
+            </p>
+          </div>
+
+          <div class="endpoint-card">
+            <header>
+              <span class="method-badge">GET</span>
+              <h3>List Keys</h3>
+            </header>
+            <p>This endpoint returns every API key associated with the authenticated user, regardless of whether the key
+              is active, paused, or replaced. It is intended for key management interfaces, audit logging, and rotation
+              workflows. Every entry includes the key identifier, user-assigned label, creation timestamp, last-used
+              timestamp, total request count, and current active status. Because keys themselves are sensitive, the
+              endpoint returns the full key string only to authorized user contexts; client-side interfaces should mask
+              the value in logs and UI after the first display.</p>
+            <div class="path">/api/keys</div>
+            <p style="margin-top:10px; font-size:0.85rem; color:var(--text-secondary);">Requires Firebase
+              <code>Authorization</code> header.
+            </p>
+          </div>
+
+          <div class="endpoint-card">
+            <header>
+              <span class="method-badge" style="background:#F3E5F5; color:#7B1FA2;">PATCH</span>
+              <h3>Update Key</h3>
+            </header>
+            <p>Not every key lifecycle event requires deletion. The update endpoint lets you change a key's label for
+              organizational purposes or toggle whether the key is active. Pausing a key is useful when you want to stop
+              a key from being accepted by the server without losing its history and request count. Reactivating a
+              paused key restores full access immediately. Labels are purely for your own organization and do not affect
+              routing or permissions. Only one key per user can be active at any given time; pausing one key does not
+              automatically activate another.</p>
+            <div class="path">/api/keys/:keyId</div>
+            <p style="margin-top:10px; font-size:0.85rem; color:var(--text-secondary);">Requires Firebase
+              <code>Authorization</code> header. Body: <code>{ "isActive": false }</code> or
+              <code>{ "label": "Production" }</code>.
+            </p>
+          </div>
+
+          <div class="endpoint-card">
+            <header>
+              <span class="method-badge" style="background:#FFEBEE; color:#C62828;">DELETE</span>
+              <h3>Delete Key</h3>
+            </header>
+            <p>When a key is no longer needed, deletion removes it from Firestore and from the server's active key
+              cache. Once deleted, the key cannot be restored and any requests using it will receive a 401 immediately.
+              This is the correct action when a key has been exposed in a public repository, log file, or client-side
+              bundle, or when you are decommissioning an integration. For temporary downtime, prefer pausing the key
+              instead so you can resume it later without generating a new value.</p>
+            <div class="path">/api/keys/:keyId</div>
+            <p style="margin-top:10px; font-size:0.85rem; color:var(--text-secondary);">Requires Firebase
+              <code>Authorization</code> header. This action cannot be undone.
+            </p>
+          </div>
+
+          <div class="endpoint-card">
+            <header>
+              <span class="method-badge">GET</span>
+              <h3>Health</h3>
+            </header>
+            <p>The health endpoint is a lightweight readiness probe for automation and monitoring. It does not require
+              authentication, making it safe to call from load balancers, CI pipelines, or uptime monitors without
+              distributing secrets. When the server is operational, it returns a simple JSON object with status
+              <code>ok</code>. If the server is starting up, shutting down, or experiencing a fatal error, the endpoint
+              will be unreachable or return a non-200 status. You can use this endpoint before issuing heavy batch
+              requests to confirm the local daemon is ready to accept traffic.
+            </p>
+            <div class="path">/api/health</div>
+            <p style="margin-top:10px; font-size:0.85rem; color:var(--text-secondary);">No authentication required.
+              Returns <code>{ "status": "ok" }</code> when the server is healthy.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <div class="modal-overlay" id="authModal">
+    <div class="glass-card modal-card">
+      <button class="modal-close" onclick="closeAuthModal()">&times;</button>
+      <h2 class="card-title">Developer Account</h2>
+      <p class="card-desc">Sign in to manage your API keys, or create a new account to get started.</p>
+
+      <div style="display:flex; gap:0; border-bottom:1px solid var(--border-color); margin-bottom:20px;">
+        <button id="tabSignIn" onclick="setAuthTab('signin')"
+          style="flex:1; padding:12px; background:transparent; border:none; border-bottom:3px solid var(--accent-color); color:var(--text-primary); font-weight:700; font-size:0.95rem; cursor:pointer; transition:all 0.2s;">Sign
+          In</button>
+        <button id="tabSignUp" onclick="setAuthTab('signup')"
+          style="flex:1; padding:12px; background:transparent; border:none; border-bottom:3px solid transparent; color:var(--text-secondary); font-weight:700; font-size:0.95rem; cursor:pointer; transition:all 0.2s;">Sign
+          Up</button>
+      </div>
+
+      <button class="auth-btn google" onclick="loginWithProvider('Google')">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path
+            d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+            fill="#4285F4" />
+          <path
+            d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+            fill="#34A853" />
+          <path
+            d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+            fill="#FBBC05" />
+          <path
+            d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+            fill="#EA4335" />
+        </svg>
+        Continue with Google
+      </button>
+
+      <button class="auth-btn github" onclick="loginWithProvider('GitHub')">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+          <path fill-rule="evenodd" clip-rule="evenodd"
+            d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.336-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0112 6.836c.85.004 1.705.114 2.504.336 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.161 22 16.418 22 12c0-5.523-4.477-10-10-10z" />
+        </svg>
+        Continue with GitHub
+      </button>
+
+      <div class="divider"><span>or</span></div>
+
+      <div id="emailAuthForm" style="margin-top: 16px;">
+        <input type="email" id="emailInput" placeholder="Email address" required
+          style="width:100%; padding:10px 14px; border:1px solid var(--border-color); border-radius:8px; font-size:0.9rem; background:var(--surface-bg); color:var(--text-primary); margin-bottom:8px; outline:none;" />
+        <input type="password" id="passwordInput" placeholder="Password" required
+          style="width:100%; padding:10px 14px; border:1px solid var(--border-color); border-radius:8px; font-size:0.9rem; background:var(--surface-bg); color:var(--text-primary); margin-bottom:8px; outline:none;" />
+        <input type="password" id="confirmPasswordInput" placeholder="Confirm password" required
+          style="width:100%; padding:10px 14px; border:1px solid var(--border-color); border-radius:8px; font-size:0.9rem; background:var(--surface-bg); color:var(--text-primary); margin-bottom:12px; outline:none; display:none;" />
+        <button class="auth-btn email" id="emailSubmitBtn" onclick="handleEmailAuth()">Sign In</button>
+        <div style="text-align:center; margin-top:8px;">
+          <button type="button" id="emailModeToggle" onclick="toggleEmailMode()"
+            style="background:transparent; color:var(--accent-color); font-weight:600; font-size:0.85rem; padding:4px 8px; border:none; cursor:pointer;">Don't
+            have an account? Sign Up</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // System State
+    let currentUserKey = localStorage.getItem('elegal_api_key') || 'YOUR_API_KEY';
+    let currentEndpointId = 'search';
+    let currentLang = 'curl';
+    let isLoggedIn = false;
+    let isKeyVisible = false;
+    let firebaseAuth = null;
+    let firebaseDb = null;
+    let authTab = 'signin';
+
+    // Firebase Config
+    const firebaseConfig = {
+      apiKey: "AIzaSyD1YHV18FAJjWLbB3_00HwdD5SLF_O7UbQ",
+      authDomain: "elegal-v1.firebaseapp.com",
+      projectId: "elegal-v1",
+      storageBucket: "elegal-v1.firebasestorage.app",
+      messagingSenderId: "708770097911",
+      appId: "1:708770097911:web:990de5eb5ab0f51f68c1f2",
+      measurementId: "G-RZGXPM7DQ0"
+    };
+
+    async function initFirebase() {
+      console.log('[initFirebase] Starting initialization...');
+
+      let firebaseAppModule, firebaseAuthModule, firebaseFirestoreModule;
+      let getAuth, signInWithRedirect, signInWithPopup, GoogleAuthProvider, GithubAuthProvider, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, getRedirectResult;
+
+      try {
+        console.log('[initFirebase] Importing firebase-app.js...');
+        firebaseAppModule = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
+        console.log('[initFirebase] firebase-app.js imported successfully.');
+      } catch (e) {
+        console.error('[initFirebase] Failed to import firebase-app.js:', e);
+        showToast('Firebase app module failed to load. Check console and network.');
+        throw e; // Re-throw to stop initialization
+      }
+
+      try {
+        console.log('[initFirebase] Importing firebase-auth.js...');
+        firebaseAuthModule = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
+        console.log('[initFirebase] firebase-auth.js imported successfully.');
+
+        // Destructuring and immediate logging of Firebase Auth exports
+        ({ getAuth, signInWithRedirect, signInWithPopup, GoogleAuthProvider, GithubAuthProvider, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, getRedirectResult } = firebaseAuthModule);
+
+        console.log('[initFirebase] Destructured from firebase-auth.js:');
+        console.log('[initFirebase] GoogleAuthProvider imported:', typeof GoogleAuthProvider !== 'undefined');
+        console.log('[initFirebase] GithubAuthProvider imported:', typeof GithubAuthProvider !== 'undefined'); // Log if it's imported
+        console.log('[initFirebase] Imported GithubAuthProvider value:', GithubAuthProvider); // Log the actual destructured value
+
+        // Assign to window immediately after destructuring
+        window._fbSignInWithRedirect = signInWithRedirect;
+        window._fbSignInWithPopup = signInWithPopup;
+        window._fbGoogleAuthProvider = GoogleAuthProvider;
+        window._fbGithubAuthProvider = GithubAuthProvider;
+        window._fbSignInWithEmail = signInWithEmailAndPassword;
+        window._fbCreateUserWithEmail = createUserWithEmailAndPassword;
+        window._fbSignOut = signOut;
+        window._fbOnAuthStateChanged = onAuthStateChanged;
+        window._fbGetRedirectResult = getRedirectResult;
+
+        console.log('[initFirebase] Firebase Auth providers assigned to window:');
+        console.log('[initFirebase] _fbGoogleAuthProvider:', window._fbGoogleAuthProvider);
+        console.log('[initFirebase] _fbGithubAuthProvider:', window._fbGithubAuthProvider); // Log this value directly from window
+
+      } catch (e) {
+        console.error('[initFirebase] Failed to import firebase-auth.js:', e);
+        showToast('Firebase auth module failed to load. Check console and network.');
+        throw e; // Re-throw to stop initialization
+      }
+
+      try {
+        console.log('[initFirebase] Importing firebase-firestore.js...');
+        firebaseFirestoreModule = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+        console.log('[initFirebase] firebase-firestore.js imported successfully.');
+
+        const { getFirestore } = firebaseFirestoreModule;
+        // Ensure initializeApp is called only once and correctly used for all services
+        const app = firebaseAppModule.initializeApp(firebaseConfig); // Use the imported module to initialize
+        firebaseAuth = getAuth(app);
+        firebaseDb = getFirestore(app);
+        window._fbApp = app; // Assign the app instance
+
+      } catch (e) {
+        console.error('[initFirebase] Failed to import firebase-firestore.js:', e);
+        showToast('Firebase firestore module failed to load. Check console and network.');
+        throw e; // Re-throw to stop initialization
+      }
+
+      console.log('[initFirebase] Firebase initialization complete.');
+      return { firebaseAuth, firebaseDb };
+    }
+
+    // Endpoints Schema definition
+    const apiEndpoints = {
+      search: {
+        id: 'search',
+        name: 'Retrieve search results',
+        method: 'GET',
+        path: '/api/search',
+        auth: 'API key required',
+        desc: 'Performs a robust full-text search across local statutes and remote Kenya Law records. Uses localized TF-IDF scoring for offline files and scrapes the remote directory for live eLegal matches. Returns an array of standardized document objects sorted by relevance.',
+        params: [
+          { name: 'q', type: 'string', required: true, desc: 'Search query (e.g. "land act")', default: 'constitution' }
+        ]
+      },
+      resolve: {
+        id: 'resolve',
+        name: 'Resolve official record',
+        method: 'GET',
+        path: '/api/resolve',
+        auth: 'API key required',
+        desc: 'Bypasses the standard eLegal web interface to directly locate and extract the underlying PDF document URL from a Kenya Law case record. Automatically triggers a local caching mechanism.',
+        params: [
+          { name: 'url', type: 'string', required: true, desc: 'URL to resolve (must be kenyalaw.org)', default: 'http://kenyalaw.org/caselaw/' },
+          { name: 'title', type: 'string', required: false, desc: 'Optional file title override', default: '' }
+        ]
+      },
+      library: {
+        id: 'library',
+        name: 'List local library',
+        method: 'GET',
+        path: '/api/library',
+        auth: 'API key required',
+        desc: 'Retrieves the complete index of locally available offline documents. Files are categorized neatly into "precedents" and "statutes" along with metadata like file size and last modified date.',
+        params: []
+      },
+      health: {
+        id: 'health',
+        name: 'Check system health',
+        method: 'GET',
+        path: '/api/health',
+        auth: 'Public',
+        desc: 'Returns the operational status of the local server. Useful for readiness probes or ensuring the local daemon is running before issuing heavy queries.',
+        params: []
+      }
+    };
+
+    // DOM Elements
+    const toast = document.getElementById('toast');
+    const requestCodeBox = document.getElementById('requestCodeBox');
+    const responseCodeBox = document.getElementById('responseCodeBox');
+
+    // Auth Elements
+    const authModal = document.getElementById('authModal');
+    const profileHeader = document.getElementById('profileHeader');
+    const keyDisplay = document.getElementById('keyDisplay');
+    const keyValueMasked = document.getElementById('keyValueMasked');
+    const keyValuePlain = document.getElementById('keyValuePlain');
+    const topLoginBtn = document.getElementById('topLoginBtn');
+    const keyListEl = document.getElementById('keyList');
+
+    // Modal Functions
+    function openAuthModal() { authModal.classList.add('show'); }
+    function closeAuthModal() { authModal.classList.remove('show'); }
+
+    // Toast Utility
+    function showToast(msg) {
+      toast.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2500);
+    }
+
+    // Initialize UI
+    function init() {
+      initFirebase().then(() => {
+        setupTopNavAuth();
+        setupUIListeners();
+        loadEndpointData('search');
+        setupAuthStateListener();
+        console.log('[init] App initialized.');
+      }).catch(error => {
+        console.error('[init] App initialization failed:', error);
+        showToast('App failed to initialize. Check console.');
+      });
+    }
+
+    function setupAuthStateListener() {
+      console.log('[auth] Setting up onAuthStateChanged listener...');
+      window._fbOnAuthStateChanged(firebaseAuth, (user) => {
+        console.log('[auth] onAuthStateChanged detected state change. Current user:', user ? user.email : null);
+        updateAuthUI(user);
+      });
+
+      setTimeout(() => {
+        const currentUser = firebaseAuth.currentUser;
+        console.log('[auth] Checking currentUser fallback:', currentUser ? currentUser.email : 'null');
+        if (currentUser) {
+          console.log('[auth] Initializing with currentUser from fallback:', currentUser.email);
+          updateAuthUI(currentUser);
+        } else {
+          console.log('[auth] No currentUser found on initial load.');
+        }
+      }, 250);
+    }
+
+    function updateAuthUI(user) {
+      if (user) {
+        isLoggedIn = true;
+        profileHeader.style.display = 'flex';
+        document.getElementById('userAvatar').textContent = (user.email || 'U')[0].toUpperCase();
+        document.getElementById('userName').textContent = user.displayName || user.email || 'Developer';
+        document.getElementById('userEmail').textContent = user.email || '';
+        topLoginBtn.textContent = 'SIGN OUT';
+        closeAuthModal();
+        fetchApiKeys(user);
+      } else {
+        isLoggedIn = false;
+        currentUserKey = 'YOUR_API_KEY';
+        profileHeader.style.display = 'none';
+        keyDisplay.style.display = 'none';
+        topLoginBtn.textContent = 'LOGIN / SIGNUP';
+        updateRequestCode();
+      }
+    }
+
+    function setupTopNavAuth() {
+      topLoginBtn.addEventListener('click', () => {
+        if (!isLoggedIn) openAuthModal();
+        else doSignOut();
+      });
+    }
+
+    // Auth Provider Flow
+    async function loginWithProvider(provider) {
+      console.log(`[auth] Attempting to log in with provider: ${provider}`);
+      console.log(`[auth] Provider type: ${typeof provider}`); // Log type of provider
+      console.log(`[auth] Provider raw value: "${provider}"`); // Log raw value of provider for exact comparison
+
+      if (provider === 'Email') {
+        setAuthTab('signin');
+        const emailInput = document.getElementById('emailInput');
+        if (emailInput) emailInput.focus();
+        return;
+      }
+
+      let ProviderClass = null;
+      if (provider === 'Google') {
+        console.log('[auth] Provider matched: Google'); // Added log
+        ProviderClass = window._fbGoogleAuthProvider;
+        console.log('[auth] window._fbGoogleAuthProvider value:', ProviderClass);
+      } else if (provider === 'GitHub') {
+        // Log the provider value right before the assignment attempt
+        console.log(`[auth] Provider matched: GitHub. Provider value for check: "${provider}"`);
+        ProviderClass = window._fbGithubAuthProvider;
+        console.log('[auth] window._fbGithubAuthProvider value:', ProviderClass); // Log to see if this is undefined/null
+      } else {
+        // This block is reached if provider is NOT 'Email', 'Google', or 'GitHub'.
+        console.error(`[auth] Unknown authentication provider: ${provider}`); // This log is what we saw before
+        showToast(`Unsupported provider: ${provider}`);
+        return;
+      }
+
+      // This check is crucial. If ProviderClass is still null after the if/else if,
+      // it means the provider was recognized (e.g., 'GitHub') but the actual Firebase Auth object
+      // (e.g., GithubAuthProvider) was not available or not properly loaded.
+      if (!ProviderClass) {
+        console.error(`[auth] Authentication provider object is not loaded for: ${provider}`);
+        // Specifically log info for Github if it's the problematic provider
+        if (provider === 'GitHub') {
+          console.error(`[auth] window._fbGithubAuthProvider value:`, window._fbGithubAuthProvider);
+        }
+        showToast(`Authentication provider '${provider}' is not available. Check console for details.`);
+        return;
+      }
+
+      showToast(`Signing in with ${provider}...`);
+      try {
+        const result = await window._fbSignInWithPopup(firebaseAuth, new ProviderClass());
+        const user = result && result.user;
+        if (user) {
+          console.log(`[auth] ${provider} sign-in success:`, user.email);
+          showToast(`Signed in with ${provider}`);
+          updateAuthUI(user);
+          closeAuthModal();
+        } else {
+          console.warn(`[auth] ${provider} sign-in returned no user object.`);
+          showToast(`${provider} sign-in did not return a user. Check console.`);
+        }
+      } catch (e) {
+        console.error(`[auth] Error during ${provider} sign-in:`, e.code, e.message);
+        console.error(`[auth] Full ${provider} sign-in error object for traceback:`, e);
+        showToast(`${provider} sign-in failed: ${e.message}`);
+        closeAuthModal();
+      }
+    }
+
+    function setupUIListeners() {
+      // Setup API Key Gen
+      document.getElementById('generateKeyBtn').addEventListener('click', () => {
+        if (!isLoggedIn) {
+          openAuthModal();
+        } else {
+          generateApiKey();
+        }
+      });
+      document.getElementById('copyKeyBtn').addEventListener('click', () => {
+        navigator.clipboard.writeText(currentUserKey !== 'YOUR_API_KEY' ? currentUserKey : '');
+        showToast('API Key copied securely');
+      });
+      document.getElementById('toggleVisibilityBtn').addEventListener('click', toggleKeyVisibility);
+
+      // Language toggle
+      document.querySelectorAll('#langToggle button').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('#langToggle button').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          currentLang = btn.dataset.lang;
+          updateRequestCode();
+        });
+      });
+
+      // Endpoint pills
+      document.querySelectorAll('.ep-pill').forEach(pill => {
+        pill.addEventListener('click', () => {
+          document.querySelectorAll('.ep-pill').forEach(p => p.classList.remove('active'));
+          pill.classList.add('active');
+          loadEndpointData(pill.dataset.ep);
+        });
+      });
+
+      // Run / Copy
+      document.getElementById('runBtn').addEventListener('click', executeRequest);
+      document.getElementById('copyReqBtn').addEventListener('click', () => copyToClipboard('requestCodeBox'));
+    }
+
+    function setAuthTab(tab) {
+      authTab = tab;
+      const isSignUp = tab === 'signup';
+      const confirmInput = document.getElementById('confirmPasswordInput');
+      const submitBtn = document.getElementById('emailSubmitBtn');
+      const toggleBtn = document.getElementById('emailModeToggle');
+      const tabSignIn = document.getElementById('tabSignIn');
+      const tabSignUp = document.getElementById('tabSignUp');
+
+      if (isSignUp) {
+        confirmInput.style.display = 'block';
+        submitBtn.textContent = 'Create Account';
+        toggleBtn.textContent = 'Already have an account? Sign In';
+        tabSignIn.style.borderBottomColor = 'transparent';
+        tabSignIn.style.color = 'var(--text-secondary)';
+        tabSignUp.style.borderBottomColor = 'var(--accent-color)';
+        tabSignUp.style.color = 'var(--text-primary)';
+      } else {
+        confirmInput.style.display = 'none';
+        submitBtn.textContent = 'Sign In';
+        toggleBtn.textContent = 'Don\'t have an account? Sign Up';
+        tabSignIn.style.borderBottomColor = 'var(--accent-color)';
+        tabSignIn.style.color = 'var(--text-primary)';
+        tabSignUp.style.borderBottomColor = 'transparent';
+        tabSignUp.style.color = 'var(--text-secondary)';
+      }
+
+      const emailInput = document.getElementById('emailInput');
+      const passwordInput = document.getElementById('passwordInput');
+      const confirmPasswordInput = document.getElementById('confirmPasswordInput');
+
+      if (emailInput) emailInput.value = '';
+      if (passwordInput) passwordInput.value = '';
+      if (confirmPasswordInput) confirmPasswordInput.value = '';
+    }
+
+    function toggleEmailMode() {
+      setAuthTab(authTab === 'signin' ? 'signup' : 'signin');
+    }
+
+    async function handleEmailAuth() {
+      const emailInput = document.getElementById('emailInput');
+      const passwordInput = document.getElementById('passwordInput');
+      const confirmPasswordInput = document.getElementById('confirmPasswordInput');
+
+      const email = emailInput ? emailInput.value.trim() : '';
+      const password = passwordInput ? passwordInput.value : '';
+      const confirmPassword = confirmPasswordInput ? confirmPasswordInput.value : '';
+
+      if (!email || !password) {
+        showToast('Please fill in email and password');
+        return;
+      }
+
+      if (authTab === 'signup') {
+        if (password !== confirmPassword) {
+          showToast('Passwords do not match');
+          return;
+        }
+        if (password.length < 6) {
+          showToast('Password should be at least 6 characters');
+          return;
+        }
+        showToast('Creating account...');
+        try {
+          const result = await window._fbCreateUserWithEmail(firebaseAuth, email, password);
+          const user = result && result.user;
+          if (user) {
+            updateAuthUI(user);
+            closeAuthModal();
+            showToast('Account created successfully');
+          } else {
+            showToast('Account created, but user data unavailable');
+            toggleEmailMode();
+          }
+        } catch (e) {
+          console.error('[auth] email sign-up error:', e.code, e.message);
+          if (e.code === 'auth/email-already-in-use') {
+            showToast('Email is already registered. Please sign in instead.');
+            toggleEmailMode();
+          } else if (e.code === 'auth/invalid-email') {
+            showToast('Invalid email address');
+          } else if (e.code === 'auth/operation-not-allowed') {
+            showToast('Email/password sign-up is not enabled');
+          } else {
+            showToast('Sign-up failed: ' + e.message);
+          }
+        }
+      } else {
+        showToast('Signing in...');
+        try {
+          const result = await window._fbSignInWithEmail(firebaseAuth, email, password);
+          const user = result && result.user;
+          if (user) {
+            updateAuthUI(user);
+            closeAuthModal();
+            showToast('Signed in successfully');
+          } else {
+            showToast('Sign-in failed: could not retrieve user');
+          }
+        } catch (e) {
+          console.error('[auth] email sign-in error:', e.code, e.message);
+          if (e.code === 'auth/user-not-found' || e.code === 'auth/wrong-password') {
+            showToast('Invalid email or password');
+          } else if (e.code === 'auth/operation-not-allowed') {
+            showToast('Email/password sign-in is not enabled');
+          } else if (e.code === 'auth/invalid-email') {
+            showToast('Invalid email address');
+          } else if (e.code === 'auth/too-many-requests') {
+            showToast('Too many attempts. Try again later.');
+          } else {
+            showToast('Sign-in failed: ' + e.message);
+          }
+        }
+      }
+    }
+
+    async function doSignOut() {
+      try {
+        await window._fbSignOut(firebaseAuth);
+        currentUserKey = 'YOUR_API_KEY';
+        localStorage.removeItem('elegal_api_key');
+        keyDisplay.style.display = 'none';
+        profileHeader.style.display = 'none';
+        topLoginBtn.textContent = 'LOGIN';
+        updateRequestCode();
+        showToast('Signed out');
+      } catch (e) {
+        showToast('Sign-out failed: ' + e.message);
+      }
+    }
+
+    async function fetchApiKeys(user) {
+      if (!user) return;
+      try {
+        const token = await user.getIdToken();
+        const res = await fetch('/api/keys', {
+          headers: { 'Authorization': token }
+        });
+        if (!res.ok) return;
+        const keys = await res.json();
+        keyListEl.innerHTML = '';
+        if (keys && keys.length) {
+          keys.forEach(k => {
+            const row = document.createElement('div');
+            row.className = 'key-row';
+            const statusClass = k.isActive ? 'active' : 'inactive';
+            const statusText = k.isActive ? 'Active' : 'Inactive';
+            row.innerHTML = `
+              <div class="key-meta">
+                <div class="key-id">${k.key.slice(0, 8)}...${k.key.slice(-4)}</div>
+                <div class="key-details">
+                  <span>${k.label}</span>
+                  <span>Created: ${new Date(k.createdAt).toLocaleDateString()}</span>
+                  <span>Requests: ${k.requestCount || 0}</span>
+                  <span>Last used: ${k.lastUsed ? new Date(k.lastUsed).toLocaleString() : 'Never'}</span>
+                </div>
+              </div>
+              <div class="key-actions-row">
+                <span class="chip ${statusClass}">${statusText}</span>
+                <button class="ghost-btn" onclick="toggleKeyStatus('${k.key}', ${!k.isActive})">${k.isActive ? 'Pause' : 'Resume'}</button>
+                <button class="ghost-btn danger" onclick="deleteKey('${k.key}')">Delete</button>
+              </div>
+            `;
+            keyListEl.appendChild(row);
+          });
+          const latestKey = keys[keys.length - 1];
+          if (latestKey.isActive) {
+            currentUserKey = latestKey.key;
+            localStorage.setItem('elegal_api_key', currentUserKey);
+            keyValuePlain.textContent = currentUserKey;
+            keyDisplay.style.display = 'flex';
+            isKeyVisible = false;
+            renderKeyVisibility();
+            updateRequestCode();
+          }
+        } else {
+          currentUserKey = 'YOUR_API_KEY';
+          localStorage.removeItem('elegal_api_key');
+          keyDisplay.style.display = 'none';
+          updateRequestCode();
+        }
+      } catch (e) {
+        console.error('[api] fetch keys failed:', e);
+      }
+    }
+
+    async function toggleKeyStatus(keyId, isActive) {
+      if (!firebaseAuth || !firebaseAuth.currentUser) return;
+      try {
+        const token = await firebaseAuth.currentUser.getIdToken();
+        const res = await fetch(`/api/keys/${keyId}`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': token
+          },
+          body: JSON.stringify({ isActive })
+        });
+        if (!res.ok) throw new Error('Failed to update key');
+        const data = await res.json();
+        showToast(isActive ? 'Key resumed' : 'Key paused');
+        fetchApiKeys(firebaseAuth.currentUser);
+      } catch (e) {
+        showToast('Update failed: ' + e.message);
+      }
+    }
+
+    async function deleteKey(keyId) {
+      if (!firebaseAuth || !firebaseAuth.currentUser) return;
+      if (!confirm('Delete this API key? This cannot be undone.')) return;
+      try {
+        const token = await firebaseAuth.currentUser.getIdToken();
+        const res = await fetch(`/api/keys/${keyId}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': token }
+        });
+        if (!res.ok) throw new Error('Failed to delete key');
+        showToast('Key deleted');
+        if (currentUserKey === keyId) {
+          currentUserKey = 'YOUR_API_KEY';
+          localStorage.removeItem('elegal_api_key');
+          keyDisplay.style.display = 'none';
+          updateRequestCode();
+        }
+        fetchApiKeys(firebaseAuth.currentUser);
+      } catch (e) {
+        showToast('Delete failed: ' + e.message);
+      }
+    }
+
+    // API Key Management via Firebase + Server
+    async function generateApiKey() {
+      if (!firebaseAuth || !firebaseAuth.currentUser) {
+        showToast('Please sign in first');
+        openAuthModal();
+        return;
+      }
+      const btn = document.getElementById('generateKeyBtn');
+      btn.textContent = 'Generating...';
+      btn.disabled = true;
+      try {
+        const token = await firebaseAuth.currentUser.getIdToken(true);
+        const res = await fetch('/api/keys', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': token
+          },
+          body: JSON.stringify({ label: 'default' })
+        });
+        if (!res.ok) {
+          const err = await res.json();
+          console.error('[api] generate key failed:', res.status, err);
+          throw new Error(err.error || 'Failed to generate key');
+        }
+        const data = await res.json();
+        currentUserKey = data.key;
+        localStorage.setItem('elegal_api_key', currentUserKey);
+        keyValuePlain.textContent = currentUserKey;
+        keyDisplay.style.display = 'flex';
+        btn.innerHTML = 'Generate New Key';
+        isKeyVisible = false;
+        renderKeyVisibility();
+        showToast('API Key Generated');
+        updateRequestCode();
+      } catch (err) {
+        showToast('Failed: ' + err.message);
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    function toggleKeyVisibility() {
+      isKeyVisible = !isKeyVisible;
+      renderKeyVisibility();
+    }
+
+    function renderKeyVisibility() {
+      const eyeIcon = document.getElementById('eyeIcon');
+      const eyeOffIcon = document.getElementById('eyeOffIcon');
+
+      if (isKeyVisible) {
+        keyValueMasked.style.display = 'none';
+        keyValuePlain.style.display = 'inline';
+        eyeIcon.style.display = 'none';
+        eyeOffIcon.style.display = 'inline';
+      } else {
+        keyValueMasked.style.display = 'inline';
+        keyValuePlain.style.display = 'none';
+        eyeIcon.style.display = 'inline';
+        eyeOffIcon.style.display = 'none';
+      }
+    }
+
+    // Load Endpoint into UI
+    function loadEndpointData(id) {
+      currentEndpointId = id;
+      const ep = apiEndpoints[id];
+
+      document.getElementById('epMethod').textContent = ep.method;
+      document.getElementById('epMethod').className = `method-badge ${ep.method === 'POST' ? 'post' : ''}`;
+      document.getElementById('epPath').textContent = ep.path;
+
+      renderParams(ep.params);
+      updateRequestCode();
+
+      document.getElementById('responseStatus').style.display = 'none';
+      responseCodeBox.innerHTML = '<span class="token comment">// Ready to execute request...</span>';
+    }
+
+    // Render Parameters inside explorer
+    function renderParams(params) {
+      const container = document.getElementById('paramsContainer');
+      if (!container) return;
+      container.innerHTML = '<span style="color:#A1A1A6; font-size:0.75rem; font-weight:600; white-space:nowrap;">PARAMS</span>';
+      if (params.length === 0) return;
+
+      params.forEach(param => {
+        const wrap = document.createElement('div');
+        wrap.style.cssText = 'display:inline-flex; align-items:center; gap:4px;';
+        wrap.innerHTML = `
+          <span style="font-size:0.7rem; font-weight:700; color:#A1A1A6; font-family:var(--font-code); white-space:nowrap;">${param.name} ${param.required ? ' *' : ''}</span>
+          <input type="text" class="param-input" data-name="${param.name}" placeholder="${param.desc}" value="${param.default}" style="background:#1C1C1E; border:1px solid #38383A; color:#F5F5F7; border-radius:0px; padding:4px 8px; font-size:0.75rem; outline:none; height:24px; min-width:120px;">
+        `;
+        container.appendChild(wrap);
+      });
+
+      document.querySelectorAll('.param-input').forEach(input => {
+        input.addEventListener('input', updateRequestCode);
+      });
+    }
+
+    // Build URL Logic
+    function buildUrl() {
+      const ep = apiEndpoints[currentEndpointId];
+      let url = 'http://localhost:3000' + ep.path;
+
+      const inputs = document.querySelectorAll('.param-input');
+      if (inputs.length > 0 && ep.method === 'GET') {
+        const params = new URLSearchParams();
+        inputs.forEach(input => {
+          if (input.value.trim() !== '') params.append(input.dataset.name, input.value.trim());
+        });
+        const qs = params.toString();
+        if (qs) url += '?' + qs;
+      }
+      return url;
+    }
+
+    // Generate Request Snippets
+    function updateRequestCode() {
+      const ep = apiEndpoints[currentEndpointId];
+      const url = buildUrl();
+      const methodStr = ep.method;
+      let codeHtml = '';
+
+      if (currentLang === 'curl') {
+        codeHtml = `<span class="token comment"># Fetch data using cURL</span>
+<span class="token method">curl</span> -X ${methodStr} \\
+  <span class="token string">"${url}"</span> \\
+  -H <span class="token string">"Accept: application/json"</span> \\
+  -H <span class="token string">"X-API-Key: ${currentUserKey}"</span>`;
+      }
+      else if (currentLang === 'js') {
+        codeHtml = `<span class="token comment">// Using modern Fetch API in Node.js or Browser</span>
+<span class="token keyword">async function</span> <span class="token method">fetchData</span>() {
+  <span class="token keyword">try</span> {
+    <span class="token keyword">const</span> res = <span class="token keyword">await</span> <span class="token method">fetch</span>(<span class="token string">'${url}'</span>, {
+      method: <span class="token string">'${methodStr}'</span>,
+      headers: {
+        <span class="token property">'Accept'</span>: <span class="token string">'application/json'</span>,
+        <span class="token property">'X-API-Key'</span>: <span class="token string">'${currentUserKey}'</span>
+      }
+    });
+
+    <span class="token keyword">if</span> (!res.ok) <span class="token keyword">throw new</span> <span class="token method">Error</span>(<span class="token string">\`HTTP error: \${res.status}\`</span>);
+
+    <span class="token keyword">const</span> data = <span class="token keyword">await</span> res.<span class="token method">json</span>();
+    console.<span class="token method">log</span>(<span class="token string">"Success:"</span>, data);
+  } <span class="token keyword">catch</span> (err) {
+    console.<span class="token method">error</span>(<span class="token string">"Request failed:"</span>, err);
+  }
+}
+
+<span class="token method">fetchData</span>();`;
+      }
+      else if (currentLang === 'python') {
+        codeHtml = `<span class="token comment"># Ensure you have requests installed: pip install requests</span>
+<span class="token keyword">import</span> requests
+<span class="token keyword">import</span> json
+
+url = <span class="token string">"${url}"</span>
+headers = {
+    <span class="token string">"Accept"</span>: <span class="token string">"application/json"</span>,
+    <span class="token string">"X-API-Key"</span>: <span class="token string">"${currentUserKey}"</span>
+}
+
+<span class="token keyword">try</span>:
+    response = requests.<span class="token method">${methodStr.toLowerCase()}</span>(url, headers=headers)
+    response.raise_for_status() <span class="token comment"># Check for HTTP errors</span>
+    
+    data = response.json()
+    <span class="token keyword">print</span>(json.dumps(data, indent=<span class="token string">2</span>))
+<span class="token keyword">except</span> requests.exceptions.RequestException <span class="token keyword">as</span> e:
+    <span class="token keyword">print</span>(<span class="token string">f"Error fetching data: {e}"</span>)`;
+      }
+
+      requestCodeBox.innerHTML = codeHtml;
+    }
+
+    // Execute Mock Request
+    async function executeRequest() {
+      const btn = document.getElementById('runBtn');
+      const url = buildUrl();
+      const ep = apiEndpoints[currentEndpointId];
+      const statusEl = document.getElementById('responseStatus');
+
+      btn.textContent = 'Running...';
+      responseCodeBox.innerHTML = '<span class="token comment">// Fetching from server...</span>';
+      statusEl.style.display = 'none';
+
+      try {
+        const relativeUrl = url.replace('http://localhost:3000', '');
+        const headers = { 'Content-Type': 'application/json' };
+        if (currentUserKey && currentUserKey !== 'YOUR_API_KEY') {
+          headers['X-API-Key'] = currentUserKey;
+        }
+        const response = await fetch(relativeUrl, { method: ep.method, headers });
+
+        if (!response.ok && response.status === 404) throw new Error("Endpoint not found. Ensure server is running.");
+
+        const data = await response.json();
+        statusEl.textContent = `${response.status} OK`;
+        statusEl.style.color = '#34C759'; // Apple Green
+        statusEl.style.display = 'block';
+
+        responseCodeBox.innerHTML = syntaxHighlightJson(JSON.stringify(data, null, 2));
+
+      } catch (err) {
+        statusEl.textContent = 'ERROR';
+        statusEl.style.color = '#FF3B30'; // Apple Red
+        statusEl.style.display = 'block';
+
+        if (err.message && err.message.includes('401')) {
+          responseCodeBox.innerHTML = syntaxHighlightJson(JSON.stringify({ error: 'Unauthorized', message: 'Missing or invalid API key. Generate a key in the API Keys section above.', providedKey: currentUserKey === 'YOUR_API_KEY' ? 'NONE' : 'PRESENT' }, null, 2));
+        } else if (err.message && err.message.includes('404')) {
+          responseCodeBox.innerHTML = syntaxHighlightJson(JSON.stringify({ error: 'Not Found', message: 'Endpoint not found. Ensure server is running.' }, null, 2));
+        } else {
+          responseCodeBox.innerHTML = syntaxHighlightJson(JSON.stringify({ status: "simulated_success", message: "Could not reach local server. This is a simulated response.", endpoint: ep.path, providedKey: currentUserKey === 'YOUR_API_KEY' ? 'NONE_PROVIDED' : 'VALID' }, null, 2));
+        }
+      } finally {
+        btn.textContent = 'Run Request';
+      }
+    }
+
+    // Syntax Highlighter
+    function syntaxHighlightJson(json) {
+      json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
+        let cls = 'token string';
+        if (/^"/.test(match)) {
+          if (/:$/.test(match)) cls = 'token property';
+        } else if (/true|false|null/.test(match)) {
+          cls = 'token keyword';
+        } else {
+          cls = 'token method';
+        }
+        return '<span class="' + cls + '">' + match + '</span>';
+      });
+    }
+
+    // Clipboard Copy for standard text
+    function copyToClipboard(elementId) {
+      const text = document.getElementById(elementId).innerText;
+      navigator.clipboard.writeText(text).then(() => showToast('Copied to clipboard'));
+    }
+
+    // Boot
+    init();
+  </script>
+</body>
+
+</html>

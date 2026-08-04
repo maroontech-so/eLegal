@@ -1,7 +1,9 @@
 services:
   - type: web
-    name: e-legal
-    runtime: docker
+    name: elegal-app
+    env: docker
+    dockerfilePath: Dockerfile
+    dockerContext: .
     plan: free
     envVars:
       - key: NODE_ENV

@@ -1,0 +1,2179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'self'; img-src 'self' data: https:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://unpkg.com">
+    <title>eLegal | Premium Research</title>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="apple-touch-icon" href="/logo.png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        :root {
+            --app-bg: #F5F5F7;
+            --surface-bg: #FFFFFF;
+            --text-primary: #1D1D1F;
+            --text-secondary: #86868B;
+            --text-tertiary: #A1A1A6;
+            --accent-blue: #0066CC;
+            --accent-blue-hover: #0077ED;
+            --border-color: rgba(0, 0, 0, 0.08);
+            --glass-bg: rgba(245, 245, 247, 0.75);
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
+            --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.08);
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 20px;
+            --font-stack: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+         body {
+             min-height: 100vh;
+             background-color: var(--app-bg);
+             color: var(--text-primary);
+             font-family: var(--font-stack);
+             line-height: 1.5;
+             overflow-x: hidden;
+             padding-bottom: 32px;
+         }
+
+        button,
+        input {
+            font-family: inherit;
+            outline: none;
+        }
+
+        button {
+            border: 0;
+            cursor: pointer;
+            background: transparent;
+            transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        /* ─── HERO ─── */
+        .hero {
+            padding: 30px 24px 60px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            position: relative;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            background: linear-gradient(180deg, #F9F9FB 0%, var(--app-bg) 100%);
+            overflow: hidden;
+        }
+
+        .hero-noise {
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+            opacity: 0.25;
+            pointer-events: none;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
+
+        .hero-grid {
+            position: absolute;
+            inset: 0;
+            z-index: 2;
+            pointer-events: none;
+            background-image:
+                linear-gradient(to right, rgba(0, 0, 0, 0.06) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(0, 0, 0, 0.06) 1px, transparent 1px);
+            background-size: 48px 48px;
+            -webkit-mask-image: linear-gradient(to bottom, black 0%, transparent 90%);
+            mask-image: linear-gradient(to bottom, black 0%, transparent 90%);
+        }
+
+        .hero-bg-mesh {
+            position: absolute;
+            inset: 0;
+            overflow: hidden;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .hero-bg-mesh::before,
+        .hero-bg-mesh::after {
+            content: '';
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+        }
+
+        .hero-bg-mesh::before {
+            top: -20%;
+            left: -15%;
+            width: 70vw;
+            height: 70vw;
+            max-width: 900px;
+            max-height: 900px;
+            background: radial-gradient(circle, rgba(0, 102, 204, 0.08) 0%, transparent 65%);
+        }
+
+        .hero-bg-mesh::after {
+            bottom: -20%;
+            right: -10%;
+            width: 60vw;
+            height: 60vw;
+            max-width: 800px;
+            max-height: 800px;
+            background: radial-gradient(circle, rgba(138, 43, 226, 0.06) 0%, transparent 65%);
+        }
+
+        .hero>*:not(.hero-bg-mesh):not(.hero-grid):not(.hero-noise) {
+            z-index: 10;
+            position: relative;
+        }
+
+        .elegal-logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Fredoka', sans-serif;
+            font-size: 84px;
+            font-weight: 700;
+            color: #000000;
+            user-select: none;
+            margin-bottom: 24px;
+        }
+
+        .logo-e {
+            margin-right: 2px;
+            letter-spacing: -2px;
+            color: #000000;
+        }
+
+        .logo-l-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #000000;
+            color: #ffffff;
+            width: 124px;
+            height: 124px;
+            border-radius: 50%;
+            margin: 0 8px;
+            font-size: 96px;
+            padding-bottom: 8px;
+            padding-left: 4px;
+            box-sizing: border-box;
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .logo-egal {
+            letter-spacing: -3px;
+            margin-left: -2px;
+            color: #000000;
+        }
+
+        .hero-tagline {
+            color: var(--text-primary);
+            font-size: 1.75rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 12px;
+        }
+
+        .hero-description {
+            color: var(--text-secondary);
+            font-size: 1.15rem;
+            font-weight: 500;
+            line-height: 1.5;
+            max-width: 580px;
+            margin: 0 auto 40px;
+            letter-spacing: -0.01em;
+        }
+
+        .search-wrap {
+            width: 100%;
+            max-width: 720px;
+            position: relative;
+            margin: 0 auto;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 24px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--text-tertiary);
+            border-radius: 50%;
+        }
+
+        .search-icon::after {
+            content: '';
+            position: absolute;
+            width: 2px;
+            height: 8px;
+            background: var(--text-tertiary);
+            bottom: -6px;
+            right: -4px;
+            transform: rotate(-45deg);
+            border-radius: 2px;
+        }
+
+        #searchInput {
+            width: 100%;
+            height: 68px;
+            border: 1px solid var(--border-color);
+            border-radius: 99px;
+            background: var(--surface-bg);
+            color: var(--text-primary);
+            font-size: 1.15rem;
+            padding: 0 140px 0 64px;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        #searchInput::placeholder {
+            color: var(--text-tertiary);
+        }
+
+        #searchInput:focus {
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.15), var(--shadow-md);
+        }
+
+        #searchBtn {
+            position: absolute;
+            right: 10px;
+            top: 10px;
+            bottom: 10px;
+            border-radius: 99px;
+            padding: 0 28px;
+            background: var(--accent-blue);
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(0, 113, 227, 0.3);
+        }
+
+        #searchBtn:hover {
+            background: var(--accent-blue-hover);
+            transform: scale(1.02);
+        }
+
+        .status-line {
+            color: var(--text-tertiary);
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin-top: 16px;
+            text-align: center;
+        }
+
+        /* ─── BUTTONS ─── */
+        .primary-btn,
+        .secondary-btn,
+        .mini-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            border-radius: var(--radius-sm);
+            transition: all 0.2s ease;
+        }
+
+        .primary-btn {
+            height: 48px;
+            padding: 0 24px;
+            background: var(--accent-blue);
+            color: white;
+            border-radius: var(--radius-md);
+        }
+
+        .primary-btn:hover {
+            background: var(--accent-blue-hover);
+        }
+
+        .secondary-btn {
+            height: 40px;
+            padding: 0 16px;
+            background: rgba(0, 0, 0, 0.04);
+            color: var(--text-primary);
+            border-radius: var(--radius-md);
+            font-size: 0.9rem;
+        }
+
+        .secondary-btn:hover {
+            background: rgba(0, 0, 0, 0.08);
+        }
+
+        .mini-btn {
+            height: 36px;
+            padding: 0 16px;
+            font-size: 0.85rem;
+            background: var(--app-bg);
+            color: var(--text-primary);
+            border-radius: var(--radius-sm);
+        }
+
+        .mini-btn:hover {
+            background: #E5E5EA;
+        }
+
+        .mini-btn.primary {
+            background: var(--text-primary);
+            color: white;
+        }
+
+        .mini-btn.primary:hover {
+            background: #000;
+        }
+
+        .api-btn {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            z-index: 100;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 99px;
+            padding: 8px 16px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            box-shadow: var(--shadow-sm);
+            letter-spacing: 0.05em;
+        }
+
+        .api-btn:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-1px);
+        }
+
+        /* ─── REALTIME AUTOCOMPLETE DROPDOWN ─── */
+        .autocomplete-dropdown {
+            position: absolute;
+            top: calc(100% + 6px);
+            left: 0;
+            right: 0;
+            background: #ffffff;
+            border: 1px solid rgba(0, 0, 0, 0.16);
+            border-radius: 18px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.18);
+            z-index: 1000;
+            display: none;
+            max-height: 400px;
+            overflow-y: auto;
+            text-align: left;
+            padding: 4px 0;
+        }
+
+        .autocomplete-dropdown.active {
+            display: block;
+        }
+
+        .suggestion-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 16px;
+            cursor: pointer;
+            transition: background 0.12s ease;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+            font-size: 0.82rem;
+            color: #1e293b;
+            gap: 12px;
+        }
+
+        .suggestion-item:last-child {
+            border-bottom: none;
+        }
+
+        .suggestion-item:hover,
+        .suggestion-item.selected {
+            background: #f1f5f9;
+        }
+
+        .suggestion-title {
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            flex: 1;
+        }
+
+        .suggestion-title b {
+            font-weight: 700;
+            color: #000000;
+            background: #fef08a;
+            padding: 0 2px;
+            border-radius: 2px;
+        }
+
+        .suggestion-meta {
+            font-size: 0.72rem;
+            color: #64748b;
+            margin-left: 4px;
+            font-weight: 400;
+        }
+
+        .suggestion-badge {
+            font-size: 0.62rem;
+            font-weight: 700;
+            padding: 2px 7px;
+            border-radius: 99px;
+            background: #e2e8f0;
+            color: #475569;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            flex-shrink: 0;
+        }
+
+        .suggestion-badge.statute {
+            background: #dcfce7;
+            color: #15803d;
+        }
+
+        .suggestion-badge.precedent {
+            background: #f3e8ff;
+            color: #7e22ce;
+        }
+
+        /* ─── CONTENT ─── */
+        .content-area {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        .filters-wrapper {
+            display: flex;
+            justify-content: center;
+            margin: 0 auto 32px;
+        }
+
+        .filters {
+            display: inline-flex;
+            background: var(--surface-bg);
+            padding: 6px;
+            border-radius: 99px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+            gap: 4px;
+        }
+
+        .filter-chip {
+            background: transparent;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            font-weight: 600;
+            padding: 10px 20px;
+            border-radius: 99px;
+        }
+
+        .filter-chip:hover {
+            color: var(--text-primary);
+            background: rgba(0, 0, 0, 0.02);
+        }
+
+        .filter-chip.active {
+            background: var(--text-primary);
+            color: white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .workspace-header {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            margin-bottom: 24px;
+            padding: 0 8px;
+        }
+
+        .workspace-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            color: var(--text-primary);
+        }
+
+        .workspace-subtitle {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            margin-top: 4px;
+        }
+
+        .results {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        /* ─── LOADING ─── */
+        .loading {
+            display: none;
+            background: var(--surface-bg);
+            border-radius: var(--radius-lg);
+            padding: 32px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+            text-align: center;
+        }
+
+        .loading-inner {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .loading-mark {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            border: 3px solid rgba(0, 113, 227, 0.1);
+            border-top-color: var(--accent-blue);
+            animation: spin 1s cubic-bezier(0.6, 0.2, 0.4, 0.8) infinite;
+        }
+
+        .loading-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .loading-detail {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .loading-fact {
+            color: var(--accent-blue);
+            font-size: 0.9rem;
+            font-weight: 500;
+            background: rgba(0, 113, 227, 0.05);
+            padding: 8px 16px;
+            border-radius: 99px;
+            display: inline-block;
+        }
+
+        /* ─── SKELETON ─── */
+        .skeleton-card {
+            background: var(--surface-bg);
+            border-radius: var(--radius-lg);
+            padding: 20px 24px;
+            min-height: 120px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02), 0 1px 2px rgba(0,0,0,0.04);
+            border: 1px solid var(--border-color);
+            pointer-events: none;
+        }
+
+        .skeleton-block {
+            background: #F0F0F2;
+            border-radius: 6px;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 12px;
+        }
+
+        .skeleton-block::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.8), transparent);
+            animation: shimmer 1.5s infinite;
+        }
+
+        /* ─── EMPTY ─── */
+        .empty-state {
+            background: transparent;
+            padding: 64px 24px;
+            text-align: center;
+        }
+
+        .empty-state h3 {
+            font-size: 1.35rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .empty-state p {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        /* ─── PREVIEW MODAL ─── */
+        .preview-modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            z-index: 200;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s ease;
+            padding: 24px;
+        }
+
+        .preview-modal-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .preview-modal {
+            background: var(--surface-bg);
+            width: 100%;
+            max-width: 480px;
+            border-radius: var(--radius-xl);
+            padding: 40px;
+            box-shadow: 0 32px 80px rgba(0, 0, 0, 0.2);
+            transform: translateY(20px) scale(0.95);
+            transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+            position: relative;
+        }
+
+        .preview-modal-overlay.active .preview-modal {
+            transform: translateY(0) scale(1);
+        }
+
+        .modal-close-btn {
+            position: absolute;
+            top: 24px;
+            right: 24px;
+            width: 36px;
+            height: 36px;
+            border-radius: 18px;
+            background: var(--app-bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .modal-close-btn:hover {
+            background: #E5E5EA;
+            color: var(--text-primary);
+        }
+
+        .inspector-kicker {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 12px;
+        }
+
+        .inspector-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            line-height: 1.3;
+            letter-spacing: -0.02em;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+        }
+
+        .inspector-meta {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.5;
+            padding-bottom: 32px;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 32px;
+        }
+
+        .inspector-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .inspector-actions .primary-btn,
+        .inspector-actions .secondary-btn {
+            width: 100%;
+            height: 52px;
+            font-size: 1.05rem;
+        }
+
+        /* ─── KEYFRAMES ─── */
+        @keyframes spin {
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes shimmer {
+            100% {
+                transform: translateX(100%);
+            }
+        }
+
+        /* ─── CASE CARDS ─── */
+::selection {
+            background-color: #dbeafe;
+            color: #1e40af;
+        }
+
+        .case-card {
+            position: relative;
+            background: var(--surface-bg);
+            border-radius: 12px;
+            padding: 12px 16px;
+            border: 1px solid rgba(226, 232, 240, 0.6);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.01), 0 1px 1px rgba(0,0,0,0.03);
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            overflow: hidden;
+        }
+
+        @media (min-width: 640px) {
+            .case-card {
+                flex-direction: row;
+                padding: 14px 20px;
+                align-items: flex-start;
+            }
+        }
+
+        .case-card:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px -1px rgba(0, 0, 0, 0.04), 0 1px 3px -1px rgba(0, 0, 0, 0.02);
+            border-color: #e2e8f0;
+        }
+
+        .case-card::before {
+            content: '';
+            position: absolute;
+            left: -1px;
+            top: -1px;
+            bottom: -1px;
+            width: 3px;
+            background: linear-gradient(135deg, #2563eb, #4f46e5);
+            border-top-left-radius: 0.75rem;
+            border-bottom-left-radius: 0.75rem;
+            opacity: 0;
+            transition: opacity 0.25s ease;
+        }
+
+        .case-card:hover::before {
+            opacity: 1;
+        }
+
+        .case-card.active {
+            border-color: #2563eb;
+            box-shadow: 0 4px 16px rgba(37, 99, 235, 0.08);
+        }
+
+        .case-card.active::before {
+            opacity: 1;
+        }
+
+        .case-card-main {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .case-card-header {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-bottom: 2px;
+        }
+
+        @media (min-width: 640px) {
+            .case-card-header {
+                flex-direction: row;
+                align-items: flex-start;
+                justify-content: space-between;
+                gap: 12px;
+            }
+        }
+
+        .case-card-title {
+            color: #0f172a;
+            font-size: 0.95rem;
+            font-weight: 600;
+            line-height: 1.4;
+            letter-spacing: -0.01em;
+            transition: color 0.2s ease;
+            min-width: 0;
+            cursor: pointer;
+        }
+
+        .case-card-title:hover {
+            color: #1d4ed8;
+        }
+
+        .case-card:hover .case-card-title {
+            color: #1d4ed8;
+        }
+
+        .case-link {
+            color: #2563eb;
+            text-decoration: underline;
+            font-size: 0.7rem;
+            cursor: pointer;
+        }
+
+        .case-link:hover {
+            color: #1d4ed8;
+        }
+
+        .case-card-badges {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            flex-shrink: 0;
+            align-self: flex-start;
+        }
+
+        .case-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 1px 6px;
+            border-radius: 99px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+
+        .case-badge-court {
+            background: rgba(0,0,0,0.04);
+            color: #64748b;
+            border: 1px solid rgba(0,0,0,0.06);
+        }
+
+        .case-badge-type {
+            background: #f0fdf4;
+            color: #16a34a;
+            border: 1px solid rgba(34,197,94,0.15);
+        }
+
+        .case-badge-type.judgment {
+            background: #faf5ff;
+            color: #9333ea;
+            border-color: rgba(168,85,247,0.15);
+        }
+
+        .case-card-meta {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 6px;
+        }
+
+        .case-citation {
+            font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+            font-size: 0.7rem;
+            font-weight: 500;
+            color: #475569;
+            background: rgba(0,0,0,0.03);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        .case-card-meta-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.7rem;
+            color: #94a3b8;
+            font-weight: 500;
+        }
+
+        .case-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+        }
+
+        .case-meta-item svg {
+            width: 12px;
+            height: 12px;
+            stroke: #94a3b8;
+        }
+
+        .case-card-action {
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-end;
+            padding-left: 12px;
+            border-left: 1px solid rgba(0,0,0,0.04);
+            margin-left: 8px;
+        }
+
+        @media (min-width: 640px) {
+            .case-card-action {
+                display: flex;
+            }
+        }
+
+        .case-card-action-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #cbd5e1;
+            transition: all 0.2s ease;
+        }
+
+        .case-card:hover .case-card-action-icon {
+            background: #eff6ff;
+            color: #2563eb;
+        }
+
+        .case-card-action-icon svg {
+            width: 14px;
+            height: 14px;
+            transition: transform 0.2s ease;
+        }
+
+        .case-card:hover .case-card-action-icon svg {
+            transform: translateX(2px);
+        }
+
+        /* ─── SAVED DOCUMENTS STYLING ─── */
+        .save-card-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 2px 8px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            border-radius: 99px;
+            background: #f1f5f9;
+            color: #475569;
+            border: 1px solid #cbd5e1;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .save-card-btn:hover {
+            background: #e2e8f0;
+            color: #1e293b;
+        }
+
+        .save-card-btn.saved {
+            background: #eff6ff;
+            color: #2563eb;
+            border-color: #bfdbfe;
+        }
+
+        .save-modal-btn.saved {
+            background: #eff6ff;
+            color: #2563eb;
+            border: 1px solid #bfdbfe;
+        }
+
+        /* ─── CARD BOOKMARK STYLING ─── */
+        .card-bookmark-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #f1f5f9;
+            color: #64748b;
+            border: 1px solid #cbd5e1;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-left: 6px;
+            flex-shrink: 0;
+        }
+
+        .card-bookmark-btn:hover {
+            background: #e2e8f0;
+            color: #1e293b;
+            transform: scale(1.1);
+        }
+
+        .card-bookmark-btn.saved {
+            background: #eff6ff;
+            color: #2563eb;
+            border-color: #bfdbfe;
+        }
+
+        .sort-select {
+            padding: 7px 12px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            border-radius: 99px;
+            background: #ffffff;
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-sm);
+            cursor: pointer;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        .sort-select:hover {
+            border-color: #cbd5e1;
+            background: #f8fafc;
+        }
+
+        .sort-select:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+        }
+
+        /* ─── RESPONSIVE ─── */
+        @media (max-width: 768px) {
+            .hero {
+                padding: 60px 16px 36px;
+            }
+
+            .elegal-logo {
+                font-size: 56px;
+            }
+
+            .logo-l-container {
+                width: 84px;
+                height: 84px;
+                font-size: 64px;
+                padding-bottom: 6px;
+                padding-left: 2px;
+                margin: 0 5px;
+            }
+
+            .search-wrap {
+                max-width: 100%;
+            }
+
+            .content-area {
+                padding: 0 16px;
+            }
+
+             .hero-tagline {
+                font-size: 1.35rem;
+            }
+
+            .hero-description {
+                font-size: 1rem;
+                padding: 0 8px;
+            }
+
+            #searchInput {
+                height: 56px;
+                font-size: 0.95rem;
+                padding: 0 110px 0 52px;
+            }
+
+            #searchBtn {
+                padding: 0 16px;
+                font-size: 0.85rem;
+            }
+
+            .case-card {
+                padding: 12px 14px;
+            }
+
+            .case-card-title {
+                font-size: 0.9rem;
+            }
+
+            .filters {
+                flex-wrap: nowrap;
+                justify-content: flex-start;
+                border-radius: 99px;
+                padding: 3px;
+                gap: 2px;
+                overflow-x: auto;
+                max-width: 100%;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .filter-chip {
+                font-size: 0.75rem;
+                padding: 6px 12px;
+                font-weight: 500;
+                white-space: nowrap;
+            }
+
+            .preview-modal {
+                padding: 28px 20px;
+                margin: 16px;
+            }
+
+            .inspector-title {
+                font-size: 1.25rem;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .case-citation {
+                display: none !important;
+            }
+            .case-card {
+                padding: 10px 12px;
+                gap: 6px;
+            }
+            .case-card-title {
+                font-size: 0.85rem;
+                line-height: 1.35;
+            }
+            .case-badge {
+                font-size: 0.6rem;
+                padding: 1px 5px;
+            }
+            .save-card-btn {
+                font-size: 0.68rem;
+                padding: 1px 6px;
+            }
+            .filter-chip {
+                font-size: 0.72rem;
+                padding: 5px 10px;
+                font-weight: 500;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .elegal-logo {
+                font-size: 40px;
+            }
+
+            .logo-l-container {
+                width: 60px;
+                height: 60px;
+                font-size: 44px;
+                padding-bottom: 4px;
+                padding-left: 2px;
+                margin: 0 4px;
+            }
+
+            .hero-tagline {
+                font-size: 1.1rem;
+            }
+
+            .hero-description {
+                font-size: 0.9rem;
+            }
+
+            #searchInput {
+                height: 48px;
+                font-size: 0.88rem;
+                padding: 0 90px 0 44px;
+            }
+
+            .search-icon {
+                left: 16px;
+                width: 15px;
+                height: 15px;
+            }
+
+            .search-icon::after {
+                height: 5px;
+                bottom: -4px;
+                right: -3px;
+            }
+
+            #searchBtn {
+                padding: 0 12px;
+                font-size: 0.78rem;
+                right: 5px;
+                top: 5px;
+                bottom: 5px;
+            }
+
+            .workspace-title {
+                font-size: 1.15rem;
+            }
+
+            .workspace-subtitle {
+                font-size: 0.8rem;
+            }
+
+            .api-btn {
+                top: 12px;
+                right: 12px;
+                font-size: 0.7rem;
+                padding: 5px 10px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ─── API BUTTON ─── -->
+    <button class="api-btn" id="apiBtn" title="Developer API">&lt;API /&gt;</button>
+
+    <!-- ─── HERO ─── -->
+    <header class="hero">
+        <div class="hero-noise"></div>
+        <div class="hero-grid"></div>
+        <div class="hero-bg-mesh"></div>
+
+        <div class="elegal-logo">
+            <span class="logo-e">e</span>
+            <div class="logo-l-container">L</div>
+            <span class="logo-egal">egal</span>
+        </div>
+
+        <h1 class="hero-tagline">The modern legal e-repository.</h1>
+        <p class="hero-description">
+            Seamlessly access millions of precedents, statutes, and official records perfectly organized for comprehensive legal research and study.
+        </p>
+
+        <div class="search-wrap">
+            <div class="search-icon"></div>
+            <input type="text" id="searchInput" placeholder="Search parties, citations, statutes, topics..." autocomplete="off" />
+            <button id="searchBtn">Search</button>
+            <div class="autocomplete-dropdown" id="autocompleteDropdown"></div>
+        </div>
+    </header>
+
+    <!-- ─── MAIN CONTENT ─── -->
+    <main class="content-area" id="contentArea">
+
+        <div class="filters-wrapper">
+            <div class="filters" id="filterBar">
+                <button class="filter-chip active" data-filter="all">All</button>
+                <button class="filter-chip" data-filter="precedent">Precedents</button>
+                <button class="filter-chip" data-filter="statute">Statutes</button>
+                <button class="filter-chip" data-filter="saved" id="savedFilterBtn"> Saved (<span id="savedCountBadge">0</span>)</button>
+            </div>
+        </div>
+
+        <!-- Loading -->
+        <div class="loading" id="loading">
+            <div class="loading-inner">
+                <div class="loading-mark"></div>
+                <div class="loading-title" id="loadingTitle">Searching Archives</div>
+                <div class="loading-detail" id="loadingDetail">Resolving official records...</div>
+                <div class="loading-fact" id="loadingFact">Sorting the docket...</div>
+            </div>
+        </div>
+
+        <!-- Results -->
+        <section>
+            <div class="workspace-header">
+                <div>
+                    <div class="workspace-title" id="workspaceTitle">Repository</div>
+                    <div class="workspace-subtitle" id="workspaceSubtitle"></div>
+                </div>
+                <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                    <select class="sort-select" id="sortSelect" aria-label="Sort repository results">
+                        <option value="relevance">Sort by: Relevance</option>
+                        <option value="newest">Sort by: Newest</option>
+                        <option value="oldest">Sort by: Oldest</option>
+                    </select>
+                    <button class="secondary-btn" id="clearSearchBtn" type="button">Library</button>
+                </div>
+            </div>
+            <div id="output"></div>
+        </section>
+
+    </main>
+
+    <!-- ─── FOOTER ─── -->
+    <footer style="text-align: center; padding: 28px 16px 36px; border-top: 1px solid var(--border-color); margin-top: 56px; color: var(--text-muted); font-size: 0.82rem; line-height: 1.6;">
+        <p style="margin: 0 0 6px 0;">Developed by <strong style="color: var(--text-primary); font-weight: 600;">emojisudios</strong> 0707865597</p>
+        <p style="margin: 0; opacity: 0.8; font-size: 0.78rem;">&copy; 2026 e-Legal. All rights reserved.</p>
+    </footer>
+
+    <!-- ─── PREVIEW MODAL ─── -->
+    <div class="preview-modal-overlay" id="previewModalOverlay">
+        <div class="preview-modal">
+            <button class="modal-close-btn" id="closePreviewBtn">&times;</button>
+            <div id="previewPanel">
+                <!-- Injected by JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- ─── SCRIPT ─── -->
+    <script>
+        const API_BASE = '/api';
+        let currentFilter = 'all';
+        let currentSort = 'relevance';
+        let currentResultIndex = -1;
+        let libraryData = null;      // remains null if not loaded
+        let lastResult = null;
+        let selectedDocument = null;
+        let loadingFactTimer = null;
+        let loadingFactIndex = 0;
+
+        const loadingFacts = [
+            'Sorting the docket...',
+            'Checking citations for accuracy...',
+            'Stacking precedents beside statutes...',
+            'Analyzing legal contexts...',
+            'Retrieving official records...'
+        ];
+
+        /* ─── LOADING STATE ─── */
+        function setSearchLoading(isLoading) {
+            document.getElementById('loading').style.display = isLoading ? 'block' : 'none';
+            if (isLoading) startLoadingFacts();
+            else stopLoadingFacts();
+        }
+
+        function startLoadingFacts() {
+            const factEl = document.getElementById('loadingFact');
+            factEl.textContent = loadingFacts[loadingFactIndex % loadingFacts.length];
+            if (loadingFactTimer) return;
+            loadingFactTimer = setInterval(() => {
+                loadingFactIndex++;
+                factEl.textContent = loadingFacts[loadingFactIndex % loadingFacts.length];
+            }, 2000);
+        }
+
+        function stopLoadingFacts() {
+            if (!loadingFactTimer) return;
+            clearInterval(loadingFactTimer);
+            loadingFactTimer = null;
+        }
+
+        /* ─── FETCH HELPER ─── */
+        function fetchApi(url, options = {}) {
+            const headers = Object.assign({}, options.headers || {});
+            headers['Accept'] = 'application/json';
+            return fetch(url, {
+                ...options,
+                credentials: 'same-origin',
+                headers
+            });
+        }
+
+        /* ─── LIBRARY ─── */
+        async function loadLibrary() {
+            setSearchLoading(false);
+            renderSkeleton();
+            try {
+                const res = await fetchApi(`${API_BASE}/library`);
+                if (!res.ok) throw new Error(`Server returned ${res.status} – ${res.statusText}`);
+                libraryData = await res.json();
+                currentResultIndex = -1;
+                renderCurrent();
+                updateStatus(`${libraryData.total || 0} stored documents ready`);
+
+                fetchApi(`${API_BASE}/latest-kenyalaw`).then(r => r.json()).then(data => {
+                    if (data && data.docs && data.docs.length > 0 && !lastResult) {
+                        libraryData.docs = data.docs;
+                        libraryData.total = data.total;
+                        renderCurrent();
+                        updateStatus(`${data.total} stored & latest eKLR legal records active`);
+                    }
+                }).catch(err => console.warn('Latest eKLR load note:', err.message));
+            } catch (e) {
+                updateStatus(e.message);
+                renderEmpty('Library unavailable', e.message);
+            }
+        }
+
+        /* ─── SEARCH ─── */
+async function search(query) {
+             const normalizedQuery = query.trim().replace(/\s+/g, ' ');
+             const res = await fetchApi(`${API_BASE}/search?q=${encodeURIComponent(normalizedQuery)}`);
+             if (!res.ok) throw new Error(`Search failed (${res.status})`);
+             return res.json();
+         }
+
+async function doSearch() {
+             const query = document.getElementById('searchInput').value.trim().replace(/\s+/g, ' ');
+             if (!query) return;
+
+             setSearchLoading(true);
+             renderSkeleton();
+             updateStatus(`Searching for "${query}"...`);
+             document.getElementById('workspaceTitle').textContent = 'Search Results';
+             document.getElementById('workspaceSubtitle').textContent = 'All sources.';
+
+             try {
+                 lastResult = await search(query);
+                 currentFilter = 'all';
+                 currentResultIndex = -1;
+                 syncFilterButtons();
+                 renderCurrent();
+                 updateStatus(`Found ${lastResult.total} results`);
+             } catch (e) {
+                 updateStatus(e.message);
+                 renderEmpty('Search Error', e.message);
+             } finally {
+                 setSearchLoading(false);
+             }
+         }
+
+        /* ─── SAVED DOCUMENTS LOCAL STORAGE ENGINE ─── */
+        const SAVED_DOCS_KEY = 'elegal_saved_documents';
+
+        function getSavedDocs() {
+            try {
+                const raw = localStorage.getItem(SAVED_DOCS_KEY);
+                return raw ? JSON.parse(raw) : [];
+            } catch (e) {
+                console.warn('Failed to parse saved documents:', e);
+                return [];
+            }
+        }
+
+        function saveDocsList(docs) {
+            try {
+                localStorage.setItem(SAVED_DOCS_KEY, JSON.stringify(docs));
+                updateSavedCountBadge();
+            } catch (e) {
+                console.warn('Failed to persist saved documents:', e);
+            }
+        }
+
+        function getDocKey(item) {
+            if (!item) return '';
+            const key = item.readUrl || item.url || item.title || item.citation || item.label || '';
+            return String(key).toLowerCase().trim();
+        }
+
+        function isDocSaved(item) {
+            const key = getDocKey(item);
+            if (!key) return false;
+            const docs = getSavedDocs();
+            return docs.some(d => getDocKey(d) === key);
+        }
+
+        function toggleSaveDoc(item) {
+            const key = getDocKey(item);
+            if (!key) return false;
+            let docs = getSavedDocs();
+            const existingIndex = docs.findIndex(d => getDocKey(d) === key);
+            let nowSaved = false;
+
+            const title = item.title || item.label || item.citation || 'Untitled Document';
+
+            if (existingIndex >= 0) {
+                docs.splice(existingIndex, 1);
+                updateStatus(`Removed "${title}" from Saved Documents`);
+            } else {
+                const docToSave = {
+                    title,
+                    citation: item.citation || '',
+                    year: item.year || extractDate(item.citation, item.updatedAt, item.documentDate),
+                    type: item.type || extractDocType(item.source, item.category),
+                    source: item.source || '',
+                    category: item.category || '',
+                    url: item.url || item.targetUrl || '',
+                    readUrl: item.readUrl || (item.url ? `/read.html?title=${encodeURIComponent(title)}&sourceUrl=${encodeURIComponent(item.url)}` : ''),
+                    isPdf: Boolean(item.isPdf || item.fileType === 'PDF' || (item.url && item.url.toLowerCase().endsWith('.pdf'))),
+                    isDocument: true,
+                    savedAt: new Date().toISOString()
+                };
+                docs.unshift(docToSave);
+                nowSaved = true;
+                updateStatus(`Saved "${title}" to your Bookmarks`);
+            }
+            saveDocsList(docs);
+
+            if (currentFilter === 'saved') {
+                renderCurrent();
+            }
+            return nowSaved;
+        }
+
+        function updateSavedCountBadge() {
+            const count = getSavedDocs().length;
+            const badge = document.getElementById('savedCountBadge');
+            if (badge) {
+                badge.textContent = count;
+            }
+        }
+
+        /* ─── RENDER ─── */
+        function renderCurrent() {
+            const items = getActiveItems();
+
+            if (currentFilter === 'saved') {
+                document.getElementById('workspaceTitle').textContent = 'Saved Documents';
+                document.getElementById('workspaceSubtitle').textContent = `Your ${items.length} bookmarked statutes and case law precedents.`;
+                if (!items.length) {
+                    renderEmpty('No Saved Documents', 'Click the  Save button on any statute or judgment to bookmark it for quick future access.');
+                    return;
+                }
+            } else if (!lastResult) {
+                document.getElementById('workspaceTitle').textContent = 'Repository';
+                document.getElementById('workspaceSubtitle').textContent = '';
+            }
+
+            if (!items.length) {
+                const msg = libraryData ? 'No documents match your filters.' : 'Library data not available.';
+                renderEmpty('No documents found', msg);
+                return;
+            }
+            renderResults(items);
+            highlightActiveResult();
+        }
+
+        function getItemYear(item) {
+            if (!item) return 0;
+            if (item.year && !isNaN(parseInt(item.year, 10))) {
+                return parseInt(item.year, 10);
+            }
+            const citation = item.citation || '';
+            const title = item.title || item.label || '';
+            const updatedAt = item.updatedAt || '';
+            const documentDate = item.documentDate || item.date || '';
+
+            const textToScan = `${citation} ${title} ${documentDate}`;
+            const matchYear = textToScan.match(/\b(18\d{2}|19\d{2}|20\d{2})\b/);
+            if (matchYear) {
+                return parseInt(matchYear[1], 10);
+            }
+
+            if (updatedAt) {
+                const d = new Date(updatedAt);
+                if (!isNaN(d.getTime())) return d.getFullYear();
+            }
+
+            if (item.savedAt) {
+                const d = new Date(item.savedAt);
+                if (!isNaN(d.getTime())) return d.getFullYear();
+            }
+
+            return 0;
+        }
+
+        function getActiveItems() {
+            let source = [];
+            if (currentFilter === 'saved') {
+                source = [...getSavedDocs()];
+            } else if (lastResult) {
+                source = [...(lastResult.results || [])];
+            } else if (libraryData) {
+                source = libraryData.docs || [...(libraryData.precedents || []), ...(libraryData.statutes || [])];
+            }
+
+            let filtered = source;
+            if (currentFilter !== 'all' && currentFilter !== 'saved') {
+                filtered = filteredByCategory(source, currentFilter);
+            }
+
+            if (currentSort === 'newest') {
+                return filtered.slice().sort((a, b) => getItemYear(b) - getItemYear(a));
+            } else if (currentSort === 'oldest') {
+                return filtered.slice().sort((a, b) => getItemYear(a) - getItemYear(b));
+            }
+
+            return filtered;
+        }
+
+        function filteredByCategory(items, category) {
+            return (items || []).filter(item => (item.category || item.source) === category);
+        }
+
+function renderResults(items) {
+             const output = document.getElementById('output');
+             output.innerHTML = '';
+
+             const listEl = document.createElement('div');
+             listEl.className = 'results';
+             items.forEach(item => listEl.appendChild(createResultItem(item)));
+             output.appendChild(listEl);
+             if (typeof lucide !== 'undefined') lucide.createIcons();
+         }
+
+function createResultItem(item) {
+              const title = item.title || item.label || item.citation || 'Untitled document';
+              const targetUrl = item.readUrl || item.url || '/';
+              const citation = item.citation || '';
+              const source = item.source || '';
+              const category = item.category || '';
+              const updatedAt = item.updatedAt || '';
+
+              const card = document.createElement('article');
+              card.className = 'case-card';
+              card.tabIndex = 0;
+
+              const mainEl = document.createElement('div');
+              mainEl.className = 'case-card-main';
+
+              const headerEl = document.createElement('div');
+              headerEl.className = 'case-card-header';
+
+              const titleEl = document.createElement('h3');
+              titleEl.className = 'case-card-title';
+              titleEl.textContent = title;
+
+              const badgesEl = document.createElement('div');
+              badgesEl.className = 'case-card-badges';
+
+              // Bookmark save button on card
+              const saved = isDocSaved(item);
+              const saveBtn = document.createElement('button');
+              saveBtn.className = `save-card-btn ${saved ? 'saved' : ''}`;
+              saveBtn.title = saved ? 'Remove from Saved' : 'Save Document to Bookmarks';
+              saveBtn.setAttribute('aria-label', 'Bookmark document');
+              saveBtn.innerHTML = saved
+                  ? `<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="#2563eb" stroke="#2563eb" stroke-width="2"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/></svg> Saved`
+                  : `<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/></svg> Save`;
+
+              saveBtn.addEventListener('click', (e) => {
+                  e.stopPropagation();
+                  const isNowSaved = toggleSaveDoc(item);
+                  saveBtn.classList.toggle('saved', isNowSaved);
+                  saveBtn.title = isNowSaved ? 'Remove from Saved' : 'Save Document to Bookmarks';
+                  saveBtn.innerHTML = isNowSaved
+                      ? `<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="#2563eb" stroke="#2563eb" stroke-width="2"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/></svg> Saved`
+                      : `<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/></svg> Save`;
+              });
+              badgesEl.appendChild(saveBtn);
+
+              if (item.isPdf || item.fileType === 'PDF' || (targetUrl && targetUrl.toLowerCase().endsWith('.pdf'))) {
+                  const pdfBadge = document.createElement('span');
+                  pdfBadge.className = 'case-badge';
+                  pdfBadge.style.cssText = 'background: #fee2e2; color: #dc2626; font-weight: 700; border: 1px solid #fca5a5;';
+                  pdfBadge.textContent = '📄 PDF Document';
+                  badgesEl.appendChild(pdfBadge);
+              }
+
+              const yearStr = item.year || extractDate(citation, updatedAt, item.documentDate);
+              if (yearStr) {
+                  const yearBadge = document.createElement('span');
+                  yearBadge.className = 'case-badge case-badge-year';
+                  yearBadge.textContent = yearStr;
+                  badgesEl.appendChild(yearBadge);
+              }
+
+              const docType = item.type || extractDocType(source, category);
+              if (docType) {
+                  const typeBadge = document.createElement('span');
+                  typeBadge.className = 'case-badge case-badge-type';
+                  typeBadge.textContent = docType;
+                  badgesEl.appendChild(typeBadge);
+              }
+
+              const sourceLabel = item.source || getSourceLabel(source, category);
+              if (sourceLabel) {
+                  const sourceBadge = document.createElement('span');
+                  sourceBadge.className = 'case-badge case-badge-source';
+                  sourceBadge.textContent = sourceLabel;
+                  badgesEl.appendChild(sourceBadge);
+              }
+
+              headerEl.append(titleEl, badgesEl);
+
+              const metaEl = document.createElement('div');
+              metaEl.className = 'case-card-meta';
+
+              const metaRightEl = document.createElement('div');
+              metaRightEl.className = 'case-card-meta-right';
+
+              if (citation) {
+                  const citationEl = document.createElement('span');
+                  citationEl.className = 'case-citation';
+                  citationEl.textContent = citation;
+                  metaRightEl.appendChild(citationEl);
+              }
+
+              if (targetUrl && (targetUrl.startsWith('http') || targetUrl.startsWith('/read'))) {
+                  const linkIcon = document.createElement('a');
+                  linkIcon.className = 'case-meta-item case-link';
+                  linkIcon.href = targetUrl.startsWith('/read') ? targetUrl : `/read.html?title=${encodeURIComponent(title)}&sourceUrl=${encodeURIComponent(targetUrl)}&year=${encodeURIComponent(yearStr || '')}&type=${encodeURIComponent(docType || '')}&source=${encodeURIComponent(sourceLabel || '')}`;
+                  linkIcon.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>';
+                  linkIcon.appendChild(document.createTextNode(' Read document'));
+                  metaRightEl.appendChild(linkIcon);
+              }
+
+              metaEl.append(metaRightEl);
+
+              const actionEl = document.createElement('div');
+              actionEl.className = 'case-card-action';
+              actionEl.innerHTML = '<div class="case-card-action-icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></div>';
+
+              mainEl.append(headerEl, metaEl);
+
+              card.append(mainEl, actionEl);
+
+              card.addEventListener('click', (e) => {
+                  if (e.target.closest('a')) return;
+                  selectDocument(item, card);
+              });
+              card.addEventListener('keydown', event => {
+                  if (event.key === 'Enter') selectDocument(item, card);
+              });
+              return card;
+          }
+
+         function extractCourtType(citation) {
+             if (!citation) return '';
+             const match = citation.match(/\b(KEHC|KECA|KESC|KLR|KEBL|KEPR)\b/);
+             if (!match) return '';
+             const codes = { KEHC: 'High Court', KECA: 'Court of Appeal', KESC: 'Supreme Court', KLR: 'Kenya Law Reports', KEBL: 'Business Laws', KEPR: 'Property Reports' };
+             return codes[match[1]] || '';
+         }
+
+         function extractDocType(source, category) {
+             if (source === 'kenyalaw') return 'Ruling';
+             if (source === 'local' && category === 'statute') return 'Statute';
+             if (source === 'local' && category === 'precedent') return 'Precedent';
+             if (source === 'international') return 'International';
+             return '';
+         }
+
+         function getSourceLabel(source, category) {
+             if (source === 'kenyalaw') return 'Kenya Law';
+             if (source === 'local' && category === 'statute') return 'Statute';
+             if (source === 'local' && category === 'precedent') return 'Precedent';
+             if (source === 'international') return 'International';
+             return '';
+         }
+
+function extractDate(citation, updatedAt, documentDate) {
+              if (documentDate) return documentDate;
+              if (citation) {
+                  const match = citation.match(/\[(\d{4})\]/);
+                  if (match) return match[1];
+              }
+              if (updatedAt) {
+                  const d = new Date(updatedAt);
+                  if (!isNaN(d.getTime())) return d.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+              }
+              return '';
+          }
+
+        function selectDocument(item, card) {
+            const items = getActiveItems();
+            currentResultIndex = items.indexOf(item);
+            selectedDocument = item;
+            highlightActiveResult();
+            renderPreview(item);
+        }
+
+        /* ─── PREVIEW ─── */
+function renderPreview(item) {
+             const title = item.citation || item.title || item.label || 'Untitled document';
+             const panel = document.getElementById('previewPanel');
+             panel.innerHTML = '';
+
+             const kicker = document.createElement('div');
+             kicker.className = 'inspector-kicker';
+             kicker.textContent = formatCategory(item.category || item.source || '');
+
+             const titleEl = document.createElement('div');
+             titleEl.className = 'inspector-title';
+             titleEl.textContent = title;
+
+             const metaText = formatMeta(item);
+             const metaEl = document.createElement('div');
+             metaEl.className = 'inspector-meta';
+             metaEl.textContent = metaText;
+             if (!metaText) metaEl.style.display = 'none';
+
+             const actions = document.createElement('div');
+             actions.className = 'inspector-actions';
+
+             const openBtn = document.createElement('button');
+             openBtn.className = 'primary-btn';
+             openBtn.textContent = 'Read PDF';
+             openBtn.addEventListener('click', () => {
+                 document.getElementById('previewModalOverlay').classList.remove('active');
+                 loadDocument(item.readUrl || item.url || '/', title);
+             });
+
+             const copyBtn = document.createElement('button');
+             copyBtn.className = 'secondary-btn';
+             copyBtn.textContent = 'Copy Citation';
+             copyBtn.addEventListener('click', () => {
+                 navigator.clipboard.writeText(title);
+                 updateStatus('Citation copied to clipboard');
+             });
+
+             actions.append(openBtn, copyBtn);
+             panel.append(kicker, titleEl, metaEl, actions);
+
+             document.getElementById('previewModalOverlay').classList.add('active');
+         }
+
+        /* ─── LOAD DOCUMENT ─── */
+        async function loadDocument(url, title) {
+            updateStatus('Opening document reader...');
+
+            if (!url || url === '/') {
+                updateStatus('No valid document available');
+                return;
+            }
+
+            if (url.startsWith('/read/') || url.startsWith('/read.html')) {
+                const targetUrl = new URL(url, window.location.origin);
+                if (title && !targetUrl.searchParams.has('title')) targetUrl.searchParams.set('title', title);
+                window.location.href = targetUrl.toString();
+                return;
+            }
+
+            if (/^https?:\/\/(?:www\.)?kenyalaw\.org/i.test(url)) {
+                try {
+                    updateStatus('Resolving eLegal document reader...');
+                    const params = new URLSearchParams({ url });
+                    if (title) params.set('title', title);
+                    const res = await fetchApi(`${API_BASE}/resolve?${params.toString()}`);
+                    if (res.ok) {
+                        const documentInfo = await res.json();
+                        if (documentInfo.readUrl || documentInfo.sourceUrl) {
+                            const readUrl = documentInfo.readUrl || `/read.html?title=${encodeURIComponent(documentInfo.title || title)}&sourceUrl=${encodeURIComponent(documentInfo.sourceUrl)}`;
+                            window.location.href = readUrl;
+                            return;
+                        }
+                    }
+                } catch (e) {
+                    console.warn('Resolve fallback:', e.message);
+                }
+            }
+
+            const defaultReaderUrl = `/read.html?title=${encodeURIComponent(title || 'Document')}&sourceUrl=${encodeURIComponent(url)}`;
+            window.location.href = defaultReaderUrl;
+        }
+
+        /* ─── SKELETON ─── */
+        function renderSkeleton() {
+            const output = document.getElementById('output');
+            output.innerHTML = '';
+            const listEl = document.createElement('div');
+            listEl.className = 'results';
+            for (let i = 0; i < 4; i++) {
+                const card = document.createElement('div');
+                card.className = 'skeleton-card';
+                card.append(
+                    skeleton('30%', '16px'),
+                    skeleton(i % 2 ? '80%' : '60%', '24px'),
+                    skeleton('40%', '16px')
+                );
+                listEl.appendChild(card);
+            }
+            output.appendChild(listEl);
+        }
+
+        function skeleton(width, height) {
+            const block = document.createElement('div');
+            block.className = 'skeleton-block';
+            block.style.width = width;
+            block.style.height = height;
+            return block;
+        }
+
+        /* ─── EMPTY ─── */
+        function renderEmpty(title, detail) {
+            document.getElementById('output').innerHTML =
+                `<div class="empty-state"><h3>${escapeHtml(title)}</h3><p>${escapeHtml(detail)}</p></div>`;
+        }
+
+        /* ─── HELPERS ─── */
+function formatCategory(category) {
+             if (category === 'precedent') return 'Precedent';
+             if (category === 'statute') return 'Statute';
+             if (category === 'kenyalaw') return 'eLegal';
+             if (category === 'local') return 'Local PDF';
+             return '';
+         }
+
+function formatMeta(item) {
+             const parts = [];
+             if (item.size) parts.push(formatBytes(item.size));
+             if (item.updatedAt) parts.push(`Updated ${formatDate(item.updatedAt)}`);
+             if (item.score) parts.push(`Relevance ${Math.round(item.score)}`);
+             return parts.join(' • ');
+         }
+
+        function formatBytes(bytes) {
+            if (!Number.isFinite(bytes)) return '';
+            if (bytes < 1024 * 1024) return `${Math.max(1, Math.round(bytes / 1024))} KB`;
+            return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+        }
+
+        function formatDate(value) {
+            const date = new Date(value);
+            if (Number.isNaN(date.getTime())) return '';
+            return date.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+        }
+
+        function updateStatus(text) {
+            const el = document.getElementById('statusText');
+            if (el) el.textContent = text;
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        /* ─── FILTERS ─── */
+        function setFilter(filter) {
+            currentFilter = filter;
+            syncFilterButtons();
+            renderCurrent();
+        }
+
+        function syncFilterButtons() {
+            document.querySelectorAll('[data-filter]').forEach(button => {
+                button.classList.toggle('active', button.dataset.filter === currentFilter);
+            });
+        }
+
+        /* ─── NAVIGATION ─── */
+        function navigatePrev() {
+            const items = getActiveItems();
+            if (items.length === 0) return;
+            currentResultIndex = currentResultIndex <= 0 ? items.length - 1 : currentResultIndex - 1;
+            highlightActiveResult();
+            const item = items[currentResultIndex];
+            renderPreview(item);
+        }
+
+        function navigateNext() {
+            const items = getActiveItems();
+            if (items.length === 0) return;
+            currentResultIndex = currentResultIndex >= items.length - 1 ? 0 : currentResultIndex + 1;
+            highlightActiveResult();
+            const item = items[currentResultIndex];
+            renderPreview(item);
+        }
+
+function highlightActiveResult() {
+             document.querySelectorAll('.case-card.active').forEach(el => el.classList.remove('active'));
+             const items = document.querySelectorAll('.case-card');
+             if (items[currentResultIndex]) {
+                 items[currentResultIndex].classList.add('active');
+                 items[currentResultIndex].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+             }
+         }
+
+        /* ─── EVENT LISTENERS ─── */
+        const sortSelect = document.getElementById('sortSelect');
+        if (sortSelect) {
+            sortSelect.addEventListener('change', (e) => {
+                currentSort = e.target.value;
+                currentResultIndex = -1;
+                renderCurrent();
+            });
+        }
+
+        document.getElementById('searchBtn').addEventListener('click', doSearch);
+        document.getElementById('searchInput').addEventListener('keydown', event => {
+            if (event.key === 'Enter') doSearch();
+        });
+
+        document.getElementById('apiBtn').addEventListener('click', () => {
+            window.open('/dev', '_blank');
+        });
+
+        document.getElementById('clearSearchBtn').addEventListener('click', () => {
+            lastResult = null;
+            currentFilter = 'all';
+            currentResultIndex = -1;
+            document.getElementById('searchInput').value = '';
+            document.getElementById('workspaceTitle').textContent = 'Repository';
+            document.getElementById('workspaceSubtitle').textContent = '';
+            syncFilterButtons();
+            renderCurrent();
+            updateStatus(libraryData ? `${libraryData.total} local files ready` : 'Library not loaded');
+        });
+
+        /* ─── REALTIME AUTOCOMPLETE & SUGGESTIONS ─── */
+        let suggestionTimeout = null;
+        let activeSuggestionController = null;
+        let currentSuggestions = [];
+        let selectedSuggestionIndex = -1;
+
+        const searchInputEl = document.getElementById('searchInput');
+        const autocompleteDropdownEl = document.getElementById('autocompleteDropdown');
+
+        function hideAutocomplete() {
+            if (autocompleteDropdownEl) {
+                autocompleteDropdownEl.classList.remove('active');
+                autocompleteDropdownEl.innerHTML = '';
+            }
+            selectedSuggestionIndex = -1;
+        }
+
+        function highlightMatch(text, query) {
+            if (!query) return escapeHtml(text);
+            const safeText = escapeHtml(text);
+            const regex = new RegExp('(' + escapeHtml(query).replace(/[^a-zA-Z0-9]/g, '\\$&') + ')', 'gi');
+            return safeText.replace(regex, '<b>$1</b>');
+        }
+
+        function escapeHtml(str) {
+            return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
+
+        function showAutocomplete(suggestions, query) {
+            if (!autocompleteDropdownEl) return;
+            if (!suggestions || suggestions.length === 0) {
+                hideAutocomplete();
+                return;
+            }
+            currentSuggestions = suggestions;
+            selectedSuggestionIndex = -1;
+            autocompleteDropdownEl.innerHTML = '';
+
+            suggestions.forEach((item, index) => {
+                const div = document.createElement('div');
+                div.className = 'suggestion-item';
+                div.dataset.index = index;
+
+                const titleSpan = document.createElement('span');
+                titleSpan.className = 'suggestion-title';
+                let htmlTitle = highlightMatch(item.title, query);
+
+                if (item.citation && item.citation !== item.title) {
+                    htmlTitle += `<span class="suggestion-meta"> (${highlightMatch(item.citation, query)})</span>`;
+                }
+                titleSpan.innerHTML = htmlTitle;
+
+                const badgeSpan = document.createElement('span');
+                const catClass = (item.category || item.type || '').toLowerCase();
+                badgeSpan.className = `suggestion-badge ${catClass.includes('statute') || catClass.includes('act') ? 'statute' : 'precedent'}`;
+                badgeSpan.textContent = item.category || item.type || 'SEARCH';
+
+                div.append(titleSpan, badgeSpan);
+
+                div.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    searchInputEl.value = item.title;
+                    hideAutocomplete();
+                    if (item.url && item.url.startsWith('/read')) {
+                        window.location.href = item.url;
+                    } else {
+                        doSearch();
+                    }
+                });
+
+                autocompleteDropdownEl.appendChild(div);
+            });
+
+            autocompleteDropdownEl.classList.add('active');
+        }
+
+        async function fetchSuggestions(query) {
+            if (!query || query.length < 1) {
+                hideAutocomplete();
+                return;
+            }
+
+            if (activeSuggestionController) {
+                activeSuggestionController.abort();
+            }
+            activeSuggestionController = new AbortController();
+
+            try {
+                const res = await fetchApi(`${API_BASE}/suggestions?q=${encodeURIComponent(query)}`, {
+                    signal: activeSuggestionController.signal
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    showAutocomplete(data.suggestions, query);
+                }
+            } catch (e) {
+                if (e.name !== 'AbortError') {
+                    console.warn('Suggestions error:', e);
+                }
+            }
+        }
+
+        if (searchInputEl) {
+            searchInputEl.addEventListener('input', (e) => {
+                const val = e.target.value.trim();
+                if (suggestionTimeout) clearTimeout(suggestionTimeout);
+                if (val.length < 1) {
+                    hideAutocomplete();
+                    return;
+                }
+                // Ultra-responsive immediate or 20ms debounce
+                suggestionTimeout = setTimeout(() => {
+                    fetchSuggestions(val);
+                }, 20);
+            });
+
+            searchInputEl.addEventListener('keydown', (e) => {
+                if (!autocompleteDropdownEl || !autocompleteDropdownEl.classList.contains('active')) {
+                    if (e.key === 'Enter') doSearch();
+                    return;
+                }
+
+                const items = autocompleteDropdownEl.querySelectorAll('.suggestion-item');
+                if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    selectedSuggestionIndex = (selectedSuggestionIndex + 1) % items.length;
+                    updateSuggestionSelection(items);
+                } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    selectedSuggestionIndex = (selectedSuggestionIndex - 1 + items.length) % items.length;
+                    updateSuggestionSelection(items);
+                } else if (e.key === 'Enter') {
+                    if (selectedSuggestionIndex >= 0 && items[selectedSuggestionIndex]) {
+                        e.preventDefault();
+                        items[selectedSuggestionIndex].click();
+                    } else {
+                        hideAutocomplete();
+                        doSearch();
+                    }
+                } else if (e.key === 'Escape') {
+                    hideAutocomplete();
+                }
+            });
+        }
+
+        function updateSuggestionSelection(items) {
+            items.forEach((item, idx) => {
+                item.classList.toggle('selected', idx === selectedSuggestionIndex);
+            });
+        }
+
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.search-wrap')) {
+                hideAutocomplete();
+            }
+        });
+
+        document.querySelectorAll('[data-filter]').forEach(button => {
+            button.addEventListener('click', () => setFilter(button.dataset.filter));
+        });
+
+document.getElementById('closePreviewBtn').addEventListener('click', () => {
+            document.getElementById('previewModalOverlay').classList.remove('active');
+        });
+
+        // Click outside modal to close
+        document.getElementById('previewModalOverlay').addEventListener('click', (e) => {
+            if (e.target === e.currentTarget) {
+                document.getElementById('previewModalOverlay').classList.remove('active');
+            }
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                document.getElementById('previewModalOverlay').classList.remove('active');
+            }
+            if (e.key === 'ArrowLeft') navigatePrev();
+            if (e.key === 'ArrowRight') navigateNext();
+        });
+
+        /* ─── INIT ─── */
+        updateSavedCountBadge();
+        loadLibrary();
+        document.getElementById('searchInput').focus();
+    </script>
+
+</body>
+</html>

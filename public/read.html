@@ -1,0 +1,2065 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes" />
+    <title>eLegal - Document Reader</title>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet" />
+    <style>
+        /* ============================================================
+           eLegal - Document Reader
+           Complete Responsive UI Redesign
+           Fixes: toolbar crowding, horizontal scroll, PDF fit
+           ============================================================ */
+
+        /* ── CSS Variables ── */
+        :root {
+            --app-bg: #F5F7F6;
+            --surface-bg: #FFFFFF;
+            --text-primary: #1A2E26;
+            --text-secondary: #52665E;
+            --text-muted: #7A8F87;
+            --accent-green: #0D5C3A;
+            --accent-green-light: #EAF2ED;
+            --accent-green-hover: #0F6B43;
+            --accent-gold: #C5A059;
+            --accent-gold-light: #FDF6E2;
+            --border-color: rgba(13, 92, 58, 0.12);
+            --border-light: rgba(13, 92, 58, 0.06);
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 6px 24px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.12);
+            --shadow-xl: 0 20px 60px rgba(0, 0, 0, 0.15);
+            --radius-sm: 6px;
+            --radius-md: 10px;
+            --radius-lg: 16px;
+            --radius-xl: 20px;
+            --radius-full: 9999px;
+            --font-body: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            --font-legal: 'Source Serif 4', Georgia, 'Times New Roman', serif;
+            --font-display: 'Cinzel', 'Times New Roman', serif;
+            --transition-fast: 0.15s ease;
+            --transition-med: 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            --transition-slow: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            --max-width-content: 900px;
+            --toolbar-height: 60px;
+            --header-font-size: clamp(1.1rem, 2.5vw, 1.4rem);
+        }
+
+        /* ── Reset & Base ── */
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        html {
+            font-size: 16px;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background: var(--app-bg);
+            color: var(--text-primary);
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            line-height: 1.6;
+            width: 100%;
+            max-width: 100vw;
+        }
+
+        /* ── Scrollbar Styling ── */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--text-muted);
+        }
+
+        /* ============================================================
+           TOOLBAR
+           ============================================================ */
+        .toolbar {
+            height: var(--toolbar-height);
+            min-height: var(--toolbar-height);
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(20px) saturate(1.2);
+            -webkit-backdrop-filter: blur(20px) saturate(1.2);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            z-index: 100;
+            flex-shrink: 0;
+            gap: 8px;
+            position: sticky;
+            top: 0;
+            left: 0;
+            right: 0;
+            overflow: hidden;
+        }
+
+        .toolbar-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 0;
+            flex: 1 1 auto;
+            overflow: hidden;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--accent-green);
+            text-decoration: none;
+            font-size: 0.8125rem;
+            font-weight: 600;
+            padding: 6px 12px;
+            border-radius: var(--radius-sm);
+            background: var(--accent-green-light);
+            transition: all var(--transition-fast);
+            white-space: nowrap;
+            border: none;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        .back-btn:hover {
+            background: rgba(13, 92, 58, 0.18);
+            transform: translateX(-2px);
+        }
+        .back-btn:active {
+            transform: translateX(0) scale(0.96);
+        }
+        .back-btn svg {
+            flex-shrink: 0;
+        }
+        .back-btn .back-label {
+            display: inline;
+        }
+
+        .doc-title {
+            font-weight: 700;
+            font-size: clamp(0.8rem, 1.6vw, 0.9375rem);
+            color: var(--text-primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            min-width: 0;
+            flex: 1 1 auto;
+            letter-spacing: -0.01em;
+        }
+
+        .toolbar-right {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-shrink: 0;
+            flex-wrap: nowrap;
+            overflow: hidden;
+        }
+
+        .badge {
+            font-size: 0.6875rem;
+            font-weight: 600;
+            padding: 3px 10px;
+            border-radius: var(--radius-sm);
+            background: var(--accent-green-light);
+            color: var(--accent-green);
+            border: 1px solid rgba(13, 92, 58, 0.12);
+            white-space: nowrap;
+            letter-spacing: 0.01em;
+            display: inline-flex;
+            align-items: center;
+        }
+        .badge-year {
+            background: var(--accent-gold-light);
+            color: #7A5500;
+            border-color: rgba(197, 160, 89, 0.25);
+        }
+        .badge-type {
+            background: #EBF3FA;
+            color: #0055A5;
+            border-color: rgba(0, 85, 165, 0.15);
+        }
+        .badge-source {
+            background: #F0F0F0;
+            color: #4A4A4A;
+            border-color: rgba(0, 0, 0, 0.08);
+        }
+
+        #pageInfo {
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            padding: 3px 10px;
+            background: var(--app-bg);
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-light);
+            white-space: nowrap;
+        }
+
+        .source-btn,
+        .btn-icon-text {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 5px 10px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-color);
+            background: var(--surface-bg);
+            color: var(--text-primary);
+            font-size: 0.75rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            text-decoration: none;
+            white-space: nowrap;
+            font-family: var(--font-body);
+            line-height: 1.4;
+        }
+        .source-btn:hover,
+        .btn-icon-text:hover {
+            background: var(--accent-green-light);
+            border-color: var(--accent-green);
+            color: var(--accent-green);
+        }
+        .source-btn:active,
+        .btn-icon-text:active {
+            transform: scale(0.96);
+        }
+        .source-btn svg,
+        .btn-icon-text svg {
+            flex-shrink: 0;
+        }
+
+        #btnBookmark[style*="background: #eff6ff"] {
+            background: #E8F0FE !important;
+            border-color: #93BBFC !important;
+            color: #1A56DB !important;
+        }
+
+        #externalLink {
+            display: none;
+        }
+        #externalLink[style*="display: inline-flex"] {
+            display: inline-flex !important;
+        }
+
+        /* ============================================================
+           VIEWER CONTAINER
+           ============================================================ */
+        .viewer-container {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 20px 12px 100px 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            -webkit-overflow-scrolling: touch;
+            width: 100%;
+            max-width: 100vw;
+        }
+
+        /* ============================================================
+           PDF PAGE STYLING
+           ============================================================ */
+        #pagesContainer {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+            max-width: var(--max-width-content);
+        }
+
+        .page-wrapper {
+            background: white;
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+            transition: box-shadow var(--transition-med);
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+        .page-wrapper:hover {
+            box-shadow: var(--shadow-md);
+        }
+        .page-wrapper canvas {
+            display: block;
+            max-width: 100%;
+            height: auto !important;
+            width: 100% !important;
+            object-fit: contain;
+        }
+
+        /* ============================================================
+           TEXT READER CARD — IMPROVED
+           ============================================================ */
+        #textReaderContainer {
+            width: 100%;
+            display: none;
+            justify-content: center;
+        }
+        #textReaderContainer[style*="display: flex"] {
+            display: flex !important;
+        }
+
+        .reader-card {
+            width: 100%;
+            max-width: var(--max-width-content);
+            background: var(--surface-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+            padding: clamp(20px, 4vw, 48px);
+            font-family: var(--font-legal);
+            font-size: clamp(0.9375rem, 1.2vw, 1.0625rem);
+            line-height: 1.8;
+            color: #1E1E1E;
+            transition: box-shadow var(--transition-med);
+            zoom: 1;
+        }
+        .reader-card:hover {
+            box-shadow: var(--shadow-md);
+        }
+
+        .reader-header {
+            display: none !important;
+        }
+
+        .reader-body {
+            font-family: var(--font-legal);
+            font-size: inherit;
+            line-height: inherit;
+            color: inherit;
+            overflow-wrap: break-word;
+            word-wrap: break-word;
+            hyphens: auto;
+        }
+
+        .reader-body p {
+            margin-bottom: 1.2em;
+            text-align: justify;
+            word-break: break-word;
+            hyphens: auto;
+            text-indent: 2.2em;
+            margin-top: 0;
+            padding-top: 0;
+        }
+        .reader-body p.first-after-heading,
+        .reader-body p.first-after-block {
+            text-indent: 0;
+        }
+
+        .reader-body h1,
+        .reader-body h2,
+        .reader-body h3,
+        .reader-body h4,
+        .reader-body .doc-heading,
+        .reader-body .case-heading {
+            font-family: var(--font-body);
+            color: var(--accent-green);
+            margin-top: 1.8em;
+            margin-bottom: 0.6em;
+            line-height: 1.3;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+            text-indent: 0;
+            text-align: center !important;
+            text-transform: uppercase !important;
+            text-decoration: underline !important;
+            text-underline-offset: 0.2em;
+            text-decoration-thickness: 2px;
+        }
+
+        .reader-body h1,
+        .reader-body .doc-heading.level-1 {
+            font-size: clamp(1.5rem, 3vw, 2rem);
+            font-family: var(--font-display);
+            text-decoration-color: var(--accent-gold);
+        }
+        .reader-body h2,
+        .reader-body .doc-heading.level-2 {
+            font-size: clamp(1.25rem, 2.2vw, 1.6rem);
+            text-decoration-color: var(--accent-green);
+        }
+        .reader-body h3,
+        .reader-body .doc-heading.level-3 {
+            font-size: clamp(1.05rem, 1.6vw, 1.25rem);
+            text-decoration-color: var(--accent-green);
+        }
+        .reader-body h4,
+        .reader-body .doc-heading.level-4 {
+            font-size: clamp(0.95rem, 1.2vw, 1.05rem);
+            font-weight: 600;
+            text-decoration-color: var(--accent-green);
+        }
+
+        .reader-body .case-heading {
+            font-family: var(--font-display);
+            font-size: clamp(1.15rem, 2vw, 1.4rem);
+            color: var(--text-primary);
+            text-align: center !important;
+            text-transform: uppercase !important;
+            text-decoration: underline !important;
+            text-underline-offset: 0.2em;
+            text-decoration-thickness: 2px;
+            text-decoration-color: var(--accent-gold);
+            margin: 1.8em 0 0.6em 0;
+            letter-spacing: 0.02em;
+            font-weight: 700;
+            text-indent: 0;
+        }
+
+        .citation-highlight {
+            background-color: #FEF3C7;
+            padding: 0.1em 0.3em;
+            border-radius: 3px;
+            border-left: 3px solid var(--accent-gold);
+            font-weight: 500;
+            color: #7A5500;
+        }
+        .caselaw-highlight {
+            background-color: #E0F2FE;
+            padding: 0.1em 0.3em;
+            border-radius: 3px;
+            border-left: 3px solid #0284C7;
+            font-weight: 500;
+            color: #0369A1;
+        }
+
+        .reader-body ul,
+        .reader-body ol {
+            padding-left: 2.4em;
+            margin: 0.4em 0 1.2em 0;
+            text-align: justify;
+        }
+        .reader-body li {
+            margin-bottom: 0.25em;
+            text-indent: 0;
+        }
+        .reader-body li p {
+            text-indent: 0 !important;
+            margin-bottom: 0.2em;
+        }
+
+        .reader-body blockquote {
+            border-left: 3px solid var(--accent-gold);
+            padding-left: 1.4em;
+            margin: 1em 0 1.2em 0;
+            color: var(--text-secondary);
+            font-style: italic;
+            text-indent: 0;
+        }
+        .reader-body blockquote p {
+            text-indent: 0 !important;
+        }
+
+        .reader-body table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1em 0;
+            font-size: 0.9em;
+            overflow-x: auto;
+            display: block;
+            text-indent: 0;
+        }
+        .reader-body th,
+        .reader-body td {
+            border: 1px solid var(--border-color);
+            padding: 8px 12px;
+            text-align: left;
+        }
+        .reader-body th {
+            background: var(--accent-green-light);
+            font-weight: 600;
+        }
+
+        mark.highlight {
+            background-color: #FFE699;
+            color: #1A1A1A;
+            padding: 1px 4px;
+            border-radius: 2px;
+            box-shadow: 0 0 0 1px rgba(255, 200, 50, 0.3);
+        }
+
+        .reader-body a,
+        .reader-body a:link,
+        .reader-body a:visited,
+        .reader-body a:hover,
+        .reader-body a:active {
+            color: inherit !important;
+            text-decoration: none !important;
+            cursor: default !important;
+            pointer-events: none !important;
+        }
+
+        .reader-controls-bar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px;
+            margin-top: 18px;
+            padding-top: 14px;
+            border-top: 1px solid var(--border-light);
+        }
+        .reader-controls-bar .search-input {
+            flex: 1 1 180px;
+            min-width: 120px;
+            padding: 7px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            font-size: 0.8125rem;
+            font-family: var(--font-body);
+            outline: none;
+            background: var(--app-bg);
+            transition: all var(--transition-fast);
+            color: var(--text-primary);
+        }
+        .reader-controls-bar .search-input:focus {
+            border-color: var(--accent-green);
+            box-shadow: 0 0 0 3px rgba(13, 92, 58, 0.12);
+            background: white;
+        }
+        .reader-controls-bar .search-input::placeholder {
+            color: var(--text-muted);
+        }
+        .reader-controls-bar>div {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            align-items: center;
+        }
+
+        /* ============================================================
+           FAB - FLOATING ACTION BUTTON
+           ============================================================ */
+        .fab-summary-btn {
+            position: fixed;
+            bottom: clamp(20px, 4vh, 32px);
+            right: clamp(16px, 3vw, 32px);
+            z-index: 990;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background: black;
+            color: #FFFFFF;
+            font-family: var(--font-body);
+            font-size: clamp(0.8125rem, 1vw, 0.9375rem);
+            font-weight: 700;
+            padding: clamp(10px, 1.2vh, 14px) clamp(16px, 2.5vw, 26px);
+            border-radius: var(--radius-full);
+            box-shadow: 0 8px 28px -4px rgba(0, 0, 0, 0.45), 0 4px 12px rgba(0, 0, 0, 0.08);
+            cursor: pointer;
+            transition: all var(--transition-med);
+            letter-spacing: 0.01em;
+            user-select: none;
+            white-space: nowrap;
+        }
+        .fab-summary-btn:hover {
+            transform: translateY(-3px) scale(1.03);
+            box-shadow: 0 14px 36px -6px rgba(13, 92, 58, 0.55), 0 6px 16px rgba(0, 0, 0, 0.12);
+            background: black;
+            border-color: #E2C278;
+        }
+        .fab-summary-btn:active {
+            transform: translateY(-1px) scale(0.96);
+        }
+        .fab-summary-btn svg {
+            flex-shrink: 0;
+        }
+
+        /* ============================================================
+           SUMMARY MODAL / DRAWER
+           ============================================================ */
+        .summary-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 20, 0.5);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            z-index: 1000;
+            display: flex;
+            justify-content: flex-end;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity var(--transition-med);
+        }
+        .summary-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .summary-drawer {
+            width: 100%;
+            max-width: 540px;
+            height: 100%;
+            background: var(--surface-bg);
+            box-shadow: -8px 0 40px rgba(0, 0, 0, 0.12);
+            display: flex;
+            flex-direction: column;
+            transform: translateX(100%);
+            transition: transform var(--transition-slow);
+            border-radius: 0;
+        }
+        .summary-overlay.active .summary-drawer {
+            transform: translateX(0);
+        }
+
+        .summary-header {
+            padding: clamp(14px, 2vh, 20px) clamp(18px, 3vw, 28px);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #F9FBF9;
+            flex-shrink: 0;
+            gap: 12px;
+        }
+        .summary-header>div {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 0;
+        }
+        .summary-drawer-title {
+            font-family: var(--font-display);
+            font-size: clamp(0.9375rem, 1.4vw, 1.125rem);
+            font-weight: 700;
+            color: var(--accent-green);
+            white-space: nowrap;
+        }
+        .summary-close-btn {
+            background: none;
+            border: none;
+            font-size: 1.6rem;
+            line-height: 1;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: var(--radius-sm);
+            transition: all var(--transition-fast);
+            font-weight: 300;
+        }
+        .summary-close-btn:hover {
+            color: var(--text-primary);
+            background: rgba(0, 0, 0, 0.05);
+        }
+
+        .summary-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: clamp(20px, 3vh, 32px) clamp(18px, 3vw, 28px);
+            font-family: var(--font-body);
+            font-size: clamp(0.875rem, 1vw, 0.9375rem);
+            line-height: 1.7;
+            color: var(--text-primary);
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* Focus mode element removal */
+        div#summaryOverlay > div > div#summaryContent > div:nth-of-type(1) > div:nth-of-type(1),
+        #summaryContent > div:first-child > div:first-child {
+            display: none !important;
+        }
+        .summary-body h4 {
+            font-family: var(--font-display);
+            font-size: clamp(0.875rem, 1.1vw, 1rem);
+            color: var(--accent-green);
+            margin-top: 22px;
+            margin-bottom: 8px;
+            border-bottom: 1px solid rgba(13, 92, 58, 0.08);
+            padding-bottom: 5px;
+            letter-spacing: 0.01em;
+        }
+        .summary-body h4:first-child {
+            margin-top: 0;
+        }
+        .summary-body p {
+            margin-bottom: 12px;
+            text-align: justify;
+        }
+        .summary-body ul,
+        .summary-body ol {
+            padding-left: 1.4em;
+            margin-bottom: 12px;
+        }
+        .summary-body li {
+            margin-bottom: 5px;
+        }
+        .summary-body strong {
+            color: var(--accent-green);
+        }
+        .summary-body .state-message {
+            text-align: center;
+            padding: 40px 16px;
+            color: var(--text-secondary);
+        }
+        .summary-body .state-message h3 {
+            font-family: var(--font-body);
+            font-size: 1.05rem;
+            color: var(--text-primary);
+            margin-bottom: 6px;
+        }
+        .summary-body .error-msg {
+            color: #DC2626;
+        }
+
+        .summary-footer {
+            padding: clamp(12px, 1.5vh, 18px) clamp(18px, 3vw, 28px);
+            border-top: 1px solid var(--border-color);
+            background: #F9FBF9;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 10px;
+            flex-shrink: 0;
+            flex-wrap: wrap;
+        }
+        .summary-footer .btn-icon-text {
+            font-size: 0.8125rem;
+            padding: 6px 14px;
+        }
+
+        /* ============================================================
+           STATE MESSAGES
+           ============================================================ */
+        .state-message {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-secondary);
+            max-width: 520px;
+            margin: auto;
+            width: 100%;
+        }
+        .state-message h3 {
+            font-size: clamp(1rem, 1.6vw, 1.125rem);
+            color: var(--text-primary);
+            margin-bottom: 6px;
+            font-family: var(--font-body);
+            font-weight: 600;
+        }
+        .state-message p {
+            font-size: clamp(0.875rem, 1vw, 0.9375rem);
+            color: var(--text-muted);
+        }
+        .error-msg {
+            color: #DC2626 !important;
+        }
+        .error-msg h3 {
+            color: #B91C1C !important;
+        }
+
+        /* ============================================================
+           RESPONSIVE BREAKPOINTS
+           ============================================================ */
+        @media (max-width: 1024px) {
+            .toolbar {
+                padding: 0 14px;
+            }
+            .doc-title {
+                max-width: 280px;
+            }
+            .reader-card {
+                padding: 32px;
+            }
+            .summary-drawer {
+                max-width: 480px;
+            }
+        }
+
+        @media (max-width: 820px) {
+            .toolbar {
+                padding: 0 12px;
+                height: 56px;
+                min-height: 56px;
+            }
+            .toolbar-left {
+                gap: 8px;
+            }
+            .back-btn {
+                font-size: 0.75rem;
+                padding: 4px 10px;
+            }
+            .back-btn .back-label {
+                display: none;
+            }
+            .doc-title {
+                max-width: 180px;
+                font-size: 0.8125rem;
+            }
+            .badge {
+                font-size: 0.625rem;
+                padding: 2px 8px;
+            }
+            #pageInfo {
+                font-size: 0.6875rem;
+                padding: 2px 8px;
+            }
+            .source-btn,
+            .btn-icon-text {
+                font-size: 0.6875rem;
+                padding: 4px 8px;
+            }
+            .source-btn .btn-label,
+            .btn-icon-text .btn-label {
+                display: none;
+            }
+            .viewer-container {
+                padding: 16px 10px 80px 10px;
+            }
+            .reader-card {
+                padding: 24px 20px;
+                border-radius: var(--radius-md);
+            }
+            .reader-controls-bar {
+                gap: 8px;
+            }
+            .reader-controls-bar .search-input {
+                min-width: 100px;
+                flex: 1 1 140px;
+                font-size: 0.75rem;
+                padding: 5px 10px;
+            }
+            .summary-drawer {
+                max-width: 420px;
+            }
+            .fab-summary-btn {
+                bottom: 18px;
+                right: 14px;
+                padding: 10px 16px;
+                font-size: 0.75rem;
+            }
+            .fab-summary-btn svg {
+                width: 16px;
+                height: 16px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .toolbar {
+                padding: 0 8px;
+                height: 50px;
+                min-height: 50px;
+                gap: 4px;
+            }
+            .toolbar-left {
+                gap: 6px;
+                flex: 1 1 auto;
+            }
+            .back-btn {
+                font-size: 0.6875rem;
+                padding: 4px 8px;
+                gap: 3px;
+            }
+            .back-btn svg {
+                width: 14px;
+                height: 14px;
+            }
+            .doc-title {
+                max-width: 100px;
+                font-size: 0.75rem;
+            }
+            .toolbar-right {
+                gap: 4px;
+            }
+            .badge,
+            #pageInfo,
+            .source-btn:not(#externalLink),
+            .btn-icon-text:not(#btnBookmark):not(#externalLink) {
+                display: none !important;
+            }
+            #btnBookmark,
+            #externalLink {
+                display: inline-flex !important;
+                padding: 4px 6px;
+                font-size: 0;
+                min-width: 30px;
+                justify-content: center;
+            }
+            #btnBookmark svg,
+            #externalLink svg {
+                width: 16px;
+                height: 16px;
+                margin: 0;
+            }
+            #btnBookmark span,
+            #externalLink span {
+                display: none;
+            }
+            #externalLink[style*="display: inline-flex"] {
+                display: inline-flex !important;
+            }
+            .viewer-container {
+                padding: 12px 6px 70px 6px;
+            }
+            #pagesContainer {
+                gap: 12px;
+            }
+            .page-wrapper {
+                border-radius: 4px;
+            }
+            .reader-card {
+                padding: 18px 14px;
+                border-radius: var(--radius-md);
+                font-size: 0.875rem;
+                line-height: 1.7;
+            }
+            .reader-body p {
+                text-align: left;
+                text-indent: 1.8em;
+            }
+            .reader-controls-bar {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 8px;
+                margin-top: 14px;
+                padding-top: 12px;
+            }
+            .reader-controls-bar .search-input {
+                width: 100%;
+                flex: 1 1 auto;
+                min-width: 0;
+                font-size: 0.75rem;
+                padding: 6px 10px;
+            }
+            .reader-controls-bar>div {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 6px;
+                justify-content: center;
+            }
+            .reader-controls-bar>div .btn-icon-text {
+                font-size: 0.6875rem;
+                padding: 4px 10px;
+            }
+            .summary-overlay {
+                justify-content: center;
+                align-items: flex-end;
+            }
+            .summary-drawer {
+                max-width: 100%;
+                max-height: 92vh;
+                border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+                transform: translateY(100%);
+                height: auto;
+                min-height: 60vh;
+                max-height: 92vh;
+            }
+            .summary-overlay.active .summary-drawer {
+                transform: translateY(0);
+            }
+            .summary-header {
+                padding: 12px 16px;
+                border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+            }
+            .summary-drawer-title {
+                font-size: 0.875rem;
+            }
+            .summary-body {
+                padding: 16px;
+                font-size: 0.8125rem;
+            }
+            .summary-footer {
+                padding: 12px 16px;
+                justify-content: center;
+            }
+            .summary-footer .btn-icon-text {
+                font-size: 0.75rem;
+                padding: 5px 12px;
+            }
+            .fab-summary-btn {
+                bottom: 14px;
+                right: 12px;
+                padding: 8px 14px;
+                font-size: 0.6875rem;
+                gap: 6px;
+                border-width: 1.5px;
+            }
+            .fab-summary-btn svg {
+                width: 14px;
+                height: 14px;
+            }
+            .state-message {
+                padding: 40px 16px;
+            }
+            .state-message h3 {
+                font-size: 0.9375rem;
+            }
+            .state-message p {
+                font-size: 0.8125rem;
+            }
+        }
+
+        @media (max-width: 380px) {
+            .toolbar {
+                padding: 0 4px;
+                height: 46px;
+                min-height: 46px;
+            }
+            .back-btn {
+                font-size: 0.625rem;
+                padding: 3px 6px;
+            }
+            .back-btn svg {
+                width: 12px;
+                height: 12px;
+            }
+            .doc-title {
+                max-width: 70px;
+                font-size: 0.6875rem;
+            }
+            .viewer-container {
+                padding: 8px 4px 60px 4px;
+            }
+            .reader-card {
+                padding: 14px 10px;
+                font-size: 0.8125rem;
+            }
+            .reader-controls-bar .search-input {
+                font-size: 0.6875rem;
+                padding: 4px 8px;
+            }
+            .fab-summary-btn {
+                bottom: 10px;
+                right: 8px;
+                padding: 6px 12px;
+                font-size: 0.625rem;
+            }
+            .fab-summary-btn svg {
+                width: 12px;
+                height: 12px;
+            }
+        }
+
+        @media (max-height: 500px) and (orientation: landscape) {
+            .toolbar {
+                height: 44px;
+                min-height: 44px;
+            }
+            .viewer-container {
+                padding: 10px 8px 60px 8px;
+            }
+            .reader-card {
+                padding: 16px 14px;
+                font-size: 0.8125rem;
+            }
+            .summary-drawer {
+                max-height: 90vh;
+                min-height: 50vh;
+            }
+            .fab-summary-btn {
+                bottom: 10px;
+                right: 12px;
+                padding: 6px 12px;
+                font-size: 0.6875rem;
+            }
+            .state-message {
+                padding: 24px 16px;
+            }
+        }
+
+        @media print {
+            body {
+                background: white;
+                overflow: visible;
+                height: auto;
+            }
+            .toolbar,
+            .fab-summary-btn,
+            .summary-overlay,
+            .reader-controls-bar,
+            .back-btn,
+            #btnBookmark,
+            #externalLink {
+                display: none !important;
+            }
+            .viewer-container {
+                padding: 20px;
+                overflow: visible;
+                height: auto;
+            }
+            .reader-card {
+                box-shadow: none;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+                padding: 24px;
+                max-width: 100%;
+            }
+            .page-wrapper {
+                box-shadow: none;
+                border: 1px solid #ddd;
+                border-radius: 2px;
+                page-break-after: always;
+            }
+            .page-wrapper canvas {
+                max-width: 100%;
+            }
+            #pagesContainer {
+                gap: 20px;
+            }
+            .state-message {
+                padding: 40px;
+            }
+        }
+
+        /* ============================================================
+           UTILITY & ACCESSIBILITY
+           ============================================================ */
+        :focus-visible {
+            outline: 2px solid var(--accent-green);
+            outline-offset: 2px;
+        }
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+                scroll-behavior: auto !important;
+            }
+        }
+        @media (prefers-contrast: high) {
+            :root {
+                --border-color: rgba(13, 92, 58, 0.3);
+                --text-secondary: #2A3F37;
+            }
+            .badge {
+                border-width: 1.5px;
+            }
+            .reader-card {
+                border-width: 2px;
+            }
+        }
+        @media (pointer: coarse) {
+            .back-btn,
+            .source-btn,
+            .btn-icon-text,
+            .fab-summary-btn,
+            .summary-close-btn {
+                min-height: 40px;
+            }
+            .back-btn {
+                min-height: 36px;
+            }
+            .source-btn,
+            .btn-icon-text {
+                min-height: 34px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="toolbar">
+        <div class="toolbar-left">
+            <a href="/" class="back-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="19" y1="12" x2="5" y2="12" />
+                    <polyline points="12 19 5 12 12 5" />
+                </svg>
+                <span class="back-label">Back to search</span>
+            </a>
+            <span class="doc-title" id="docTitle">Loading document...</span>
+        </div>
+        <div class="toolbar-right">
+            <span class="badge badge-year" id="badgeYear" style="display:none;">Year</span>
+            <span class="badge badge-type" id="badgeType" style="display:none;">Type</span>
+            <span class="badge" id="badgeSource" style="display:none;">Source</span>
+            <span class="badge" id="pageInfo">Loading...</span>
+            <button id="btnBookmark" class="source-btn" style="cursor: pointer; display: inline-flex; align-items: center; gap: 4px;" title="Save document to bookmarks">
+                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z" />
+                </svg>
+                <span id="btnBookmarkText">Save</span>
+            </button>
+            <a href="#" id="externalLink" class="source-btn" style="display:none;" target="_blank" rel="noopener noreferrer">
+                Original source
+                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                    <polyline points="15 3 21 3 21 9" />
+                    <line x1="10" y1="14" x2="21" y2="3" />
+                </svg>
+            </a>
+        </div>
+    </div>
+
+    <div class="viewer-container" id="viewerContainer">
+        <div id="loading" class="state-message">
+            <h3>Loading document</h3>
+            <p>Fetching legal document and metadata...</p>
+        </div>
+        <div id="pagesContainer" style="width: 100%; display: flex; flex-direction: column; align-items: center;"></div>
+        <div id="textReaderContainer" style="width: 100%; display: none; justify-content: center;"></div>
+        <div id="error" class="state-message error-msg" style="display:none;"></div>
+    </div>
+
+    <!-- FLOATING ACTION BUTTON FOR AI SUMMARY -->
+    <button class="fab-summary-btn" id="fabSummaryBtn" title="Get Legal AI Summary">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#C5A059" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3z" />
+        </svg>
+        Get Summary
+    </button>
+
+    <!-- SUMMARY MODAL DRAWER OVERLAY -->
+    <div class="summary-overlay" id="summaryOverlay">
+        <div class="summary-drawer">
+            <div class="summary-header">
+                <div style="display:flex; align-items:center; gap:8px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0D5C3A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3z" />
+                    </svg>
+                    <span class="summary-drawer-title">Legal Brief & Summary</span>
+                </div>
+                <button class="summary-close-btn" id="summaryCloseBtn">&times;</button>
+            </div>
+            <div class="summary-body" id="summaryContent">
+                <div class="state-message" style="padding: 40px 0;">
+                    <h3>Generating Legal Brief</h3>
+                    <p>Analyzing document structure, ratio decidendi, and legal provisions...</p>
+                </div>
+            </div>
+            <div class="summary-footer">
+                <button class="btn-icon-text" id="btnCopySummary">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                    </svg>
+                    Copy Brief
+                </button>
+                <button class="btn-icon-text" id="btnCloseDrawer">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/lib/pdf.min.js"></script>
+    <script>
+        pdfjsLib.GlobalWorkerOptions.workerSrc = '/lib/pdf.worker.min.js';
+
+        let loadedDocData = null;
+        let cachedSummaryHtml = null;
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const titleParam = urlParams.get('title');
+        const sourceUrl = urlParams.get('sourceUrl') || urlParams.get('url');
+        const reqYear = urlParams.get('year') || '';
+        const reqType = urlParams.get('type') || '';
+        const reqSource = urlParams.get('source') || '';
+        let filename = urlParams.get('file') || decodeURIComponent(window.location.pathname.replace(/^\/read\/?/, '').replace(
+            'read.html', ''));
+        if (!filename || filename === '/' || filename === 'read.html') filename = 'document.pdf';
+
+        const loadingEl = document.getElementById('loading');
+        const errorEl = document.getElementById('error');
+        const pageInfoEl = document.getElementById('pageInfo');
+        const docTitleEl = document.getElementById('docTitle');
+        const pagesContainer = document.getElementById('pagesContainer');
+        const textReaderContainer = document.getElementById('textReaderContainer');
+        const externalLink = document.getElementById('externalLink');
+        const badgeYear = document.getElementById('badgeYear');
+        const badgeType = document.getElementById('badgeType');
+        const badgeSource = document.getElementById('badgeSource');
+
+        const fabSummaryBtn = document.getElementById('fabSummaryBtn');
+        const summaryOverlay = document.getElementById('summaryOverlay');
+        const summaryContent = document.getElementById('summaryContent');
+        const summaryCloseBtn = document.getElementById('summaryCloseBtn');
+        const btnCloseDrawer = document.getElementById('btnCloseDrawer');
+        const btnCopySummary = document.getElementById('btnCopySummary');
+
+        function closeSummaryDrawer() {
+            summaryOverlay.classList.remove('active');
+        }
+        summaryCloseBtn.addEventListener('click', closeSummaryDrawer);
+        btnCloseDrawer.addEventListener('click', closeSummaryDrawer);
+        summaryOverlay.addEventListener('click', (e) => {
+            if (e.target === summaryOverlay) closeSummaryDrawer();
+        });
+
+        btnCopySummary.addEventListener('click', () => {
+            if (summaryContent) {
+                navigator.clipboard.writeText(summaryContent.innerText);
+                alert('Legal Brief copied to clipboard!');
+            }
+        });
+
+        function getSummaryLocalStorageKey() {
+            const rawKey = sourceUrl || loadedDocData?.citation || displayTitle || filename || '';
+            return 'elegal_summary_' + String(rawKey).replace(/[^a-zA-Z0-9_-]/g, '_').substring(0, 100).toLowerCase();
+        }
+
+        function getCachedSummaryFromLocalStorage() {
+            try {
+                const key = getSummaryLocalStorageKey();
+                const cached = localStorage.getItem(key);
+                if (cached && cached.length > 50) {
+                    return cached;
+                }
+            } catch (e) {
+                console.warn('LocalStorage summary read error:', e);
+            }
+            return null;
+        }
+
+        function saveSummaryToLocalStorage(html) {
+            try {
+                if (html && html.length > 50) {
+                    const key = getSummaryLocalStorageKey();
+                    localStorage.setItem(key, html);
+                }
+            } catch (e) {
+                console.warn('LocalStorage summary save error:', e);
+            }
+        }
+
+        fabSummaryBtn.addEventListener('click', async () => {
+            summaryOverlay.classList.add('active');
+
+            if (cachedSummaryHtml) {
+                summaryContent.innerHTML = cachedSummaryHtml;
+                return;
+            }
+
+            // Check Browser LocalStorage cache first
+            const localCachedHtml = getCachedSummaryFromLocalStorage();
+            if (localCachedHtml) {
+                console.log('[localStorage] Loaded brief from browser cache');
+                cachedSummaryHtml = localCachedHtml;
+                summaryContent.innerHTML = cachedSummaryHtml;
+                return;
+            }
+
+            summaryContent.innerHTML = `
+                <div class="state-message" style="padding: 40px 0;">
+                    <h3>Generating Legal Brief</h3>
+                    <p>Analyzing holdings, ratio decidendi, and statutory provisions...</p>
+                </div>
+            `;
+            try {
+                const res = await fetch('/api/summarize-doc', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        title: loadedDocData?.title || displayTitle,
+                        sourceUrl: sourceUrl || '',
+                        text: loadedDocData?.text || '',
+                        year: reqYear || loadedDocData?.year || '',
+                        type: reqType || loadedDocData?.type || '',
+                        citation: loadedDocData?.citation || ''
+                    })
+                });
+                const data = await res.json();
+                if (data.success && data.summaryHtml) {
+                    cachedSummaryHtml = data.summaryHtml;
+                    summaryContent.innerHTML = cachedSummaryHtml;
+                    saveSummaryToLocalStorage(cachedSummaryHtml);
+                } else {
+                    summaryContent.innerHTML = `<p class="error-msg">Could not generate summary at this moment.</p>`;
+                }
+            } catch (e) {
+                summaryContent.innerHTML = `<p class="error-msg">Error generating summary: ${e.message}</p>`;
+            }
+        });
+
+        const displayTitle = titleParam ? decodeURIComponent(titleParam) : filename.replace('.pdf', '');
+        docTitleEl.textContent = displayTitle;
+        document.title = `${displayTitle} | eLegal Reader`;
+
+        /* ─── BOOKMARK LOCAL STORAGE LOGIC ─── */
+        const SAVED_DOCS_KEY = 'elegal_saved_documents';
+        const btnBookmark = document.getElementById('btnBookmark');
+        const btnBookmarkText = document.getElementById('btnBookmarkText');
+
+        function getSavedDocs() {
+            try {
+                const raw = localStorage.getItem(SAVED_DOCS_KEY);
+                return raw ? JSON.parse(raw) : [];
+            } catch (e) {
+                return [];
+            }
+        }
+
+        function getDocKey() {
+            const key = window.location.search || sourceUrl || displayTitle;
+            return String(key).toLowerCase().trim();
+        }
+
+        function isDocSaved() {
+            const key = getDocKey();
+            if (!key) return false;
+            const docs = getSavedDocs();
+            return docs.some(d => {
+                const dKey = d.readUrl || d.url || d.title || d.citation || '';
+                return String(dKey).toLowerCase().trim() === key || (d.title && d.title.toLowerCase().trim() === displayTitle
+                    .toLowerCase().trim());
+            });
+        }
+
+        function updateBookmarkButtonUI() {
+            const saved = isDocSaved();
+            if (saved) {
+                btnBookmarkText.textContent = 'Saved';
+                btnBookmark.style.background = '#eff6ff';
+                btnBookmark.style.color = '#2563eb';
+                btnBookmark.style.borderColor = '#bfdbfe';
+            } else {
+                btnBookmarkText.textContent = 'Save';
+                btnBookmark.style.background = '';
+                btnBookmark.style.color = '';
+                btnBookmark.style.borderColor = '';
+            }
+        }
+
+        btnBookmark.addEventListener('click', () => {
+            let docs = getSavedDocs();
+            const saved = isDocSaved();
+            if (saved) {
+                docs = docs.filter(d => {
+                    const dKey = d.readUrl || d.url || d.title || d.citation || '';
+                    return String(dKey).toLowerCase().trim() !== getDocKey() && d.title?.toLowerCase().trim() !==
+                        displayTitle.toLowerCase().trim();
+                });
+            } else {
+                docs.unshift({
+                    title: displayTitle,
+                    citation: loadedDocData?.citation || displayTitle,
+                    year: reqYear || loadedDocData?.year || '',
+                    type: reqType || loadedDocData?.type || '',
+                    source: reqSource || loadedDocData?.source || '',
+                    category: loadedDocData?.category || 'precedent',
+                    url: sourceUrl || '',
+                    readUrl: window.location.pathname + window.location.search,
+                    isPdf: true,
+                    isDocument: true,
+                    savedAt: new Date().toISOString()
+                });
+            }
+            try {
+                localStorage.setItem(SAVED_DOCS_KEY, JSON.stringify(docs));
+            } catch (e) {
+                console.warn('Failed to save bookmark', e);
+            }
+            updateBookmarkButtonUI();
+        });
+
+        updateBookmarkButtonUI();
+
+        if (sourceUrl && sourceUrl.startsWith('http')) {
+            externalLink.href = sourceUrl;
+            externalLink.style.display = 'inline-flex';
+        }
+
+        if (reqYear) {
+            badgeYear.textContent = reqYear;
+            badgeYear.style.display = 'inline-block';
+        }
+        if (reqType) {
+            badgeType.textContent = reqType;
+            badgeType.style.display = 'inline-block';
+        }
+        if (reqSource) {
+            badgeSource.textContent = reqSource;
+            badgeSource.style.display = 'inline-block';
+        }
+
+        function showError(message) {
+            loadingEl.style.display = 'none';
+            errorEl.style.display = 'block';
+            errorEl.innerHTML = `<h3>Could not load document</h3><p>${message}</p>`;
+        }
+
+        let textFontSize = 1.0625;
+
+        /* ─── Helper: Detect Kenya Law (KLR) source ─── */
+        function isKenyaLawSource(url) {
+            if (!url) return false;
+            const u = url.toLowerCase();
+            return u.includes('kenyalaw.org') || u.includes('klr') || u.includes('kenya law');
+        }
+
+        /* ─── Helper: Build PDF URL for Kenya Law source ─── */
+        function buildKenyaLawPdfUrl(baseUrl) {
+            if (!baseUrl) return null;
+            // If the URL already ends with /source, use as-is
+            if (baseUrl.endsWith('/source')) return baseUrl;
+            // If it ends with /, append source
+            if (baseUrl.endsWith('/')) return baseUrl + 'source';
+            // Otherwise append /source
+            return baseUrl + '/source';
+        }
+
+        /* ─── Helper: Check if a URL points to a DOCX/DOC file ─── */
+        function isDocxFile(url) {
+            if (!url) return false;
+            const u = url.toLowerCase();
+            return u.endsWith('.docx') || u.endsWith('.doc');
+        }
+
+        /* ─── Helper: Render PDF from ArrayBuffer ─── */
+        async function renderPdfFromBuffer(arrayBuffer, totalPagesOverride) {
+            const pdfDoc = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+            const totalPages = totalPagesOverride || pdfDoc.numPages;
+            pageInfoEl.textContent = `${totalPages} page${totalPages !== 1 ? 's' : ''}`;
+            loadingEl.style.display = 'none';
+
+            const firstPage = await pdfDoc.getPage(1);
+            const firstViewport = firstPage.getViewport({ scale: 1 });
+            const availableWidth = Math.min(window.innerWidth - 40, 900);
+            const fitScale = Math.min(availableWidth / firstViewport.width, 1.8);
+
+            for (let i = 1; i <= totalPages; i++) {
+                const page = await pdfDoc.getPage(i);
+                const viewport = page.getViewport({ scale: fitScale });
+
+                const canvas = document.createElement('canvas');
+                canvas.height = viewport.height;
+                canvas.width = viewport.width;
+
+                const wrapper = document.createElement('div');
+                wrapper.className = 'page-wrapper';
+                wrapper.appendChild(canvas);
+                pagesContainer.appendChild(wrapper);
+
+                await page.render({ canvasContext: canvas.getContext('2d'), viewport }).promise;
+            }
+            return true;
+        }
+
+        /* ─── Helper: Convert DOCX to PDF using server API ─── */
+        async function convertDocxToPdf(docxUrl) {
+            // Assume server endpoint: /api/convert-docx?url=...
+            const convertUrl = `/api/convert-docx?url=${encodeURIComponent(docxUrl)}`;
+            const response = await fetch(convertUrl);
+            if (!response.ok) throw new Error(`Conversion failed: ${response.status}`);
+            const arrayBuffer = await response.arrayBuffer();
+            // Validate PDF header
+            const bytes = new Uint8Array(arrayBuffer.slice(0, 5));
+            const header = String.fromCharCode.apply(null, Array.from(bytes));
+            if (!header.startsWith('%PDF')) {
+                throw new Error('Converted document is not a valid PDF');
+            }
+            return arrayBuffer;
+        }
+
+        /* ─── Render PDF from Kenya Law source ─── */
+        async function renderKenyaLawPdf(sourceUrl) {
+            const pdfUrl = buildKenyaLawPdfUrl(sourceUrl);
+            if (!pdfUrl) return false;
+
+            try {
+                // First, fetch the source (could be PDF or DOCX)
+                const response = await fetch(pdfUrl);
+                if (!response.ok) return false;
+
+                const arrayBuffer = await response.arrayBuffer();
+                const bytes = new Uint8Array(arrayBuffer.slice(0, 5));
+                const header = String.fromCharCode.apply(null, Array.from(bytes));
+
+                if (header.startsWith('%PDF')) {
+                    // It's already a PDF, render it
+                    await renderPdfFromBuffer(arrayBuffer);
+                    return true;
+                } else {
+                    // Probably a DOCX or other format - attempt conversion
+                    // We need to get the actual file URL from the response? The response is the file itself.
+                    // We can try to convert the fetched buffer, but we need to send it to server for conversion.
+                    // Since we already have the buffer, we can send it via FormData to a conversion endpoint.
+                    // Alternatively, we can use the original pdfUrl as the source for conversion.
+                    // Let's use the conversion endpoint that takes a URL.
+                    // But we already have the file content; we can send it as a blob.
+                    // For simplicity, we'll use the conversion endpoint with the URL.
+                    // However, if the source URL is the /source endpoint, it might require authentication? We'll assume server can fetch it.
+                    // Let's try to convert using the same URL.
+                    const convertedPdf = await convertDocxToPdf(pdfUrl);
+                    await renderPdfFromBuffer(convertedPdf);
+                    return true;
+                }
+            } catch (e) {
+                console.warn('Kenya Law PDF fetch/conversion failed:', e.message);
+                return false;
+            }
+        }
+
+        /* ─── TEXT READER RENDER (restructured) ─── */
+        function renderTextReader(data) {
+            loadingEl.style.display = 'none';
+            pagesContainer.style.display = 'none';
+            textReaderContainer.style.display = 'flex';
+            pageInfoEl.textContent = 'Text View';
+
+            if (data.year) {
+                badgeYear.textContent = data.year;
+                badgeYear.style.display = 'inline-block';
+            }
+            if (data.type) {
+                badgeType.textContent = data.type;
+                badgeType.style.display = 'inline-block';
+            }
+            if (data.source) {
+                badgeSource.textContent = data.source;
+                badgeSource.style.display = 'inline-block';
+            }
+
+            textReaderContainer.innerHTML = '';
+
+            const card = document.createElement('div');
+            card.className = 'reader-card';
+            card.style.fontSize = textFontSize + 'rem';
+
+            const body = document.createElement('div');
+            body.className = 'reader-body';
+            body.id = 'readerBody';
+
+            let rawHtml = data.html || '';
+            let rawText = data.text || '';
+
+            // For Kenya Law sources that fell back to text, we already have structured text
+            // But we also try to restructure plain text
+            let contentHtml = '';
+
+            if (rawHtml && rawHtml.trim().length > 50) {
+                // Clean HTML and apply styling
+                const temp = document.createElement('div');
+                temp.innerHTML = rawHtml;
+                // Remove unwanted elements
+                const removeSelectors = ['header', 'footer', 'nav', 'aside', '.header', '.footer', '.navigation',
+                    '.sidebar', '[role="banner"]', '[role="navigation"]', '[role="contentinfo"]'
+                ];
+                for (const sel of removeSelectors) {
+                    const els = temp.querySelectorAll(sel);
+                    for (const el of els) el.remove();
+                }
+                // Deactivate links
+                const links = temp.querySelectorAll('a');
+                for (const link of links) {
+                    link.removeAttribute('href');
+                    link.style.pointerEvents = 'none';
+                    link.style.cursor = 'default';
+                    link.style.textDecoration = 'none';
+                    link.style.color = 'inherit';
+                }
+                contentHtml = temp.innerHTML;
+            } else if (rawText && rawText.trim().length > 10) {
+                // Restructure plain text into legal document format
+                const result = restructureLegalText(rawText);
+                if (result.hasContent) {
+                    contentHtml = result.html;
+                } else {
+                    contentHtml = `<p>${escapeHtml(rawText)}</p>`;
+                }
+            } else {
+                // Fallback
+                contentHtml = `
+                    <div style="padding:24px; background:#FDFBF7; border:1px solid rgba(197,160,89,0.3); border-radius:8px; margin-top:16px;">
+                        <h3 style="font-family:var(--font-legal); color:var(--accent-green); margin-bottom:8px;">Legal Document Overview</h3>
+                        <p style="margin-bottom:12px; color:var(--text-secondary); line-height:1.6;">
+                            This legal record (<strong>${escapeHtml(data.title || displayTitle)}</strong>) is referenced in Kenya Law records.
+                            ${sourceUrl ? 'You can view the original court record directly or click "Get Summary" to generate an AI Legal Brief.' : ''}
+                        </p>
+                        <div style="display:flex; gap:12px; flex-wrap:wrap; margin-top:16px;">
+                            ${sourceUrl ? `<a href="${escapeHtml(sourceUrl)}" target="_blank" rel="noopener noreferrer" class="back-btn" style="background:var(--accent-green); color:white;">Open Original Source ↗</a>` : ''}
+                            <button class="btn-icon-text" onclick="document.getElementById('fabSummaryBtn').click()">✨ Generate Legal Brief</button>
+                        </div>
+                    </div>
+                `;
+            }
+
+            body.innerHTML = contentHtml;
+
+            const controls = document.createElement('div');
+            controls.className = 'reader-controls-bar';
+            controls.innerHTML = `
+                <input type="text" class="search-input" id="inDocSearch" placeholder="Find in document text…">
+                <div style="display:flex; gap:8px;">
+                    <button class="btn-icon-text" id="btnFontDec">A−</button>
+                    <button class="btn-icon-text" id="btnFontInc">A+</button>
+                    <button class="btn-icon-text" id="btnCopyText">Copy text</button>
+                    <button class="btn-icon-text" id="btnPrintDoc">Print</button>
+                </div>
+            `;
+
+            card.appendChild(body);
+            card.appendChild(controls);
+            textReaderContainer.appendChild(card);
+
+            // Font controls
+            document.getElementById('btnFontDec')?.addEventListener('click', () => {
+                textFontSize = Math.max(0.85, textFontSize - 0.1);
+                card.style.fontSize = textFontSize + 'rem';
+            });
+            document.getElementById('btnFontInc')?.addEventListener('click', () => {
+                textFontSize = Math.min(1.8, textFontSize + 0.1);
+                card.style.fontSize = textFontSize + 'rem';
+            });
+            document.getElementById('btnCopyText')?.addEventListener('click', () => {
+                const text = body.innerText || data.text || '';
+                navigator.clipboard.writeText(text).catch(() => {
+                    const range = document.createRange();
+                    range.selectNode(body);
+                    window.getSelection().removeAllRanges();
+                    window.getSelection().addRange(range);
+                    document.execCommand('copy');
+                    window.getSelection().removeAllRanges();
+                });
+                alert('Document text copied to clipboard');
+            });
+            document.getElementById('btnPrintDoc')?.addEventListener('click', () => {
+                window.print();
+            });
+
+            // Search
+            const searchInput = document.getElementById('inDocSearch');
+            if (searchInput) {
+                let originalHtml = body.innerHTML;
+                searchInput.addEventListener('input', (e) => {
+                    const val = e.target.value.trim();
+                    if (!val) { body.innerHTML = originalHtml; return; }
+                    const regex = new RegExp(`(${val.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+
+                    function highlightTextNodes(node) {
+                        if (node.nodeType === Node.TEXT_NODE) {
+                            const text = node.textContent;
+                            if (regex.test(text)) {
+                                const span = document.createElement('span');
+                                span.innerHTML = text.replace(regex, '<mark class="highlight">$1</mark>');
+                                node.parentNode.replaceChild(span, node);
+                            }
+                        } else if (node.nodeType === Node.ELEMENT_NODE) {
+                            if (node.tagName === 'MARK') return;
+                            const children = Array.from(node.childNodes);
+                            for (const child of children) highlightTextNodes(child);
+                        }
+                    }
+                    body.innerHTML = originalHtml;
+                    highlightTextNodes(body);
+                });
+                setTimeout(() => { originalHtml = body.innerHTML; }, 50);
+            }
+        }
+
+        /* ─── LEGAL TEXT RESTRUCTURING ENGINE ─── */
+        function isLegalHeading(line) {
+            const t = line.trim();
+            if (!t) return false;
+            if (t === t.toUpperCase() && t.length > 8 && t.length < 120) return true;
+            if (/^(SECTION|ARTICLE|CHAPTER|PART|TITLE|SUBPART|RULE|ORDER|CLAUSE|SCHEDULE)\s+/i.test(t)) return true;
+            if (/^(\d+\.\s*|\d+\.\d+\.\s*|\([a-z]\)\s*|\([ivx]+\)\s*|\([0-9]+\)\s*)/i.test(t) && t.length < 100) return true;
+            if (/v\.|versus/i.test(t) && /[A-Z]/.test(t) && t.length < 120) return true;
+            if (/^(IN THE MATTER OF|IN RE|BETWEEN|AND|REPUBLIC OF|THE STATE|ATTORNEY GENERAL|JUDGMENT|RULING|ORDER|DECREE|FINDINGS|DETERMINATION)/i
+                .test(t) && t.length < 100) return true;
+            return false;
+        }
+
+        function getHeadingLevel(line) {
+            const t = line.trim();
+            if (t === t.toUpperCase() && (t.includes('REPUBLIC') || t.includes('KENYA') || t.includes('COURT') || t.includes(
+                    'JUDGMENT') || t.includes('RULING'))) return 1;
+            if (/^(SECTION|ARTICLE|CHAPTER|PART|TITLE)\s+/i.test(t)) return 2;
+            if (/^\d+\.\s/.test(t)) return 3;
+            if (/^\d+\.\d+\.\s|^\([a-z]\)\s|^\([ivx]+\)\s/.test(t)) return 4;
+            if (/v\.|versus/i.test(t) && /[A-Z]/.test(t)) return 2;
+            return 3;
+        }
+
+        function isListItem(line) {
+            const t = line.trim();
+            if (/^[•·●◦‣⁃]\s/.test(t)) return true;
+            if (/^(\d+\.\s|\d+\)\s|\([a-z]\)\s|\([ivx]+\)\s|[a-z]\.\s)/i.test(t)) return true;
+            return false;
+        }
+
+        function isCitationLine(line) {
+            const t = line.trim();
+            if (/\[\d{4}\]\s*(KECA|KLR|KHC|KESC|KEM|KLR|EA|UKPC|UKSC|HC|CA|SC)\s*\d+/i.test(t)) return true;
+            if (/neutral\s*citation/i.test(t)) return true;
+            return false;
+        }
+
+        function highlightCitations(text) {
+            if (!text) return text;
+            let result = text.replace(
+                /(\[\d{4}\]\s*(KECA|KLR|KHC|KESC|KEM|KLR|EA|UKPC|UKSC|HC|CA|SC)\s*\d+[a-z]?(?:\s*\([^)]*\))?)/gi,
+                '<span class="citation-highlight">$1</span>'
+            );
+            result = result.replace(
+                /(Media\s+Neutral\s+Citation\s*:?\s*\[\d{4}\]\s*(KECA|KLR|KHC|KESC|KEM|KLR|EA|UKPC|UKSC|HC|CA|SC)\s*\d+[a-z]?(?:\s*\([^)]*\))?)/gi,
+                '<span class="citation-highlight">$1</span>'
+            );
+            result = result.replace(
+                /\b([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*\s+v\.\s+[A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)\b/g,
+                (match) => {
+                    if (match.includes('class="')) return match;
+                    return `<span class="caselaw-highlight">${match}</span>`;
+                }
+            );
+            return result;
+        }
+
+        function isSignatureBlock(line) {
+            const t = line.trim().toLowerCase();
+            if (/date\s*signed|signed\s*at|judge|justice|delivered\s*by|dated\s*this|this\s*\d+\s*day\s*of/i.test(t))
+            return true;
+            if (/^\s*dated\s*$/i.test(t)) return true;
+            if (/^\s*judge\s*$/i.test(t)) return true;
+            if (/^\s*justice\s*$/i.test(t)) return true;
+            return false;
+        }
+
+        function removeSignatureBlock(lines) {
+            const result = [];
+            let inBlock = false;
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i];
+                const trimmed = line.trim();
+                if (!inBlock && isSignatureBlock(trimmed)) {
+                    inBlock = true;
+                    let j = i + 1;
+                    while (j < lines.length && j < i + 5) {
+                        const nt = lines[j].trim();
+                        if (isSignatureBlock(nt) || nt === '' || /^[•·\-–—]/.test(nt)) { j++; } else break;
+                    }
+                    i = j - 1;
+                    continue;
+                }
+                if (inBlock) {
+                    if (isSignatureBlock(trimmed) || trimmed === '' || /^[•·\-–—]/.test(trimmed)) continue;
+                    inBlock = false;
+                }
+                result.push(line);
+            }
+            return result;
+        }
+
+        function restructureLegalText(rawText) {
+            if (!rawText || rawText.trim().length < 5) {
+                return { html: '<p><em>No text content available.</em></p>', hasContent: false };
+            }
+            let text = rawText.replace(/\r\n/g, '\n').replace(/\r/g, '\n').replace(/\t/g, ' ').replace(/[ \t]+/g, ' ');
+            let lines = text.split('\n');
+            lines = removeSignatureBlock(lines);
+
+            const blocks = [];
+            let currentParagraph = [];
+            let inList = false;
+            let listItems = [];
+
+            function flushParagraph() {
+                if (currentParagraph.length === 0) return;
+                const content = currentParagraph.join(' ');
+                if (content.trim()) {
+                    const highlighted = highlightCitations(content.trim());
+                    blocks.push({ type: 'paragraph', content: highlighted });
+                }
+                currentParagraph = [];
+            }
+
+            function flushList() {
+                if (listItems.length === 0) return;
+                const highlightedItems = listItems.map(item => highlightCitations(item));
+                blocks.push({ type: 'list', items: highlightedItems });
+                listItems = [];
+                inList = false;
+            }
+
+            for (let i = 0; i < lines.length; i++) {
+                const raw = lines[i];
+                const trimmed = raw.trim();
+                if (!trimmed) { flushParagraph();
+                    flushList(); continue; }
+
+                if (isCitationLine(trimmed) && trimmed.length < 100) {
+                    flushParagraph();
+                    flushList();
+                    blocks.push({ type: 'citation', content: highlightCitations(trimmed) });
+                    continue;
+                }
+
+                if (isLegalHeading(trimmed)) {
+                    flushParagraph();
+                    flushList();
+                    const level = getHeadingLevel(trimmed);
+                    blocks.push({ type: 'heading', content: highlightCitations(trimmed), level: level });
+                    continue;
+                }
+
+                if (isListItem(trimmed)) {
+                    flushParagraph();
+                    if (!inList) { inList = true;
+                        listItems = []; }
+                    listItems.push(trimmed);
+                    continue;
+                }
+
+                if (inList) {
+                    if (/^[a-z]/.test(trimmed) && trimmed.length > 3) {
+                        if (listItems.length > 0) {
+                            listItems[listItems.length - 1] += ' ' + trimmed;
+                        } else { currentParagraph.push(trimmed); }
+                        continue;
+                    } else { flushList(); }
+                }
+                currentParagraph.push(trimmed);
+            }
+
+            flushParagraph();
+            flushList();
+
+            let html = '';
+            let prevType = '';
+
+            for (let i = 0; i < blocks.length; i++) {
+                const block = blocks[i];
+                const isFirst = (i === 0);
+
+                if (block.type === 'heading') {
+                    const level = block.level || 3;
+                    const cls = `doc-heading level-${level}`;
+                    const isCase = /v\.|versus/i.test(block.content) && /[A-Z]/.test(block.content);
+                    const tag = isCase ? 'div' : (level <= 2 ? 'h2' : (level === 3 ? 'h3' : 'h4'));
+                    const extraClass = isCase ? 'case-heading' : cls;
+                    html += `<${tag} class="${extraClass}">${block.content}</${tag}>`;
+                    prevType = 'heading';
+                    continue;
+                }
+
+                if (block.type === 'citation') {
+                    html +=
+                        `<div class="citation-highlight" style="display:inline-block; padding:0.2em 0.6em; margin:0.2em 0;">${block.content}</div>`;
+                    prevType = 'citation';
+                    continue;
+                }
+
+                if (block.type === 'list') {
+                    const firstItem = block.items[0] || '';
+                    const isOrdered = /^\d+\.|^\d+\)|^\([0-9]\)/.test(firstItem);
+                    const tag = isOrdered ? 'ol' : 'ul';
+                    html += `<${tag} class="doc-list">`;
+                    for (const item of block.items) {
+                        const clean = item.replace(/^[•·●◦‣⁃]\s*/, '')
+                            .replace(/^(\d+\.\s*|\d+\)\s*|\([a-z]\)\s*|\([ivx]+\)\s*|[a-z]\.\s*)/i, '');
+                        html += `<li>${highlightCitations(clean)}</li>`;
+                    }
+                    html += `</${tag}>`;
+                    prevType = 'list';
+                    continue;
+                }
+
+                if (block.type === 'paragraph') {
+                    const content = block.content;
+                    if (content.length < 3) continue;
+                    if (content === content.toUpperCase() && content.length < 60 && !content.includes('.')) {
+                        html += `<h4 class="doc-heading level-4">${content}</h4>`;
+                        prevType = 'heading';
+                        continue;
+                    }
+                    const isFirstAfterHeading = (prevType === 'heading' || prevType === 'citation' || isFirst);
+                    const cls = isFirstAfterHeading ? 'first-after-heading' : '';
+                    html += `<p class="${cls}">${content}</p>`;
+                    prevType = 'paragraph';
+                    continue;
+                }
+            }
+
+            return { html: html, hasContent: true };
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        /* ─── MAIN LOAD FUNCTION ─── */
+        async function loadDocument() {
+            // ── Step 1: If it's a Kenya Law source, try PDF directly or convert ──
+            if (sourceUrl && isKenyaLawSource(sourceUrl)) {
+                // Attempt to get PDF from /source or convert if needed
+                const pdfOk = await renderKenyaLawPdf(sourceUrl);
+                if (pdfOk) {
+                    // Successfully rendered PDF (either native or converted)
+                    return;
+                }
+                // If PDF fetch/conversion failed, fall through to API
+                console.warn('Kenya Law PDF fetch/conversion failed, falling back to API');
+            }
+
+            // ── Step 2: Fall back to API-based loading ──
+            if (!sourceUrl && (!filename || filename === 'document.pdf')) {
+                showError('No source URL or file provided');
+                return;
+            }
+
+            try {
+                const fetchTarget = sourceUrl ?
+                    `/api/document-content?sourceUrl=${encodeURIComponent(sourceUrl)}&title=${encodeURIComponent(displayTitle)}&year=${encodeURIComponent(reqYear)}&type=${encodeURIComponent(reqType)}&source=${encodeURIComponent(reqSource)}` :
+                    `/read/${encodeURIComponent(filename)}?raw=1`;
+
+                const res = await fetch(fetchTarget);
+                if (!res.ok) {
+                    throw new Error(`Failed to load document (${res.status})`);
+                }
+
+                const data = await res.json();
+                loadedDocData = data;
+
+                // If API says it's a PDF, try to render it
+                const preferPdf = !data.fallback && (data.isPdf || data.hasPdf || !!data.pdfUrl);
+
+                if (preferPdf) {
+                    try {
+                        const pdfUrl = data.pdfUrl || `/api/pdf-proxy?sourceUrl=${encodeURIComponent(sourceUrl)}`;
+                        const pdfRes = await fetch(pdfUrl);
+                        if (pdfRes.ok) {
+                            const arrayBuffer = await pdfRes.arrayBuffer();
+                            const bytes = new Uint8Array(arrayBuffer.slice(0, 5));
+                            const pdfHeader = String.fromCharCode.apply(null, Array.from(bytes));
+                            if (pdfHeader.startsWith('%PDF')) {
+                                await renderPdfFromBuffer(arrayBuffer);
+                                return;
+                            }
+                        }
+                    } catch (pdfErr) {
+                        console.warn('PDF rendering error, switching to Text Reader:', pdfErr.message);
+                    }
+                }
+
+                // ── Step 3: Render as text ──
+                renderTextReader(data);
+
+            } catch (e) {
+                showError(e.message);
+            }
+        }
+
+        loadDocument();
+    </script>
+</body>
+
+</html>

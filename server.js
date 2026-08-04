@@ -135,7 +135,7 @@ const rateLimits = new Map();
 const RATE_LIMIT_WINDOW_MS = 60 * 1000;
 const RATE_LIMIT_MAX = 60;
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 const INDEX_FILE = path.join(__dirname, 'search-index.json');
 const KEYS_FILE = path.join(__dirname, 'data', 'apikeys.json');
 
@@ -144,8 +144,32 @@ function initLocalKeysStore() {
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir, { recursive: true });
   }
+  const defaultKeys = {
+    userKeys: {
+      "user_demo": {
+        "el_demo_key_12345": {
+          "label": "Primary API Key",
+          "createdAt": "2026-08-04T00:00:00.000Z",
+          "lastUsed": null,
+          "requestCount": 0,
+          "isActive": true
+        }
+      }
+    }
+  };
+
   if (!fs.existsSync(KEYS_FILE)) {
-    fs.writeFileSync(KEYS_FILE, JSON.stringify({ userKeys: {} }, null, 2));
+    fs.writeFileSync(KEYS_FILE, JSON.stringify(defaultKeys, null, 2));
+  } else {
+    try {
+      const raw = fs.readFileSync(KEYS_FILE, 'utf8');
+      const data = JSON.parse(raw);
+      if (!data.userKeys || Object.keys(data.userKeys).length === 0) {
+        fs.writeFileSync(KEYS_FILE, JSON.stringify(defaultKeys, null, 2));
+      }
+    } catch (_) {
+      fs.writeFileSync(KEYS_FILE, JSON.stringify(defaultKeys, null, 2));
+    }
   }
 }
 
@@ -344,13 +368,25 @@ async function createApiKey(label, userId) {
 }
 
 async function validateApiKey(req, res, next) {
-  const key = req.headers['x-api-key'];
+  let key = req.headers['x-api-key'] || req.query.api_key;
+  if (!key && req.headers['authorization']) {
+    const authHeader = req.headers['authorization'];
+    if (authHeader.startsWith('Bearer el_')) {
+      key = authHeader.substring(7);
+    }
+  }
+
   if (!key) {
-    return res.status(401).json({ error: 'API key required', code: 'MISSING_API_KEY' });
+    return res.status(401).json({
+      error: 'API key required',
+      code: 'MISSING_API_KEY',
+      message: 'Include a valid API key in X-API-Key header or api_key parameter.'
+    });
   }
 
   let keyData = null;
   let keyDocRef = null;
+  let keyOwnerId = null;
 
   try {
     const db = getFirestore();
@@ -358,13 +394,17 @@ async function validateApiKey(req, res, next) {
       const snapshot = await db.collection('apikeys').get();
       const checks = [];
       snapshot.forEach(userDoc => {
-        checks.push(userDoc.ref.collection('keys').doc(key).get());
+        checks.push({
+          userId: userDoc.id,
+          promise: userDoc.ref.collection('keys').doc(key).get()
+        });
       });
-      const docs = await Promise.all(checks);
-      for (const doc of docs) {
+      for (const item of checks) {
+        const doc = await item.promise;
         if (doc.exists) {
           keyData = doc.data();
           keyDocRef = doc.ref;
+          keyOwnerId = item.userId;
           break;
         }
       }
@@ -378,13 +418,18 @@ async function validateApiKey(req, res, next) {
     for (const uId of Object.keys(userKeys)) {
       if (userKeys[uId] && userKeys[uId][key]) {
         keyData = userKeys[uId][key];
+        keyOwnerId = uId;
         break;
       }
     }
   }
 
   if (!keyData || !keyData.isActive) {
-    return res.status(401).json({ error: 'Invalid API key', code: 'INVALID_API_KEY' });
+    return res.status(401).json({
+      error: 'Invalid API key',
+      code: 'INVALID_API_KEY',
+      message: 'The provided API key is invalid or inactive. Please use a registered API key assigned to your user account.'
+    });
   }
 
   const now = Date.now();
@@ -421,6 +466,7 @@ async function validateApiKey(req, res, next) {
 
   req.apiKey = key;
   req.apiKeyInfo = keyData;
+  req.keyOwnerId = keyOwnerId;
   next();
 }
 
@@ -951,7 +997,7 @@ function saveDocToRepository(docMeta, contentBufferOrString = null, ext = 'txt')
   }
 }
 
-app.get('/api/pdf-proxy', async (req, res) => {
+app.get('/api/pdf-proxy', validateApiKey, async (req, res) => {
   const sourceUrl = req.query.sourceUrl;
   if (!sourceUrl) {
     return res.status(400).json({ error: 'No source URL provided' });
@@ -1149,7 +1195,7 @@ app.get('/read/:filename', async (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'read.html'));
 });
 
-app.get('/api/document-content', async (req, res) => {
+app.get('/api/document-content', validateApiKey, async (req, res) => {
   const sourceUrl = req.query.sourceUrl || req.query.url;
   const reqTitle = req.query.title || 'Document';
   const reqYear = req.query.year || '';
@@ -1544,7 +1590,7 @@ Respond in clean HTML using this exact structure:
   throw lastError || new Error('Failed to generate summary with Groq models');
 }
 
-app.post('/api/summarize-doc', async (req, res) => {
+app.post('/api/summarize-doc', validateApiKey, async (req, res) => {
   const { title = 'Legal Document', sourceUrl = '', text = '', year = '', type = '', citation = '' } = req.body || {};
   const docText = text ? text.substring(0, 15000) : '';
   const docKey = sourceUrl || citation || title;
@@ -1586,7 +1632,7 @@ app.post('/api/summarize-doc', async (req, res) => {
   }
 });
 
-app.get('/api/repository/docs', (req, res) => {
+app.get('/api/repository/docs', validateApiKey, (req, res) => {
   try {
     const docs = getRepositoryDocs();
     res.json({ docs, total: docs.length });
@@ -2362,7 +2408,7 @@ async function fetchLatestKenyaLawItems() {
   }
 }
 
-app.get('/api/latest-kenyalaw', async (req, res) => {
+app.get('/api/latest-kenyalaw', validateApiKey, async (req, res) => {
   try {
     const latest = await fetchLatestKenyaLawItems();
     const repoDocs = getRepositoryDocs();
@@ -2372,7 +2418,7 @@ app.get('/api/latest-kenyalaw', async (req, res) => {
   }
 });
 
-app.get('/api/suggestions', (req, res) => {
+app.get('/api/suggestions', validateApiKey, (req, res) => {
   const q = String(req.query.q || '').trim().toLowerCase();
   if (!q || q.length < 1) {
     return res.json({ suggestions: [] });
@@ -2451,11 +2497,15 @@ app.get('/api/suggestions', (req, res) => {
 
 
 app.get('/api/docs', (req, res) => {
+  const protocol = req.headers['x-forwarded-proto'] || req.protocol || 'http';
+  const host = req.get('host') || 'localhost:3000';
+  const origin = `${protocol}://${host}`;
+
   res.json({
     name: 'eLegal API',
     version: '1.0.0',
     description: 'Search Kenya Law statutes and judgments with AI-powered ranking.',
-    baseUrl: '/api',
+    baseUrl: `${origin}/api`,
     authentication: {
       type: 'API Key',
       header: 'X-API-Key',
@@ -2517,9 +2567,9 @@ app.get('/api/docs', (req, res) => {
        }
     ],
     examples: {
-      curl: `curl -H "X-API-Key: el_your_key_here" "http://localhost:3000/api/search?q=land+act"`,
-      javascript: `const res = await fetch('http://localhost:3000/api/search?q=land+act', {\n  headers: { 'X-API-Key': 'el_your_key_here' }\n});\nconst data = await res.json();`,
-      python: `import requests\nres = requests.get('http://localhost:3000/api/search?q=land+act',\n  headers={'X-API-Key': 'el_your_key_here'})\ndata = res.json()`
+      curl: `curl -H "X-API-Key: el_your_key_here" "${origin}/api/search?q=land+act"`,
+      javascript: `const res = await fetch('${origin}/api/search?q=land+act', {\n  headers: { 'X-API-Key': 'el_your_key_here' }\n});\nconst data = await res.json();`,
+      python: `import requests\nres = requests.get('${origin}/api/search?q=land+act',\n  headers={'X-API-Key': 'el_your_key_here'})\ndata = res.json()`
     }
   });
 });
@@ -2751,7 +2801,7 @@ app.delete('/api/keys/:keyId', async (req, res) => {
   }
 });
 
-app.get('/api/search', async (req, res) => {
+app.get('/api/search', validateApiKey, async (req, res) => {
   const q = req.query.q || '';
   const sourceOverride = req.query.source || 'all';
   if (!q.trim()) {
@@ -2785,7 +2835,7 @@ app.get('/api/search', async (req, res) => {
   }
 });
 
-app.get('/api/library', (req, res) => {
+app.get('/api/library', validateApiKey, (req, res) => {
   try {
     const docs = getRepositoryDocs();
     const precedents = docs.filter(d => d.type === 'Judgment' || d.type === 'Precedent' || d.type === 'Ruling' || d.type === 'Advisory Opinion');

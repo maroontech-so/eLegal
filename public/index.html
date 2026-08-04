@@ -70,9 +70,10 @@
             align-items: center;
             text-align: center;
             position: relative;
+            z-index: 100;
             border-bottom: 1px solid rgba(0, 0, 0, 0.05);
             background: linear-gradient(180deg, #F9F9FB 0%, var(--app-bg) 100%);
-            overflow: hidden;
+            overflow: visible;
         }
 
         .hero-noise {
@@ -201,6 +202,7 @@
             width: 100%;
             max-width: 720px;
             position: relative;
+            z-index: 1000;
             margin: 0 auto;
         }
 
@@ -367,8 +369,8 @@
             background: #ffffff;
             border: 1px solid rgba(0, 0, 0, 0.16);
             border-radius: 18px;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.18);
-            z-index: 1000;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.22);
+            z-index: 9999;
             display: none;
             max-height: 400px;
             overflow-y: auto;
@@ -1349,9 +1351,17 @@
         }
 
         /* ─── FETCH HELPER ─── */
+        function getActiveApiKey() {
+            return localStorage.getItem('elegal_api_key') || 'el_demo_key_12345';
+        }
+
         function fetchApi(url, options = {}) {
             const headers = Object.assign({}, options.headers || {});
             headers['Accept'] = 'application/json';
+            const key = getActiveApiKey();
+            if (key) {
+                headers['X-API-Key'] = key;
+            }
             return fetch(url, {
                 ...options,
                 credentials: 'same-origin',

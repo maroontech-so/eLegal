@@ -1055,6 +1055,13 @@
         padding: 16px 12px;
       }
 
+      .btn-text-mobile {
+        display: none;
+      }
+      .btn-text-desktop {
+        display: inline;
+      }
+
       .top-nav {
         margin: 0 -12px;
         padding: 0 12px;
@@ -1069,6 +1076,38 @@
       .top-login-btn {
         padding: 5px 10px;
         font-size: 0.7rem;
+      }
+
+      @media (max-width: 640px) {
+        .top-nav {
+          height: 44px;
+          padding: 0 8px;
+        }
+
+        .nav-links {
+          gap: 4px;
+        }
+
+        .nav-app-home,
+        .nav-docs {
+          display: none !important;
+        }
+
+        .top-login-btn {
+          padding: 4px 8px;
+          font-size: 0.65rem;
+          height: 26px;
+          line-height: 1;
+          letter-spacing: 0;
+        }
+
+        .btn-text-desktop {
+          display: none !important;
+        }
+
+        .btn-text-mobile {
+          display: inline !important;
+        }
       }
 
       .glass-card {
@@ -1150,9 +1189,9 @@
               style="font-weight: 600; color: var(--text-secondary); letter-spacing: -0.01em; margin-left: 8px;">API</span>
           </a>
           <div class="nav-links">
-            <a href="/">App Home</a>
-            <a href="#" style="color: var(--text-primary);">Docs</a>
-            <button id="topLoginBtn" class="top-login-btn">LOGIN / SIGNUP</button>
+            <a href="/" class="nav-app-home">App Home</a>
+            <a href="#" class="nav-docs" style="color: var(--text-primary);">Docs</a>
+            <button id="topLoginBtn" class="top-login-btn"><span class="btn-text-desktop">LOGIN / SIGNUP</span><span class="btn-text-mobile">LOGIN</span></button>
           </div>
         </header>
 
@@ -1225,8 +1264,8 @@
               <code>X-API-Key: your_key_here</code>. Unauthorized requests will be rejected with a 401 status.
             </p>
             <p style="margin-bottom: 14px;"><strong style="color: var(--text-primary); font-weight: 700;">2. Base
-                URL:</strong> When running the local eLegal daemon, all endpoints are relative to your local server,
-              typically <code>http://localhost:3000</code>.</p>
+                URL:</strong> When running the eLegal server, all endpoints are relative to your active domain host,
+              typically <code class="dynamic-base-url">http://localhost:3000</code>.</p>
             <p style="margin-bottom: 14px;"><strong style="color: var(--text-primary); font-weight: 700;">3. Rate
                 Limiting:</strong> To ensure local engine stability, requests are limited to 100 per minute per IP
               address. Exceeding this returns a <code>429 Too Many Requests</code> status.</p>
@@ -1308,15 +1347,15 @@
             <header><span class="method-badge" style="background:#E8F5E9; color:#2E7D32;">SETUP</span>
               <h3>Environment Setup</h3>
             </header>
-            <p>Before calling any data endpoint, make sure the local eLegal server is running on
-              <code>http://localhost:3000</code> or your deployed host. From the dev portal, sign in with Google,
+            <p>Before calling any data endpoint, make sure the eLegal server is accessible on
+              <code class="dynamic-base-url">http://localhost:3000</code> or your deployed host. From the dev portal, sign in with Google,
               GitHub, or Email/Password, then generate an API key. That key must be included in the
               <code>X-API-Key</code> header of every request to protected endpoints. If you are building an external
               application, install the <code>cors</code> package on the server so your frontend or mobile app can call
               the API from another origin. Rate limits are enforced per API key at 100 requests per minute; exceeding
               that returns HTTP 429.
             </p>
-            <div class="path">Base URL: http://localhost:3000</div>
+            <div class="path">Base URL: <span class="dynamic-base-url">http://localhost:3000</span></div>
             <p style="margin-top:10px; font-size:0.85rem; color:var(--text-secondary);">Headers: <code>X-API-Key</code>
               for data endpoints, <code>Authorization</code> (Firebase ID token) for key management endpoints.</p>
           </div>
@@ -1530,6 +1569,19 @@
   <div class="toast" id="toast"></div>
 
   <script>
+    // Storage Sanitizer: remove any corrupted items
+    try {
+      for (let i = localStorage.length - 1; i >= 0; i--) {
+        const key = localStorage.key(i);
+        if (key) {
+          const val = localStorage.getItem(key);
+          if (val === 'undefined' || val === 'null' || val === '[object Object]') {
+            localStorage.removeItem(key);
+          }
+        }
+      }
+    } catch (_) {}
+
     // System State
     let currentUserKey = localStorage.getItem('elegal_api_key') || 'YOUR_API_KEY';
     let currentEndpointId = 'search';
@@ -1562,9 +1614,8 @@
         firebaseAppModule = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
         console.log('[initFirebase] firebase-app.js imported successfully.');
       } catch (e) {
-        console.error('[initFirebase] Failed to import firebase-app.js:', e);
-        showToast('Firebase app module failed to load. Check console and network.');
-        throw e; // Re-throw to stop initialization
+        console.warn('[initFirebase] Failed to import firebase-app.js:', e.message || e);
+        return null;
       }
 
       try {
@@ -1572,15 +1623,8 @@
         firebaseAuthModule = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
         console.log('[initFirebase] firebase-auth.js imported successfully.');
 
-        // Destructuring and immediate logging of Firebase Auth exports
         ({ getAuth, signInWithRedirect, signInWithPopup, GoogleAuthProvider, GithubAuthProvider, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, getRedirectResult } = firebaseAuthModule);
 
-        console.log('[initFirebase] Destructured from firebase-auth.js:');
-        console.log('[initFirebase] GoogleAuthProvider imported:', typeof GoogleAuthProvider !== 'undefined');
-        console.log('[initFirebase] GithubAuthProvider imported:', typeof GithubAuthProvider !== 'undefined'); // Log if it's imported
-        console.log('[initFirebase] Imported GithubAuthProvider value:', GithubAuthProvider); // Log the actual destructured value
-
-        // Assign to window immediately after destructuring
         window._fbSignInWithRedirect = signInWithRedirect;
         window._fbSignInWithPopup = signInWithPopup;
         window._fbGoogleAuthProvider = GoogleAuthProvider;
@@ -1590,15 +1634,8 @@
         window._fbSignOut = signOut;
         window._fbOnAuthStateChanged = onAuthStateChanged;
         window._fbGetRedirectResult = getRedirectResult;
-
-        console.log('[initFirebase] Firebase Auth providers assigned to window:');
-        console.log('[initFirebase] _fbGoogleAuthProvider:', window._fbGoogleAuthProvider);
-        console.log('[initFirebase] _fbGithubAuthProvider:', window._fbGithubAuthProvider); // Log this value directly from window
-
       } catch (e) {
-        console.error('[initFirebase] Failed to import firebase-auth.js:', e);
-        showToast('Firebase auth module failed to load. Check console and network.');
-        throw e; // Re-throw to stop initialization
+        console.warn('[initFirebase] Could not load firebase-auth.js module:', e.message || e);
       }
 
       try {
@@ -1607,19 +1644,15 @@
         console.log('[initFirebase] firebase-firestore.js imported successfully.');
 
         const { getFirestore } = firebaseFirestoreModule;
-        // Ensure initializeApp is called only once and correctly used for all services
-        const app = firebaseAppModule.initializeApp(firebaseConfig); // Use the imported module to initialize
-        firebaseAuth = getAuth(app);
-        firebaseDb = getFirestore(app);
-        window._fbApp = app; // Assign the app instance
-
+        const app = firebaseAppModule.initializeApp(firebaseConfig);
+        if (getAuth) firebaseAuth = getAuth(app);
+        if (getFirestore) firebaseDb = getFirestore(app);
+        window._fbApp = app;
       } catch (e) {
-        console.error('[initFirebase] Failed to import firebase-firestore.js:', e);
-        showToast('Firebase firestore module failed to load. Check console and network.');
-        throw e; // Re-throw to stop initialization
+        console.warn('[initFirebase] Could not load firestore or initialize app:', e.message || e);
       }
 
-      console.log('[initFirebase] Firebase initialization complete.');
+      console.log('[initFirebase] Firebase initialization step finished.');
       return { firebaseAuth, firebaseDb };
     }
 
@@ -1694,36 +1727,46 @@
     }
 
     // Initialize UI
-    function init() {
-      initFirebase().then(() => {
+    async function init() {
+      document.querySelectorAll('.dynamic-base-url').forEach(el => {
+        el.textContent = window.location.origin;
+      });
+      try {
+        await initFirebase();
+      } catch (error) {
+        console.warn('[init] Firebase init note:', error);
+      } finally {
         setupTopNavAuth();
         setupUIListeners();
         loadEndpointData('search');
         setupAuthStateListener();
         console.log('[init] App initialized.');
-      }).catch(error => {
-        console.error('[init] App initialization failed:', error);
-        showToast('App failed to initialize. Check console.');
-      });
+      }
     }
 
     function setupAuthStateListener() {
-      console.log('[auth] Setting up onAuthStateChanged listener...');
-      window._fbOnAuthStateChanged(firebaseAuth, (user) => {
-        console.log('[auth] onAuthStateChanged detected state change. Current user:', user ? user.email : null);
-        updateAuthUI(user);
-      });
+      if (typeof window._fbOnAuthStateChanged === 'function' && firebaseAuth) {
+        console.log('[auth] Setting up onAuthStateChanged listener...');
+        window._fbOnAuthStateChanged(firebaseAuth, (user) => {
+          console.log('[auth] onAuthStateChanged detected state change. Current user:', user ? user.email : null);
+          updateAuthUI(user);
+        });
 
-      setTimeout(() => {
-        const currentUser = firebaseAuth.currentUser;
-        console.log('[auth] Checking currentUser fallback:', currentUser ? currentUser.email : 'null');
-        if (currentUser) {
-          console.log('[auth] Initializing with currentUser from fallback:', currentUser.email);
-          updateAuthUI(currentUser);
-        } else {
-          console.log('[auth] No currentUser found on initial load.');
-        }
-      }, 250);
+        setTimeout(() => {
+          const currentUser = firebaseAuth ? firebaseAuth.currentUser : null;
+          console.log('[auth] Checking currentUser fallback:', currentUser ? currentUser.email : 'null');
+          if (currentUser) {
+            console.log('[auth] Initializing with currentUser from fallback:', currentUser.email);
+            updateAuthUI(currentUser);
+          } else {
+            console.log('[auth] No currentUser found on initial load.');
+            updateAuthUI(null);
+          }
+        }, 250);
+      } else {
+        console.log('[auth] Running in standard API mode.');
+        updateAuthUI(null);
+      }
     }
 
     function updateAuthUI(user) {
@@ -1741,7 +1784,7 @@
         currentUserKey = 'YOUR_API_KEY';
         profileHeader.style.display = 'none';
         keyDisplay.style.display = 'none';
-        topLoginBtn.textContent = 'LOGIN / SIGNUP';
+        topLoginBtn.innerHTML = '<span class="btn-text-desktop">LOGIN / SIGNUP</span><span class="btn-text-mobile">LOGIN</span>';
         updateRequestCode();
       }
     }
@@ -1980,7 +2023,7 @@
         localStorage.removeItem('elegal_api_key');
         keyDisplay.style.display = 'none';
         profileHeader.style.display = 'none';
-        topLoginBtn.textContent = 'LOGIN';
+        topLoginBtn.innerHTML = '<span class="btn-text-desktop">LOGIN / SIGNUP</span><span class="btn-text-mobile">LOGIN</span>';
         updateRequestCode();
         showToast('Signed out');
       } catch (e) {
@@ -2192,7 +2235,7 @@
     // Build URL Logic
     function buildUrl() {
       const ep = apiEndpoints[currentEndpointId];
-      let url = 'http://localhost:3000' + ep.path;
+      let url = window.location.origin + ep.path;
 
       const inputs = document.querySelectorAll('.param-input');
       if (inputs.length > 0 && ep.method === 'GET') {
@@ -2279,12 +2322,11 @@ headers = {
       statusEl.style.display = 'none';
 
       try {
-        const relativeUrl = url.replace('http://localhost:3000', '');
         const headers = { 'Content-Type': 'application/json' };
         if (currentUserKey && currentUserKey !== 'YOUR_API_KEY') {
           headers['X-API-Key'] = currentUserKey;
         }
-        const response = await fetch(relativeUrl, { method: ep.method, headers });
+        const response = await fetch(url, { method: ep.method, headers });
 
         if (!response.ok && response.status === 404) throw new Error("Endpoint not found. Ensure server is running.");
 

@@ -342,20 +342,26 @@
             top: 16px;
             right: 16px;
             z-index: 100;
-            background: var(--glass-bg);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            color: var(--text-primary);
-            border: 1px solid var(--border-color);
+            background: #10081a;
+            color: #ffffff !important;
+            border: 1px solid rgba(255, 255, 255, 0.15);
             border-radius: 99px;
             padding: 8px 16px;
-            font-size: 0.8rem;
-            font-weight: 600;
+            font-size: 0.85rem;
+            font-family: monospace, SFMono-Regular, Consolas, Courier, monospace;
+            font-weight: 700;
             box-shadow: var(--shadow-sm);
             letter-spacing: 0.05em;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
         }
 
         .api-btn:hover {
+            background: #2a2a2a;
             box-shadow: var(--shadow-md);
             transform: translateY(-1px);
         }
@@ -1221,7 +1227,7 @@
 <body>
 
     <!-- ─── API BUTTON ─── -->
-    <button class="api-btn" id="apiBtn" title="Developer API">&lt;API /&gt;</button>
+    <a href="/dev" class="api-btn" id="apiBtn" title="Developer API">&lt;/API&gt;</a>
 
     <!-- ─── HERO ─── -->
     <header class="hero">
@@ -1982,8 +1988,11 @@ function highlightActiveResult() {
             if (event.key === 'Enter') doSearch();
         });
 
-        document.getElementById('apiBtn').addEventListener('click', () => {
-            window.open('/dev', '_blank');
+        document.getElementById('apiBtn').addEventListener('click', (e) => {
+            if (!e.ctrlKey && !e.metaKey && !e.shiftKey) {
+                e.preventDefault();
+                window.location.href = '/dev';
+            }
         });
 
         document.getElementById('clearSearchBtn').addEventListener('click', () => {

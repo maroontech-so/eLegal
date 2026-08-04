@@ -76,6 +76,9 @@
       display: flex;
       flex-direction: column;
       width: 100%;
+      min-height: 100vh;
+      align-items: center;
+      background: var(--app-bg);
     }
 
     .panel {
@@ -89,13 +92,17 @@
       display: flex;
       flex-direction: column;
       gap: 32px;
+      width: 100%;
+      max-width: 1280px;
+      margin: 0 auto;
+      box-sizing: border-box;
     }
 
     .panel-noise {
       position: fixed;
       top: 0;
       left: 0;
-      width: 50%;
+      width: 100%;
       height: 100%;
       z-index: 0;
       opacity: 0.4;
@@ -120,6 +127,7 @@
     .content-z {
       position: relative;
       z-index: 10;
+      width: 100%;
     }
 
     .top-nav {
@@ -129,13 +137,15 @@
       justify-content: space-between;
       position: sticky;
       top: 0;
-      background: rgba(245, 245, 247, 0.7);
+      background: rgba(245, 245, 247, 0.85);
       backdrop-filter: saturate(180%) blur(20px);
       -webkit-backdrop-filter: saturate(180%) blur(20px);
       margin: 0 -40px;
       padding: 0 40px;
       z-index: 100;
       border-bottom: 1px solid var(--border-color);
+      width: calc(100% + 80px);
+      box-sizing: border-box;
     }
 
     .brand {
@@ -195,6 +205,34 @@
 
     .nav-links a:hover {
       color: var(--text-primary);
+    }
+
+    .top-api-badge {
+      background: #10081a;
+      color: #ffffff !important;
+      font-family: var(--font-code);
+      font-weight: 700;
+      font-size: 0.85rem;
+      padding: 8px 16px;
+      border-radius: 99px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      text-decoration: none;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      letter-spacing: 0.05em;
+      cursor: pointer;
+      user-select: none;
+      white-space: nowrap;
+    }
+
+    .top-api-badge:hover {
+      background: #2a2a2a;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
     }
 
     .glass-card {
@@ -945,49 +983,17 @@
       overflow-x: hidden;
     }
 
-    @media (min-width: 1025px) {
-      .workspace {
-        display: grid;
-        grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
-        min-height: 100vh;
-      }
-
-      .left-panel,
-      .right-panel {
-        height: 100vh;
-        overflow-y: auto;
-      }
-    }
-
     @media (max-width: 1024px) {
-      .workspace {
-        display: flex;
-        flex-direction: column;
-        width: 100%;
-        max-width: 100vw;
-        overflow-x: hidden;
-      }
-
       .left-panel {
-        padding: 0 20px 40px;
-        gap: 20px;
-        height: auto;
-        overflow: visible;
-      }
-
-      .right-panel {
-        padding: 24px 20px;
-        border-left: none;
-        border-top: 1px solid var(--code-border);
-        gap: 16px;
-        height: auto;
-        overflow: visible;
+        padding: 0 24px 48px;
+        gap: 24px;
       }
 
       .top-nav {
-        margin: 0 -20px;
-        padding: 0 20px;
+        margin: 0 -24px;
+        padding: 0 24px;
         height: 64px;
+        width: calc(100% + 48px);
       }
 
       .brand {
@@ -999,13 +1005,13 @@
       }
 
       .logo-l-container-mini {
-        width: 26px;
-        height: 26px;
-        font-size: 18px;
+        width: 28px;
+        height: 28px;
+        font-size: 20px;
       }
 
       .glass-card {
-        padding: 20px;
+        padding: 22px;
       }
 
       .explorer-body {
@@ -1047,71 +1053,49 @@
 
     @media (max-width: 640px) {
       .left-panel {
-        padding: 0 12px 32px;
+        padding: 0 14px 32px;
         gap: 16px;
       }
 
-      .right-panel {
-        padding: 16px 12px;
-      }
-
-      .btn-text-mobile {
-        display: none;
-      }
-      .btn-text-desktop {
-        display: inline;
-      }
-
       .top-nav {
-        margin: 0 -12px;
-        padding: 0 12px;
-        height: 56px;
+        margin: 0 -14px;
+        padding: 0 14px;
+        height: 54px;
+        width: calc(100% + 28px);
       }
 
       .nav-links {
-        gap: 10px;
+        gap: 8px;
         font-size: 0.78rem;
+        align-items: center;
+      }
+
+      .nav-app-home,
+      .nav-docs {
+        display: none !important;
       }
 
       .top-login-btn {
         padding: 5px 10px;
         font-size: 0.7rem;
+        height: 30px;
       }
 
-      @media (max-width: 640px) {
-        .top-nav {
-          height: 44px;
-          padding: 0 8px;
-        }
+      .top-api-badge {
+        padding: 5px 10px;
+        font-size: 0.75rem;
+      }
 
-        .nav-links {
-          gap: 4px;
-        }
+      .btn-text-desktop {
+        display: none !important;
+      }
 
-        .nav-app-home,
-        .nav-docs {
-          display: none !important;
-        }
-
-        .top-login-btn {
-          padding: 4px 8px;
-          font-size: 0.65rem;
-          height: 26px;
-          line-height: 1;
-          letter-spacing: 0;
-        }
-
-        .btn-text-desktop {
-          display: none !important;
-        }
-
-        .btn-text-mobile {
-          display: inline !important;
-        }
+      .btn-text-mobile {
+        display: inline !important;
       }
 
       .glass-card {
-        padding: 14px;
+        padding: 16px;
         border-radius: 14px;
       }
 
@@ -1192,6 +1176,7 @@
             <a href="/" class="nav-app-home">App Home</a>
             <a href="#" class="nav-docs" style="color: var(--text-primary);">Docs</a>
             <button id="topLoginBtn" class="top-login-btn"><span class="btn-text-desktop">LOGIN / SIGNUP</span><span class="btn-text-mobile">LOGIN</span></button>
+            <a href="/dev" class="top-api-badge" title="Developer API">&lt;/API&gt;</a>
           </div>
         </header>
 
@@ -1280,8 +1265,10 @@
           <p class="card-desc">Test endpoints directly in the browser.</p>
 
           <div class="control-row" style="justify-content: space-between; align-items: center;">
-            <div style="display:flex; gap:4px;">
+            <div style="display:flex; gap:4px; flex-wrap:wrap;">
               <button class="ep-pill active" data-ep="search">Search</button>
+              <button class="ep-pill" data-ep="documentContent">Doc Content</button>
+              <button class="ep-pill" data-ep="pdfProxy">PDF Proxy</button>
               <button class="ep-pill" data-ep="library">Library</button>
               <button class="ep-pill" data-ep="resolve">Resolve</button>
               <button class="ep-pill" data-ep="health">Health</button>
@@ -1339,167 +1326,330 @@
         </div>
 
         <div class="docs-section">
-          <h2 class="card-title">API Documentation</h2>
-          <p class="card-desc">Detailed reference for every eLegal endpoint. Use this section to understand request
-            shape, expected responses, authentication requirements, and common integration patterns.</p>
+          <h2 class="card-title">API Documentation & Usage Guide</h2>
+          <p class="card-desc">Comprehensive reference for every eLegal endpoint. Use this guide to understand authentication, request shape, error handling, rate limiting, and code implementation patterns.</p>
 
           <div class="endpoint-card">
             <header><span class="method-badge" style="background:#E8F5E9; color:#2E7D32;">SETUP</span>
-              <h3>Environment Setup</h3>
+              <h3>Environment & Architecture Overview</h3>
             </header>
-            <p>Before calling any data endpoint, make sure the eLegal server is accessible on
-              <code class="dynamic-base-url">http://localhost:3000</code> or your deployed host. From the dev portal, sign in with Google,
-              GitHub, or Email/Password, then generate an API key. That key must be included in the
-              <code>X-API-Key</code> header of every request to protected endpoints. If you are building an external
-              application, install the <code>cors</code> package on the server so your frontend or mobile app can call
-              the API from another origin. Rate limits are enforced per API key at 100 requests per minute; exceeding
-              that returns HTTP 429.
-            </p>
+            <p>eLegal provides a high-throughput legal search engine and document resolver. Every protected endpoint requires a valid <code>X-API-Key</code> header or Firebase <code>Authorization</code> token.
+            API keys are generated per authenticated user UID, saved in Firestore under <code>apikeys/{userId}/keys/{key}</code>, and stored with local AES-256-GCM encryption in the application server database for sub-millisecond key validation without Firestore latency spikes.</p>
             <div class="path">Base URL: <span class="dynamic-base-url">http://localhost:3000</span></div>
-            <p style="margin-top:10px; font-size:0.85rem; color:var(--text-secondary);">Headers: <code>X-API-Key</code>
-              for data endpoints, <code>Authorization</code> (Firebase ID token) for key management endpoints.</p>
+            <p style="margin-top:10px; font-size:0.85rem; color:var(--text-secondary);">Authentication Headers: <code>X-API-Key: el_...</code> for data endpoints, <code>Authorization: Bearer &lt;Firebase_ID_Token&gt;</code> for key management.</p>
           </div>
 
+          <!-- Error Handling & Status Codes Card -->
+          <div class="endpoint-card" style="border-left: 4px solid #FF9500;">
+            <header>
+              <span class="method-badge" style="background:#FFF3E0; color:#E65100;">GUIDE</span>
+              <h3>Response Codes & Error Handling</h3>
+            </header>
+            <p>eLegal returns standardized HTTP response codes and consistent JSON payloads for all requests. Applications should inspect the HTTP status code and parse the returned <code>error</code> or <code>message</code> property when non-200 responses occur.</p>
+
+            <div style="margin-top:16px; display:flex; flex-direction:column; gap:12px;">
+              <div style="background:var(--code-bg); padding:12px 16px; border-radius:8px; border:1px solid var(--code-border);">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                  <span style="color:#34C759; font-weight:700; font-family:var(--font-code); font-size:0.85rem;">HTTP 200 OK</span>
+                  <span style="color:var(--text-tertiary); font-size:0.75rem;">Success</span>
+                </div>
+                <p style="font-size:0.8rem; color:var(--code-text); margin:0;">Request executed successfully. Returns the requested JSON dataset or document structure.</p>
+              </div>
+
+              <div style="background:var(--code-bg); padding:12px 16px; border-radius:8px; border:1px solid var(--code-border);">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                  <span style="color:#FF9500; font-weight:700; font-family:var(--font-code); font-size:0.85rem;">HTTP 400 Bad Request</span>
+                  <span style="color:var(--text-tertiary); font-size:0.75rem;">Invalid Parameters</span>
+                </div>
+                <p style="font-size:0.8rem; color:var(--code-text); margin-bottom:8px;">Missing mandatory query parameters (e.g., omitting <code>q</code> in search or <code>sourceUrl</code> in document-content).</p>
+                <pre style="background:var(--code-surface); padding:8px 12px; border-radius:6px; font-size:0.75rem; color:#FF9500;">{ "error": "Query parameter 'q' is required for search" }</pre>
+              </div>
+
+              <div style="background:var(--code-bg); padding:12px 16px; border-radius:8px; border:1px solid var(--code-border);">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                  <span style="color:#FF3B30; font-weight:700; font-family:var(--font-code); font-size:0.85rem;">HTTP 401 Unauthorized</span>
+                  <span style="color:var(--text-tertiary); font-size:0.75rem;">Authentication Failed</span>
+                </div>
+                <p style="font-size:0.8rem; color:var(--code-text); margin-bottom:8px;">Missing or invalid <code>X-API-Key</code> header, or inactive/revoked API key.</p>
+                <pre style="background:var(--code-surface); padding:8px 12px; border-radius:6px; font-size:0.75rem; color:#FF3B30;">{ "error": "Unauthorized", "message": "Valid X-API-Key header required" }</pre>
+              </div>
+
+              <div style="background:var(--code-bg); padding:12px 16px; border-radius:8px; border:1px solid var(--code-border);">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                  <span style="color:#AF52DE; font-weight:700; font-family:var(--font-code); font-size:0.85rem;">HTTP 429 Too Many Requests</span>
+                  <span style="color:var(--text-tertiary); font-size:0.75rem;">Rate Limited</span>
+                </div>
+                <p style="font-size:0.8rem; color:var(--code-text); margin-bottom:8px;">Request quota exceeded (>100 requests per 60-second sliding window per API key).</p>
+                <pre style="background:var(--code-surface); padding:8px 12px; border-radius:6px; font-size:0.75rem; color:#AF52DE;">{ "error": "Rate limit exceeded. Try again in 42 seconds.", "retryAfter": 42 }</pre>
+              </div>
+            </div>
+          </div>
+
+          <!-- Code Examples & Handling Instances Card -->
+          <div class="endpoint-card">
+            <header>
+              <span class="method-badge" style="background:#E0F7FA; color:#006064;">CODE</span>
+              <h3>Production Code Examples & Error Handling</h3>
+            </header>
+            <p>Below are production-ready code patterns for integrating eLegal into modern Node.js/TypeScript applications, Python scripts, and shell automation scripts with built-in retry logic and error validation.</p>
+
+            <div style="margin-top:16px;">
+              <h4 style="font-size:0.9rem; color:var(--text-primary); margin-bottom:8px;">Node.js / TypeScript Instance with Robust Error Handling & Retry</h4>
+              <div class="code-window">
+                <div class="code-header"><span class="code-title">TypeScript / Node.js Client</span></div>
+                <div class="code-content">
+                  <pre style="font-size:0.78rem;"><code class="language-typescript"><span class="token keyword">import</span> fetch <span class="token keyword">from</span> <span class="token string">'node-fetch'</span>;
+
+<span class="token keyword">interface</span> <span class="token class-name">SearchResult</span> {
+  title<span class="token operator">:</span> <span class="token keyword">string</span>;
+  citation<span class="token operator">:</span> <span class="token keyword">string</span>;
+  url<span class="token operator">:</span> <span class="token keyword">string</span>;
+  type<span class="token operator">:</span> <span class="token string">'precedent'</span> <span class="token operator">|</span> <span class="token string">'statute'</span>;
+  source<span class="token operator">:</span> <span class="token string">'kenya'</span> <span class="token operator">|</span> <span class="token string">'international'</span>;
+  excerpt<span class="token operator">:</span> <span class="token keyword">string</span>;
+}
+
+<span class="token keyword">async function</span> <span class="token method">searchLegalCorpus</span>(query<span class="token operator">:</span> <span class="token keyword">string</span>, apiKey<span class="token operator">:</span> <span class="token keyword">string</span>, retries = <span class="token number">3</span>)<span class="token operator">:</span> <span class="token keyword">Promise</span><span class="token operator">&lt;</span>SearchResult<span class="token operator">[</span><span class="token operator">]</span><span class="token operator">&gt;</span> {
+  <span class="token keyword">const</span> endpoint = <span class="token string">`http://localhost:3000/api/search?q=${encodeURIComponent(query)}&source=all`</span>;
+
+  <span class="token keyword">for</span> (<span class="token keyword">let</span> attempt = <span class="token number">1</span>; attempt &lt;= retries; attempt++) {
+    <span class="token keyword">try</span> {
+      <span class="token keyword">const</span> res = <span class="token keyword">await</span> <span class="token method">fetch</span>(endpoint, {
+        method<span class="token operator">:</span> <span class="token string">'GET'</span>,
+        headers<span class="token operator">:</span> {
+          <span class="token string">'Accept'</span><span class="token operator">:</span> <span class="token string">'application/json'</span>,
+          <span class="token string">'X-API-Key'</span><span class="token operator">:</span> apiKey
+        }
+      });
+
+      <span class="token keyword">if</span> (res.status === <span class="token number">429</span>) {
+        <span class="token keyword">const</span> delay = attempt * <span class="token number">2000</span>;
+        console.<span class="token method">warn</span>(<span class="token string">`[Rate Limited] Waiting ${delay}ms before retry ${attempt}...`</span>);
+        <span class="token keyword">await</span> <span class="token keyword">new</span> <span class="token method">Promise</span>(r =&gt; <span class="token method">setTimeout</span>(r, delay));
+        <span class="token keyword">continue</span>;
+      }
+
+      <span class="token keyword">if</span> (!res.ok) {
+        <span class="token keyword">const</span> errData = <span class="token keyword">await</span> res.<span class="token method">json</span>().<span class="token method">catch</span>(() =&gt; ({}));
+        <span class="token keyword">throw new</span> <span class="token method">Error</span>(<span class="token string">`API Error (${res.status}): ${errData.error || errData.message || res.statusText}`</span>);
+      }
+
+      <span class="token keyword">return</span> <span class="token keyword">await</span> res.<span class="token method">json</span>();
+    } <span class="token keyword">catch</span> (err) {
+      <span class="token keyword">if</span> (attempt === retries) <span class="token keyword">throw</span> err;
+    }
+  }
+  <span class="token keyword">throw new</span> <span class="token method">Error</span>(<span class="token string">'Max retries exceeded'</span>);
+}</code></pre>
+                </div>
+              </div>
+
+              <h4 style="font-size:0.9rem; color:var(--text-primary); margin-top:20px; margin-bottom:8px;">Python Instance with Exception Handling</h4>
+              <div class="code-window">
+                <div class="code-header"><span class="code-title">Python Client</span></div>
+                <div class="code-content">
+                  <pre style="font-size:0.78rem;"><code class="language-python"><span class="token keyword">import</span> requests
+<span class="token keyword">import</span> time
+
+<span class="token keyword">def</span> <span class="token method">get_document_content</span>(source_url, api_key):
+    endpoint = <span class="token string">"http://localhost:3000/api/document-content"</span>
+    headers = {
+        <span class="token string">"Accept"</span>: <span class="token string">"application/json"</span>,
+        <span class="token string">"X-API-Key"</span>: api_key
+    }
+    params = { <span class="token string">"sourceUrl"</span>: source_url }
+
+    <span class="token keyword">try</span>:
+        response = requests.get(endpoint, headers=headers, params=params, timeout=<span class="token number">15</span>)
+        
+        <span class="token comment"># Handle HTTP error status codes</span>
+        <span class="token keyword">if</span> response.status_code == <span class="token number">401</span>:
+            <span class="token keyword">raise</span> <span class="token class-name">PermissionError</span>(<span class="token string">"Invalid or inactive API key provided."</span>)
+        <span class="token keyword">elif</span> response.status_code == <span class="token number">429</span>:
+            <span class="token keyword">print</span>(<span class="token string">"Rate limit reached. Pausing requests..."</span>)
+            time.sleep(<span class="token number">5</span>)
+            <span class="token keyword">return</span> get_document_content(source_url, api_key)
+            
+        response.raise_for_status()
+        <span class="token keyword">return</span> response.json()
+        
+    <span class="token keyword">except</span> requests.exceptions.RequestException <span class="token keyword">as</span> e:
+        <span class="token keyword">print</span>(<span class="token string">f"Network or server error occurred: {e}"</span>)
+        <span class="token keyword">return</span> None</code></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Endpoint: Search -->
           <div class="endpoint-card">
             <header>
               <span class="method-badge">GET</span>
-              <h3>Search</h3>
+              <h3>Search (/api/search)</h3>
             </header>
-            <p>This is the primary research endpoint. It accepts a plain-text query and searches across three layers: a
-              local offline corpus of statutes and precedents, the live Kenya Law directory when local results are
-              insufficient, and the open internet for international case law and legal documents. For international
-              results, the server dynamically crawls web search results, follows links, extracts PDF document URLs, and
-              uses pattern-matching to infer case citations and court details. Results are ranked by relevance using
-              TF-IDF scoring on local content, heuristic matching for Kenya Law records, and a priority score that
-              favors direct PDF documents for international sources. Each result object includes a title, inferred
-              citation, source URL, document type, and a short excerpt so your application can render a preview before
-              opening the full document. Queries should be URL-encoded and are limited by server configuration for
-              response size.</p>
-            <div class="path">/api/search?q=land+act&amp;source=all</div>
-            <p style="margin-top:10px; font-size:0.85rem; color:var(--text-secondary);">Accepts optional
-              <code>source</code> query parameter: <code>all</code> (default), <code>kenya</code>, or
-              <code>international</code>. Requires <code>X-API-Key</code> header. Returns up to N ranked documents with
-              citations, source URLs, and metadata.</p>
+            <p>Searches statutes, case precedents, Kenya Law records, and international jurisprudence. Uses TF-IDF for offline matching and scrapers for live remote legal databases.</p>
+            <div class="path">GET /api/search?q=land+act&amp;source=all</div>
+
+            <div style="margin-top:12px;">
+              <strong style="font-size:0.8rem; color:var(--text-primary);">Parameters:</strong>
+              <ul style="font-size:0.8rem; color:var(--text-secondary); margin-left:18px; margin-top:4px;">
+                <li><code>q</code> (string, required): Search terms or legal citation.</li>
+                <li><code>source</code> (string, optional): Scope — <code>all</code> (default), <code>kenya</code>, or <code>international</code>.</li>
+              </ul>
+            </div>
+
+            <div style="margin-top:12px;">
+              <strong style="font-size:0.8rem; color:var(--text-primary);">Example Response Object:</strong>
+              <div class="code-window" style="margin-top:6px;">
+                <div class="code-content"><pre style="font-size:0.75rem;"><code class="language-json">[
+  {
+    <span class="token property">"title"</span>: <span class="token string">"Republic v Land Registrar &amp; 2 others Ex-Parte Mwangi"</span>,
+    <span class="token property">"citation"</span>: <span class="token string">"[2023] KEHC 3174 (KLR)"</span>,
+    <span class="token property">"url"</span>: <span class="token string">"https://kenyalaw.org/akn/ke/judgment/kehc/2023/3174/eng@2023-04-18"</span>,
+    <span class="token property">"type"</span>: <span class="token string">"precedent"</span>,
+    <span class="token property">"source"</span>: <span class="token string">"kenya"</span>,
+    <span class="token property">"score"</span>: <span class="token number">4.85</span>,
+    <span class="token property">"excerpt"</span>: <span class="token string">"Application for order of mandamus directing the Land Registrar to register transfer of land..."</span>
+  }
+]</code></pre></div>
+              </div>
+            </div>
           </div>
 
+          <!-- Endpoint: Document Content -->
           <div class="endpoint-card">
             <header>
               <span class="method-badge">GET</span>
-              <h3>Library</h3>
+              <h3>Document Content (/api/document-content)</h3>
             </header>
-            <p>The library endpoint provides a complete inventory of locally cached documents that the server can serve
-              without hitting the network. This is useful when you want to build your own document browser, build a
-              search index on the client, or verify which statutes and case precedents are currently available offline.
-              The response is grouped into categories such as precedents and statutes, and each entry includes the
-              filename, file size, last modified timestamp, and the relative path needed to read or download the
-              document. Because this endpoint does not parse the file contents, it is fast and suitable for repeated
-              polling at startup.</p>
-            <div class="path">/api/library</div>
-            <p style="margin-top:10px; font-size:0.85rem; color:var(--text-secondary);">Requires <code>X-API-Key</code>
-              header. Useful for building your own document browser or validating offline availability.</p>
+            <p>Fetches cleaned HTML, plain text, and PDF stream proxy URL for Kenya Law cases or uploaded statutes.</p>
+            <div class="path">GET /api/document-content?sourceUrl=https://kenyalaw.org/...</div>
+
+            <div style="margin-top:12px;">
+              <strong style="font-size:0.8rem; color:var(--text-primary);">Parameters:</strong>
+              <ul style="font-size:0.8rem; color:var(--text-secondary); margin-left:18px; margin-top:4px;">
+                <li><code>sourceUrl</code> (string, required): Source Kenya Law URL or local doc path.</li>
+                <li><code>title</code> (string, optional): Display title.</li>
+                <li><code>year</code> (string, optional): Judgment year.</li>
+                <li><code>type</code> (string, optional): <code>precedent</code> or <code>statute</code>.</li>
+              </ul>
+            </div>
+
+            <div style="margin-top:12px;">
+              <strong style="font-size:0.8rem; color:var(--text-primary);">Example Response Object:</strong>
+              <div class="code-window" style="margin-top:6px;">
+                <div class="code-content"><pre style="font-size:0.75rem;"><code class="language-json">{
+  <span class="token property">"title"</span>: <span class="token string">"Republic v Land Registrar Ex-Parte Mwangi"</span>,
+  <span class="token property">"citation"</span>: <span class="token string">"[2023] KEHC 3174 (KLR)"</span>,
+  <span class="token property">"type"</span>: <span class="token string">"precedent"</span>,
+  <span class="token property">"year"</span>: <span class="token string">"2023"</span>,
+  <span class="token property">"source"</span>: <span class="token string">"kenya"</span>,
+  <span class="token property">"bodyHtml"</span>: <span class="token string">"&lt;div class=\"legal-doc\"&gt;&lt;h1&gt;REPUBLIC OF KENYA&lt;/h1&gt;...&lt;/div&gt;"</span>,
+  <span class="token property">"plainText"</span>: <span class="token string">"REPUBLIC OF KENYA IN THE HIGH COURT OF KENYA AT NAIROBI..."</span>,
+  <span class="token property">"pdfUrl"</span>: <span class="token string">"/api/pdf-proxy?sourceUrl=https%3A%2F%2Fkenyalaw.org%2F..."</span>
+}</code></pre></div>
+              </div>
+            </div>
           </div>
 
+          <!-- Endpoint: Library -->
           <div class="endpoint-card">
             <header>
               <span class="method-badge">GET</span>
-              <h3>Resolve</h3>
+              <h3>Library (/api/library)</h3>
             </header>
-            <p>Some Kenya Law URLs point to a case or statute page rather than the PDF itself. The resolve endpoint
-              follows those pages, extracts the official PDF document URL, and stores a local cached copy so subsequent
-              reads are faster and more reliable. This is especially useful for integrations that need the raw document
-              rather than the HTML wrapper. The server validates that the input URL belongs to kenyalaw.org, fetches the
-              page metadata, and returns both the original source and a local reader URL. If the PDF cannot be located,
-              the endpoint returns a 404 with a descriptive message.</p>
-            <div class="path">/api/resolve?url=https://kenyalaw.org/...</div>
-            <p style="margin-top:10px; font-size:0.85rem; color:var(--text-secondary);">Requires <code>X-API-Key</code>
-              header. Only accepts kenyalaw.org URLs. Returns a local <code>/read/...</code> URL when successful.</p>
+            <p>Returns the local offline inventory grouped into precedents and statutes with file sizes and timestamps.</p>
+            <div class="path">GET /api/library</div>
+
+            <div style="margin-top:12px;">
+              <strong style="font-size:0.8rem; color:var(--text-primary);">Example Response Object:</strong>
+              <div class="code-window" style="margin-top:6px;">
+                <div class="code-content"><pre style="font-size:0.75rem;"><code class="language-json">{
+  <span class="token property">"precedents"</span>: [
+    {
+      <span class="token property">"name"</span>: <span class="token string">"Constitution_of_Kenya_2010.pdf"</span>,
+      <span class="token property">"path"</span>: <span class="token string">"precedents/Constitution_of_Kenya_2010.pdf"</span>,
+      <span class="token property">"size"</span>: <span class="token number">1428560</span>,
+      <span class="token property">"modified"</span>: <span class="token string">"2026-08-04T12:00:00.000Z"</span>
+    }
+  ],
+  <span class="token property">"statutes"</span>: [
+    {
+      <span class="token property">"name"</span>: <span class="token string">"Land_Act_No_6_of_2012.pdf"</span>,
+      <span class="token property">"path"</span>: <span class="token string">"statutes/Land_Act_No_6_of_2012.pdf"</span>,
+      <span class="token property">"size"</span>: <span class="token number">892100</span>,
+      <span class="token property">"modified"</span>: <span class="token string">"2026-08-04T12:00:00.000Z"</span>
+    }
+  ]
+}</code></pre></div>
+              </div>
+            </div>
           </div>
 
-          <div class="endpoint-card">
-            <header>
-              <span class="method-badge" style="background:#E8F5E9; color:#2E7D32;">POST</span>
-              <h3>Create Key</h3>
-            </header>
-            <p>Each authenticated user account needs an API key before it can call protected data endpoints. The create
-              key endpoint generates a new random key, stores it in Firestore under the user's account, and returns the
-              key string. The key should be treated as a secret: store it securely on your server or in a secure backend
-              store, not in client-side code that others can read. eLegal enforces a one-active-key policy to reduce
-              blast radius from leaked keys. When you create a new key, any previously active key for that user is
-              automatically paused rather than deleted, so existing integrations can roll back if needed.</p>
-            <div class="path">/api/keys</div>
-            <p style="margin-top:10px; font-size:0.85rem; color:var(--text-secondary);">Requires Firebase
-              <code>Authorization</code> header. Each user can have one active key at a time; creating a new key
-              deactivates the previous one.
-            </p>
-          </div>
-
-          <div class="endpoint-card">
-            <header>
-              <span class="method-badge">GET</span>
-              <h3>List Keys</h3>
-            </header>
-            <p>This endpoint returns every API key associated with the authenticated user, regardless of whether the key
-              is active, paused, or replaced. It is intended for key management interfaces, audit logging, and rotation
-              workflows. Every entry includes the key identifier, user-assigned label, creation timestamp, last-used
-              timestamp, total request count, and current active status. Because keys themselves are sensitive, the
-              endpoint returns the full key string only to authorized user contexts; client-side interfaces should mask
-              the value in logs and UI after the first display.</p>
-            <div class="path">/api/keys</div>
-            <p style="margin-top:10px; font-size:0.85rem; color:var(--text-secondary);">Requires Firebase
-              <code>Authorization</code> header.
-            </p>
-          </div>
-
-          <div class="endpoint-card">
-            <header>
-              <span class="method-badge" style="background:#F3E5F5; color:#7B1FA2;">PATCH</span>
-              <h3>Update Key</h3>
-            </header>
-            <p>Not every key lifecycle event requires deletion. The update endpoint lets you change a key's label for
-              organizational purposes or toggle whether the key is active. Pausing a key is useful when you want to stop
-              a key from being accepted by the server without losing its history and request count. Reactivating a
-              paused key restores full access immediately. Labels are purely for your own organization and do not affect
-              routing or permissions. Only one key per user can be active at any given time; pausing one key does not
-              automatically activate another.</p>
-            <div class="path">/api/keys/:keyId</div>
-            <p style="margin-top:10px; font-size:0.85rem; color:var(--text-secondary);">Requires Firebase
-              <code>Authorization</code> header. Body: <code>{ "isActive": false }</code> or
-              <code>{ "label": "Production" }</code>.
-            </p>
-          </div>
-
-          <div class="endpoint-card">
-            <header>
-              <span class="method-badge" style="background:#FFEBEE; color:#C62828;">DELETE</span>
-              <h3>Delete Key</h3>
-            </header>
-            <p>When a key is no longer needed, deletion removes it from Firestore and from the server's active key
-              cache. Once deleted, the key cannot be restored and any requests using it will receive a 401 immediately.
-              This is the correct action when a key has been exposed in a public repository, log file, or client-side
-              bundle, or when you are decommissioning an integration. For temporary downtime, prefer pausing the key
-              instead so you can resume it later without generating a new value.</p>
-            <div class="path">/api/keys/:keyId</div>
-            <p style="margin-top:10px; font-size:0.85rem; color:var(--text-secondary);">Requires Firebase
-              <code>Authorization</code> header. This action cannot be undone.
-            </p>
-          </div>
-
+          <!-- Endpoint: Resolve -->
           <div class="endpoint-card">
             <header>
               <span class="method-badge">GET</span>
-              <h3>Health</h3>
+              <h3>Resolve (/api/resolve)</h3>
             </header>
-            <p>The health endpoint is a lightweight readiness probe for automation and monitoring. It does not require
-              authentication, making it safe to call from load balancers, CI pipelines, or uptime monitors without
-              distributing secrets. When the server is operational, it returns a simple JSON object with status
-              <code>ok</code>. If the server is starting up, shutting down, or experiencing a fatal error, the endpoint
-              will be unreachable or return a non-200 status. You can use this endpoint before issuing heavy batch
-              requests to confirm the local daemon is ready to accept traffic.
-            </p>
-            <div class="path">/api/health</div>
-            <p style="margin-top:10px; font-size:0.85rem; color:var(--text-secondary);">No authentication required.
-              Returns <code>{ "status": "ok" }</code> when the server is healthy.</p>
+            <p>Extracts official PDF document URLs from Kenya Law case pages and triggers local caching for fast offline retrieval.</p>
+            <div class="path">GET /api/resolve?url=http://kenyalaw.org/caselaw/cases/view/234567/</div>
+
+            <div style="margin-top:12px;">
+              <strong style="font-size:0.8rem; color:var(--text-primary);">Example Response Object:</strong>
+              <div class="code-window" style="margin-top:6px;">
+                <div class="code-content"><pre style="font-size:0.75rem;"><code class="language-json">{
+  <span class="token property">"originalUrl"</span>: <span class="token string">"http://kenyalaw.org/caselaw/cases/view/234567/"</span>,
+  <span class="token property">"pdfUrl"</span>: <span class="token string">"http://kenyalaw.org/caselaw/cases/export_pdf/234567"</span>,
+  <span class="token property">"readerUrl"</span>: <span class="token string">"/read/case_234567.pdf"</span>,
+  <span class="token property">"cachedLocally"</span>: <span class="token boolean">true</span>
+}</code></pre></div>
+              </div>
+            </div>
           </div>
+
+          <!-- Key Management Endpoints -->
+          <div class="endpoint-card">
+            <header>
+              <span class="method-badge" style="background:#E8F5E9; color:#2E7D32;">KEY API</span>
+              <h3>API Key Management (/api/keys)</h3>
+            </header>
+            <p>Endpoints for managing developer API keys. Requires a Firebase User ID token in the <code>Authorization</code> header (<code>Authorization: Bearer &lt;Token&gt;</code>).</p>
+
+            <div style="margin-top:12px; display:flex; flex-direction:column; gap:10px;">
+              <div>
+                <strong style="color:#2E7D32;">POST /api/keys</strong>
+                <p style="font-size:0.8rem; color:var(--text-secondary); margin:2px 0;">Generates a new API key. Encrypts and syncs with Firestore and local database store.</p>
+              </div>
+
+              <div>
+                <strong style="color:#0288D1;">GET /api/keys</strong>
+                <p style="font-size:0.8rem; color:var(--text-secondary); margin:2px 0;">Lists all API keys created under the authenticated user UID.</p>
+              </div>
+
+              <div>
+                <strong style="color:#7B1FA2;">PATCH /api/keys/:keyId</strong>
+                <p style="font-size:0.8rem; color:var(--text-secondary); margin:2px 0;">Updates key label or toggles <code>isActive</code> status.</p>
+              </div>
+
+              <div>
+                <strong style="color:#C62828;">DELETE /api/keys/:keyId</strong>
+                <p style="font-size:0.8rem; color:var(--text-secondary); margin:2px 0;">Permanently deletes an API key and purges local and Firestore caches.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Endpoint: Health -->
+          <div class="endpoint-card">
+            <header>
+              <span class="method-badge">GET</span>
+              <h3>Health Check (/api/health)</h3>
+            </header>
+            <p>Public readiness probe. Returns server health status.</p>
+            <div class="path">GET /api/health</div>
+            <p style="margin-top:10px; font-size:0.85rem; color:var(--text-secondary);">No authentication required. Returns <code>{ "status": "ok" }</code>.</p>
+          </div>
+
         </div>
       </div>
     </section>
@@ -1666,7 +1816,30 @@
         auth: 'API key required',
         desc: 'Performs a robust full-text search across local statutes and remote Kenya Law records. Uses localized TF-IDF scoring for offline files and scrapes the remote directory for live eLegal matches. Returns an array of standardized document objects sorted by relevance.',
         params: [
-          { name: 'q', type: 'string', required: true, desc: 'Search query (e.g. "land act")', default: 'constitution' }
+          { name: 'q', type: 'string', required: true, desc: 'Search query (e.g. "land act")', default: 'constitution' },
+          { name: 'source', type: 'string', required: false, desc: 'Search scope: all, kenya, or international', default: 'all' }
+        ]
+      },
+      documentContent: {
+        id: 'documentContent',
+        name: 'Get legal document content',
+        method: 'GET',
+        path: '/api/document-content',
+        auth: 'API key required',
+        desc: 'Extracts cleaned HTML body, plain text, and PDF proxy URL for Kenya Law cases or uploaded statutes. Supports direct URL extraction as well as cached document lookup.',
+        params: [
+          { name: 'sourceUrl', type: 'string', required: true, desc: 'Source Kenya Law URL or document path', default: 'https://kenyalaw.org/akn/ke/judgment/kehc/2023/3174/eng@2023-04-18' }
+        ]
+      },
+      pdfProxy: {
+        id: 'pdfProxy',
+        name: 'Proxy PDF document stream',
+        method: 'GET',
+        path: '/api/pdf-proxy',
+        auth: 'API key required',
+        desc: 'Proxies raw PDF binaries from Kenya Law and remote legal portals to bypass CORS restrictions in browser client applications.',
+        params: [
+          { name: 'sourceUrl', type: 'string', required: true, desc: 'Target PDF source URL', default: 'https://kenyalaw.org/akn/ke/judgment/kehc/2023/3174/eng@2023-04-18/source' }
         ]
       },
       resolve: {

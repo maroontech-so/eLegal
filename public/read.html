@@ -1551,11 +1551,16 @@
             return true;
         }
 
+        function getActiveApiKey() {
+            return localStorage.getItem('elegal_api_key') || 'el_demo_key_12345';
+        }
+
         /* ─── Helper: Convert DOCX to PDF using server API ─── */
         async function convertDocxToPdf(docxUrl) {
-            // Assume server endpoint: /api/convert-docx?url=...
             const convertUrl = `/api/convert-docx?url=${encodeURIComponent(docxUrl)}`;
-            const response = await fetch(convertUrl);
+            const response = await fetch(convertUrl, {
+                headers: { 'X-API-Key': getActiveApiKey() }
+            });
             if (!response.ok) throw new Error(`Conversion failed: ${response.status}`);
             const arrayBuffer = await response.arrayBuffer();
             // Validate PDF header
@@ -1569,12 +1574,15 @@
 
         /* ─── Render PDF from Kenya Law source ─── */
         async function renderKenyaLawPdf(sourceUrl) {
-            const pdfUrl = buildKenyaLawPdfUrl(sourceUrl);
+            const pdfUrl = buildKenyaLawPdfUrl(sourceUrl) || sourceUrl;
             if (!pdfUrl) return false;
 
             try {
-                // First, fetch the source (could be PDF or DOCX)
-                const response = await fetch(pdfUrl);
+                // Fetch via server PDF proxy to prevent browser CORS block
+                const proxyUrl = `/api/pdf-proxy?sourceUrl=${encodeURIComponent(pdfUrl)}`;
+                const response = await fetch(proxyUrl, {
+                    headers: { 'X-API-Key': getActiveApiKey() }
+                });
                 if (!response.ok) return false;
 
                 const arrayBuffer = await response.arrayBuffer();
@@ -1582,20 +1590,11 @@
                 const header = String.fromCharCode.apply(null, Array.from(bytes));
 
                 if (header.startsWith('%PDF')) {
-                    // It's already a PDF, render it
+                    // It's a PDF, render it
                     await renderPdfFromBuffer(arrayBuffer);
                     return true;
                 } else {
-                    // Probably a DOCX or other format - attempt conversion
-                    // We need to get the actual file URL from the response? The response is the file itself.
-                    // We can try to convert the fetched buffer, but we need to send it to server for conversion.
-                    // Since we already have the buffer, we can send it via FormData to a conversion endpoint.
-                    // Alternatively, we can use the original pdfUrl as the source for conversion.
-                    // Let's use the conversion endpoint that takes a URL.
-                    // But we already have the file content; we can send it as a blob.
-                    // For simplicity, we'll use the conversion endpoint with the URL.
-                    // However, if the source URL is the /source endpoint, it might require authentication? We'll assume server can fetch it.
-                    // Let's try to convert using the same URL.
+                    // Attempt conversion if server returned non-PDF format
                     const convertedPdf = await convertDocxToPdf(pdfUrl);
                     await renderPdfFromBuffer(convertedPdf);
                     return true;
@@ -2021,7 +2020,9 @@
                     `/api/document-content?sourceUrl=${encodeURIComponent(sourceUrl)}&title=${encodeURIComponent(displayTitle)}&year=${encodeURIComponent(reqYear)}&type=${encodeURIComponent(reqType)}&source=${encodeURIComponent(reqSource)}` :
                     `/read/${encodeURIComponent(filename)}?raw=1`;
 
-                const res = await fetch(fetchTarget);
+                const res = await fetch(fetchTarget, {
+                    headers: { 'X-API-Key': getActiveApiKey() }
+                });
                 if (!res.ok) {
                     throw new Error(`Failed to load document (${res.status})`);
                 }
@@ -2035,7 +2036,9 @@
                 if (preferPdf) {
                     try {
                         const pdfUrl = data.pdfUrl || `/api/pdf-proxy?sourceUrl=${encodeURIComponent(sourceUrl)}`;
-                        const pdfRes = await fetch(pdfUrl);
+                        const pdfRes = await fetch(pdfUrl, {
+                            headers: { 'X-API-Key': getActiveApiKey() }
+                        });
                         if (pdfRes.ok) {
                             const arrayBuffer = await pdfRes.arrayBuffer();
                             const bytes = new Uint8Array(arrayBuffer.slice(0, 5));

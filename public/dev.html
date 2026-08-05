@@ -19,16 +19,16 @@
       --text-primary: #1D1D1F;
       --text-secondary: #86868B;
       --text-tertiary: #A1A1A6;
-      --accent-color: #10081a;
-      --accent-hover: #2a2a2a;
+      --accent-color: #000000;
+      --accent-hover: #1f1f23;
       --border-color: rgba(0, 0, 0, 0.08);
 
       /* Apple Dark Theme for Right Panel */
       --dark-bg: #000000;
-      --code-bg: #1C1C1E;
-      --code-surface: #2C2C2E;
+      --code-bg: #0a0a0c;
+      --code-surface: #18181b;
       --code-text: #F5F5F7;
-      --code-border: #38383A;
+      --code-border: #27272a;
 
       /* Shadows & Radii */
       --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.04);
@@ -161,7 +161,7 @@
       font-family: 'Fredoka', sans-serif;
       font-size: 24px;
       font-weight: 700;
-      color: #10081a;
+      color: #000000;
       user-select: none;
     }
 
@@ -174,7 +174,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      background-color: #10081a;
+      background-color: #000000;
       color: #ffffff;
       width: 32px;
       height: 32px;
@@ -208,7 +208,7 @@
     }
 
     .top-api-badge {
-      background: #10081a;
+      background: #000000;
       color: #ffffff !important;
       font-family: var(--font-code);
       font-weight: 700;
@@ -487,8 +487,8 @@
     }
 
     .method-badge.post {
-      background: #F3E5F5;
-      color: #7B1FA2;
+      background: #000000;
+      color: #ffffff;
     }
 
     .endpoint-url {
@@ -544,10 +544,21 @@
       border-left: 1px solid var(--code-border);
     }
 
+    .code-window,
+    .explorer,
+    .explorer-body,
+    .explorer-body .code-window,
+    .code-header,
+    .code-content,
+    pre,
+    code,
+    .param-input {
+      border-radius: 0px !important;
+    }
+
     .code-window {
       background: var(--code-bg);
       border: 1px solid var(--code-border);
-      border-radius: var(--radius-lg);
       display: flex;
       flex-direction: column;
       overflow: hidden;
@@ -593,16 +604,22 @@
     }
 
     .dark-btn {
-      background: #38383A;
+      background: #27272a;
       color: white;
       border-radius: 99px;
       padding: 6px 14px;
       font-size: 0.8rem;
       font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      cursor: pointer;
+      transition: all 0.2s;
     }
 
     .dark-btn:hover {
-      background: #48484A;
+      background: #3f3f46;
     }
 
     .code-content {
@@ -637,7 +654,7 @@
     }
 
     .token.keyword {
-      color: #AF52DE;
+      color: #38BDF8;
     }
 
     .token.comment {
@@ -1299,7 +1316,13 @@
               <div class="code-window" style="border-radius:0px">
                 <div class="code-header" style="padding: 6px 10px;">
                   <span class="code-title" style="font-size:0.7rem;">Request</span>
-                  <button class="dark-btn" id="copyReqBtn" style="padding:3px 8px; font-size:0.65rem;">Copy</button>
+                  <button class="dark-btn" id="copyReqBtn" style="padding:3px 8px; font-size:0.65rem;" title="Copy Request Code">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                    </svg>
+                    <span>Copy</span>
+                  </button>
                 </div>
                 <div class="code-content">
                   <pre><code id="requestCodeBox"></code></pre>
@@ -1313,6 +1336,13 @@
                     <span id="responseStatus"
                       style="color: #34C759; font-size: 0.7rem; font-family: var(--font-code); display: none;">200
                       OK</span>
+                    <button class="dark-btn" onclick="copyToClipboard('responseCodeBox')" style="padding:3px 8px; font-size:0.65rem;" title="Copy Response">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                      </svg>
+                      <span>Copy</span>
+                    </button>
                   </div>
                 </div>
                 <div class="code-content">
@@ -1346,7 +1376,7 @@
             <p>eLegal returns standardized HTTP response codes and consistent JSON payloads for all requests. Applications should inspect the HTTP status code and parse the returned <code>error</code> or <code>message</code> property when non-200 responses occur.</p>
 
             <div style="margin-top:16px; display:flex; flex-direction:column; gap:12px;">
-              <div style="background:var(--code-bg); padding:12px 16px; border-radius:8px; border:1px solid var(--code-border);">
+              <div style="background:var(--code-bg); padding:12px 16px; border-radius:0px; border:1px solid var(--code-border);">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
                   <span style="color:#34C759; font-weight:700; font-family:var(--font-code); font-size:0.85rem;">HTTP 200 OK</span>
                   <span style="color:var(--text-tertiary); font-size:0.75rem;">Success</span>
@@ -1354,31 +1384,31 @@
                 <p style="font-size:0.8rem; color:var(--code-text); margin:0;">Request executed successfully. Returns the requested JSON dataset or document structure.</p>
               </div>
 
-              <div style="background:var(--code-bg); padding:12px 16px; border-radius:8px; border:1px solid var(--code-border);">
+              <div style="background:var(--code-bg); padding:12px 16px; border-radius:0px; border:1px solid var(--code-border);">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
                   <span style="color:#FF9500; font-weight:700; font-family:var(--font-code); font-size:0.85rem;">HTTP 400 Bad Request</span>
                   <span style="color:var(--text-tertiary); font-size:0.75rem;">Invalid Parameters</span>
                 </div>
                 <p style="font-size:0.8rem; color:var(--code-text); margin-bottom:8px;">Missing mandatory query parameters (e.g., omitting <code>q</code> in search or <code>sourceUrl</code> in document-content).</p>
-                <pre style="background:var(--code-surface); padding:8px 12px; border-radius:6px; font-size:0.75rem; color:#FF9500;">{ "error": "Query parameter 'q' is required for search" }</pre>
+                <pre style="background:var(--code-surface); padding:8px 12px; border-radius:0px; font-size:0.75rem; color:#FF9500;">{ "error": "Query parameter 'q' is required for search" }</pre>
               </div>
 
-              <div style="background:var(--code-bg); padding:12px 16px; border-radius:8px; border:1px solid var(--code-border);">
+              <div style="background:var(--code-bg); padding:12px 16px; border-radius:0px; border:1px solid var(--code-border);">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
                   <span style="color:#FF3B30; font-weight:700; font-family:var(--font-code); font-size:0.85rem;">HTTP 401 Unauthorized</span>
                   <span style="color:var(--text-tertiary); font-size:0.75rem;">Authentication Failed</span>
                 </div>
                 <p style="font-size:0.8rem; color:var(--code-text); margin-bottom:8px;">Missing or invalid <code>X-API-Key</code> header, or inactive/revoked API key.</p>
-                <pre style="background:var(--code-surface); padding:8px 12px; border-radius:6px; font-size:0.75rem; color:#FF3B30;">{ "error": "Unauthorized", "message": "Valid X-API-Key header required" }</pre>
+                <pre style="background:var(--code-surface); padding:8px 12px; border-radius:0px; font-size:0.75rem; color:#FF3B30;">{ "error": "Unauthorized", "message": "Valid X-API-Key header required" }</pre>
               </div>
 
-              <div style="background:var(--code-bg); padding:12px 16px; border-radius:8px; border:1px solid var(--code-border);">
+              <div style="background:var(--code-bg); padding:12px 16px; border-radius:0px; border:1px solid var(--code-border);">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-                  <span style="color:#AF52DE; font-weight:700; font-family:var(--font-code); font-size:0.85rem;">HTTP 429 Too Many Requests</span>
+                  <span style="color:#E4E4E7; font-weight:700; font-family:var(--font-code); font-size:0.85rem;">HTTP 429 Too Many Requests</span>
                   <span style="color:var(--text-tertiary); font-size:0.75rem;">Rate Limited</span>
                 </div>
                 <p style="font-size:0.8rem; color:var(--code-text); margin-bottom:8px;">Request quota exceeded (>100 requests per 60-second sliding window per API key).</p>
-                <pre style="background:var(--code-surface); padding:8px 12px; border-radius:6px; font-size:0.75rem; color:#AF52DE;">{ "error": "Rate limit exceeded. Try again in 42 seconds.", "retryAfter": 42 }</pre>
+                <pre style="background:var(--code-surface); padding:8px 12px; border-radius:0px; font-size:0.75rem; color:#E4E4E7;">{ "error": "Rate limit exceeded. Try again in 42 seconds.", "retryAfter": 42 }</pre>
               </div>
             </div>
           </div>
@@ -1386,7 +1416,7 @@
           <!-- Code Examples & Handling Instances Card -->
           <div class="endpoint-card">
             <header>
-              <span class="method-badge" style="background:#E0F7FA; color:#006064;">CODE</span>
+              <span class="method-badge" style="background:#000000; color:#FFFFFF;">CODE</span>
               <h3>Production Code Examples & Error Handling</h3>
             </header>
             <p>Below are production-ready code patterns for integrating eLegal into modern Node.js/TypeScript applications, Python scripts, and shell automation scripts with built-in retry logic and error validation.</p>
@@ -1394,7 +1424,16 @@
             <div style="margin-top:16px;">
               <h4 style="font-size:0.9rem; color:var(--text-primary); margin-bottom:8px;">Node.js / TypeScript Instance with Robust Error Handling & Retry</h4>
               <div class="code-window">
-                <div class="code-header"><span class="code-title">TypeScript / Node.js Client</span></div>
+                <div class="code-header">
+                  <span class="code-title">TypeScript / Node.js Client</span>
+                  <button class="dark-btn" onclick="copyCodeBlock(this)" style="padding:3px 8px; font-size:0.65rem;" title="Copy Code">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                    </svg>
+                    <span>Copy</span>
+                  </button>
+                </div>
                 <div class="code-content">
                   <pre style="font-size:0.78rem;"><code class="language-typescript"><span class="token keyword">import</span> fetch <span class="token keyword">from</span> <span class="token string">'node-fetch'</span>;
 
@@ -1444,7 +1483,16 @@
 
               <h4 style="font-size:0.9rem; color:var(--text-primary); margin-top:20px; margin-bottom:8px;">Python Instance with Exception Handling</h4>
               <div class="code-window">
-                <div class="code-header"><span class="code-title">Python Client</span></div>
+                <div class="code-header">
+                  <span class="code-title">Python Client</span>
+                  <button class="dark-btn" onclick="copyCodeBlock(this)" style="padding:3px 8px; font-size:0.65rem;" title="Copy Code">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                    </svg>
+                    <span>Copy</span>
+                  </button>
+                </div>
                 <div class="code-content">
                   <pre style="font-size:0.78rem;"><code class="language-python"><span class="token keyword">import</span> requests
 <span class="token keyword">import</span> time
@@ -1499,6 +1547,16 @@
             <div style="margin-top:12px;">
               <strong style="font-size:0.8rem; color:var(--text-primary);">Example Response Object:</strong>
               <div class="code-window" style="margin-top:6px;">
+                <div class="code-header">
+                  <span class="code-title">JSON Response Example</span>
+                  <button class="dark-btn" onclick="copyCodeBlock(this)" style="padding:3px 8px; font-size:0.65rem;" title="Copy Code">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                    </svg>
+                    <span>Copy</span>
+                  </button>
+                </div>
                 <div class="code-content"><pre style="font-size:0.75rem;"><code class="language-json">[
   {
     <span class="token property">"title"</span>: <span class="token string">"Republic v Land Registrar &amp; 2 others Ex-Parte Mwangi"</span>,
@@ -1536,6 +1594,16 @@
             <div style="margin-top:12px;">
               <strong style="font-size:0.8rem; color:var(--text-primary);">Example Response Object:</strong>
               <div class="code-window" style="margin-top:6px;">
+                <div class="code-header">
+                  <span class="code-title">JSON Response Example</span>
+                  <button class="dark-btn" onclick="copyCodeBlock(this)" style="padding:3px 8px; font-size:0.65rem;" title="Copy Code">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                    </svg>
+                    <span>Copy</span>
+                  </button>
+                </div>
                 <div class="code-content"><pre style="font-size:0.75rem;"><code class="language-json">{
   <span class="token property">"title"</span>: <span class="token string">"Republic v Land Registrar Ex-Parte Mwangi"</span>,
   <span class="token property">"citation"</span>: <span class="token string">"[2023] KEHC 3174 (KLR)"</span>,
@@ -1562,6 +1630,16 @@
             <div style="margin-top:12px;">
               <strong style="font-size:0.8rem; color:var(--text-primary);">Example Response Object:</strong>
               <div class="code-window" style="margin-top:6px;">
+                <div class="code-header">
+                  <span class="code-title">JSON Response Example</span>
+                  <button class="dark-btn" onclick="copyCodeBlock(this)" style="padding:3px 8px; font-size:0.65rem;" title="Copy Code">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                    </svg>
+                    <span>Copy</span>
+                  </button>
+                </div>
                 <div class="code-content"><pre style="font-size:0.75rem;"><code class="language-json">{
   <span class="token property">"precedents"</span>: [
     {
@@ -1596,6 +1674,16 @@
             <div style="margin-top:12px;">
               <strong style="font-size:0.8rem; color:var(--text-primary);">Example Response Object:</strong>
               <div class="code-window" style="margin-top:6px;">
+                <div class="code-header">
+                  <span class="code-title">JSON Response Example</span>
+                  <button class="dark-btn" onclick="copyCodeBlock(this)" style="padding:3px 8px; font-size:0.65rem;" title="Copy Code">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                    </svg>
+                    <span>Copy</span>
+                  </button>
+                </div>
                 <div class="code-content"><pre style="font-size:0.75rem;"><code class="language-json">{
   <span class="token property">"originalUrl"</span>: <span class="token string">"http://kenyalaw.org/caselaw/cases/view/234567/"</span>,
   <span class="token property">"pdfUrl"</span>: <span class="token string">"http://kenyalaw.org/caselaw/cases/export_pdf/234567"</span>,
@@ -1609,7 +1697,7 @@
           <!-- Key Management Endpoints -->
           <div class="endpoint-card">
             <header>
-              <span class="method-badge" style="background:#E8F5E9; color:#2E7D32;">KEY API</span>
+              <span class="method-badge" style="background:#000000; color:#FFFFFF;">KEY API</span>
               <h3>API Key Management (/api/keys)</h3>
             </header>
             <p>Endpoints for managing developer API keys. Requires a Firebase User ID token in the <code>Authorization</code> header (<code>Authorization: Bearer &lt;Token&gt;</code>).</p>
@@ -1626,7 +1714,7 @@
               </div>
 
               <div>
-                <strong style="color:#7B1FA2;">PATCH /api/keys/:keyId</strong>
+                <strong style="color:#1D1D1F;">PATCH /api/keys/:keyId</strong>
                 <p style="font-size:0.8rem; color:var(--text-secondary); margin:2px 0;">Updates key label or toggles <code>isActive</code> status.</p>
               </div>
 
@@ -2638,9 +2726,21 @@ headers = {
 
     // Clipboard Copy for standard text
     function copyToClipboard(elementId) {
-      const text = document.getElementById(elementId).innerText;
+      const el = document.getElementById(elementId);
+      if (!el) return;
+      const text = el.innerText || el.textContent;
       navigator.clipboard.writeText(text).then(() => showToast('Copied to clipboard'));
     }
+
+    function copyCodeBlock(btn) {
+      const codeWindow = btn.closest('.code-window');
+      if (!codeWindow) return;
+      const codeEl = codeWindow.querySelector('code') || codeWindow.querySelector('pre');
+      if (!codeEl) return;
+      const text = codeEl.innerText || codeEl.textContent;
+      navigator.clipboard.writeText(text).then(() => showToast('Copied code to clipboard'));
+    }
+    window.copyCodeBlock = copyCodeBlock;
 
     // Boot
     init();

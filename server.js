@@ -2355,13 +2355,51 @@ Respond ONLY with a valid JSON array starting with '[' and ending with ']'. No m
   return [];
 }
 
+function parseDuckDuckGoHtml(html, source) {
+  const results = [];
+  const seen = new Set();
+  const regex = /<a[^>]+href="([^"]*uddg=([^"&]+)[^"]*)"[^>]*>([\s\S]*?)<\/a>/gi;
+  let m;
+  while ((m = regex.exec(html)) !== null) {
+    const encodedUrl = m[2];
+    const rawText = m[3].replace(/<[^>]+>/g, '').trim();
+    if (!rawText || rawText.length < 3 || rawText.includes('http://') || rawText.includes('https://') || rawText.startsWith('//')) continue;
+
+    let actualUrl = decodeURIComponent(encodedUrl);
+    if (!actualUrl || actualUrl.includes('duckduckgo.com')) continue;
+    
+    const key = actualUrl.toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+
+    const title = rawText.replace(/^\|\s*/, '').trim();
+    const isKenya = actualUrl.includes('kenyalaw.org');
+    const isPdfUrl = actualUrl.endsWith('.pdf') || actualUrl.includes('.pdf?') || title.toLowerCase().includes('[pdf]');
+
+    results.push({
+      title,
+      label: title.replace(/^(The|An|A)\s+/i, '').trim(),
+      citation: title,
+      url: actualUrl,
+      readUrl: actualUrl,
+      source: isKenya ? 'kenyalaw' : (source === 'international' || !isKenya ? 'international' : 'local'),
+      isPdf: isPdfUrl,
+      fileType: isPdfUrl ? 'PDF' : 'DOC',
+      score: isPdfUrl ? 90 : 80,
+      snippets: [actualUrl]
+    });
+    if (results.length >= 25) break;
+  }
+  return results;
+}
+
 async function searchFastWeb(query, source = 'all') {
   const isIntl = source === 'international';
   const scopeQuery = source === 'kenya' 
     ? `${query} site:kenyalaw.org`
     : isIntl
-    ? `${query} case law precedent statute judgment filetype:pdf OR site:worldlii.org OR site:bailii.org OR site:justia.com OR site:law.cornell.edu`
-    : `${query} case law precedent statute legal judgment filetype:pdf`;
+    ? `"${query}" OR ${query} case law precedent statute judgment site:worldlii.org OR site:bailii.org OR site:justia.com OR site:law.cornell.edu OR site:canlii.org OR site:austlii.edu.au`
+    : `"${query}" case law precedent statute legal judgment`;
 
   try {
     const response = await fetch(`https://html.duckduckgo.com/html/?q=${encodeURIComponent(scopeQuery)}`, {
@@ -2372,45 +2410,155 @@ async function searchFastWeb(query, source = 'all') {
     });
     if (!response.ok) return [];
     const html = await response.text();
-    const results = [];
-    const seen = new Set();
-    const regex = /<a[^>]+href="([^"]*uddg=([^"&]+)[^"]*)"[^>]*>([\s\S]*?)<\/a>/gi;
-    let m;
-    while ((m = regex.exec(html)) !== null) {
-      const encodedUrl = m[2];
-      const rawText = m[3].replace(/<[^>]+>/g, '').trim();
-      if (!rawText || rawText.length < 3 || rawText.includes('http://') || rawText.includes('https://') || rawText.startsWith('//')) continue;
+    let results = parseDuckDuckGoHtml(html, source);
 
-      let actualUrl = decodeURIComponent(encodedUrl);
-      if (!actualUrl || actualUrl.includes('duckduckgo.com')) continue;
-      
-      const key = actualUrl.toLowerCase();
-      if (seen.has(key)) continue;
-      seen.add(key);
-
-      const title = rawText.replace(/^\|\s*/, '').trim();
-      const isKenya = actualUrl.includes('kenyalaw.org');
-      const isPdfUrl = actualUrl.endsWith('.pdf') || actualUrl.includes('.pdf?') || title.toLowerCase().includes('[pdf]');
-
-      results.push({
-        title,
-        label: title.replace(/^(The|An|A)\s+/i, '').trim(),
-        citation: title,
-        url: actualUrl,
-        readUrl: actualUrl,
-        source: isKenya ? 'kenyalaw' : 'international',
-        isPdf: isPdfUrl,
-        fileType: isPdfUrl ? 'PDF' : 'DOC',
-        score: isPdfUrl ? 90 : 80,
-        snippets: [actualUrl]
+    if (isIntl && results.length < 5) {
+      const altQuery = `"${query}" legal case precedent judgment`;
+      const altResponse = await fetch(`https://html.duckduckgo.com/html/?q=${encodeURIComponent(altQuery)}`, {
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+          'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
+        }
       });
-      if (results.length >= 20) break;
+      if (altResponse.ok) {
+        const altHtml = await altResponse.text();
+        const altResults = parseDuckDuckGoHtml(altHtml, source);
+        const seen = new Set(results.map(r => r.url.toLowerCase()));
+        for (const item of altResults) {
+          if (!seen.has(item.url.toLowerCase())) {
+            results.push(item);
+          }
+        }
+      }
     }
     return results;
   } catch (e) {
     console.error('Fast web fallback search error:', e.message);
     return [];
   }
+}
+
+async function fetchInternationalLegalPrecedents(query) {
+  const cleanQ = query.trim().replace(/\s+/g, ' ');
+  const results = [];
+  const seenUrls = new Set();
+
+  let expandedQuery = cleanQ;
+  if (/^r\s+v(s)?\s+/i.test(cleanQ)) {
+    const party = cleanQ.replace(/^r\s+v(s)?\s+/i, '');
+    expandedQuery = `"${cleanQ}" OR "Regina v ${party}" OR "Rex v ${party}" OR "${party}"`;
+  }
+
+  // 1. Wikipedia Legal Precedents API
+  try {
+    const wikiUrl = `https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(expandedQuery + ' case law precedent statute')}&format=json&origin=*`;
+    const response = await fetch(wikiUrl);
+    if (response.ok) {
+      const data = await response.json();
+      const hits = (data && data.query && data.query.search) || [];
+      for (const hit of hits.slice(0, 10)) {
+        const title = hit.title;
+        const snippet = (hit.snippet || '').replace(/<[^>]+>/g, '').trim();
+        const pageUrl = `https://en.wikipedia.org/wiki/${encodeURIComponent(title.replace(/\s+/g, '_'))}`;
+        if (seenUrls.has(pageUrl.toLowerCase())) continue;
+        seenUrls.add(pageUrl.toLowerCase());
+        
+        results.push({
+          title: title,
+          label: title,
+          citation: `${title} (International Law Precedent)`,
+          url: pageUrl,
+          readUrl: `/read/${encodeURIComponent(sanitizeFilename(title))}?sourceUrl=${encodeURIComponent(pageUrl)}&title=${encodeURIComponent(title)}`,
+          source: 'international',
+          category: 'precedent',
+          isPdf: false,
+          fileType: 'DOC',
+          score: 110,
+          snippets: [snippet]
+        });
+      }
+    }
+  } catch (e) {
+    console.error('fetchInternationalLegalPrecedents Wikipedia error:', e.message);
+  }
+
+  // 2. OpenAlex Global Legal & Scholarly Precedents API
+  try {
+    const oaUrl = `https://api.openalex.org/works?search=${encodeURIComponent(expandedQuery)}&per_page=8`;
+    const oaRes = await fetch(oaUrl);
+    if (oaRes.ok) {
+      const oaData = await oaRes.json();
+      const oaHits = oaData.results || [];
+      for (const hit of oaHits) {
+        const title = hit.title;
+        if (!title || title.length < 5) continue;
+        const year = hit.publication_year ? `[${hit.publication_year}]` : '';
+        const doi = hit.doi || (hit.primary_location && hit.primary_location.landing_page_url) || `https://openalex.org/${hit.id}`;
+        if (seenUrls.has(doi.toLowerCase())) continue;
+        seenUrls.add(doi.toLowerCase());
+
+        let venue = '';
+        if (hit.primary_location && hit.primary_location.source && hit.primary_location.source.display_name) {
+          venue = hit.primary_location.source.display_name;
+        }
+
+        results.push({
+          title: `${title} ${year}`.trim(),
+          label: title,
+          citation: venue ? `${title} ${year} (${venue})` : `${title} ${year} (Global Legal Research)`,
+          url: doi,
+          readUrl: `/read/${encodeURIComponent(sanitizeFilename(title))}?sourceUrl=${encodeURIComponent(doi)}&title=${encodeURIComponent(title)}`,
+          source: 'international',
+          category: 'precedent',
+          isPdf: doi.toLowerCase().endsWith('.pdf'),
+          fileType: doi.toLowerCase().endsWith('.pdf') ? 'PDF' : 'DOC',
+          score: 115,
+          snippets: [venue ? `Published in ${venue}. Global Legal Authority & Precedent` : `Global Legal Scholarship & Precedent`]
+        });
+      }
+    }
+  } catch (e) {
+    console.error('fetchInternationalLegalPrecedents OpenAlex error:', e.message);
+  }
+
+  // 3. CourtListener Open API
+  try {
+    const clUrl = `https://www.courtlistener.com/api/rest/v4/search/?q=${encodeURIComponent(cleanQ)}`;
+    const clRes = await fetch(clUrl);
+    if (clRes.ok) {
+      const clData = await clRes.json();
+      const clHits = clData.results || [];
+      for (const hit of clHits.slice(0, 10)) {
+        const caseName = hit.caseName || hit.case_name;
+        if (!caseName) continue;
+        const cits = Array.isArray(hit.citation) ? hit.citation.join(', ') : (hit.citation || '');
+        const court = hit.court || 'Court of Appeal / High Court';
+        const year = hit.dateFiled ? hit.dateFiled.split('-')[0] : '';
+        const citeString = cits ? `[${year}] ${cits}` : (year ? `[${year}]` : '');
+        const docUrl = hit.absolute_url ? `https://www.courtlistener.com${hit.absolute_url}` : `https://www.courtlistener.com/?q=${encodeURIComponent(caseName)}`;
+        if (seenUrls.has(docUrl.toLowerCase())) continue;
+        seenUrls.add(docUrl.toLowerCase());
+
+        results.push({
+          title: `${caseName} ${citeString}`.trim(),
+          label: caseName,
+          citation: `${caseName} ${citeString} (${court})`.trim(),
+          url: docUrl,
+          readUrl: `/read/${encodeURIComponent(sanitizeFilename(caseName))}?sourceUrl=${encodeURIComponent(docUrl)}&title=${encodeURIComponent(caseName)}`,
+          source: 'international',
+          category: 'precedent',
+          isPdf: false,
+          fileType: 'DOC',
+          score: 120,
+          snippets: [hit.snippet || hit.summary || `${caseName} international legal authority`]
+        });
+      }
+    }
+  } catch (e) {
+    console.error('fetchInternationalLegalPrecedents CourtListener error:', e.message);
+  }
+
+  return results;
 }
 
 async function fetchKenyaLawDirect(query) {
@@ -2502,8 +2650,9 @@ function extractLinks(text) {
 }
 
 function rankResults(results, query, classification = null) {
-  const stopWords = new Set(['v', 'vs', 'r', 're', 'the', 'and', 'or', 'in', 'of', 'to', 'at', 'a', 'an', 'for']);
-  const queryTerms = query.toLowerCase().split(/\s+/).filter(t => t.length > 1 && !stopWords.has(t));
+  const cleanQuery = query.toLowerCase().trim();
+  const stopWords = new Set(['the', 'and', 'or', 'in', 'of', 'to', 'at', 'a', 'an', 'for']);
+  const queryTerms = cleanQuery.split(/\s+/).filter(t => t.length > 0 && !stopWords.has(t));
 
   return results.map(r => {
     const titleLower = (r.title || '').toLowerCase();
@@ -2513,38 +2662,56 @@ function rankResults(results, query, classification = null) {
 
     // Requirement: Prioritize PDF and official document results while keeping others significant
     const isPdf = Boolean(r.isPdf) || urlLower.endsWith('.pdf') || urlLower.includes('.pdf?') || titleLower.includes('pdf');
-    const isDoc = isPdf || urlLower.includes('/doc/') || urlLower.includes('/document/') || urlLower.includes('/cases/') || urlLower.includes('/akn/ke/') || urlLower.includes('kenyalaw.org') || urlLower.includes('bailii.org') || urlLower.includes('worldlii.org') || urlLower.includes('justia.com') || urlLower.includes('law.cornell.edu');
+    const isDoc = isPdf || urlLower.includes('/doc/') || urlLower.includes('/document/') || urlLower.includes('/cases/') || urlLower.includes('/akn/ke/') || urlLower.includes('kenyalaw.org') || urlLower.includes('bailii.org') || urlLower.includes('worldlii.org') || urlLower.includes('justia.com') || urlLower.includes('law.cornell.edu') || urlLower.includes('canlii.org') || urlLower.includes('austlii.edu.au');
 
     r.isPdf = isPdf;
     r.isDocument = isDoc;
     r.fileType = isPdf ? 'PDF' : (isDoc ? 'DOC' : 'WEB');
 
     if (isPdf) {
-      score += 45; // Significant priority boost for PDF files
+      score += 35; // Significant priority boost for PDF files
     } else if (isDoc) {
-      score += 25; // Priority boost for formal legal documents
+      score += 20; // Priority boost for formal legal documents
     }
 
-    let allMatch = true;
-    for (const term of queryTerms) {
-      if (titleLower.includes(term) || citationLower.includes(term)) {
-        score += 15;
-        if (titleLower.startsWith(term)) score += 10;
-      } else {
-        allMatch = false;
+    // Exact title / citation phrase match boost (e.g., "r v stevenson" or "donoghue v stevenson")
+    if (titleLower.includes(cleanQuery) || citationLower.includes(cleanQuery)) {
+      score += 90;
+    }
+
+    // Common variant match (e.g. "regina v stevenson" vs "r v stevenson")
+    if (cleanQuery.startsWith('r v ') || cleanQuery.startsWith('r vs ')) {
+      const altQuery = cleanQuery.replace(/^r\s+v(s)?\s+/i, 'regina v ');
+      if (titleLower.includes(altQuery) || citationLower.includes(altQuery)) {
+        score += 80;
       }
     }
 
-    if (allMatch && queryTerms.length > 0) {
-      score += 30;
+    let tokenMatchCount = 0;
+    for (const term of queryTerms) {
+      if (titleLower.includes(term) || citationLower.includes(term)) {
+        score += 15;
+        tokenMatchCount++;
+      }
     }
 
-    // Classification alignment boost
+    if (queryTerms.length > 0 && tokenMatchCount === queryTerms.length) {
+      score += 25;
+    }
+
+    // Jurisdiction alignment boost / penalty
     if (classification) {
-      if (classification.jurisdiction === 'international' && r.source === 'international') {
-        score += 20;
-      } else if (classification.jurisdiction === 'kenya' && (r.source === 'kenyalaw' || r.source === 'local')) {
-        score += 20;
+      const targetJur = classification.jurisdiction;
+      if (targetJur === 'international') {
+        if (r.source === 'international' || urlLower.includes('bailii') || urlLower.includes('worldlii') || urlLower.includes('justia') || urlLower.includes('canlii') || urlLower.includes('austlii') || urlLower.includes('law.cornell.edu') || urlLower.includes('courtlistener')) {
+          score += 65;
+        } else if (!titleLower.includes(cleanQuery) && !citationLower.includes(cleanQuery)) {
+          score -= 150; // Heavy penalty for non-matching local/Kenyan records when searching international cases
+        }
+      } else if (targetJur === 'kenya') {
+        if (r.source === 'kenyalaw' || r.source === 'local') {
+          score += 25;
+        }
       }
     }
 
@@ -2559,39 +2726,55 @@ async function searchWithRetry(query, retries = 1, source = 'all', classificatio
   const normalizedQuery = query.trim().replace(/\s+/g, ' ');
   if (!normalizedQuery) return [];
 
-  const effectiveSource = (classification && ['kenya', 'international'].includes(classification.jurisdiction)) 
-    ? classification.jurisdiction 
-    : source;
+  // Respect user preference when 'all', 'kenya', or 'international' is selected
+  const effectiveSource = (source && source !== 'all') 
+    ? source 
+    : ((classification && ['kenya', 'international'].includes(classification.jurisdiction)) ? 'all' : 'all');
 
   const stopWords = new Set(['v', 'vs', 'r', 're', 'the', 'and', 'or', 'in', 'of', 'to', 'at', 'a', 'an', 'for']);
   const sigTokens = normalizedQuery.toLowerCase().split(/\W+/).filter(t => t.length > 1 && !stopWords.has(t));
 
   // 1. Tokenized local index lookup & persistent repository lookup
-  const localResults = searchLocalIndex(normalizedQuery);
+  let localResults = searchLocalIndex(normalizedQuery);
+  if (effectiveSource === 'international') {
+    localResults = localResults.filter(r => (r.title || '').toLowerCase().includes(normalizedQuery.toLowerCase()));
+  }
   const repoDocs = getRepositoryDocs();
   const repoMatches = repoDocs.filter(doc => {
-    const target = `${doc.title || ''} ${doc.citation || ''} ${doc.type || ''} ${doc.source || ''} ${doc.year || ''}`.toLowerCase();
+    const titleLower = (doc.title || '').toLowerCase();
+    const citationLower = (doc.citation || '').toLowerCase();
+    const cleanQ = normalizedQuery.toLowerCase();
+    
+    if (effectiveSource === 'international') {
+      return (doc.source === 'international' || titleLower.includes(cleanQ) || citationLower.includes(cleanQ));
+    }
+    
     if (sigTokens.length > 0) {
-      return sigTokens.some(t => target.includes(t));
+      return sigTokens.some(t => titleLower.includes(t) || citationLower.includes(t));
     }
     return false;
   }).map(d => {
     const titleLower = (d.title || '').toLowerCase();
-    const matchesAll = sigTokens.length > 0 && sigTokens.every(t => titleLower.includes(t));
-    return { ...d, score: matchesAll ? 95 : 60, source: 'local' };
+    const cleanQ = normalizedQuery.toLowerCase();
+    const matchesExact = titleLower.includes(cleanQ);
+    return { ...d, score: matchesExact ? 90 : 35, source: d.source || 'local' };
   });
 
-  // 2. Parallel AI Google Search Grounding & KenyaLaw direct lookup
+  // 2. Parallel AI Google Search Grounding, KenyaLaw direct lookup, and International Precedents lookup
   const geminiPromise = searchWithGeminiGrounding(normalizedQuery, effectiveSource);
   const kenyaLawPromise = (effectiveSource === 'all' || effectiveSource === 'kenya' || effectiveSource === 'mixed') 
     ? fetchKenyaLawDirect(normalizedQuery)
     : Promise.resolve([]);
+  const intlPromise = (effectiveSource === 'all' || effectiveSource === 'international')
+    ? fetchInternationalLegalPrecedents(normalizedQuery)
+    : Promise.resolve([]);
 
   const timeoutPromise = new Promise(resolve => setTimeout(() => resolve([]), 9000));
 
-  let [geminiResults, kenyaLawResults] = await Promise.all([
+  let [geminiResults, kenyaLawResults, intlResults] = await Promise.all([
     Promise.race([geminiPromise, timeoutPromise]),
-    Promise.race([kenyaLawPromise, timeoutPromise])
+    Promise.race([kenyaLawPromise, timeoutPromise]),
+    Promise.race([intlPromise, timeoutPromise])
   ]);
 
   // Fallback to fast web search if gemini returns empty
@@ -2602,7 +2785,7 @@ async function searchWithRetry(query, retries = 1, source = 'all', classificatio
   const combined = [];
   const seen = new Set();
 
-  for (const item of [...geminiResults, ...repoMatches, ...localResults, ...kenyaLawResults]) {
+  for (const item of [...geminiResults, ...intlResults, ...repoMatches, ...localResults, ...kenyaLawResults]) {
     if (!isLegalDocument(item)) continue;
     const key = (item.url || item.title || '').toLowerCase();
     if (key && !seen.has(key)) {

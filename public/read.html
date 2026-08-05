@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
     <title>eLegal - Document Reader</title>
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet" />
@@ -266,13 +266,13 @@
         }
 
         /* ============================================================
-           VIEWER CONTAINER
+           VIEWER CONTAINER & ZOOM BAR
            ============================================================ */
         .viewer-container {
             flex: 1;
             overflow-y: auto;
-            overflow-x: hidden;
-            padding: 20px 12px 100px 12px;
+            overflow-x: auto;
+            padding: 16px 12px 100px 12px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -280,6 +280,65 @@
             -webkit-overflow-scrolling: touch;
             width: 100%;
             max-width: 100vw;
+            touch-action: pan-x pan-y;
+        }
+
+        .pdf-zoom-bar {
+            display: inline-flex;
+            align-items: center;
+            gap: 2px;
+            background: var(--surface-bg);
+            padding: 2px 6px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-color);
+            user-select: none;
+            touch-action: none;
+            flex-shrink: 0;
+        }
+
+        .zoom-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-primary);
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background var(--transition-fast);
+            font-weight: 600;
+            font-size: 0.75rem;
+        }
+        .zoom-btn:hover {
+            background: var(--accent-green-light);
+            color: var(--accent-green);
+        }
+        .zoom-btn:active {
+            transform: scale(0.92);
+        }
+        .zoom-btn.reset-btn {
+            width: auto;
+            padding: 0 6px;
+            font-size: 0.7rem;
+            font-family: var(--font-body);
+        }
+
+        .zoom-level {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            min-width: 36px;
+            text-align: center;
+            font-family: var(--font-body);
+        }
+
+        /* Hide court, ruling, year, source badges so zoom control sits in top navbar */
+        .badge-year,
+        .badge-type,
+        .badge-source {
+            display: none !important;
         }
 
         /* ============================================================
@@ -292,6 +351,9 @@
             align-items: center;
             gap: 16px;
             max-width: var(--max-width-content);
+            transform-origin: top center;
+            transition: transform 0.08s ease-out;
+            will-change: transform;
         }
 
         .page-wrapper {
@@ -1196,6 +1258,17 @@
             <span class="doc-title" id="docTitle">Loading document...</span>
         </div>
         <div class="toolbar-right">
+            <!-- PDF Zoom Controls in Top Nav Bar -->
+            <div id="pdfZoomControls" class="pdf-zoom-bar" style="display: none;">
+                <button id="btnZoomOut" class="zoom-btn" title="Zoom Out (−)">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                </button>
+                <span id="zoomLevelDisplay" class="zoom-level">100%</span>
+                <button id="btnZoomIn" class="zoom-btn" title="Zoom In (+)">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                </button>
+                <button id="btnZoomReset" class="zoom-btn reset-btn" title="Reset Zoom">Fit</button>
+            </div>
             <span class="badge badge-year" id="badgeYear" style="display:none;">Year</span>
             <span class="badge badge-type" id="badgeType" style="display:none;">Type</span>
             <span class="badge" id="badgeSource" style="display:none;">Source</span>
@@ -1205,6 +1278,14 @@
                     <path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z" />
                 </svg>
                 <span id="btnBookmarkText">Save</span>
+            </button>
+            <button id="btnDownload" class="source-btn" style="cursor: pointer; display: inline-flex; align-items: center; gap: 4px;" title="Download PDF document">
+                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="7 10 12 15 17 10"/>
+                    <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+                <span>Download</span>
             </button>
             <a href="#" id="externalLink" class="source-btn" style="display:none;" target="_blank" rel="noopener noreferrer">
                 Original source
@@ -1386,7 +1467,11 @@
                         citation: loadedDocData?.citation || ''
                     })
                 });
-                const data = await res.json();
+                const text = await res.text();
+                if (!text || text.trim() === '' || text.trim() === 'undefined') {
+                    throw new Error('Summary response was empty');
+                }
+                const data = JSON.parse(text);
                 if (data.success && data.summaryHtml) {
                     cachedSummaryHtml = data.summaryHtml;
                     summaryContent.innerHTML = cachedSummaryHtml;
@@ -1411,7 +1496,8 @@
         function getSavedDocs() {
             try {
                 const raw = localStorage.getItem(SAVED_DOCS_KEY);
-                return raw ? JSON.parse(raw) : [];
+                if (!raw || raw === 'undefined' || raw === 'null') return [];
+                return JSON.parse(raw);
             } catch (e) {
                 return [];
             }
@@ -1507,6 +1593,139 @@
         }
 
         let textFontSize = 1.0625;
+        let pdfZoomScale = 1.0;
+        let loadedPdfArrayBuffer = null;
+
+        /* ─── PDF Zoom & Pinch-to-Zoom Controller ─── */
+        function setPdfZoom(scale) {
+            pdfZoomScale = Math.min(Math.max(scale, 0.5), 3.5);
+
+            const zoomLevelDisplay = document.getElementById('zoomLevelDisplay');
+            if (zoomLevelDisplay) {
+                zoomLevelDisplay.textContent = Math.round(pdfZoomScale * 100) + '%';
+            }
+
+            const targetContainer = (pagesContainer && pagesContainer.style.display !== 'none') ? pagesContainer :
+                                    (textReaderContainer && textReaderContainer.style.display !== 'none' ? textReaderContainer : null);
+
+            if (targetContainer) {
+                targetContainer.style.transform = `scale(${pdfZoomScale})`;
+                targetContainer.style.transformOrigin = 'top center';
+                targetContainer.style.transition = 'transform 0.06s ease-out';
+
+                const unscaledHeight = targetContainer.offsetHeight;
+                if (pdfZoomScale > 1) {
+                    const extraHeight = unscaledHeight * (pdfZoomScale - 1);
+                    targetContainer.style.marginBottom = `${extraHeight + 40}px`;
+                } else {
+                    targetContainer.style.marginBottom = '0px';
+                }
+            }
+        }
+
+        const btnZoomOut = document.getElementById('btnZoomOut');
+        const btnZoomIn = document.getElementById('btnZoomIn');
+        const btnZoomReset = document.getElementById('btnZoomReset');
+
+        if (btnZoomOut) btnZoomOut.addEventListener('click', () => setPdfZoom(pdfZoomScale - 0.15));
+        if (btnZoomIn) btnZoomIn.addEventListener('click', () => setPdfZoom(pdfZoomScale + 0.15));
+        if (btnZoomReset) btnZoomReset.addEventListener('click', () => setPdfZoom(1.0));
+
+        /* ─── Pinch-to-Zoom Gesture for PDF Canvas ─── */
+        const viewerContainer = document.getElementById('viewerContainer');
+        let initialPinchDistance = null;
+        let startPinchScale = 1.0;
+
+        if (viewerContainer) {
+            viewerContainer.addEventListener('touchstart', (e) => {
+                if (e.touches.length === 2) {
+                    initialPinchDistance = Math.hypot(
+                        e.touches[0].clientX - e.touches[1].clientX,
+                        e.touches[0].clientY - e.touches[1].clientY
+                    );
+                    startPinchScale = pdfZoomScale;
+                }
+            }, { passive: true });
+
+            viewerContainer.addEventListener('touchmove', (e) => {
+                if (e.touches.length === 2 && initialPinchDistance) {
+                    e.preventDefault(); // Prevent full UI scaling
+                    const currentDistance = Math.hypot(
+                        e.touches[0].clientX - e.touches[1].clientX,
+                        e.touches[0].clientY - e.touches[1].clientY
+                    );
+                    const factor = currentDistance / initialPinchDistance;
+                    setPdfZoom(startPinchScale * factor);
+                }
+            }, { passive: false });
+
+            viewerContainer.addEventListener('touchend', (e) => {
+                if (e.touches.length < 2) {
+                    initialPinchDistance = null;
+                }
+            }, { passive: true });
+
+            // Trackpad pinch or Ctrl + mouse wheel
+            viewerContainer.addEventListener('wheel', (e) => {
+                if (e.ctrlKey || e.metaKey) {
+                    e.preventDefault();
+                    const delta = e.deltaY < 0 ? 0.1 : -0.1;
+                    setPdfZoom(pdfZoomScale + delta);
+                }
+            }, { passive: false });
+        }
+
+        /* ─── DOWNLOAD PDF BUTTON HANDLER ─── */
+        const btnDownload = document.getElementById('btnDownload');
+        if (btnDownload) {
+            btnDownload.addEventListener('click', async () => {
+                let downloadFileName = (displayTitle || 'legal_document').replace(/[^a-zA-Z0-9_\- ]/g, '_').replace(/_+/g, '_').trim() || 'eLegal_Document';
+                if (!downloadFileName.toLowerCase().endsWith('.pdf')) {
+                    downloadFileName += '.pdf';
+                }
+
+                let pdfBlob = null;
+
+                if (loadedPdfArrayBuffer) {
+                    pdfBlob = new Blob([loadedPdfArrayBuffer], { type: 'application/pdf' });
+                } else if (sourceUrl) {
+                    const originalHtml = btnDownload.innerHTML;
+                    try {
+                        btnDownload.innerHTML = `
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10" stroke-opacity="0.25"/>
+                                <path d="M12 2a10 10 0 0 1 10 10" stroke-linecap="round"/>
+                            </svg>
+                            <span>Downloading...</span>`;
+
+                        const pdfUrl = buildKenyaLawPdfUrl(sourceUrl) || sourceUrl;
+                        const proxyUrl = `/api/pdf-proxy?sourceUrl=${encodeURIComponent(pdfUrl)}`;
+                        const res = await fetch(proxyUrl, { headers: { 'X-API-Key': getActiveApiKey() } });
+                        if (res.ok) {
+                            const buffer = await res.arrayBuffer();
+                            pdfBlob = new Blob([buffer], { type: 'application/pdf' });
+                        }
+                    } catch (err) {
+                        console.warn('PDF download fetch failed:', err);
+                    } finally {
+                        btnDownload.innerHTML = originalHtml;
+                    }
+                }
+
+                if (pdfBlob) {
+                    const blobUrl = URL.createObjectURL(pdfBlob);
+                    const link = document.createElement('a');
+                    link.href = blobUrl;
+                    link.download = downloadFileName;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    setTimeout(() => URL.revokeObjectURL(blobUrl), 10000);
+                } else {
+                    alert('PDF is not available for direct download for this document.');
+                }
+            });
+        }
 
         /* ─── Helper: Detect Kenya Law (KLR) source ─── */
         function isKenyaLawSource(url) {
@@ -1518,11 +1737,8 @@
         /* ─── Helper: Build PDF URL for Kenya Law source ─── */
         function buildKenyaLawPdfUrl(baseUrl) {
             if (!baseUrl) return null;
-            // If the URL already ends with /source, use as-is
             if (baseUrl.endsWith('/source')) return baseUrl;
-            // If it ends with /, append source
             if (baseUrl.endsWith('/')) return baseUrl + 'source';
-            // Otherwise append /source
             return baseUrl + '/source';
         }
 
@@ -1535,6 +1751,10 @@
 
         /* ─── Helper: Render PDF from ArrayBuffer with Clear Readable Quality ─── */
         async function renderPdfFromBuffer(arrayBuffer, totalPagesOverride) {
+            loadedPdfArrayBuffer = arrayBuffer; // Cache array buffer for download
+            const pdfZoomControls = document.getElementById('pdfZoomControls');
+            if (pdfZoomControls) pdfZoomControls.style.display = 'flex';
+
             const pdfDoc = await pdfjsLib.getDocument({
                 data: arrayBuffer,
                 cMapUrl: 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/cmaps/',
@@ -2080,7 +2300,11 @@
                     throw new Error(`Failed to load document (${res.status})`);
                 }
 
-                const data = await res.json();
+                const text = await res.text();
+                if (!text || text.trim() === '' || text.trim() === 'undefined') {
+                    throw new Error('Document data received was empty.');
+                }
+                const data = JSON.parse(text);
                 loadedDocData = data;
 
                 // If API says it's a PDF, try to render it

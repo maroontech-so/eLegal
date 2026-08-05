@@ -315,6 +315,36 @@
             background: rgba(0, 0, 0, 0.08);
         }
 
+        .jurisdiction-pill {
+            padding: 6px 14px;
+            border-radius: 99px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            background: rgba(255, 255, 255, 0.9);
+            color: #475569;
+            border: 1px solid rgba(203, 213, 225, 0.8);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            backdrop-filter: blur(8px);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .jurisdiction-pill:hover {
+            background: #ffffff;
+            color: #0f172a;
+            border-color: #94a3b8;
+            transform: translateY(-1px);
+        }
+
+        .jurisdiction-pill.active {
+            background: #2563eb;
+            color: #ffffff;
+            border-color: #2563eb;
+            box-shadow: 0 2px 10px rgba(37, 99, 235, 0.28);
+        }
+
         .mini-btn {
             height: 36px;
             padding: 0 16px;
@@ -881,6 +911,20 @@
             border-color: rgba(168,85,247,0.15);
         }
 
+        .case-badge-source.international {
+            background: #eff6ff;
+            color: #1d4ed8;
+            border: 1px solid #bfdbfe;
+            font-weight: 700;
+        }
+
+        .case-badge-source.kenyalaw {
+            background: #f0fdf4;
+            color: #15803d;
+            border: 1px solid #bbf7d0;
+            font-weight: 700;
+        }
+
         .case-card-meta {
             display: flex;
             flex-wrap: wrap;
@@ -1252,6 +1296,12 @@
             <button id="searchBtn">Search</button>
             <div class="autocomplete-dropdown" id="autocompleteDropdown"></div>
         </div>
+
+        <div class="jurisdiction-bar" id="jurisdictionBar" style="display: flex; gap: 8px; justify-content: center; margin-top: 14px; flex-wrap: wrap; z-index: 2; position: relative;">
+            <button class="jurisdiction-pill active" data-source="all" type="button" title="Auto-detect & search both Kenya Law and Global Repositories">🌐 All Repositories</button>
+            <button class="jurisdiction-pill" data-source="kenya" type="button" title="Restricted to Kenya Law (eKLR) and Kenyan Courts">🇰🇪 Kenya Law (eKLR)</button>
+            <button class="jurisdiction-pill" data-source="international" type="button" title="Global Precedents, UK, US, Commonwealth & International Law">🌍 International Law</button>
+        </div>
     </header>
 
     <!-- ─── MAIN CONTENT ─── -->
@@ -1382,12 +1432,18 @@
             try {
                 const res = await fetchApi(`${API_BASE}/library`);
                 if (!res.ok) throw new Error(`Server returned ${res.status} – ${res.statusText}`);
-                libraryData = await res.json();
+                const text = await res.text();
+                libraryData = (text && text.trim() && text.trim() !== 'undefined') ? JSON.parse(text) : { total: 0, docs: [] };
                 currentResultIndex = -1;
                 renderCurrent();
                 updateStatus(`${libraryData.total || 0} stored documents ready`);
 
-                fetchApi(`${API_BASE}/latest-kenyalaw`).then(r => r.json()).then(data => {
+                fetchApi(`${API_BASE}/latest-kenyalaw`).then(r => r.text()).then(t => {
+                    if (t && t.trim() && t.trim() !== 'undefined') {
+                        try { return JSON.parse(t); } catch (_) {}
+                    }
+                    return null;
+                }).then(data => {
                     if (data && data.docs && data.docs.length > 0 && !lastResult) {
                         libraryData.docs = data.docs;
                         libraryData.total = data.total;
@@ -1402,12 +1458,16 @@
         }
 
         /* ─── SEARCH ─── */
-async function search(query) {
-             const normalizedQuery = query.trim().replace(/\s+/g, ' ');
-             const res = await fetchApi(`${API_BASE}/search?q=${encodeURIComponent(normalizedQuery)}`);
-             if (!res.ok) throw new Error(`Search failed (${res.status})`);
-             return res.json();
-         }
+        let currentSource = 'all';
+
+        async function search(query) {
+            const normalizedQuery = query.trim().replace(/\s+/g, ' ');
+            const res = await fetchApi(`${API_BASE}/search?q=${encodeURIComponent(normalizedQuery)}&source=${encodeURIComponent(currentSource)}`);
+            if (!res.ok) throw new Error(`Search failed (${res.status})`);
+            const text = await res.text();
+            if (!text || text.trim() === '' || text.trim() === 'undefined') return { total: 0, results: [] };
+            return JSON.parse(text);
+        }
 
 async function doSearch() {
              const query = document.getElementById('searchInput').value.trim().replace(/\s+/g, ' ');
@@ -1440,7 +1500,8 @@ async function doSearch() {
         function getSavedDocs() {
             try {
                 const raw = localStorage.getItem(SAVED_DOCS_KEY);
-                return raw ? JSON.parse(raw) : [];
+                if (!raw || raw === 'undefined' || raw === 'null') return [];
+                return JSON.parse(raw);
             } catch (e) {
                 console.warn('Failed to parse saved documents:', e);
                 return [];
@@ -1678,10 +1739,10 @@ function createResultItem(item) {
                   badgesEl.appendChild(typeBadge);
               }
 
-              const sourceLabel = item.source || getSourceLabel(source, category);
+              const sourceLabel = item.source === 'international' ? '🌍 Global Precedent' : (item.source === 'kenyalaw' ? '🇰🇪 Kenya Law (eKLR)' : getSourceLabel(source, category));
               if (sourceLabel) {
                   const sourceBadge = document.createElement('span');
-                  sourceBadge.className = 'case-badge case-badge-source';
+                  sourceBadge.className = `case-badge case-badge-source ${item.source || ''}`;
                   sourceBadge.textContent = sourceLabel;
                   badgesEl.appendChild(sourceBadge);
               }
@@ -1843,11 +1904,14 @@ function renderPreview(item) {
                     if (title) params.set('title', title);
                     const res = await fetchApi(`${API_BASE}/resolve?${params.toString()}`);
                     if (res.ok) {
-                        const documentInfo = await res.json();
-                        if (documentInfo.readUrl || documentInfo.sourceUrl) {
-                            const readUrl = documentInfo.readUrl || `/read.html?title=${encodeURIComponent(documentInfo.title || title)}&sourceUrl=${encodeURIComponent(documentInfo.sourceUrl)}`;
-                            window.location.href = readUrl;
-                            return;
+                        const text = await res.text();
+                        if (text && text.trim() && text.trim() !== 'undefined') {
+                            const documentInfo = JSON.parse(text);
+                            if (documentInfo.readUrl || documentInfo.sourceUrl) {
+                                const readUrl = documentInfo.readUrl || `/read.html?title=${encodeURIComponent(documentInfo.title || title)}&sourceUrl=${encodeURIComponent(documentInfo.sourceUrl)}`;
+                                window.location.href = readUrl;
+                                return;
+                            }
                         }
                     }
                 } catch (e) {
@@ -2099,8 +2163,11 @@ function highlightActiveResult() {
                     signal: activeSuggestionController.signal
                 });
                 if (res.ok) {
-                    const data = await res.json();
-                    showAutocomplete(data.suggestions, query);
+                    const text = await res.text();
+                    if (text && text.trim() && text.trim() !== 'undefined') {
+                        const data = JSON.parse(text);
+                        showAutocomplete(data.suggestions || [], query);
+                    }
                 }
             } catch (e) {
                 if (e.name !== 'AbortError') {
@@ -2166,6 +2233,18 @@ function highlightActiveResult() {
 
         document.querySelectorAll('[data-filter]').forEach(button => {
             button.addEventListener('click', () => setFilter(button.dataset.filter));
+        });
+
+        document.querySelectorAll('.jurisdiction-pill').forEach(button => {
+            button.addEventListener('click', () => {
+                document.querySelectorAll('.jurisdiction-pill').forEach(b => b.classList.remove('active'));
+                button.classList.add('active');
+                currentSource = button.dataset.source || 'all';
+                const searchVal = document.getElementById('searchInput')?.value?.trim();
+                if (searchVal) {
+                    doSearch();
+                }
+            });
         });
 
 document.getElementById('closePreviewBtn').addEventListener('click', () => {

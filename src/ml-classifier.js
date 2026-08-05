@@ -26,10 +26,15 @@ const JURISDICTION_TRAINING_CORPUS = {
       'uk supreme court': 9, 'privy council': 9, 'house of lords': 9, 'court of justice': 8, 'echr': 9,
       'uncitral': 9, 'treaty': 8, 'convention': 8, 'geneva': 8, 'hague': 8, 'vienna convention': 9, 'us code': 8,
       'commonwealth': 7, 'ssrn': 8, 'heinonline': 8, 'worldlii': 9, 'bailii': 9, 'justia': 8, 'cornell': 8,
-      'singapore': 6, 'south africa': 6, 'european union': 8, 'eu': 7, 'gdpr': 8, 'maritime boundary': 9,
-      'unclos': 10, 'law of the sea': 9, 'extradition': 7, 'sovereignty': 7, 'customary international law': 9,
+      'canlii': 9, 'austlii': 9, 'saflii': 9, 'commonlii': 9, 'singapore': 6, 'south africa': 6, 'european union': 8, 'eu': 7, 'gdpr': 8,
+      'maritime boundary': 9, 'unclos': 10, 'law of the sea': 9, 'extradition': 7, 'sovereignty': 7, 'customary international law': 9,
       'diplomatic immunity': 8, 'arbitration': 6, 'icc tribunal': 8, 'icsid': 9, 'wipo': 8, 'wto': 8,
-      'donoghue v stevenson': 9, 'salomon v salomon': 9, 'hadley v baxendale': 9, 'carlill v carbolic': 9,
+      'r v': 10, 'r vs': 10, 'regina v': 10, 'rex v': 10, 'stevenson': 9, 'donoghue v stevenson': 10, 'donoghue': 9,
+      'salomon v salomon': 10, 'hadley v baxendale': 10, 'carlill v carbolic': 10, 'marbury v madison': 10, 'marbury': 9,
+      'dudley': 9, 'woolmington': 9, 'caparo': 9, 'hedley': 9, 'anns': 9, 'salomon': 9, 'carlill': 9, 'madison': 9,
+      'brown v board': 10, 'miranda': 9, 'chevron': 9, 'rookes': 9, 'entick': 9, 'rylands': 9, 'palsgraf': 9, 'hadley': 9,
+      'tulk': 9, 'roe v wade': 10, 'wlr': 9, 'all er': 9, 'ac': 8, 'qb': 8, 'kb': 8, 'f.3d': 8, 'f.2d': 8, 'uksc': 9, 'ukhl': 9,
+      'ewca': 9, 'ewhc': 9, 'nzlr': 8, 'clr': 8, 'hca': 8, 'zacc': 8, 'human rights act': 9, 'uniform commercial code': 9,
       'american': 6, 'british': 6, 'canadian': 6, 'australian': 6, 'federal': 6, 'district court': 6
     }
   },
@@ -143,8 +148,19 @@ function classifyQueryOpenSourceML(query) {
 
   // Handle tie-breaking or low feature detection
   if (matchedFeatures.length === 0) {
-    winningClass = 'kenya';
-    highestProb = 0.85;
+    const isExplicitKenya = /\b(kenya|eklr|klr|kehc|keca|kesc|nairobi|mombasa|milimani|kisumu|nakuru|eldoret|cap|article|gazette|lsk|kra|dci|eacc)\b/i.test(normalized);
+    const hasCaseOrCitationPattern = /\b(v|vs|r|regina|rex|re)\b/i.test(normalized) || /\[\d{4}\]|\d+\s+[A-Za-z.]+\s+\d+/.test(normalized);
+    
+    if (isExplicitKenya) {
+      winningClass = 'kenya';
+      highestProb = 0.85;
+    } else if (hasCaseOrCitationPattern) {
+      winningClass = 'international';
+      highestProb = 0.85;
+    } else {
+      winningClass = 'mixed'; // search both local and global repositories
+      highestProb = 0.80;
+    }
   }
 
   // 2. Classify Legal Domain using Cosine Match / Keyword Density

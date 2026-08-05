@@ -326,21 +326,23 @@ function getFirestore() {
         }
 
         if (!initialized) {
-          try {
-            admin.initializeApp({
-              credential: admin.applicationDefault(),
-              projectId
-            });
-            console.log('Firebase Admin SDK initialized via application default credentials');
-            initialized = true;
-          } catch (e) {
-            console.warn('Firebase Admin SDK not initialized via application default credentials:', e.message);
+          if (process.env.GOOGLE_APPLICATION_CREDENTIALS) {
+            try {
+              admin.initializeApp({
+                credential: admin.applicationDefault(),
+                projectId
+              });
+              console.log('Firebase Admin SDK initialized via application default credentials');
+              initialized = true;
+            } catch (e) {
+              console.warn('Firebase Admin SDK not initialized via application default credentials:', e.message);
+            }
           }
         }
 
         if (!initialized) {
-          console.warn('Firebase Admin SDK not initialized — using local API key store');
           firestoreInitialized = true;
+          firestoreDisabled = true;
           return null;
         }
       }
@@ -414,25 +416,16 @@ async function createApiKey(label, userId) {
     encryptedKey: encryptedKey,
     userId: userId,
     uid: userId,
-    label: label || 'default',
+    label: label || 'Primary Key',
     createdAt: now,
     lastUsed: null,
     requestCount: 0,
     isActive: true
   };
 
-  // 1. Update local store
+  // 1. Update local store (allow multiple active keys per developer)
   const userKeys = getLocalKeys();
   if (!userKeys[userId]) userKeys[userId] = {};
-
-  Object.keys(userKeys[userId]).forEach(k => {
-    if (userKeys[userId][k] && userKeys[userId][k].isActive) {
-      userKeys[userId][k].isActive = false;
-      userKeys[userId][k].replacedAt = now;
-      activeKeyCache.delete(k);
-      rateLimits.delete(k);
-    }
-  });
 
   userKeys[userId][key] = keyRecord;
   saveLocalKeys(userKeys);
@@ -450,21 +443,14 @@ async function createApiKey(label, userId) {
       }, { merge: true });
 
       const userKeysRef = db.collection('apikeys').doc(userId).collection('keys');
-      const existing = await userKeysRef.where('isActive', '==', true).get();
-      if (!existing.empty) {
-        for (const oldKeyDoc of existing.docs) {
-          await oldKeyDoc.ref.update({ isActive: false, replacedAt: now });
-        }
-      }
-
       await userKeysRef.doc(key).set(keyRecord);
-      console.log(`[apikeys] Saved key ${key} under user ${userId} in Firestore.`);
+      console.log(`[apikeys] Saved key ${key} ("${label}") under user ${userId} in Firestore.`);
     }
   } catch (e) {
     console.warn('[apikeys] Firestore save omitted, using local encrypted store:', e.message);
   }
 
-  return { key, encryptedKey, label: label || 'default', createdAt: now, isActive: true };
+  return { key, encryptedKey, label: label || 'Primary Key', createdAt: now, isActive: true, requestCount: 0, lastUsed: null };
 }
 
 async function validateApiKey(req, res, next) {
@@ -585,17 +571,23 @@ async function validateApiKey(req, res, next) {
   activeKeyCache.set(key, keyData);
 
   setImmediate(async () => {
-    if (keyDocRef) {
-      try {
-        await keyDocRef.update({ lastUsed, requestCount: keyData.requestCount });
-      } catch (_) {}
-    }
     const userKeys = getLocalKeys();
     if (keyOwnerId && userKeys[keyOwnerId] && userKeys[keyOwnerId][key]) {
       userKeys[keyOwnerId][key].lastUsed = lastUsed;
       userKeys[keyOwnerId][key].requestCount = keyData.requestCount;
       saveLocalKeys(userKeys);
     }
+    try {
+      const db = getFirestore();
+      if (db && keyOwnerId) {
+        await db.collection('apikeys').doc(keyOwnerId).collection('keys').doc(key).set({
+          lastUsed,
+          requestCount: keyData.requestCount
+        }, { merge: true });
+      } else if (keyDocRef) {
+        await keyDocRef.update({ lastUsed, requestCount: keyData.requestCount });
+      }
+    } catch (_) {}
   });
 
   req.apiKey = key;
@@ -1618,10 +1610,9 @@ function generateNativeLegalBrief({ title = 'Legal Document', citation = '', yea
 }
 
 async function generateGroqBrief({ title, citation, year, type, sourceUrl, text }) {
-  const groqApiKey = process.env.GROQ_API_KEY ;
+  const groqApiKey = process.env.GROQ_API_KEY;
   if (!groqApiKey) {
-    console.error('[groq-summarize] GROQ_API_KEY is missing');
-    throw new Error('GROQ_API_KEY is missing');
+    throw new Error('GROQ_API_KEY is not configured');
   }
 
   const docText = text ? text.substring(0, 15000) : '';
@@ -1785,17 +1776,28 @@ Respond in clean HTML using this exact structure:
   </ul>
 </div>`;
 
-  const response = await ai.models.generateContent({
-    model: 'gemini-2.5-flash',
-    contents: prompt
-  });
+  const models = ['gemini-3.6-flash', 'gemini-flash-latest'];
+  let lastError = null;
 
-  let summaryHtml = response.text || '';
-  summaryHtml = summaryHtml.replace(/```html/gi, '').replace(/```/g, '').trim();
-  if (!summaryHtml || summaryHtml.length < 50) {
-    throw new Error('Gemini brief generation empty or invalid');
+  for (const model of models) {
+    try {
+      const response = await ai.models.generateContent({
+        model,
+        contents: prompt
+      });
+
+      let summaryHtml = response.text || '';
+      summaryHtml = summaryHtml.replace(/```html/gi, '').replace(/```/g, '').trim();
+      if (summaryHtml && summaryHtml.length >= 50) {
+        return summaryHtml;
+      }
+    } catch (err) {
+      console.warn(`[gemini-summarize] Model ${model} brief generation error:`, err.message);
+      lastError = err;
+    }
   }
-  return summaryHtml;
+
+  throw lastError || new Error('Gemini brief generation empty or invalid');
 }
 
 app.post('/api/summarize-doc', validateApiKey, async (req, res) => {
@@ -2857,18 +2859,40 @@ app.post('/api/keys', async (req, res) => {
    }
  });
 
+function extractUidFromJwtUnverified(token) {
+  try {
+    const parts = token.split('.');
+    if (parts.length === 3) {
+      const payloadBase64 = parts[1].replace(/-/g, '+').replace(/_/g, '/');
+      const payloadJson = Buffer.from(payloadBase64, 'base64').toString('utf8');
+      const payload = JSON.parse(payloadJson);
+      return payload.user_id || payload.sub || payload.uid || null;
+    }
+  } catch (_) {}
+  return null;
+}
+
 async function getUserIdFromReq(req) {
   const idToken = req.headers['authorization'];
   if (!idToken) return null;
   const token = idToken.replace(/^Bearer\s+/i, '').trim();
   if (!token) return null;
+
+  if (token.startsWith('el_')) {
+    const keyData = activeKeyCache.get(token);
+    if (keyData) return keyData.userId || keyData.uid;
+  }
+
   try {
     if (admin.getApps().length > 0) {
       const decoded = await getAuth(admin.getApp()).verifyIdToken(token);
-      return decoded.uid;
+      if (decoded && decoded.uid) return decoded.uid;
     }
   } catch (_) {}
-  // Sanitize token string for fallback local user id
+
+  const unverifiedUid = extractUidFromJwtUnverified(token);
+  if (unverifiedUid) return unverifiedUid;
+
   return 'user_' + crypto.createHash('md5').update(token).digest('hex').substring(0, 16);
 }
 
@@ -2879,9 +2903,27 @@ app.get('/api/keys', async (req, res) => {
   }
   try {
     const userId = await getUserIdFromReq(req);
-    const keys = [];
-    let fetchedFromFirestore = false;
+    if (!userId) {
+      return res.status(401).json({ error: 'Invalid user token', code: 'INVALID_TOKEN' });
+    }
 
+    const keyMap = new Map();
+
+    // 1. Fetch from local store
+    const userKeys = getLocalKeys();
+    const uKeys = userKeys[userId] || {};
+    Object.entries(uKeys).forEach(([kId, data]) => {
+      keyMap.set(kId, {
+        key: kId,
+        label: data.label || 'Primary Key',
+        createdAt: data.createdAt,
+        lastUsed: data.lastUsed || null,
+        requestCount: data.requestCount || 0,
+        isActive: data.isActive !== false
+      });
+    });
+
+    // 2. Fetch from Firestore if available and merge
     try {
       const db = getFirestore();
       if (db) {
@@ -2890,21 +2932,40 @@ app.get('/api/keys', async (req, res) => {
           const snapshot = await userDoc.ref.collection('keys').get();
           snapshot.forEach(doc => {
             const data = doc.data();
-            keys.push({ key: doc.id, label: data.label, createdAt: data.createdAt, lastUsed: data.lastUsed, requestCount: data.requestCount, isActive: data.isActive, replacedAt: data.replacedAt });
+            const kId = doc.id;
+            const existing = keyMap.get(kId) || {};
+            const merged = {
+              key: kId,
+              label: data.label || existing.label || 'Primary Key',
+              createdAt: data.createdAt || existing.createdAt,
+              lastUsed: data.lastUsed || existing.lastUsed || null,
+              requestCount: Math.max(data.requestCount || 0, existing.requestCount || 0),
+              isActive: data.isActive !== false
+            };
+            keyMap.set(kId, merged);
+            if (merged.isActive) {
+              activeKeyCache.set(kId, { ...data, ...merged, userId, uid: userId });
+            }
           });
         }
-        fetchedFromFirestore = true;
       }
     } catch (dbErr) {
       handleFirestoreError(dbErr, 'apikeys: Firestore fetch error');
     }
 
-    if (!fetchedFromFirestore) {
-      const userKeys = getLocalKeys();
-      const uKeys = userKeys[userId] || {};
-      Object.entries(uKeys).forEach(([kId, data]) => {
-        keys.push({ key: kId, label: data.label, createdAt: data.createdAt, lastUsed: data.lastUsed, requestCount: data.requestCount, isActive: data.isActive, replacedAt: data.replacedAt });
-      });
+    let keys = Array.from(keyMap.values());
+
+    // If user has NO keys yet, auto-generate a default key on login!
+    if (keys.length === 0) {
+      const newKeyObj = await createApiKey('Primary Key', userId);
+      keys = [{
+        key: newKeyObj.key,
+        label: newKeyObj.label,
+        createdAt: newKeyObj.createdAt,
+        lastUsed: null,
+        requestCount: 0,
+        isActive: true
+      }];
     }
 
     res.json(keys);

@@ -1,6 +1,8 @@
 {
-  "name": "eLegal",
+  "name": "Remix eLegal",
   "description": "AI Legal Search, Precedent Analysis, and Statutory Document Repository for Kenya and International Law",
   "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
 }

@@ -1173,10 +1173,8 @@
               style="font-weight: 600; color: var(--text-secondary); letter-spacing: -0.01em; margin-left: 8px;">API</span>
           </a>
           <div class="nav-links">
-            <a href="/" class="nav-app-home">App Home</a>
-            <a href="#" class="nav-docs" style="color: var(--text-primary);">Docs</a>
-            <button id="topLoginBtn" class="top-login-btn"><span class="btn-text-desktop">LOGIN / SIGNUP</span><span class="btn-text-mobile">LOGIN</span></button>
-            <a href="/dev" class="top-api-badge" title="Developer API">&lt;/API&gt;</a>
+            <button id="topLoginBtn" class="top-login-btn"><span class="btn-text-desktop"></span></button>
+            
           </div>
         </header>
 
@@ -1957,7 +1955,7 @@
         currentUserKey = 'YOUR_API_KEY';
         profileHeader.style.display = 'none';
         keyDisplay.style.display = 'none';
-        topLoginBtn.innerHTML = '<span class="btn-text-desktop">LOGIN / SIGNUP</span><span class="btn-text-mobile">LOGIN</span>';
+        topLoginBtn.innerHTML = '<span class="btn-text-desktop">LOGIN </span>';
         updateRequestCode();
       }
     }
@@ -2196,12 +2194,16 @@
         localStorage.removeItem('elegal_api_key');
         keyDisplay.style.display = 'none';
         profileHeader.style.display = 'none';
-        topLoginBtn.innerHTML = '<span class="btn-text-desktop">LOGIN / SIGNUP</span><span class="btn-text-mobile">LOGIN</span>';
+        topLoginBtn.innerHTML = '<span class="btn-text-desktop">LOGIN</span>';
         updateRequestCode();
         showToast('Signed out');
       } catch (e) {
         showToast('Sign-out failed: ' + e.message);
       }
+    }
+
+    function escapeHtml(str) {
+      return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
     }
 
     async function fetchApiKeys(user) {
@@ -2212,39 +2214,54 @@
           headers: { 'Authorization': token }
         });
         if (!res.ok) return;
-        const keys = await res.json();
+        const text = await res.text();
+        if (!text || text.trim() === '' || text.trim() === 'undefined') return;
+        let keys = [];
+        try { keys = JSON.parse(text); } catch (_) { return; }
         keyListEl.innerHTML = '';
         if (keys && keys.length) {
           keys.forEach(k => {
             const row = document.createElement('div');
             row.className = 'key-row';
+            const isSelected = (k.key === currentUserKey);
             const statusClass = k.isActive ? 'active' : 'inactive';
             const statusText = k.isActive ? 'Active' : 'Inactive';
+            const safeLabel = escapeHtml(k.label || 'Primary Key');
+            const safeKey = escapeHtml(k.key);
+            
             row.innerHTML = `
               <div class="key-meta">
-                <div class="key-id">${k.key.slice(0, 8)}...${k.key.slice(-4)}</div>
+                <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                  <span class="key-id" title="${safeKey}">${safeKey.slice(0, 8)}...${safeKey.slice(-6)}</span>
+                  <span style="font-weight:700; font-size:0.85rem; color:var(--text-primary); background:rgba(0,0,0,0.05); padding:2px 8px; border-radius:6px;">${safeLabel}</span>
+                  ${isSelected ? '<span class="chip active" style="font-size:0.65rem;">Selected</span>' : ''}
+                </div>
                 <div class="key-details">
-                  <span>${k.label}</span>
                   <span>Created: ${new Date(k.createdAt).toLocaleDateString()}</span>
-                  <span>Requests: ${k.requestCount || 0}</span>
+                  <span><strong style="color:var(--accent-color)">Requests: ${k.requestCount || 0}</strong></span>
                   <span>Last used: ${k.lastUsed ? new Date(k.lastUsed).toLocaleString() : 'Never'}</span>
                 </div>
               </div>
               <div class="key-actions-row">
                 <span class="chip ${statusClass}">${statusText}</span>
-                <button class="ghost-btn" onclick="toggleKeyStatus('${k.key}', ${!k.isActive})">${k.isActive ? 'Pause' : 'Resume'}</button>
-                <button class="ghost-btn danger" onclick="deleteKey('${k.key}')">Delete</button>
+                <button class="ghost-btn" onclick="window.copySpecificKey('${safeKey}')" title="Copy key">Copy</button>
+                <button class="ghost-btn" onclick="window.editKeyName('${safeKey}', '${safeLabel}')" title="Rename key">Rename</button>
+                ${k.isActive ? `<button class="ghost-btn" onclick="window.useKeyForTesting('${safeKey}')" title="Use in Explorer">Use Key</button>` : ''}
+                <button class="ghost-btn" onclick="window.toggleKeyStatus('${safeKey}', ${!k.isActive})">${k.isActive ? 'Pause' : 'Resume'}</button>
+                <button class="ghost-btn danger" onclick="window.deleteKey('${safeKey}')">Delete</button>
               </div>
             `;
             keyListEl.appendChild(row);
           });
-          const latestKey = keys[keys.length - 1];
-          if (latestKey.isActive) {
-            currentUserKey = latestKey.key;
+
+          const activeKeys = keys.filter(k => k.isActive);
+          if (activeKeys.length > 0) {
+            if (!currentUserKey || currentUserKey === 'YOUR_API_KEY' || !activeKeys.some(k => k.key === currentUserKey)) {
+              currentUserKey = activeKeys[activeKeys.length - 1].key;
+            }
             localStorage.setItem('elegal_api_key', currentUserKey);
             keyValuePlain.textContent = currentUserKey;
             keyDisplay.style.display = 'flex';
-            isKeyVisible = false;
             renderKeyVisibility();
             updateRequestCode();
           }
@@ -2271,13 +2288,55 @@
           },
           body: JSON.stringify({ isActive })
         });
-        if (!res.ok) throw new Error('Failed to update key');
-        const data = await res.json();
+        if (!res.ok) throw new Error('Failed to update key status');
         showToast(isActive ? 'Key resumed' : 'Key paused');
         fetchApiKeys(firebaseAuth.currentUser);
       } catch (e) {
         showToast('Update failed: ' + e.message);
       }
+    }
+
+    async function editKeyName(keyId, currentLabel) {
+      if (!firebaseAuth || !firebaseAuth.currentUser) return;
+      const newLabel = prompt('Enter a new name for this API key:', currentLabel);
+      if (newLabel === null) return;
+      const trimmed = newLabel.trim();
+      if (!trimmed || trimmed === currentLabel) return;
+
+      try {
+        const token = await firebaseAuth.currentUser.getIdToken();
+        const res = await fetch(`/api/keys/${keyId}`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': token
+          },
+          body: JSON.stringify({ label: trimmed })
+        });
+        if (!res.ok) throw new Error('Failed to update key name');
+        showToast('Key name updated');
+        fetchApiKeys(firebaseAuth.currentUser);
+      } catch (e) {
+        showToast('Update failed: ' + e.message);
+      }
+    }
+
+    function useKeyForTesting(keyId) {
+      currentUserKey = keyId;
+      localStorage.setItem('elegal_api_key', currentUserKey);
+      keyValuePlain.textContent = currentUserKey;
+      keyDisplay.style.display = 'flex';
+      renderKeyVisibility();
+      updateRequestCode();
+      showToast('Key selected for testing in Explorer');
+      if (firebaseAuth && firebaseAuth.currentUser) {
+        fetchApiKeys(firebaseAuth.currentUser);
+      }
+    }
+
+    function copySpecificKey(keyVal) {
+      navigator.clipboard.writeText(keyVal);
+      showToast('API Key copied to clipboard');
     }
 
     async function deleteKey(keyId) {
@@ -2303,14 +2362,18 @@
       }
     }
 
-    // API Key Management via Firebase + Server
     async function generateApiKey() {
       if (!firebaseAuth || !firebaseAuth.currentUser) {
         showToast('Please sign in first');
         openAuthModal();
         return;
       }
+      const existingCount = document.querySelectorAll('.key-row').length + 1;
+      const keyLabel = prompt('Enter a name for your new API key (e.g. Production App, Staging, Mobile SDK):', 'API Key ' + existingCount);
+      if (keyLabel === null) return;
+
       const btn = document.getElementById('generateKeyBtn');
+      const origHtml = btn.innerHTML;
       btn.textContent = 'Generating...';
       btn.disabled = true;
       try {
@@ -2321,29 +2384,39 @@
             'Content-Type': 'application/json',
             'Authorization': token
           },
-          body: JSON.stringify({ label: 'default' })
+          body: JSON.stringify({ label: keyLabel.trim() || ('API Key ' + existingCount) })
         });
-        if (!res.ok) {
-          const err = await res.json();
-          console.error('[api] generate key failed:', res.status, err);
-          throw new Error(err.error || 'Failed to generate key');
+        const text = await res.text();
+        let data = {};
+        if (text && text.trim() && text.trim() !== 'undefined') {
+          try { data = JSON.parse(text); } catch (_) {}
         }
-        const data = await res.json();
+        if (!res.ok) {
+          console.error('[api] generate key failed:', res.status, data);
+          throw new Error(data.error || 'Failed to generate key');
+        }
         currentUserKey = data.key;
         localStorage.setItem('elegal_api_key', currentUserKey);
         keyValuePlain.textContent = currentUserKey;
         keyDisplay.style.display = 'flex';
-        btn.innerHTML = 'Generate New Key';
         isKeyVisible = false;
         renderKeyVisibility();
-        showToast('API Key Generated');
+        showToast(`API Key "${data.label}" Generated`);
         updateRequestCode();
+        await fetchApiKeys(firebaseAuth.currentUser);
       } catch (err) {
         showToast('Failed: ' + err.message);
       } finally {
+        btn.innerHTML = origHtml;
         btn.disabled = false;
       }
     }
+
+    window.toggleKeyStatus = toggleKeyStatus;
+    window.deleteKey = deleteKey;
+    window.editKeyName = editKeyName;
+    window.useKeyForTesting = useKeyForTesting;
+    window.copySpecificKey = copySpecificKey;
 
     function toggleKeyVisibility() {
       isKeyVisible = !isKeyVisible;
@@ -2503,7 +2576,17 @@ headers = {
 
         if (!response.ok && response.status === 404) throw new Error("Endpoint not found. Ensure server is running.");
 
-        const data = await response.json();
+        const text = await response.text();
+        let data;
+        if (text && text.trim() && text.trim() !== 'undefined') {
+          try {
+            data = JSON.parse(text);
+          } catch (_) {
+            data = { rawResponse: text };
+          }
+        } else {
+          data = { status: response.status, message: "Response body was empty." };
+        }
         statusEl.textContent = `${response.status} OK`;
         statusEl.style.color = '#34C759'; // Apple Green
         statusEl.style.display = 'block';
@@ -2524,8 +2607,18 @@ headers = {
         }
       } finally {
         btn.textContent = 'Run Request';
+        if (firebaseAuth && firebaseAuth.currentUser) {
+          fetchApiKeys(firebaseAuth.currentUser);
+        }
       }
     }
+
+    // Auto-sync key usage stats every 10 seconds when signed in
+    setInterval(() => {
+      if (isLoggedIn && firebaseAuth && firebaseAuth.currentUser) {
+        fetchApiKeys(firebaseAuth.currentUser);
+      }
+    }, 10000);
 
     // Syntax Highlighter
     function syntaxHighlightJson(json) {

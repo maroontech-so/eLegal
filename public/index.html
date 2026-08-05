@@ -1,18 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'self' https://unpkg.com; img-src 'self' data: https:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://unpkg.com">
+    <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; connect-src 'self' https://unpkg.com; img-src 'self' data: https:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://unpkg.com">
     <title>eLegal | Modern Legal E-Repository & AI Intelligence Engine ⚖️</title>
-    <meta name="description" content="eLegal is the ultimate legal e-repository & AI intelligence engine. Seamlessly research millions of precedents, statutes, eKLR case law, and international legal records in seconds.">
-    <meta name="keywords" content="eLegal, Legal Research, Kenya Law, eKLR, Legal Precedents, Statutes, Legal AI, Law Case Search, Commonwealth Law">
-    
+    <meta name="description"
+        content="eLegal is the ultimate legal e-repository & AI intelligence engine. Seamlessly research millions of precedents, statutes, eKLR case law, and international legal records in seconds.">
+    <meta name="keywords"
+        content="eLegal, Legal Research, Kenya Law, eKLR, Legal Precedents, Statutes, Legal AI, Law Case Search, Commonwealth Law">
+
     <!-- Open Graph / Facebook / WhatsApp / LinkedIn / Telegram -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://elegal-hteg.onrender.com/">
     <meta property="og:title" content="eLegal — Modern Legal E-Repository & AI Intelligence Engine ⚖️">
-    <meta property="og:description" content="⚡ Instantly explore millions of legal precedents, statutes, constitutional provisions, and official records. Powered by AI legal intelligence, ML classification, and real-time eKLR integration.">
+    <meta property="og:description"
+        content="⚡ Instantly explore millions of legal precedents, statutes, constitutional provisions, and official records. Powered by AI legal intelligence, ML classification, and real-time eKLR integration.">
     <meta property="og:image" content="/share-thumbnail.png">
     <meta property="og:image:secure_url" content="/share-thumbnail.png">
     <meta property="og:image:type" content="image/png">
@@ -25,7 +30,8 @@
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:url" content="https://elegal-hteg.onrender.com/">
     <meta name="twitter:title" content="eLegal — Modern Legal E-Repository & AI Research Engine ⚖️">
-    <meta name="twitter:description" content="⚡ Instantly explore millions of legal precedents, statutes, constitutional provisions, and official records. Powered by AI legal intelligence, ML classification, and real-time eKLR integration.">
+    <meta name="twitter:description"
+        content="⚡ Instantly explore millions of legal precedents, statutes, constitutional provisions, and official records. Powered by AI legal intelligence, ML classification, and real-time eKLR integration.">
     <meta name="twitter:image" content="/share-thumbnail.png">
     <meta name="twitter:image:alt" content="eLegal Legal E-Repository & AI Assistant Interface">
 
@@ -63,15 +69,15 @@
             -moz-osx-font-smoothing: grayscale;
         }
 
-         body {
-             min-height: 100vh;
-             background-color: var(--app-bg);
-             color: var(--text-primary);
-             font-family: var(--font-stack);
-             line-height: 1.5;
-             overflow-x: hidden;
-             padding-bottom: 32px;
-         }
+        body {
+            min-height: 100vh;
+            background-color: var(--app-bg);
+            color: var(--text-primary);
+            font-family: var(--font-stack);
+            line-height: 1.5;
+            overflow-x: hidden;
+            padding-bottom: 32px;
+        }
 
         button,
         input {
@@ -633,7 +639,7 @@
             border-radius: var(--radius-lg);
             padding: 20px 24px;
             min-height: 120px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.02), 0 1px 2px rgba(0,0,0,0.04);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02), 0 1px 2px rgba(0, 0, 0, 0.04);
             border: 1px solid var(--border-color);
             pointer-events: none;
         }
@@ -786,7 +792,7 @@
         }
 
         /* ─── CASE CARDS ─── */
-::selection {
+        ::selection {
             background-color: #dbeafe;
             color: #1e40af;
         }
@@ -797,7 +803,7 @@
             border-radius: 12px;
             padding: 12px 16px;
             border: 1px solid rgba(226, 232, 240, 0.6);
-            box-shadow: 0 1px 2px rgba(0,0,0,0.01), 0 1px 1px rgba(0,0,0,0.03);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.01), 0 1px 1px rgba(0, 0, 0, 0.03);
             cursor: pointer;
             transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
             display: flex;
@@ -809,8 +815,9 @@
         @media (min-width: 640px) {
             .case-card {
                 flex-direction: row;
-                padding: 14px 20px;
+                padding: 14px 16px;
                 align-items: flex-start;
+                justify-content: space-between;
             }
         }
 
@@ -918,9 +925,9 @@
         }
 
         .case-badge-court {
-            background: rgba(0,0,0,0.04);
+            background: rgba(0, 0, 0, 0.04);
             color: #64748b;
-            border: 1px solid rgba(0,0,0,0.06);
+            border: 1px solid rgba(0, 0, 0, 0.06);
         }
 
         .case-badge-type {
@@ -930,7 +937,7 @@
         .case-badge-type.judgment {
             background: #faf5ff;
             color: #9333ea;
-            border-color: rgba(168,85,247,0.15);
+            border-color: rgba(168, 85, 247, 0.15);
         }
 
         .case-badge-source.international {
@@ -960,7 +967,7 @@
             font-size: 0.7rem;
             font-weight: 500;
             color: #475569;
-            background: rgba(0,0,0,0.03);
+            background: rgba(0, 0, 0, 0.03);
             padding: 2px 6px;
             border-radius: 4px;
         }
@@ -1019,7 +1026,9 @@
         /* ─── SAVED DOCUMENTS STYLING ─── */
         .save-card-btn {
             display: inline-flex;
-            align-items: center;
+            align-items: right;
+            justify-self: end;
+            align-self: end;
             gap: 4px;
             padding: 2px 8px;
             font-size: 0.75rem;
@@ -1129,7 +1138,7 @@
                 padding: 0 16px;
             }
 
-             .hero-tagline {
+            .hero-tagline {
                 font-size: 1.35rem;
             }
 
@@ -1189,22 +1198,27 @@
             .case-citation {
                 display: none !important;
             }
+
             .case-card {
                 padding: 10px 12px;
                 gap: 6px;
             }
+
             .case-card-title {
                 font-size: 0.85rem;
                 line-height: 1.35;
             }
+
             .case-badge {
                 font-size: 0.6rem;
                 padding: 1px 5px;
             }
+
             .save-card-btn {
                 font-size: 0.68rem;
                 padding: 1px 6px;
             }
+
             .filter-chip {
                 font-size: 0.72rem;
                 padding: 5px 10px;
@@ -1297,20 +1311,26 @@
 
         <h1 class="hero-tagline">The modern legal e-repository.</h1>
         <p class="hero-description">
-            Seamlessly access millions of precedents, statutes, and official records perfectly organized for comprehensive legal research and study.
+            Seamlessly access millions of precedents, statutes, and official records perfectly organized for
+            comprehensive legal research and study.
         </p>
 
         <div class="search-wrap">
             <div class="search-icon"></div>
-            <input type="text" id="searchInput" placeholder="Search parties, citations, statutes, topics..." autocomplete="off" />
+            <input type="text" id="searchInput" placeholder="Search parties, citations, statutes, topics..."
+                autocomplete="off" />
             <button id="searchBtn">Search</button>
             <div class="autocomplete-dropdown" id="autocompleteDropdown"></div>
         </div>
 
-        <div class="jurisdiction-bar" id="jurisdictionBar" style="display: flex; gap: 8px; justify-content: center; margin-top: 14px; flex-wrap: wrap; z-index: 2; position: relative;">
-            <button class="jurisdiction-pill active" data-source="all" type="button" title="Auto-detect & search both Kenya Law and Global Repositories">All</button>
-            <button class="jurisdiction-pill" data-source="kenya" type="button" title="Restricted to Kenya Law (eKLR) and Kenyan Courts">Kenyan</button>
-            <button class="jurisdiction-pill" data-source="international" type="button" title="Global Precedents, UK, US, Commonwealth & International Law">International</button>
+        <div class="jurisdiction-bar" id="jurisdictionBar"
+            style="display: flex; gap: 8px; justify-content: center; margin-top: 14px; flex-wrap: wrap; z-index: 2; position: relative;">
+            <button class="jurisdiction-pill active" data-source="all" type="button"
+                title="Auto-detect & search both Kenya Law and Global Repositories">All</button>
+            <button class="jurisdiction-pill" data-source="kenya" type="button"
+                title="Restricted to Kenya Law (eKLR) and Kenyan Courts">Kenyan</button>
+            <button class="jurisdiction-pill" data-source="international" type="button"
+                title="Global Precedents, UK, US, Commonwealth & International Law">International</button>
         </div>
     </header>
 
@@ -1322,7 +1342,8 @@
                 <button class="filter-chip active" data-filter="all">All</button>
                 <button class="filter-chip" data-filter="precedent">Precedents</button>
                 <button class="filter-chip" data-filter="statute">Statutes</button>
-                <button class="filter-chip" data-filter="saved" id="savedFilterBtn"> Saved (<span id="savedCountBadge">0</span>)</button>
+                <button class="filter-chip" data-filter="saved" id="savedFilterBtn"> Saved (<span
+                        id="savedCountBadge">0</span>)</button>
             </div>
         </div>
 
@@ -1358,24 +1379,23 @@
     </main>
 
     <!-- ─── FOOTER ─── -->
-    <footer style="border-top: 1px solid var(--border-color); margin-top: 32px; padding: 12px 16px; background: #ffffff; font-size: 0.78rem; color: #64748b; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
-        <div style="max-width: 1200px; margin: 0 auto; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px 20px;">
+    <footer
+        style="border-top: 1px solid var(--border-color); margin-top: 32px; padding: 12px 16px; background: #ffffff; font-size: 0.78rem; color: #64748b; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+        <div
+            style="max-width: 1200px; margin: 0 auto; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px 20px;">
             <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px;">
                 <strong style="font-weight: 700; color: #0f172a; font-size: 0.85rem;">eLegal</strong>
                 <span style="color: #cbd5e1;">|</span>
                 <span style="color: #475569; font-weight: 600;">EmojiStudios</span>
                 <span style="color: #cbd5e1;">|</span>
-                <span>WhatsApp / Call: <a href="https://wa.me/254707865597" target="_blank" rel="noopener noreferrer" style="color: #334155; font-weight: 600; text-decoration: none;">0707865597</a></span>
-                <span style="color: #cbd5e1;">|</span>
-                <span>Email: <a href="mailto:micahprincemicah001@gmail.com" style="color: #334155; font-weight: 600; text-decoration: none;">micahprincemicah001@gmail.com</a></span>
+                <span style="color: #475569; font-weight: 600;">&copy; 2026 eLegal</span>
+
             </div>
             <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px; font-weight: 500;">
                 <a href="/" style="color: #475569; text-decoration: none;">Research Engine</a>
-                <a href="/read" style="color: #475569; text-decoration: none;">Reader Studio</a>
                 <a href="/dev" style="color: #475569; text-decoration: none;">Developer API</a>
                 <a href="/terms" style="color: #475569; text-decoration: underline;">Terms & Conditions</a>
                 <span style="color: #cbd5e1;">•</span>
-                <span style="color: #94a3b8;">&copy; 2026 eLegal</span>
             </div>
         </div>
     </footer>
@@ -1449,6 +1469,13 @@
                 ...options,
                 credentials: 'same-origin',
                 headers
+            }).then(async (res) => {
+                if (res.status === 401 && key !== 'el_demo_key_12345') {
+                    localStorage.setItem('elegal_api_key', 'el_demo_key_12345');
+                    headers['X-API-Key'] = 'el_demo_key_12345';
+                    return fetch(url, { ...options, credentials: 'same-origin', headers });
+                }
+                return res;
             });
         }
 
@@ -1467,7 +1494,7 @@
 
                 fetchApi(`${API_BASE}/latest-kenyalaw`).then(r => r.text()).then(t => {
                     if (t && t.trim() && t.trim() !== 'undefined') {
-                        try { return JSON.parse(t); } catch (_) {}
+                        try { return JSON.parse(t); } catch (_) { }
                     }
                     return null;
                 }).then(data => {
@@ -1777,165 +1804,165 @@
             return (items || []).filter(item => (item.category || item.source) === category);
         }
 
-function renderResults(items) {
-             const output = document.getElementById('output');
-             output.innerHTML = '';
+        function renderResults(items) {
+            const output = document.getElementById('output');
+            output.innerHTML = '';
 
-             const listEl = document.createElement('div');
-             listEl.className = 'results';
-             items.forEach(item => listEl.appendChild(createResultItem(item)));
-             output.appendChild(listEl);
-             if (typeof lucide !== 'undefined') lucide.createIcons();
-         }
+            const listEl = document.createElement('div');
+            listEl.className = 'results';
+            items.forEach(item => listEl.appendChild(createResultItem(item)));
+            output.appendChild(listEl);
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+        }
 
-function createResultItem(item) {
-              const title = item.title || item.label || item.citation || 'Untitled document';
-              const targetUrl = item.readUrl || item.url || '/';
-              const citation = item.citation || '';
-              const source = item.source || '';
-              const category = item.category || '';
-              const updatedAt = item.updatedAt || '';
+        function createResultItem(item) {
+            const title = item.title || item.label || item.citation || 'Untitled document';
+            const targetUrl = item.readUrl || item.url || '/';
+            const citation = item.citation || '';
+            const source = item.source || '';
+            const category = item.category || '';
+            const updatedAt = item.updatedAt || '';
 
-              const card = document.createElement('article');
-              card.className = 'case-card';
-              card.tabIndex = 0;
+            const card = document.createElement('article');
+            card.className = 'case-card';
+            card.tabIndex = 0;
 
-              const mainEl = document.createElement('div');
-              mainEl.className = 'case-card-main';
+            const mainEl = document.createElement('div');
+            mainEl.className = 'case-card-main';
 
-              const headerEl = document.createElement('div');
-              headerEl.className = 'case-card-header';
+            const headerEl = document.createElement('div');
+            headerEl.className = 'case-card-header';
 
-              const titleEl = document.createElement('h3');
-              titleEl.className = 'case-card-title';
-              titleEl.textContent = title;
+            const titleEl = document.createElement('h3');
+            titleEl.className = 'case-card-title';
+            titleEl.textContent = title;
 
-              const badgesEl = document.createElement('div');
-              badgesEl.className = 'case-card-badges';
+            const badgesEl = document.createElement('div');
+            badgesEl.className = 'case-card-badges';
 
-              // Download button on card
-              const downloadBtn = document.createElement('button');
-              downloadBtn.className = 'save-card-btn download-card-btn';
-              downloadBtn.title = 'Download Document';
-              downloadBtn.setAttribute('aria-label', 'Download document');
-              downloadBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Download`;
+            // Download button on card
+            const downloadBtn = document.createElement('button');
+            downloadBtn.className = 'save-card-btn download-card-btn';
+            downloadBtn.title = 'Download Document';
+            downloadBtn.setAttribute('aria-label', 'Download document');
+            downloadBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Download`;
 
-              downloadBtn.addEventListener('click', (e) => {
-                  e.stopPropagation();
-                  const fileUrl = item.pdfUrl || item.url || item.path || targetUrl;
-                  if (fileUrl && fileUrl.startsWith('http')) {
-                      window.open(fileUrl, '_blank');
-                  } else {
-                      const textContent = `E-LEGAL REPOSITORY DOCUMENT\n============================\nTitle: ${title}\nCitation: ${citation || 'N/A'}\n\nExcerpt / Summary:\n${item.snippet || item.summary || item.content || 'No text content available.'}`;
-                      const blob = new Blob([textContent], { type: 'text/plain;charset=utf-8' });
-                      const downloadLink = document.createElement('a');
-                      downloadLink.href = URL.createObjectURL(blob);
-                      downloadLink.download = `${(title || 'legal_document').replace(/[^a-z0-9]/gi, '_').toLowerCase()}.txt`;
-                      document.body.appendChild(downloadLink);
-                      downloadLink.click();
-                      document.body.removeChild(downloadLink);
-                  }
-              });
-              badgesEl.appendChild(downloadBtn);
+            downloadBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const fileUrl = item.pdfUrl || item.url || item.path || targetUrl;
+                if (fileUrl && fileUrl.startsWith('http')) {
+                    window.open(fileUrl, '_blank');
+                } else {
+                    const textContent = `E-LEGAL REPOSITORY DOCUMENT\n============================\nTitle: ${title}\nCitation: ${citation || 'N/A'}\n\nExcerpt / Summary:\n${item.snippet || item.summary || item.content || 'No text content available.'}`;
+                    const blob = new Blob([textContent], { type: 'text/plain;charset=utf-8' });
+                    const downloadLink = document.createElement('a');
+                    downloadLink.href = URL.createObjectURL(blob);
+                    downloadLink.download = `${(title || 'legal_document').replace(/[^a-z0-9]/gi, '_').toLowerCase()}.txt`;
+                    document.body.appendChild(downloadLink);
+                    downloadLink.click();
+                    document.body.removeChild(downloadLink);
+                }
+            });
+            badgesEl.appendChild(downloadBtn);
 
-              const targetLower = (targetUrl || '').toLowerCase();
-              const isPdf = item.isPdf || item.fileType === 'PDF' || targetLower.endsWith('.pdf') || targetLower.includes('.pdf?');
-              const isDocx = item.isDocx || item.fileType === 'DOCX' || targetLower.endsWith('.docx') || targetLower.includes('.docx?');
-              const isDoc = item.isDoc || item.fileType === 'DOC' || targetLower.endsWith('.doc') || targetLower.includes('.doc?');
+            const targetLower = (targetUrl || '').toLowerCase();
+            const isPdf = item.isPdf || item.fileType === 'PDF' || targetLower.endsWith('.pdf') || targetLower.includes('.pdf?');
+            const isDocx = item.isDocx || item.fileType === 'DOCX' || targetLower.endsWith('.docx') || targetLower.includes('.docx?');
+            const isDoc = item.isDoc || item.fileType === 'DOC' || targetLower.endsWith('.doc') || targetLower.includes('.doc?');
 
-              const yearStr = item.year || extractDate(citation, updatedAt, item.documentDate);
-              if (yearStr) {
-                  const yearBadge = document.createElement('span');
-                  yearBadge.className = 'case-badge case-badge-year';
-                  yearBadge.textContent = yearStr;
-                  badgesEl.appendChild(yearBadge);
-              }
+            const yearStr = item.year || extractDate(citation, updatedAt, item.documentDate);
+            if (yearStr) {
+                const yearBadge = document.createElement('span');
+                yearBadge.className = 'case-badge case-badge-year';
+                yearBadge.textContent = yearStr;
+                badgesEl.appendChild(yearBadge);
+            }
 
-              const sourceLabel = item.source === 'international' ? 'Global' : (item.source === 'kenyalaw' ? 'Kenyan' : getSourceLabel(source, category));
-              if (sourceLabel) {
-                  const sourceBadge = document.createElement('span');
-                  sourceBadge.className = `case-badge case-badge-source ${item.source || ''}`;
-                  sourceBadge.textContent = sourceLabel;
-                  badgesEl.appendChild(sourceBadge);
-              }
+            const sourceLabel = item.source === 'international' ? 'Global' : (item.source === 'kenyalaw' ? 'Kenyan' : getSourceLabel(source, category));
+            if (sourceLabel) {
+                const sourceBadge = document.createElement('span');
+                sourceBadge.className = `case-badge case-badge-source ${item.source || ''}`;
+                sourceBadge.textContent = sourceLabel;
+                badgesEl.appendChild(sourceBadge);
+            }
 
-              headerEl.append(titleEl, badgesEl);
+            headerEl.append(titleEl, badgesEl);
 
-              const metaEl = document.createElement('div');
-              metaEl.className = 'case-card-meta';
+            const metaEl = document.createElement('div');
+            metaEl.className = 'case-card-meta';
 
-              const metaRightEl = document.createElement('div');
-              metaRightEl.className = 'case-card-meta-right';
+            const metaRightEl = document.createElement('div');
+            metaRightEl.className = 'case-card-meta-right';
 
-              if (citation) {
-                  const citationEl = document.createElement('span');
-                  citationEl.className = 'case-citation';
-                  citationEl.textContent = citation;
-                  metaRightEl.appendChild(citationEl);
-              }
+            if (citation) {
+                const citationEl = document.createElement('span');
+                citationEl.className = 'case-citation';
+                citationEl.textContent = citation;
+                metaRightEl.appendChild(citationEl);
+            }
 
-              if (targetUrl && (targetUrl.startsWith('http') || targetUrl.startsWith('/read'))) {
-                  const linkIcon = document.createElement('a');
-                  linkIcon.className = 'case-meta-item case-link';
-                  linkIcon.href = targetUrl.startsWith('/read') ? targetUrl : `/read.html?title=${encodeURIComponent(title)}&sourceUrl=${encodeURIComponent(targetUrl)}&year=${encodeURIComponent(yearStr || '')}&type=${encodeURIComponent(docType || '')}&source=${encodeURIComponent(sourceLabel || '')}`;
-                  linkIcon.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>';
-                  linkIcon.appendChild(document.createTextNode(' Read document'));
-                  linkIcon.addEventListener('click', saveSearchState);
-                  metaRightEl.appendChild(linkIcon);
-              }
+            if (targetUrl && (targetUrl.startsWith('http') || targetUrl.startsWith('/read'))) {
+                const linkIcon = document.createElement('a');
+                linkIcon.className = 'case-meta-item case-link';
+                linkIcon.href = targetUrl.startsWith('/read') ? targetUrl : `/read.html?title=${encodeURIComponent(title)}&sourceUrl=${encodeURIComponent(targetUrl)}&year=${encodeURIComponent(yearStr || '')}&type=${encodeURIComponent(docType || '')}&source=${encodeURIComponent(sourceLabel || '')}`;
+                linkIcon.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>';
+                linkIcon.appendChild(document.createTextNode(' Read document'));
+                linkIcon.addEventListener('click', saveSearchState);
+                metaRightEl.appendChild(linkIcon);
+            }
 
-              metaEl.append(metaRightEl);
+            metaEl.append(metaRightEl);
 
-              mainEl.append(headerEl, metaEl);
+            mainEl.append(headerEl, metaEl);
 
-              card.append(mainEl);
+            card.append(mainEl);
 
-              card.addEventListener('click', (e) => {
-                  if (e.target.closest('a')) return;
-                  selectDocument(item, card);
-              });
-              card.addEventListener('keydown', event => {
-                  if (event.key === 'Enter') selectDocument(item, card);
-              });
-              return card;
-          }
+            card.addEventListener('click', (e) => {
+                if (e.target.closest('a')) return;
+                selectDocument(item, card);
+            });
+            card.addEventListener('keydown', event => {
+                if (event.key === 'Enter') selectDocument(item, card);
+            });
+            return card;
+        }
 
-         function extractCourtType(citation) {
-             if (!citation) return '';
-             const match = citation.match(/\b(KEHC|KECA|KESC|KLR|KEBL|KEPR)\b/);
-             if (!match) return '';
-             const codes = { KEHC: 'High Court', KECA: 'Court of Appeal', KESC: 'Supreme Court', KLR: 'Kenya Law Reports', KEBL: 'Business Laws', KEPR: 'Property Reports' };
-             return codes[match[1]] || '';
-         }
+        function extractCourtType(citation) {
+            if (!citation) return '';
+            const match = citation.match(/\b(KEHC|KECA|KESC|KLR|KEBL|KEPR)\b/);
+            if (!match) return '';
+            const codes = { KEHC: 'High Court', KECA: 'Court of Appeal', KESC: 'Supreme Court', KLR: 'Kenya Law Reports', KEBL: 'Business Laws', KEPR: 'Property Reports' };
+            return codes[match[1]] || '';
+        }
 
-         function extractDocType(source, category) {
-             if (source === 'kenyalaw') return 'Ruling';
-             if (source === 'local' && category === 'statute') return 'Statute';
-             if (source === 'local' && category === 'precedent') return 'Precedent';
-             if (source === 'international') return 'International';
-             return '';
-         }
+        function extractDocType(source, category) {
+            if (source === 'kenyalaw') return 'Ruling';
+            if (source === 'local' && category === 'statute') return 'Statute';
+            if (source === 'local' && category === 'precedent') return 'Precedent';
+            if (source === 'international') return 'International';
+            return '';
+        }
 
-         function getSourceLabel(source, category) {
-             if (source === 'kenyalaw') return 'Kenya Law';
-             if (source === 'local' && category === 'statute') return 'Statute';
-             if (source === 'local' && category === 'precedent') return 'Precedent';
-             if (source === 'international') return 'International';
-             return '';
-         }
+        function getSourceLabel(source, category) {
+            if (source === 'kenyalaw') return 'Kenya Law';
+            if (source === 'local' && category === 'statute') return 'Statute';
+            if (source === 'local' && category === 'precedent') return 'Precedent';
+            if (source === 'international') return 'International';
+            return '';
+        }
 
-function extractDate(citation, updatedAt, documentDate) {
-              if (documentDate) return documentDate;
-              if (citation) {
-                  const match = citation.match(/\[(\d{4})\]/);
-                  if (match) return match[1];
-              }
-              if (updatedAt) {
-                  const d = new Date(updatedAt);
-                  if (!isNaN(d.getTime())) return d.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
-              }
-              return '';
-          }
+        function extractDate(citation, updatedAt, documentDate) {
+            if (documentDate) return documentDate;
+            if (citation) {
+                const match = citation.match(/\[(\d{4})\]/);
+                if (match) return match[1];
+            }
+            if (updatedAt) {
+                const d = new Date(updatedAt);
+                if (!isNaN(d.getTime())) return d.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+            }
+            return '';
+        }
 
         function selectDocument(item, card) {
             const items = getActiveItems();
@@ -1946,49 +1973,49 @@ function extractDate(citation, updatedAt, documentDate) {
         }
 
         /* ─── PREVIEW ─── */
-function renderPreview(item) {
-             const title = item.citation || item.title || item.label || 'Untitled document';
-             const panel = document.getElementById('previewPanel');
-             panel.innerHTML = '';
+        function renderPreview(item) {
+            const title = item.citation || item.title || item.label || 'Untitled document';
+            const panel = document.getElementById('previewPanel');
+            panel.innerHTML = '';
 
-             const kicker = document.createElement('div');
-             kicker.className = 'inspector-kicker';
-             kicker.textContent = formatCategory(item.category || item.source || '');
+            const kicker = document.createElement('div');
+            kicker.className = 'inspector-kicker';
+            kicker.textContent = formatCategory(item.category || item.source || '');
 
-             const titleEl = document.createElement('div');
-             titleEl.className = 'inspector-title';
-             titleEl.textContent = title;
+            const titleEl = document.createElement('div');
+            titleEl.className = 'inspector-title';
+            titleEl.textContent = title;
 
-             const metaText = formatMeta(item);
-             const metaEl = document.createElement('div');
-             metaEl.className = 'inspector-meta';
-             metaEl.textContent = metaText;
-             if (!metaText) metaEl.style.display = 'none';
+            const metaText = formatMeta(item);
+            const metaEl = document.createElement('div');
+            metaEl.className = 'inspector-meta';
+            metaEl.textContent = metaText;
+            if (!metaText) metaEl.style.display = 'none';
 
-             const actions = document.createElement('div');
-             actions.className = 'inspector-actions';
+            const actions = document.createElement('div');
+            actions.className = 'inspector-actions';
 
-             const openBtn = document.createElement('button');
-             openBtn.className = 'primary-btn';
-             openBtn.textContent = 'Read PDF';
-             openBtn.addEventListener('click', () => {
-                 document.getElementById('previewModalOverlay').classList.remove('active');
-                 loadDocument(item.readUrl || item.url || '/', title);
-             });
+            const openBtn = document.createElement('button');
+            openBtn.className = 'primary-btn';
+            openBtn.textContent = 'Read PDF';
+            openBtn.addEventListener('click', () => {
+                document.getElementById('previewModalOverlay').classList.remove('active');
+                loadDocument(item.readUrl || item.url || '/', title);
+            });
 
-             const copyBtn = document.createElement('button');
-             copyBtn.className = 'secondary-btn';
-             copyBtn.textContent = 'Copy Citation';
-             copyBtn.addEventListener('click', () => {
-                 navigator.clipboard.writeText(title);
-                 updateStatus('Citation copied to clipboard');
-             });
+            const copyBtn = document.createElement('button');
+            copyBtn.className = 'secondary-btn';
+            copyBtn.textContent = 'Copy Citation';
+            copyBtn.addEventListener('click', () => {
+                navigator.clipboard.writeText(title);
+                updateStatus('Citation copied to clipboard');
+            });
 
-             actions.append(openBtn, copyBtn);
-             panel.append(kicker, titleEl, metaEl, actions);
+            actions.append(openBtn, copyBtn);
+            panel.append(kicker, titleEl, metaEl, actions);
 
-             document.getElementById('previewModalOverlay').classList.add('active');
-         }
+            document.getElementById('previewModalOverlay').classList.add('active');
+        }
 
         /* ─── LOAD DOCUMENT ─── */
         async function loadDocument(url, title) {
@@ -2067,21 +2094,21 @@ function renderPreview(item) {
         }
 
         /* ─── HELPERS ─── */
-function formatCategory(category) {
-             if (category === 'precedent') return 'Precedent';
-             if (category === 'statute') return 'Statute';
-             if (category === 'kenyalaw') return 'eLegal';
-             if (category === 'local') return 'Local PDF';
-             return '';
-         }
+        function formatCategory(category) {
+            if (category === 'precedent') return 'Precedent';
+            if (category === 'statute') return 'Statute';
+            if (category === 'kenyalaw') return 'eLegal';
+            if (category === 'local') return 'Local PDF';
+            return '';
+        }
 
-function formatMeta(item) {
-             const parts = [];
-             if (item.size) parts.push(formatBytes(item.size));
-             if (item.updatedAt) parts.push(`Updated ${formatDate(item.updatedAt)}`);
-             if (item.score) parts.push(`Relevance ${Math.round(item.score)}`);
-             return parts.join(' • ');
-         }
+        function formatMeta(item) {
+            const parts = [];
+            if (item.size) parts.push(formatBytes(item.size));
+            if (item.updatedAt) parts.push(`Updated ${formatDate(item.updatedAt)}`);
+            if (item.score) parts.push(`Relevance ${Math.round(item.score)}`);
+            return parts.join(' • ');
+        }
 
         function formatBytes(bytes) {
             if (!Number.isFinite(bytes)) return '';
@@ -2400,4 +2427,5 @@ function formatMeta(item) {
     </script>
 
 </body>
+
 </html>

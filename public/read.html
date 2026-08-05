@@ -1362,9 +1362,13 @@
                 </div>
             `;
             try {
+                const activeApiKey = localStorage.getItem('elegal_api_key') || 'el_demo_key_12345';
                 const res = await fetch('/api/summarize-doc', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-API-Key': activeApiKey
+                    },
                     body: JSON.stringify({
                         title: loadedDocData?.title || displayTitle,
                         sourceUrl: sourceUrl || '',

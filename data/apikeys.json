@@ -1,3 +1,30 @@
 {
-  "userKeys": {}
+  "userKeys": {
+    "user_demo": {
+      "el_demo_key_12345": {
+        "label": "Primary API Key",
+        "createdAt": "2026-08-04T00:00:00.000Z",
+        "lastUsed": "2026-08-04T23:58:18.547Z",
+        "requestCount": 78,
+        "isActive": true,
+        "key": "el_demo_key_12345",
+        "encryptedKey": "enc:0129b1bba536e821bc065c6d:840b74e3026619c319666c5c366de698:7f3b924982275fd710dc3cee587cf17bb0",
+        "userId": "user_demo",
+        "uid": "user_demo"
+      }
+    },
+    "TJIRQKWZ8ahMSYWAU9UEPl9xsiK2": {
+      "el_9abdad143b6933786074a4cf1060662c": {
+        "key": "el_9abdad143b6933786074a4cf1060662c",
+        "encryptedKey": "enc:2177f050bd44d30bab406d02:816a39d4aa58c25ec337849a322caf97:2e6a666599113d9421e0bdbaa8d897b1174ff44e7b2d7e16fd9532cccc59f0f3e74515",
+        "userId": "TJIRQKWZ8ahMSYWAU9UEPl9xsiK2",
+        "uid": "TJIRQKWZ8ahMSYWAU9UEPl9xsiK2",
+        "label": "default",
+        "createdAt": "2026-08-04T23:40:20.574Z",
+        "lastUsed": "2026-08-04T23:45:00.251Z",
+        "requestCount": 1,
+        "isActive": true
+      }
+    }
+  }
 }

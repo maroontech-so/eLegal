@@ -354,46 +354,49 @@ function getFirestore() {
   return firebaseGetFirestore();
 }
 
-async function loadApiKeys() {
-  let loadedFromFirestore = false;
-  try {
-    const db = getFirestore();
-    if (db) {
-      const snapshot = await db.collection('apikeys').get();
-      const promises = [];
-      snapshot.forEach(userDoc => {
-        promises.push(
-          userDoc.ref.collection('keys').get().then(keysSnap => {
-            keysSnap.forEach(keyDoc => {
-              rateLimits.set(keyDoc.id, { count: 0, resetAt: Date.now() + RATE_LIMIT_WINDOW_MS });
-            });
-          }).catch(err => {
-            console.warn('[apikeys] Subcollection fetch warning:', err.message);
-          })
-        );
-      });
-      await Promise.all(promises);
-      loadedFromFirestore = true;
-      console.log(`Loaded API keys from Firestore`);
-    }
-  } catch (e) {
-    handleFirestoreError(e, 'apikeys: Firestore unauthenticated or unavailable');
-  }
+const activeKeyCache = new Map();
 
-  if (!loadedFromFirestore) {
+async function loadApiKeys() {
+  activeKeyCache.clear();
+  let count = 0;
+
+  // 1. Load from local encrypted key store first for guaranteed offline availability
+  try {
     const userKeys = getLocalKeys();
-    let count = 0;
     Object.values(userKeys).forEach(keys => {
       if (keys && typeof keys === 'object') {
         Object.entries(keys).forEach(([keyId, keyData]) => {
           if (keyData && keyData.isActive) {
+            activeKeyCache.set(keyId, keyData);
             rateLimits.set(keyId, { count: 0, resetAt: Date.now() + RATE_LIMIT_WINDOW_MS });
             count++;
           }
         });
       }
     });
-    console.log(`Loaded ${count} active API keys from local key store`);
+    console.log(`Loaded ${count} active API keys into cache from local key store`);
+  } catch (e) {
+    console.warn('[apikeys] Local key store loading error:', e.message);
+  }
+
+  // 2. Hydrate from Firestore if available
+  try {
+    const db = getFirestore();
+    if (db) {
+      const snapshot = await db.collectionGroup('keys').where('isActive', '==', true).get();
+      if (!snapshot.empty) {
+        snapshot.forEach(doc => {
+          const data = doc.data();
+          if (data && data.key) {
+            activeKeyCache.set(data.key, data);
+            rateLimits.set(data.key, { count: 0, resetAt: Date.now() + RATE_LIMIT_WINDOW_MS });
+          }
+        });
+        console.log(`Hydrated ${snapshot.size} active API keys from Firestore`);
+      }
+    }
+  } catch (e) {
+    // Firestore unauthenticated or unavailable; silent graceful fallback
   }
 }
 
@@ -405,59 +408,8 @@ async function createApiKey(label, userId) {
   const key = generateApiKey();
   const now = new Date().toISOString();
   const encryptedKey = encryptText(key);
-  let savedToFirestore = false;
 
-  try {
-    const db = getFirestore();
-    if (db) {
-      // Create/update parent user record under apikeys/{userId}
-      await db.collection('apikeys').doc(userId).set({
-        uid: userId,
-        updatedAt: now,
-        latestKey: key
-      }, { merge: true });
-
-      // Deactivate older active keys for this specific user in Firestore
-      const userKeysRef = db.collection('apikeys').doc(userId).collection('keys');
-      const existing = await userKeysRef.where('isActive', '==', true).get();
-      if (!existing.empty) {
-        for (const oldKeyDoc of existing.docs) {
-          await oldKeyDoc.ref.update({ isActive: false, replacedAt: now });
-          rateLimits.delete(oldKeyDoc.id);
-        }
-      }
-
-      // Save new API key under apikeys/{userId}/keys/{key} in Firestore
-      await userKeysRef.doc(key).set({
-        key: key,
-        encryptedKey: encryptedKey,
-        userId: userId,
-        uid: userId,
-        label: label || 'default',
-        createdAt: now,
-        lastUsed: null,
-        requestCount: 0,
-        isActive: true
-      });
-      savedToFirestore = true;
-      console.log(`[apikeys] Saved key ${key} under user UID ${userId} in Firestore.`);
-    }
-  } catch (e) {
-    console.warn('[apikeys] Could not save API key to Firestore, using local encrypted store:', e.message);
-  }
-
-  const userKeys = getLocalKeys();
-  if (!userKeys[userId]) userKeys[userId] = {};
-
-  Object.keys(userKeys[userId]).forEach(k => {
-    if (userKeys[userId][k] && userKeys[userId][k].isActive) {
-      userKeys[userId][k].isActive = false;
-      userKeys[userId][k].replacedAt = now;
-      rateLimits.delete(k);
-    }
-  });
-
-  userKeys[userId][key] = {
+  const keyRecord = {
     key: key,
     encryptedKey: encryptedKey,
     userId: userId,
@@ -468,74 +420,145 @@ async function createApiKey(label, userId) {
     requestCount: 0,
     isActive: true
   };
-  saveLocalKeys(userKeys);
 
+  // 1. Update local store
+  const userKeys = getLocalKeys();
+  if (!userKeys[userId]) userKeys[userId] = {};
+
+  Object.keys(userKeys[userId]).forEach(k => {
+    if (userKeys[userId][k] && userKeys[userId][k].isActive) {
+      userKeys[userId][k].isActive = false;
+      userKeys[userId][k].replacedAt = now;
+      activeKeyCache.delete(k);
+      rateLimits.delete(k);
+    }
+  });
+
+  userKeys[userId][key] = keyRecord;
+  saveLocalKeys(userKeys);
+  activeKeyCache.set(key, keyRecord);
   rateLimits.set(key, { count: 0, resetAt: Date.now() + RATE_LIMIT_WINDOW_MS });
-  console.log(`Created & encrypted API key for user UID ${userId}: ${key}`);
-  return { key, encryptedKey, label: label || 'default', createdAt: now };
+
+  // 2. Persist to Firestore if available
+  try {
+    const db = getFirestore();
+    if (db) {
+      await db.collection('apikeys').doc(userId).set({
+        uid: userId,
+        updatedAt: now,
+        latestKey: key
+      }, { merge: true });
+
+      const userKeysRef = db.collection('apikeys').doc(userId).collection('keys');
+      const existing = await userKeysRef.where('isActive', '==', true).get();
+      if (!existing.empty) {
+        for (const oldKeyDoc of existing.docs) {
+          await oldKeyDoc.ref.update({ isActive: false, replacedAt: now });
+        }
+      }
+
+      await userKeysRef.doc(key).set(keyRecord);
+      console.log(`[apikeys] Saved key ${key} under user ${userId} in Firestore.`);
+    }
+  } catch (e) {
+    console.warn('[apikeys] Firestore save omitted, using local encrypted store:', e.message);
+  }
+
+  return { key, encryptedKey, label: label || 'default', createdAt: now, isActive: true };
 }
 
 async function validateApiKey(req, res, next) {
   let key = req.headers['x-api-key'] || req.query.api_key;
+  if (key) key = String(key).trim();
+
+  // If X-API-Key is not set, inspect Authorization header
   if (!key && req.headers['authorization']) {
-    const authHeader = req.headers['authorization'];
-    if (authHeader.startsWith('Bearer el_')) {
-      key = authHeader.substring(7);
+    const authHeader = String(req.headers['authorization']).trim();
+    if (authHeader.startsWith('Bearer ')) {
+      const tokenCandidate = authHeader.substring(7).trim();
+      if (tokenCandidate.startsWith('el_')) {
+        key = tokenCandidate;
+      } else if (tokenCandidate.length > 20) {
+        // Firebase ID Token passed as Bearer Token
+        try {
+          if (admin.getApps().length > 0) {
+            const decoded = await getAuth(admin.getApp()).verifyIdToken(tokenCandidate);
+            if (decoded && decoded.uid) {
+              const uId = decoded.uid;
+              const userKeys = getLocalKeys();
+              if (userKeys[uId]) {
+                const activeK = Object.values(userKeys[uId]).find(k => k && k.isActive);
+                if (activeK) {
+                  key = activeK.key;
+                }
+              }
+              if (!key) {
+                const newKeyObj = await createApiKey('default', uId);
+                key = newKeyObj.key;
+              }
+            }
+          }
+        } catch (_) {}
+      }
+    } else if (authHeader.startsWith('el_')) {
+      key = authHeader;
     }
   }
 
+  // Fall back to demo key if no header or token provided
   if (!key) {
     key = 'el_demo_key_12345';
   }
 
-  let keyData = null;
+  // 1. Check active in-memory cache first (0ms latency)
+  let keyData = activeKeyCache.get(key);
+  let keyOwnerId = keyData ? keyData.userId || keyData.uid : null;
   let keyDocRef = null;
-  let keyOwnerId = null;
 
-  try {
-    const db = getFirestore();
-    if (db) {
-      const snapshot = await db.collection('apikeys').get();
-      const checks = [];
-      snapshot.forEach(userDoc => {
-        checks.push({
-          userId: userDoc.id,
-          promise: userDoc.ref.collection('keys').doc(key).get()
-        });
-      });
-      for (const item of checks) {
-        const doc = await item.promise;
-        if (doc.exists) {
-          keyData = doc.data();
-          keyDocRef = doc.ref;
-          keyOwnerId = item.userId;
-          break;
-        }
-      }
-    }
-  } catch (e) {
-    // Firestore unavailable/unauthenticated, fall back to local store
-  }
-
+  // 2. Check local store if missing from cache
   if (!keyData) {
     const userKeys = getLocalKeys();
     for (const uId of Object.keys(userKeys)) {
       if (userKeys[uId] && userKeys[uId][key]) {
         keyData = userKeys[uId][key];
         keyOwnerId = uId;
+        if (keyData.isActive) {
+          activeKeyCache.set(key, keyData);
+        }
         break;
       }
     }
   }
 
-  if (!keyData || !keyData.isActive) {
+  // 3. Check Firestore safely if still missing
+  if (!keyData) {
+    try {
+      const db = getFirestore();
+      if (db) {
+        const snapshot = await db.collectionGroup('keys').where('key', '==', key).get();
+        if (!snapshot.empty) {
+          const doc = snapshot.docs[0];
+          keyData = doc.data();
+          keyDocRef = doc.ref;
+          keyOwnerId = keyData.userId || keyData.uid;
+          if (keyData.isActive) {
+            activeKeyCache.set(key, keyData);
+          }
+        }
+      }
+    } catch (_) {}
+  }
+
+  // Reject invalid or inactive keys with explicit production-ready error response
+  if (!keyData || keyData.isActive === false) {
     return res.status(401).json({
       error: 'Invalid API key',
       code: 'INVALID_API_KEY',
-      message: 'The provided API key is invalid or inactive. Please use a registered API key assigned to your user account.'
+      message: 'The provided API key is invalid or inactive. Please use a registered active API key or pass a valid Authorization header.'
     });
   }
 
+  // Rate Limiting (100 requests per 60-second window per API key)
   const now = Date.now();
   const limit = rateLimits.get(key) || { count: 0, resetAt: now + RATE_LIMIT_WINDOW_MS };
   if (now > limit.resetAt) {
@@ -544,29 +567,36 @@ async function validateApiKey(req, res, next) {
   }
   limit.count++;
   rateLimits.set(key, limit);
+
   if (limit.count > RATE_LIMIT_MAX) {
-    return res.status(429).json({ error: 'Rate limit exceeded', code: 'RATE_LIMIT_EXCEEDED', resetAt: new Date(limit.resetAt).toISOString() });
+    const secondsLeft = Math.ceil((limit.resetAt - now) / 1000);
+    return res.status(429).json({
+      error: `Rate limit exceeded. Try again in ${secondsLeft} seconds.`,
+      code: 'RATE_LIMIT_EXCEEDED',
+      retryAfter: secondsLeft,
+      resetAt: new Date(limit.resetAt).toISOString()
+    });
   }
 
+  // Async non-blocking metadata update
   const lastUsed = new Date().toISOString();
   keyData.lastUsed = lastUsed;
   keyData.requestCount = (keyData.requestCount || 0) + 1;
+  activeKeyCache.set(key, keyData);
 
-  if (keyDocRef) {
-    try {
-      await keyDocRef.update({ lastUsed, requestCount: keyData.requestCount });
-    } catch (_) {}
-  } else {
-    const userKeys = getLocalKeys();
-    for (const uId of Object.keys(userKeys)) {
-      if (userKeys[uId] && userKeys[uId][key]) {
-        userKeys[uId][key].lastUsed = lastUsed;
-        userKeys[uId][key].requestCount = keyData.requestCount;
-        saveLocalKeys(userKeys);
-        break;
-      }
+  setImmediate(async () => {
+    if (keyDocRef) {
+      try {
+        await keyDocRef.update({ lastUsed, requestCount: keyData.requestCount });
+      } catch (_) {}
     }
-  }
+    const userKeys = getLocalKeys();
+    if (keyOwnerId && userKeys[keyOwnerId] && userKeys[keyOwnerId][key]) {
+      userKeys[keyOwnerId][key].lastUsed = lastUsed;
+      userKeys[keyOwnerId][key].requestCount = keyData.requestCount;
+      saveLocalKeys(userKeys);
+    }
+  });
 
   req.apiKey = key;
   req.apiKeyInfo = keyData;
@@ -1694,6 +1724,80 @@ Respond in clean HTML using this exact structure:
   throw lastError || new Error('Failed to generate summary with Groq models');
 }
 
+async function generateGeminiBrief({ title, citation, year, type, sourceUrl, text }) {
+  const ai = getAiClient();
+  if (!ai) {
+    throw new Error('GEMINI_API_KEY is missing');
+  }
+
+  const docText = text ? text.substring(0, 15000) : '';
+
+  const prompt = `You are eLegal Senior High Court Research Clerk & Law Reporter.
+Generate a 100% substantive, lawyer and law-student friendly Legal Brief for this document.
+
+CRITICAL MANDATES FOR HIGH-DENSITY LEGAL BRIEF:
+1. STRICT ZERO BLUFF / ZERO FLUFF RULE: NO generic preamble, NO introductory conversational commentary ("Here is a brief...", "In conclusion...").
+2. USE FORMAL JUDICIAL TERMINOLOGY appropriate for Advocates, Judges, Law Students, and Bar Examination preparation.
+3. EXTRACT ACCURATE MATERIAL FACTS, RATIO DECIDENDI, STATUTORY ARTICLES/SECTIONS, AND COURT ORDERS FROM THE TEXT.
+
+DOCUMENT METADATA:
+- Title: ${title}
+- Official Citation: ${citation}
+- Year/Date: ${year}
+- Type/Nature: ${type}
+- Source URL: ${sourceUrl}
+
+DOCUMENT TEXT EXCERPT:
+${docText || 'No full text available. Synthesize strict legal brief from title, citation, and official metadata.'}
+
+Respond in clean HTML using this exact structure:
+<div style="font-family: system-ui, -apple-system, sans-serif; line-height: 1.6; color: #0f172a;">
+  <div style="background: #f8fafc; border: 1px solid #cbd5e1; border-left: 4px solid #1e3a8a; padding: 12px 16px; border-radius: 6px; margin-bottom: 16px;">
+    <h3 style="margin: 0 0 4px 0; font-size: 1.1rem; color: #0f172a;">${title}</h3>
+    <div style="font-size: 0.85rem; color: #475569;">
+      <strong>Citation:</strong> ${citation || 'Official Record'} | <strong>Year:</strong> ${year || 'N/A'} | <strong>Classification:</strong> ${type || 'Legal Authority'} | <span style="color: #0d9488; font-weight: 600;">⚡ Gemini AI Legal Brief</span>
+    </div>
+  </div>
+
+  <h4 style="color: #1e3a8a; border-bottom: 1.5px solid #cbd5e1; padding-bottom: 4px; margin: 16px 0 8px 0; font-size: 0.95rem; text-transform: uppercase;">I. MATERIAL FACTS & PROCEDURAL HISTORY</h4>
+  <ul style="margin: 6px 0 12px 18px; padding: 0;">
+    <li>Exact factual background, party claims, procedural path.</li>
+  </ul>
+
+  <h4 style="color: #1e3a8a; border-bottom: 1.5px solid #cbd5e1; padding-bottom: 4px; margin: 16px 0 8px 0; font-size: 0.95rem; text-transform: uppercase;">II. LEGAL ISSUES BEFORE THE COURT / LEGISLATIVE INTENT</h4>
+  <ul style="margin: 6px 0 12px 18px; padding: 0;">
+    <li>Numbered legal questions framed clearly for litigation or exam analysis.</li>
+  </ul>
+
+  <h4 style="color: #1e3a8a; border-bottom: 1.5px solid #cbd5e1; padding-bottom: 4px; margin: 16px 0 8px 0; font-size: 0.95rem; text-transform: uppercase;">III. RATIO DECIDENDI & HOLDING (BINDING RULE OF LAW)</h4>
+  <ul style="margin: 6px 0 12px 18px; padding: 0;">
+    <li>Core holding, ratio decidendi, and legal principles established.</li>
+  </ul>
+
+  <h4 style="color: #1e3a8a; border-bottom: 1.5px solid #cbd5e1; padding-bottom: 4px; margin: 16px 0 8px 0; font-size: 0.95rem; text-transform: uppercase;">IV. STATUTORY PROVISIONS & PRECEDENTS CITED</h4>
+  <ul style="margin: 6px 0 12px 18px; padding: 0;">
+    <li>Specific Act sections, Constitutional Articles, and cited case laws.</li>
+  </ul>
+
+  <h4 style="color: #1e3a8a; border-bottom: 1.5px solid #cbd5e1; padding-bottom: 4px; margin: 16px 0 8px 0; font-size: 0.95rem; text-transform: uppercase;">V. FINAL DISPOSITION, ORDERS & ADVOCATE BRIEFING NOTES</h4>
+  <ul style="margin: 6px 0 12px 18px; padding: 0;">
+    <li>Court orders, costs, and practical advice on how to cite this precedent.</li>
+  </ul>
+</div>`;
+
+  const response = await ai.models.generateContent({
+    model: 'gemini-2.5-flash',
+    contents: prompt
+  });
+
+  let summaryHtml = response.text || '';
+  summaryHtml = summaryHtml.replace(/```html/gi, '').replace(/```/g, '').trim();
+  if (!summaryHtml || summaryHtml.length < 50) {
+    throw new Error('Gemini brief generation empty or invalid');
+  }
+  return summaryHtml;
+}
+
 app.post('/api/summarize-doc', validateApiKey, async (req, res) => {
   const { title = 'Legal Document', sourceUrl = '', text = '', year = '', type = '', citation = '' } = req.body || {};
   const docText = text ? text.substring(0, 15000) : '';
@@ -1714,24 +1818,50 @@ app.post('/api/summarize-doc', validateApiKey, async (req, res) => {
     console.warn('[summarize-doc] App DB summary cache check warning:', cacheErr.message);
   }
 
-  // 2. Call Groq AI if not cached in App DB
+  // 2. Try Gemini AI
   try {
-    const groqHtml = await generateGroqBrief({ title, citation, year, type, sourceUrl, text: docText });
-
-    // Save generated brief into App DB (local store & Firestore)
-    await saveCachedSummary(docKey, groqHtml, { title, citation, year, type, sourceUrl });
-
+    const geminiHtml = await generateGeminiBrief({ title, citation, year, type, sourceUrl, text: docText });
+    await saveCachedSummary(docKey, geminiHtml, { title, citation, year, type, sourceUrl });
+    console.log(`[summarize-doc] Generated Gemini AI brief for: "${title}"`);
     return res.json({
       success: true,
-      source: 'groq_ai_lawyer_brief',
+      source: 'gemini_ai_brief',
+      summaryHtml: geminiHtml
+    });
+  } catch (geminiErr) {
+    console.log('[summarize-doc] Gemini brief generation not available or failed:', geminiErr.message);
+  }
+
+  // 3. Try Groq AI
+  try {
+    const groqHtml = await generateGroqBrief({ title, citation, year, type, sourceUrl, text: docText });
+    await saveCachedSummary(docKey, groqHtml, { title, citation, year, type, sourceUrl });
+    console.log(`[summarize-doc] Generated Groq AI brief for: "${title}"`);
+    return res.json({
+      success: true,
+      source: 'groq_ai_brief',
       summaryHtml: groqHtml
     });
-  } catch (err) {
-    console.error('[summarize-doc] Groq AI summarization error log:', err.message || err);
+  } catch (groqErr) {
+    console.log('[summarize-doc] Groq AI brief generation not available or failed:', groqErr.message);
+  }
+
+  // 4. Standalone Local Rule-Based NLP High-Density Brief Extraction (100% Guaranteed, No API Key Required)
+  try {
+    const localHtml = generateNativeLegalBrief({ title, citation, year, type, sourceUrl, text: docText });
+    await saveCachedSummary(docKey, localHtml, { title, citation, year, type, sourceUrl });
+    console.log(`[summarize-doc] Generated Local NLP Brief for: "${title}"`);
+    return res.json({
+      success: true,
+      source: 'local_nlp_brief',
+      summaryHtml: localHtml
+    });
+  } catch (localErr) {
+    console.error('[summarize-doc] Local brief extraction error:', localErr.message);
     return res.status(500).json({
       success: false,
-      error: 'Groq AI summarization failed',
-      details: err.message || String(err)
+      error: 'Brief generation failed',
+      details: localErr.message
     });
   }
 });
@@ -2679,11 +2809,12 @@ app.get('/api/docs', (req, res) => {
 });
 
 app.post('/api/auth/verify', async (req, res) => {
-  const idToken = req.headers['authorization'];
-  if (!idToken) {
+  const rawToken = req.headers['authorization'];
+  if (!rawToken) {
     console.warn('[auth] verify: missing authorization header');
     return res.status(401).json({ error: 'ID token required', code: 'MISSING_TOKEN' });
   }
+  const idToken = rawToken.replace(/^Bearer\s+/i, '').trim();
   try {
     if (!admin.getApps().length) {
       console.error('[auth] verify: Firebase Admin SDK not initialized');
@@ -2700,11 +2831,12 @@ app.post('/api/auth/verify', async (req, res) => {
 });
 
 app.post('/api/keys', async (req, res) => {
-   const idToken = req.headers['authorization'];
-   if (!idToken) {
+   const rawToken = req.headers['authorization'];
+   if (!rawToken) {
      console.warn('[auth] create key: missing authorization header');
      return res.status(401).json({ error: 'Firebase ID token required', code: 'MISSING_TOKEN' });
    }
+   const idToken = rawToken.replace(/^Bearer\s+/i, '').trim();
    try {
      const decoded = await getAuth(admin.getApp()).verifyIdToken(idToken);
      console.log('[auth] create key: token verified for', decoded.uid);
@@ -2713,8 +2845,8 @@ app.post('/api/keys', async (req, res) => {
      res.status(201).json(key);
    } catch (e) {
      console.error('[auth] create key: error:', e.code, e.message);
-     if (e.code === 'auth/id-token-expired' || e.code === 'auth/argument-error' || e.message && e.message.includes('Invalid Firebase token')) {
-       res.status(401).json({ error: 'Invalid Firebase token', code: 'INVALID_TOKEN' });
+     if (e.code === 'auth/id-token-expired' || e.code === 'auth/argument-error' || (e.message && e.message.includes('Invalid Firebase token'))) {
+       res.status(401).json({ error: 'Invalid or expired Firebase ID token', code: 'INVALID_TOKEN' });
      } else if (e.message && e.message.includes('Firestore not configured')) {
        res.status(503).json({ error: e.message, code: 'FIRESTORE_UNAVAILABLE' });
      } else if (e.code === 16 || e.code === 'UNAUTHENTICATED' || (e.message && e.message.includes('UNAUTHENTICATED'))) {
@@ -2833,6 +2965,23 @@ app.patch('/api/keys/:keyId', async (req, res) => {
 
     let updatedData = null;
 
+    const userKeys = getLocalKeys();
+    if (userKeys[userId] && userKeys[userId][keyId]) {
+      if (req.body && typeof req.body.isActive !== 'undefined') {
+        userKeys[userId][keyId].isActive = req.body.isActive;
+        if (req.body.isActive) {
+          activeKeyCache.set(keyId, userKeys[userId][keyId]);
+        } else {
+          activeKeyCache.delete(keyId);
+        }
+      }
+      if (req.body && req.body.label) {
+        userKeys[userId][keyId].label = req.body.label;
+      }
+      saveLocalKeys(userKeys);
+      updatedData = { key: keyId, ...userKeys[userId][keyId] };
+    }
+
     try {
       const db = getFirestore();
       if (db) {
@@ -2846,21 +2995,16 @@ app.patch('/api/keys/:keyId', async (req, res) => {
             await keyRef.update(updates);
             const updatedDoc = await keyRef.get();
             updatedData = { key: updatedDoc.id, ...updatedDoc.data() };
+            if (updatedData.isActive) {
+              activeKeyCache.set(keyId, updatedData);
+            } else {
+              activeKeyCache.delete(keyId);
+            }
           }
         }
       }
     } catch (e) {
       // Firestore unavailable
-    }
-
-    const userKeys = getLocalKeys();
-    if (userKeys[userId] && userKeys[userId][keyId]) {
-      if (req.body && typeof req.body.isActive !== 'undefined') userKeys[userId][keyId].isActive = req.body.isActive;
-      if (req.body && req.body.label) userKeys[userId][keyId].label = req.body.label;
-      saveLocalKeys(userKeys);
-      if (!updatedData) {
-        updatedData = { key: keyId, ...userKeys[userId][keyId] };
-      }
     }
 
     if (!updatedData) {
@@ -2882,6 +3026,15 @@ app.delete('/api/keys/:keyId', async (req, res) => {
     const userId = await getUserIdFromReq(req);
     const keyId = req.params.keyId;
 
+    activeKeyCache.delete(keyId);
+    rateLimits.delete(keyId);
+
+    const userKeys = getLocalKeys();
+    if (userKeys[userId] && userKeys[userId][keyId]) {
+      delete userKeys[userId][keyId];
+      saveLocalKeys(userKeys);
+    }
+
     try {
       const db = getFirestore();
       if (db) {
@@ -2892,13 +3045,6 @@ app.delete('/api/keys/:keyId', async (req, res) => {
       // Firestore unavailable
     }
 
-    const userKeys = getLocalKeys();
-    if (userKeys[userId] && userKeys[userId][keyId]) {
-      delete userKeys[userId][keyId];
-      saveLocalKeys(userKeys);
-    }
-
-    rateLimits.delete(keyId);
     res.json({ key: keyId, deleted: true });
   } catch (e) {
     res.status(500).json({ error: e.message || 'Failed to delete key', code: 'KEY_DELETE_FAILED' });

@@ -253,7 +253,10 @@ function getLocalKeys() {
       if (keysObj && typeof keysObj === 'object') {
         Object.entries(keysObj).forEach(([storedKeyIdentifier, data]) => {
           if (!data || typeof data !== 'object') return;
-          const plainKey = data.encryptedKey ? decryptText(data.encryptedKey) : (data.key || storedKeyIdentifier);
+          let plainKey = data.encryptedKey ? decryptText(data.encryptedKey) : (data.key || storedKeyIdentifier);
+          if (plainKey && plainKey.startsWith('enc:')) {
+            plainKey = data.key || storedKeyIdentifier;
+          }
           const encKey = data.encryptedKey || encryptText(plainKey);
           decryptedUserKeys[uId][plainKey] = {
             ...data,

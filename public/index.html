@@ -1459,6 +1459,65 @@
 
         /* ─── SEARCH ─── */
         let currentSource = 'all';
+        const SEARCH_STATE_KEY = 'elegal_homepage_search_state';
+
+        function saveSearchState() {
+            try {
+                const query = document.getElementById('searchInput')?.value || '';
+                const state = {
+                    query,
+                    lastResult,
+                    source: currentSource,
+                    filter: currentFilter,
+                    sort: currentSort,
+                    scrollTop: window.scrollY || document.documentElement.scrollTop || 0
+                };
+                sessionStorage.setItem(SEARCH_STATE_KEY, JSON.stringify(state));
+            } catch (e) {
+                console.warn('Failed to save homepage search state:', e);
+            }
+        }
+
+        function restoreSearchState() {
+            try {
+                const raw = sessionStorage.getItem(SEARCH_STATE_KEY);
+                if (!raw || raw === 'undefined' || raw === 'null') return false;
+                const state = JSON.parse(raw);
+                if (!state) return false;
+
+                currentSource = state.source || 'all';
+                currentFilter = state.filter || 'all';
+                currentSort = state.sort || 'relevance';
+
+                if (state.query) {
+                    const input = document.getElementById('searchInput');
+                    if (input) input.value = state.query;
+                }
+
+                const sortSelect = document.getElementById('sortSelect');
+                if (sortSelect) sortSelect.value = currentSort;
+
+                document.querySelectorAll('.jurisdiction-pill').forEach(b => {
+                    b.classList.toggle('active', (b.dataset.source || 'all') === currentSource);
+                });
+
+                if (state.lastResult && Array.isArray(state.lastResult.results) && state.lastResult.results.length > 0) {
+                    lastResult = state.lastResult;
+                    document.getElementById('workspaceTitle').textContent = 'Search Results';
+                    document.getElementById('workspaceSubtitle').textContent = state.query ? `Results for "${state.query}"` : 'All sources';
+                    syncFilterButtons();
+                    renderCurrent();
+                    updateStatus(`Found ${lastResult.total || lastResult.results.length} results`);
+                    if (state.scrollTop) {
+                        setTimeout(() => window.scrollTo(0, state.scrollTop), 60);
+                    }
+                    return true;
+                }
+            } catch (e) {
+                console.warn('Failed to restore homepage search state:', e);
+            }
+            return false;
+        }
 
         async function search(query) {
             const normalizedQuery = query.trim().replace(/\s+/g, ' ');
@@ -1469,30 +1528,31 @@
             return JSON.parse(text);
         }
 
-async function doSearch() {
-             const query = document.getElementById('searchInput').value.trim().replace(/\s+/g, ' ');
-             if (!query) return;
+        async function doSearch() {
+            const query = document.getElementById('searchInput').value.trim().replace(/\s+/g, ' ');
+            if (!query) return;
 
-             setSearchLoading(true);
-             renderSkeleton();
-             updateStatus(`Searching for "${query}"...`);
-             document.getElementById('workspaceTitle').textContent = 'Search Results';
-             document.getElementById('workspaceSubtitle').textContent = 'All sources.';
+            setSearchLoading(true);
+            renderSkeleton();
+            updateStatus(`Searching for "${query}"...`);
+            document.getElementById('workspaceTitle').textContent = 'Search Results';
+            document.getElementById('workspaceSubtitle').textContent = 'All sources.';
 
-             try {
-                 lastResult = await search(query);
-                 currentFilter = 'all';
-                 currentResultIndex = -1;
-                 syncFilterButtons();
-                 renderCurrent();
-                 updateStatus(`Found ${lastResult.total} results`);
-             } catch (e) {
-                 updateStatus(e.message);
-                 renderEmpty('Search Error', e.message);
-             } finally {
-                 setSearchLoading(false);
-             }
-         }
+            try {
+                lastResult = await search(query);
+                currentFilter = 'all';
+                currentResultIndex = -1;
+                syncFilterButtons();
+                renderCurrent();
+                updateStatus(`Found ${lastResult.total} results`);
+                saveSearchState();
+            } catch (e) {
+                updateStatus(e.message);
+                renderEmpty('Search Error', e.message);
+            } finally {
+                setSearchLoading(false);
+            }
+        }
 
         /* ─── SAVED DOCUMENTS LOCAL STORAGE ENGINE ─── */
         const SAVED_DOCS_KEY = 'elegal_saved_documents';
@@ -1593,7 +1653,7 @@ async function doSearch() {
             }
 
             if (!items.length) {
-                const msg = libraryData ? 'No documents match your filters.' : 'Library data not available.';
+                const msg = lastResult ? 'No legal records found matching your query.' : (libraryData ? 'No documents match your filters.' : 'Library data not available.');
                 renderEmpty('No documents found', msg);
                 return;
             }
@@ -1715,12 +1775,29 @@ function createResultItem(item) {
               });
               badgesEl.appendChild(saveBtn);
 
-              if (item.isPdf || item.fileType === 'PDF' || (targetUrl && targetUrl.toLowerCase().endsWith('.pdf'))) {
-                  const pdfBadge = document.createElement('span');
-                  pdfBadge.className = 'case-badge';
-                  pdfBadge.style.cssText = 'background: #fee2e2; color: #dc2626; font-weight: 700; border: 1px solid #fca5a5;';
-                  pdfBadge.textContent = '📄 PDF Document';
-                  badgesEl.appendChild(pdfBadge);
+              const targetLower = (targetUrl || '').toLowerCase();
+              const isPdf = item.isPdf || item.fileType === 'PDF' || targetLower.endsWith('.pdf') || targetLower.includes('.pdf?');
+              const isDocx = item.isDocx || item.fileType === 'DOCX' || targetLower.endsWith('.docx') || targetLower.includes('.docx?');
+              const isDoc = item.isDoc || item.fileType === 'DOC' || targetLower.endsWith('.doc') || targetLower.includes('.doc?');
+
+              if (isPdf) {
+                  const docBadge = document.createElement('span');
+                  docBadge.className = 'case-badge';
+                  docBadge.style.cssText = 'background: #fee2e2; color: #dc2626; font-weight: 700; border: 1px solid #fca5a5;';
+                  docBadge.textContent = '📄 PDF Document';
+                  badgesEl.appendChild(docBadge);
+              } else if (isDocx) {
+                  const docBadge = document.createElement('span');
+                  docBadge.className = 'case-badge';
+                  docBadge.style.cssText = 'background: #e0f2fe; color: #0284c7; font-weight: 700; border: 1px solid #7dd3fc;';
+                  docBadge.textContent = '📝 DOCX Document';
+                  badgesEl.appendChild(docBadge);
+              } else if (isDoc) {
+                  const docBadge = document.createElement('span');
+                  docBadge.className = 'case-badge';
+                  docBadge.style.cssText = 'background: #fef3c7; color: #d97706; font-weight: 700; border: 1px solid #fcd34d;';
+                  docBadge.textContent = '📝 DOC Document';
+                  badgesEl.appendChild(docBadge);
               }
 
               const yearStr = item.year || extractDate(citation, updatedAt, item.documentDate);
@@ -1768,6 +1845,7 @@ function createResultItem(item) {
                   linkIcon.href = targetUrl.startsWith('/read') ? targetUrl : `/read.html?title=${encodeURIComponent(title)}&sourceUrl=${encodeURIComponent(targetUrl)}&year=${encodeURIComponent(yearStr || '')}&type=${encodeURIComponent(docType || '')}&source=${encodeURIComponent(sourceLabel || '')}`;
                   linkIcon.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>';
                   linkIcon.appendChild(document.createTextNode(' Read document'));
+                  linkIcon.addEventListener('click', saveSearchState);
                   metaRightEl.appendChild(linkIcon);
               }
 
@@ -1883,6 +1961,7 @@ function renderPreview(item) {
 
         /* ─── LOAD DOCUMENT ─── */
         async function loadDocument(url, title) {
+            saveSearchState();
             updateStatus('Opening document reader...');
 
             if (!url || url === '/') {
@@ -2001,6 +2080,7 @@ function formatMeta(item) {
             currentFilter = filter;
             syncFilterButtons();
             renderCurrent();
+            saveSearchState();
         }
 
         function syncFilterButtons() {
@@ -2028,14 +2108,14 @@ function formatMeta(item) {
             renderPreview(item);
         }
 
-function highlightActiveResult() {
-             document.querySelectorAll('.case-card.active').forEach(el => el.classList.remove('active'));
-             const items = document.querySelectorAll('.case-card');
-             if (items[currentResultIndex]) {
-                 items[currentResultIndex].classList.add('active');
-                 items[currentResultIndex].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-             }
-         }
+        function highlightActiveResult() {
+            document.querySelectorAll('.case-card.active').forEach(el => el.classList.remove('active'));
+            const items = document.querySelectorAll('.case-card');
+            if (items[currentResultIndex]) {
+                items[currentResultIndex].classList.add('active');
+                items[currentResultIndex].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+        }
 
         /* ─── EVENT LISTENERS ─── */
         const sortSelect = document.getElementById('sortSelect');
@@ -2044,6 +2124,7 @@ function highlightActiveResult() {
                 currentSort = e.target.value;
                 currentResultIndex = -1;
                 renderCurrent();
+                saveSearchState();
             });
         }
 
@@ -2060,6 +2141,7 @@ function highlightActiveResult() {
         });
 
         document.getElementById('clearSearchBtn').addEventListener('click', () => {
+            sessionStorage.removeItem(SEARCH_STATE_KEY);
             lastResult = null;
             currentFilter = 'all';
             currentResultIndex = -1;
@@ -2240,6 +2322,7 @@ function highlightActiveResult() {
                 document.querySelectorAll('.jurisdiction-pill').forEach(b => b.classList.remove('active'));
                 button.classList.add('active');
                 currentSource = button.dataset.source || 'all';
+                saveSearchState();
                 const searchVal = document.getElementById('searchInput')?.value?.trim();
                 if (searchVal) {
                     doSearch();
@@ -2247,7 +2330,7 @@ function highlightActiveResult() {
             });
         });
 
-document.getElementById('closePreviewBtn').addEventListener('click', () => {
+        document.getElementById('closePreviewBtn').addEventListener('click', () => {
             document.getElementById('previewModalOverlay').classList.remove('active');
         });
 
@@ -2269,7 +2352,17 @@ document.getElementById('closePreviewBtn').addEventListener('click', () => {
 
         /* ─── INIT ─── */
         updateSavedCountBadge();
-        loadLibrary();
+        const hasRestored = restoreSearchState();
+        if (!hasRestored) {
+            loadLibrary();
+        }
+        window.addEventListener('beforeunload', saveSearchState);
+        window.addEventListener('pagehide', saveSearchState);
+        window.addEventListener('pageshow', (e) => {
+            if (e.persisted || !lastResult) {
+                restoreSearchState();
+            }
+        });
         document.getElementById('searchInput').focus();
     </script>
 

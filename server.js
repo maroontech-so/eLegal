@@ -25,7 +25,29 @@ const { getAuth } = require('firebase-admin/auth');
 const { getFirestore: firebaseGetFirestore } = require('firebase-admin/firestore');
 const cors = require('cors');
 const { v2: cloudinary } = require('cloudinary');
+const mammoth = require('mammoth');
 const { classifyQueryOpenSourceML } = require('./src/ml-classifier');
+
+async function parseWordDocumentBuffer(buffer) {
+  try {
+    const htmlResult = await mammoth.convertToHtml({ buffer });
+    const textResult = await mammoth.extractRawText({ buffer });
+    return {
+      success: true,
+      html: htmlResult.value || '',
+      text: textResult.value || '',
+      warnings: htmlResult.warnings || []
+    };
+  } catch (err) {
+    console.warn('[mammoth] Word doc conversion warning:', err.message);
+    return {
+      success: false,
+      error: err.message,
+      html: '',
+      text: ''
+    };
+  }
+}
 
 // Initialize Cloudinary safely
 function getCloudinary() {
@@ -833,9 +855,9 @@ function isLegalDocument(doc) {
 
   // Filter out non-legal pages, blogs, news commentary sites, directory listings, search aggregators
   const bannedKeywords = [
-    'techtrendske', 'blog', 'news', 'editorial', 'what the new law does',
+    'techtrendske', 'blog', 'editorial', 'what the new law does',
     'all courts - kenya law', 'home - kenya law', 'search results', 'privacy policy',
-    'terms of service', 'contact us', 'about us', 'subscribe', 'newsletter', 'login', 'signup',
+    'terms of service', 'contact us', 'about us', 'newsletter',
     'googlef3644fe', 'sitemap', 'category/', 'tag/'
   ];
   for (const banned of bannedKeywords) {
@@ -843,13 +865,16 @@ function isLegalDocument(doc) {
       return false;
     }
   }
+  if (url.includes('/login') || url.includes('/signin') || url.includes('/captcha')) {
+    return false;
+  }
 
   // Precedents / Judgments / Rulings / Advisory Opinions
   const isCaseOrPrecedent =
     /\b(v|vs|versus)\b/i.test(title) ||
     /\[\d{4}\]\s*(KECA|KEHC|KESC|KEELRC|KLR|UKSC|ICJ|ICC|EACHR|BAILII)\b/i.test(title + ' ' + citation) ||
     /akn\/ke\/judgment\//i.test(url) ||
-    /\b(civil appeal|criminal appeal|petition|miscellaneous cause|constitutional petition|advisory opinion|ruling|judgment|judgement)\b/i.test(title + ' ' + citation + ' ' + rawType);
+    /\b(civil appeal|criminal appeal|petition|miscellaneous cause|constitutional petition|advisory opinion|ruling|judgment|judgement|cause|court|case)\b/i.test(title + ' ' + citation + ' ' + rawType);
 
   // Legislations / Acts / Constitutions / Statutes / Bills / Gazette Notices
   const isStatuteOrLegislation =
@@ -858,17 +883,29 @@ function isLegalDocument(doc) {
     /^(the|an)?\s*[A-Z][A-Za-z0-9\s,-]+(Act|Code|Constitution|Bill|Ordinance)\b/.test(title);
 
   // Known official legal document repositories
-  const isOfficialRepoDoc = (url.includes('kenyalaw.org/akn/') || url.includes('bailii.org') || url.includes('worldlii.org') || url.includes('law.cornell.edu') || url.includes('justia.com')) &&
+  const isOfficialRepoDoc = (url.includes('kenyalaw.org') || url.includes('bailii.org') || url.includes('worldlii.org') || url.includes('law.cornell.edu') || url.includes('justia.com') || url.includes('courtlistener.com') || url.includes('canlii.org') || url.includes('austlii.edu.au')) &&
     !url.endsWith('/all/') && !url.endsWith('/judgments/') && !url.endsWith('/acts/');
 
   const validTypes = ['constitution', 'legislation', 'bill', 'gazette notice', 'judgment', 'ruling', 'advisory opinion', 'precedent', 'statute', 'act', 'code'];
   const isExplicitLegalType = rawType && validTypes.includes(rawType.toLowerCase());
 
+  const isDocumentFile = url.endsWith('.pdf') || url.endsWith('.docx') || url.endsWith('.doc') ||
+    url.includes('.pdf?') || url.includes('.docx?') || url.includes('.doc?') ||
+    Boolean(doc.isPdf) || Boolean(doc.isDocx) || Boolean(doc.isDoc) || Boolean(doc.isDocument);
+
+  if (isDocumentFile) {
+    return true;
+  }
+
   if (isExplicitLegalType && (isCaseOrPrecedent || isStatuteOrLegislation || isOfficialRepoDoc)) {
     return true;
   }
 
-  return isCaseOrPrecedent || isStatuteOrLegislation;
+  if (doc.source === 'kenyalaw' || doc.source === 'international' || doc.source === 'local') {
+    return true;
+  }
+
+  return isCaseOrPrecedent || isStatuteOrLegislation || isOfficialRepoDoc;
 }
 
 function getRepositoryDocs() {
@@ -988,12 +1025,63 @@ function normalizeFetchUrl(urlStr = '') {
   return normalized;
 }
 
+async function safeFetchWithTimeout(urlStr, options = {}, timeoutMs = 12000) {
+  const normUrl = normalizeFetchUrl(urlStr);
+  if (!normUrl) throw new Error('Invalid URL');
+
+  const headers = {
+    ...getBrowserHeaders(normUrl),
+    ...(options.headers || {})
+  };
+
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+
+  try {
+    const res = await fetch(normUrl, {
+      ...options,
+      headers,
+      signal: controller.signal,
+      redirect: 'follow'
+    });
+    clearTimeout(timer);
+    return res;
+  } catch (firstErr) {
+    clearTimeout(timer);
+
+    if (normUrl.startsWith('https://') && !normUrl.includes('localhost')) {
+      const httpUrl = normUrl.replace('https://', 'http://');
+      try {
+        const retryController = new AbortController();
+        const retryTimer = setTimeout(() => retryController.abort(), 8000);
+        const retryRes = await fetch(httpUrl, {
+          ...options,
+          headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' },
+          signal: retryController.signal,
+          redirect: 'follow'
+        });
+        clearTimeout(retryTimer);
+        return retryRes;
+      } catch (_) {}
+    }
+    throw firstErr;
+  }
+}
+
 function extractPdfUrlFromHtml(rawHtml = '', sourceUrl = '') {
   if (!rawHtml && !sourceUrl) return null;
 
   const normSource = normalizeFetchUrl(sourceUrl);
 
-  // 1. Direct KenyaLaw caselaw view check: /caselaw/cases/view/123456 -> /caselaw/cases/export/123456/pdf
+  // 1. Direct KenyaLaw AKN check: e.g. https://kenyalaw.org/akn/ke/judgment/... -> https://kenyalaw.org/akn/ke/judgment/.../main.pdf
+  if (normSource && normSource.includes('/akn/ke/')) {
+    if (normSource.toLowerCase().endsWith('.pdf')) return normSource;
+    if (normSource.toLowerCase().endsWith('/source')) return normSource;
+    const baseAkn = normSource.replace(/\/+$/, '');
+    return `${baseAkn}/main.pdf`;
+  }
+
+  // 2. Direct KenyaLaw caselaw view check: /caselaw/cases/view/123456 -> /caselaw/cases/export/123456/pdf
   if (normSource && normSource.includes('/caselaw/cases/view/')) {
     try {
       const u = new URL(normSource);
@@ -1008,7 +1096,7 @@ function extractPdfUrlFromHtml(rawHtml = '', sourceUrl = '') {
 
   if (!rawHtml) return null;
 
-  // 2. Check href attributes for pdf/export links
+  // 3. Check href attributes for pdf/export links
   const matches = Array.from(rawHtml.matchAll(/href=["']([^"']+)["']/gi));
   for (const match of matches) {
     const href = match[1];
@@ -1020,7 +1108,7 @@ function extractPdfUrlFromHtml(rawHtml = '', sourceUrl = '') {
     }
   }
 
-  // 3. Check for Download PDF button link text
+  // 4. Check for Download PDF button link text
   const downloadMatch = rawHtml.match(/<a[^>]+href=["']([^"']+)["'][^>]*>(?:[\s\S]*?Download PDF[\s\S]*?)<\/a>/i);
   if (downloadMatch && downloadMatch[1]) {
     try { return new URL(downloadMatch[1], normSource || 'https://kenyalaw.org').href; } catch (_) {}
@@ -1167,22 +1255,16 @@ app.get('/api/pdf-proxy', validateApiKey, async (req, res) => {
       targetPdfUrl = extractPdfUrlFromHtml('', normSource) || normSource;
     }
 
-    let response = await fetch(targetPdfUrl, {
-      headers: getBrowserHeaders(targetPdfUrl),
-      redirect: 'follow'
-    });
+    let response = await safeFetchWithTimeout(targetPdfUrl, {}, 10000);
 
-    if (!response.ok && targetPdfUrl !== normSource) {
+    if ((!response || !response.ok) && targetPdfUrl !== normSource) {
       // Retry with original normalized URL
       targetPdfUrl = normSource;
-      response = await fetch(targetPdfUrl, {
-        headers: getBrowserHeaders(targetPdfUrl),
-        redirect: 'follow'
-      });
+      response = await safeFetchWithTimeout(targetPdfUrl, {}, 10000);
     }
 
-    if (!response.ok) {
-      return res.status(502).json({ error: `Failed to fetch document (status ${response.status})` });
+    if (!response || !response.ok) {
+      return res.status(502).json({ error: `Failed to fetch document (status ${response ? response.status : 'timeout'})` });
     }
 
     let contentType = response.headers.get('content-type') || '';
@@ -1370,11 +1452,8 @@ app.get('/api/document-content', validateApiKey, async (req, res) => {
   const directExportPdfUrl = extractPdfUrlFromHtml('', normSource);
   if (directExportPdfUrl) {
     try {
-      const pdfResp = await fetch(directExportPdfUrl, {
-        headers: getBrowserHeaders(directExportPdfUrl),
-        redirect: 'follow'
-      });
-      if (pdfResp.ok) {
+      const pdfResp = await safeFetchWithTimeout(directExportPdfUrl, {}, 8000);
+      if (pdfResp && pdfResp.ok) {
         const pdfBuffer = Buffer.from(await pdfResp.arrayBuffer());
         if (pdfBuffer.toString('utf8', 0, 10).startsWith('%PDF-')) {
           console.log('[document-content] Successfully downloaded direct PDF export:', directExportPdfUrl);
@@ -1398,18 +1477,15 @@ app.get('/api/document-content', validateApiKey, async (req, res) => {
         }
       }
     } catch (exportErr) {
-      console.warn('[document-content] Direct PDF export fetch attempt failed:', exportErr.message);
+      console.warn('[document-content] Direct PDF export fetch attempt warning:', exportErr.message);
     }
   }
 
   // 3. Fetch HTML document from external source with browser headers
   try {
-    const response = await fetch(normSource, {
-      headers: getBrowserHeaders(normSource),
-      redirect: 'follow'
-    });
+    const response = await safeFetchWithTimeout(normSource, {}, 10000);
 
-    if (!response.ok) {
+    if (!response || !response.ok) {
       const docMeta = enrichDocumentMetadata({
         title: reqTitle,
         url: normSource,
@@ -1417,17 +1493,54 @@ app.get('/api/document-content', validateApiKey, async (req, res) => {
         type: reqType,
         source: reqSource
       });
+      const statusText = response ? `status ${response.status}` : 'timeout';
       return res.json({
         isPdf: false,
         hasPdf: false,
         fallback: true,
         ...docMeta,
-        text: `Unable to fetch direct content from source (${response.status}). You can click "Original source" above to view it on the official site.`,
-        html: `<p>Unable to fetch direct content from source (${response.status}). You can click "Original source" above to view it on the official site.</p>`
+        text: `Content is hosted on external legal registry (${statusText}). Please click "Original Source" above to view directly on official repository.`,
+        html: `<div style="padding: 16px; background-color: #f8fafc; border-radius: 8px; border: 1px solid #e2e8f0;"><p style="font-weight: 600; color: #0f172a; margin-bottom: 8px;">Official Document Record</p><p style="color: #475569; margin-bottom: 12px;">This document record is hosted directly on the external registry portal (${statusText}).</p><a href="${normSource}" target="_blank" rel="noopener noreferrer" style="display: inline-block; padding: 8px 16px; background-color: #0f172a; color: #ffffff; font-weight: 600; text-decoration: none; border-radius: 6px;">Open Original Source ↗</a></div>`
       });
     }
 
     const contentType = response.headers.get('content-type') || '';
+
+    // Check for Word Document (.docx / .doc)
+    const isDocxOrDoc = contentType.includes('officedocument') ||
+      contentType.includes('msword') ||
+      normSource.endsWith('.docx') ||
+      normSource.endsWith('.doc');
+
+    if (isDocxOrDoc) {
+      const buffer = Buffer.from(await response.arrayBuffer());
+      const wordParsed = await parseWordDocumentBuffer(buffer);
+      const isDocx = normSource.endsWith('.docx') || contentType.includes('officedocument');
+      const docTitle = reqTitle !== 'Document' ? reqTitle : (normSource.split('/').pop() || 'Word Document');
+
+      const docMeta = enrichDocumentMetadata({
+        title: docTitle,
+        url: normSource,
+        year: reqYear || extractYearFromText(wordParsed.text) || extractYearFromText(docTitle),
+        type: reqType || classifyDocumentType(docTitle, '', normSource, wordParsed.text),
+        source: reqSource || parseSourceLabel(normSource, 'web')
+      });
+
+      const saved = saveDocToRepository(docMeta, wordParsed.text || wordParsed.html, 'txt');
+
+      return res.json({
+        isPdf: false,
+        isDocx: isDocx,
+        isDoc: !isDocx,
+        fileType: isDocx ? 'DOCX' : 'DOC',
+        cloudinaryUrl: saved.cloudinaryUrl || null,
+        cloudinaryMetaUrl: saved.cloudinaryMetaUrl || null,
+        ...docMeta,
+        text: wordParsed.text || 'Word Document Content',
+        html: wordParsed.html || `<p>${wordParsed.text}</p>`
+      });
+    }
+
     if (contentType.includes('pdf') || normSource.endsWith('.pdf')) {
       const buffer = Buffer.from(await response.arrayBuffer());
       const docMeta = enrichDocumentMetadata({
@@ -1509,7 +1622,7 @@ app.get('/api/document-content', validateApiKey, async (req, res) => {
       html: bodyHtml
     });
   } catch (e) {
-    console.error('Document content fetch error:', e.message);
+    console.warn('[document-content] Remote document fetch warning:', e.message);
     const docMeta = enrichDocumentMetadata({
       title: reqTitle,
       url: normSource,
@@ -1522,9 +1635,41 @@ app.get('/api/document-content', validateApiKey, async (req, res) => {
       hasPdf: false,
       fallback: true,
       ...docMeta,
-      text: `Error fetching content: ${e.message}. Click "Original source" to view the original web page.`,
-      html: `<p>Error fetching content: ${e.message}. Click "Original source" to view the original web page.</p>`
+      text: `Notice: Remote registry connection (${e.message}). You can view the document directly by clicking "Original Source".`,
+      html: `<div style="padding: 16px; background-color: #f8fafc; border-radius: 8px; border: 1px solid #cbd5e1;"><p style="font-weight: 600; color: #0f172a; margin-bottom: 8px;">Official Document Reference</p><p style="color: #475569; margin-bottom: 12px;">This legal record is hosted on the official registry portal. Click below to inspect directly.</p><a href="${normSource}" target="_blank" rel="noopener noreferrer" style="display: inline-block; padding: 8px 16px; background-color: #0066cc; color: #ffffff; font-weight: 600; text-decoration: none; border-radius: 6px;">Open Original Source ↗</a></div>`
     });
+  }
+});
+
+app.get('/api/convert-docx', validateApiKey, async (req, res) => {
+  const docxUrl = req.query.url || req.query.sourceUrl;
+  if (!docxUrl) {
+    return res.status(400).json({ error: 'No URL provided' });
+  }
+
+  try {
+    const normUrl = normalizeFetchUrl(docxUrl);
+    const response = await fetch(normUrl, {
+      headers: getBrowserHeaders(normUrl),
+      redirect: 'follow'
+    });
+
+    if (!response.ok) {
+      return res.status(502).json({ error: `Failed to fetch DOCX document (${response.status})` });
+    }
+
+    const buffer = Buffer.from(await response.arrayBuffer());
+    const parsed = await parseWordDocumentBuffer(buffer);
+
+    return res.json({
+      success: true,
+      text: parsed.text,
+      html: parsed.html,
+      sourceUrl: normUrl
+    });
+  } catch (err) {
+    console.error('convert-docx error:', err.message);
+    return res.status(500).json({ error: 'DOCX processing failed', message: err.message });
   }
 });
 
@@ -2360,6 +2505,13 @@ function parseDuckDuckGoHtml(html, source) {
   const seen = new Set();
   const regex = /<a[^>]+href="([^"]*uddg=([^"&]+)[^"]*)"[^>]*>([\s\S]*?)<\/a>/gi;
   let m;
+
+  const blockedKeywords = [
+    'login', 'signin', 'captcha', 'paywall', 'subscribe', 'register', 'membership',
+    'lexisnexis.com', 'westlaw.com', 'heinonline.org', 'vlex.com', 'bloomberglaw.com',
+    'facebook.com', 'twitter.com', 'instagram.com', 'linkedin.com', 'youtube.com', 'tiktok.com'
+  ];
+
   while ((m = regex.exec(html)) !== null) {
     const encodedUrl = m[2];
     const rawText = m[3].replace(/<[^>]+>/g, '').trim();
@@ -2368,13 +2520,28 @@ function parseDuckDuckGoHtml(html, source) {
     let actualUrl = decodeURIComponent(encodedUrl);
     if (!actualUrl || actualUrl.includes('duckduckgo.com')) continue;
     
-    const key = actualUrl.toLowerCase();
+    const urlLower = actualUrl.toLowerCase();
+
+    // Skip pages requiring logins or paywalls or captcha blocks
+    if (blockedKeywords.some(kw => urlLower.includes(kw))) {
+      continue;
+    }
+
+    const key = urlLower;
     if (seen.has(key)) continue;
     seen.add(key);
 
     const title = rawText.replace(/^\|\s*/, '').trim();
+    const titleLower = title.toLowerCase();
     const isKenya = actualUrl.includes('kenyalaw.org');
-    const isPdfUrl = actualUrl.endsWith('.pdf') || actualUrl.includes('.pdf?') || title.toLowerCase().includes('[pdf]');
+    
+    const isPdf = key.endsWith('.pdf') || key.includes('.pdf?') || titleLower.includes('[pdf]') || titleLower.includes('pdf');
+    const isDocx = key.endsWith('.docx') || key.includes('.docx?') || titleLower.includes('[docx]') || titleLower.includes('docx');
+    const isDocFile = key.endsWith('.doc') || key.includes('.doc?') || titleLower.includes('[doc]');
+    const isDocument = isPdf || isDocx || isDocFile || key.includes('/source') || key.includes('/akn/ke/');
+
+    const fileType = isPdf ? 'PDF' : (isDocx ? 'DOCX' : (isDocFile ? 'DOC' : 'DOC'));
+    const score = isPdf ? 98 : (isDocx || isDocFile ? 92 : 80);
 
     results.push({
       title,
@@ -2383,9 +2550,12 @@ function parseDuckDuckGoHtml(html, source) {
       url: actualUrl,
       readUrl: actualUrl,
       source: isKenya ? 'kenyalaw' : (source === 'international' || !isKenya ? 'international' : 'local'),
-      isPdf: isPdfUrl,
-      fileType: isPdfUrl ? 'PDF' : 'DOC',
-      score: isPdfUrl ? 90 : 80,
+      isPdf,
+      isDocx,
+      isDoc: isDocFile,
+      isDocument,
+      fileType,
+      score,
       snippets: [actualUrl]
     });
     if (results.length >= 25) break;
@@ -2395,11 +2565,13 @@ function parseDuckDuckGoHtml(html, source) {
 
 async function searchFastWeb(query, source = 'all') {
   const isIntl = source === 'international';
-  const scopeQuery = source === 'kenya' 
+  const isKenya = source === 'kenya';
+  
+  const scopeQuery = isKenya 
     ? `${query} site:kenyalaw.org`
     : isIntl
-    ? `"${query}" OR ${query} case law precedent statute judgment site:worldlii.org OR site:bailii.org OR site:justia.com OR site:law.cornell.edu OR site:canlii.org OR site:austlii.edu.au`
-    : `"${query}" case law precedent statute legal judgment`;
+    ? `${query} site:worldlii.org OR site:bailii.org OR site:justia.com OR site:law.cornell.edu OR site:canlii.org`
+    : query;
 
   try {
     const response = await fetch(`https://html.duckduckgo.com/html/?q=${encodeURIComponent(scopeQuery)}`, {
@@ -2412,21 +2584,25 @@ async function searchFastWeb(query, source = 'all') {
     const html = await response.text();
     let results = parseDuckDuckGoHtml(html, source);
 
-    if (isIntl && results.length < 5) {
-      const altQuery = `"${query}" legal case precedent judgment`;
-      const altResponse = await fetch(`https://html.duckduckgo.com/html/?q=${encodeURIComponent(altQuery)}`, {
-        headers: {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-          'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
-        }
-      });
-      if (altResponse.ok) {
-        const altHtml = await altResponse.text();
-        const altResults = parseDuckDuckGoHtml(altHtml, source);
-        const seen = new Set(results.map(r => r.url.toLowerCase()));
-        for (const item of altResults) {
-          if (!seen.has(item.url.toLowerCase())) {
-            results.push(item);
+    if (results.length < 3) {
+      // Try spell-corrected or variant query fallback
+      const fixedQuery = query.replace(/\brayland\b/gi, 'rylands').replace(/\br\b/gi, 'regina');
+      if (fixedQuery !== query) {
+        const altScope = isKenya ? `${fixedQuery} site:kenyalaw.org` : fixedQuery;
+        const altResponse = await fetch(`https://html.duckduckgo.com/html/?q=${encodeURIComponent(altScope)}`, {
+          headers: {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
+          }
+        });
+        if (altResponse.ok) {
+          const altHtml = await altResponse.text();
+          const altResults = parseDuckDuckGoHtml(altHtml, source);
+          const seen = new Set(results.map(r => r.url.toLowerCase()));
+          for (const item of altResults) {
+            if (!seen.has(item.url.toLowerCase())) {
+              results.push(item);
+            }
           }
         }
       }
@@ -2451,7 +2627,8 @@ async function fetchInternationalLegalPrecedents(query) {
 
   // 1. Wikipedia Legal Precedents API
   try {
-    const wikiUrl = `https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(expandedQuery + ' case law precedent statute')}&format=json&origin=*`;
+    const wikiSearchTerm = cleanQ.replace(/\brayland\b/gi, 'Rylands');
+    const wikiUrl = `https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(wikiSearchTerm)}&format=json&origin=*`;
     const response = await fetch(wikiUrl);
     if (response.ok) {
       const data = await response.json();
@@ -2660,18 +2837,24 @@ function rankResults(results, query, classification = null) {
     const urlLower = (r.url || r.readUrl || '').toLowerCase();
     let score = r.score || 50;
 
-    // Requirement: Prioritize PDF and official document results while keeping others significant
-    const isPdf = Boolean(r.isPdf) || urlLower.endsWith('.pdf') || urlLower.includes('.pdf?') || titleLower.includes('pdf');
-    const isDoc = isPdf || urlLower.includes('/doc/') || urlLower.includes('/document/') || urlLower.includes('/cases/') || urlLower.includes('/akn/ke/') || urlLower.includes('kenyalaw.org') || urlLower.includes('bailii.org') || urlLower.includes('worldlii.org') || urlLower.includes('justia.com') || urlLower.includes('law.cornell.edu') || urlLower.includes('canlii.org') || urlLower.includes('austlii.edu.au');
+    // Requirement: Prioritize PDF, DOCX, DOC, and official document results
+    const isPdf = Boolean(r.isPdf) || urlLower.endsWith('.pdf') || urlLower.includes('.pdf?') || titleLower.includes('[pdf]') || titleLower.includes('pdf');
+    const isDocx = Boolean(r.isDocx) || urlLower.endsWith('.docx') || urlLower.includes('.docx?') || titleLower.includes('[docx]') || titleLower.includes('docx');
+    const isDocFile = Boolean(r.isDoc) || urlLower.endsWith('.doc') || urlLower.includes('.doc?') || titleLower.includes('[doc]');
+    const isDoc = isPdf || isDocx || isDocFile || urlLower.includes('/doc/') || urlLower.includes('/document/') || urlLower.includes('/cases/') || urlLower.includes('/akn/ke/') || urlLower.includes('kenyalaw.org') || urlLower.includes('bailii.org') || urlLower.includes('worldlii.org') || urlLower.includes('justia.com') || urlLower.includes('law.cornell.edu') || urlLower.includes('canlii.org') || urlLower.includes('austlii.edu.au');
 
     r.isPdf = isPdf;
+    r.isDocx = isDocx;
+    r.isDoc = isDocFile;
     r.isDocument = isDoc;
-    r.fileType = isPdf ? 'PDF' : (isDoc ? 'DOC' : 'WEB');
+    r.fileType = isPdf ? 'PDF' : (isDocx ? 'DOCX' : (isDocFile ? 'DOC' : (isDoc ? 'DOC' : 'WEB')));
 
     if (isPdf) {
-      score += 35; // Significant priority boost for PDF files
+      score += 45; // Highest priority boost for PDF files
+    } else if (isDocx || isDocFile) {
+      score += 40; // High priority boost for Word files (DOCX/DOC)
     } else if (isDoc) {
-      score += 20; // Priority boost for formal legal documents
+      score += 25; // Priority boost for formal legal document records
     }
 
     // Exact title / citation phrase match boost (e.g., "r v stevenson" or "donoghue v stevenson")
@@ -2798,13 +2981,23 @@ async function searchWithRetry(query, retries = 1, source = 'all', classificatio
     }
   }
 
-  // If no results from web or API, fallback to repository docs
-  if (combined.length === 0 && repoDocs.length > 0) {
-    for (const item of repoDocs) {
-      const key = (item.url || item.title || '').toLowerCase();
-      if (key && !seen.has(key)) {
-        seen.add(key);
-        combined.push(item);
+  // If no results from web or API, try a spell-corrected query search
+  if (combined.length === 0) {
+    const spellFixed = normalizedQuery.replace(/\brayland\b/gi, 'rylands').replace(/\br\b/gi, 'regina');
+    if (spellFixed !== normalizedQuery) {
+      const fixedIntl = await fetchInternationalLegalPrecedents(spellFixed);
+      const fixedWeb = await searchFastWeb(spellFixed, effectiveSource);
+      for (const item of [...fixedIntl, ...fixedWeb]) {
+        if (!isLegalDocument(item)) continue;
+        const key = (item.url || item.title || '').toLowerCase();
+        if (key && !seen.has(key)) {
+          seen.add(key);
+          const enriched = enrichDocumentMetadata(item);
+          if (isLegalDocument(enriched)) {
+            combined.push(enriched);
+            saveDocToRepository(enriched);
+          }
+        }
       }
     }
   }

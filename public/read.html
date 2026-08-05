@@ -1883,15 +1883,29 @@
             loadingEl.style.display = 'none';
             pagesContainer.style.display = 'none';
             textReaderContainer.style.display = 'flex';
-            pageInfoEl.textContent = 'Text View';
+            
+            if (data.isDocx || data.fileType === 'DOCX') {
+                pageInfoEl.textContent = 'DOCX Document View';
+            } else if (data.isDoc || data.fileType === 'DOC') {
+                pageInfoEl.textContent = 'DOC Document View';
+            } else {
+                pageInfoEl.textContent = 'Text View';
+            }
 
             if (data.year) {
                 badgeYear.textContent = data.year;
                 badgeYear.style.display = 'inline-block';
             }
             if (data.type) {
-                badgeType.textContent = data.type;
+                badgeType.textContent = data.isDocx ? 'DOCX Document' : (data.isDoc ? 'DOC Document' : data.type);
                 badgeType.style.display = 'inline-block';
+                if (data.isDocx) {
+                    badgeType.style.background = '#e0f2fe';
+                    badgeType.style.color = '#0284c7';
+                } else if (data.isDoc) {
+                    badgeType.style.background = '#fef3c7';
+                    badgeType.style.color = '#d97706';
+                }
             }
             if (data.source) {
                 badgeSource.textContent = data.source;
@@ -2336,6 +2350,16 @@
             } catch (e) {
                 showError(e.message);
             }
+        }
+
+        const backBtn = document.querySelector('.back-btn');
+        if (backBtn) {
+            backBtn.addEventListener('click', (e) => {
+                if (window.history.length > 1 && document.referrer.includes(window.location.host)) {
+                    e.preventDefault();
+                    window.history.back();
+                }
+            });
         }
 
         loadDocument();

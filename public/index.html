@@ -4,7 +4,31 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'self'; img-src 'self' data: https:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://unpkg.com">
-    <title>eLegal | Premium Research</title>
+    <title>eLegal | Modern Legal E-Repository & AI Intelligence Engine ⚖️</title>
+    <meta name="description" content="eLegal is the ultimate legal e-repository & AI intelligence engine. Seamlessly research millions of precedents, statutes, eKLR case law, and international legal records in seconds.">
+    <meta name="keywords" content="eLegal, Legal Research, Kenya Law, eKLR, Legal Precedents, Statutes, Legal AI, Law Case Search, Commonwealth Law">
+    
+    <!-- Open Graph / Facebook / WhatsApp / LinkedIn / Telegram -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://elegal-hteg.onrender.com/">
+    <meta property="og:title" content="eLegal — Modern Legal E-Repository & AI Intelligence Engine ⚖️">
+    <meta property="og:description" content="⚡ Instantly explore millions of legal precedents, statutes, constitutional provisions, and official records. Powered by AI legal intelligence, ML classification, and real-time eKLR integration.">
+    <meta property="og:image" content="/share-thumbnail.png">
+    <meta property="og:image:secure_url" content="/share-thumbnail.png">
+    <meta property="og:image:type" content="image/png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="eLegal Platform Dashboard Preview">
+    <meta property="og:site_name" content="eLegal">
+
+    <!-- Twitter / X -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://elegal-hteg.onrender.com/">
+    <meta name="twitter:title" content="eLegal — Modern Legal E-Repository & AI Research Engine ⚖️">
+    <meta name="twitter:description" content="⚡ Instantly explore millions of legal precedents, statutes, constitutional provisions, and official records. Powered by AI legal intelligence, ML classification, and real-time eKLR integration.">
+    <meta name="twitter:image" content="/share-thumbnail.png">
+    <meta name="twitter:image:alt" content="eLegal Legal E-Repository & AI Assistant Interface">
+
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <link rel="apple-touch-icon" href="/logo.png">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -900,9 +924,7 @@
         }
 
         .case-badge-type {
-            background: #f0fdf4;
-            color: #16a34a;
-            border: 1px solid rgba(34,197,94,0.15);
+            display: none !important;
         }
 
         .case-badge-type.judgment {
@@ -965,19 +987,7 @@
         }
 
         .case-card-action {
-            display: none;
-            flex-direction: column;
-            justify-content: center;
-            align-items: flex-end;
-            padding-left: 12px;
-            border-left: 1px solid rgba(0,0,0,0.04);
-            margin-left: 8px;
-        }
-
-        @media (min-width: 640px) {
-            .case-card-action {
-                display: flex;
-            }
+            display: none !important;
         }
 
         .case-card-action-icon {
@@ -1298,9 +1308,9 @@
         </div>
 
         <div class="jurisdiction-bar" id="jurisdictionBar" style="display: flex; gap: 8px; justify-content: center; margin-top: 14px; flex-wrap: wrap; z-index: 2; position: relative;">
-            <button class="jurisdiction-pill active" data-source="all" type="button" title="Auto-detect & search both Kenya Law and Global Repositories">🌐 All Repositories</button>
-            <button class="jurisdiction-pill" data-source="kenya" type="button" title="Restricted to Kenya Law (eKLR) and Kenyan Courts">🇰🇪 Kenya Law (eKLR)</button>
-            <button class="jurisdiction-pill" data-source="international" type="button" title="Global Precedents, UK, US, Commonwealth & International Law">🌍 International Law</button>
+            <button class="jurisdiction-pill active" data-source="all" type="button" title="Auto-detect & search both Kenya Law and Global Repositories">All</button>
+            <button class="jurisdiction-pill" data-source="kenya" type="button" title="Restricted to Kenya Law (eKLR) and Kenyan Courts">Kenyan</button>
+            <button class="jurisdiction-pill" data-source="international" type="button" title="Global Precedents, UK, US, Commonwealth & International Law">International</button>
         </div>
     </header>
 
@@ -1348,9 +1358,26 @@
     </main>
 
     <!-- ─── FOOTER ─── -->
-    <footer style="text-align: center; padding: 28px 16px 36px; border-top: 1px solid var(--border-color); margin-top: 56px; color: var(--text-muted); font-size: 0.82rem; line-height: 1.6;">
-        <p style="margin: 0 0 6px 0;">Developed by <strong style="color: var(--text-primary); font-weight: 600;">emojisudios</strong> 0707865597</p>
-        <p style="margin: 0; opacity: 0.8; font-size: 0.78rem;">&copy; 2026 e-Legal. All rights reserved.</p>
+    <footer style="border-top: 1px solid var(--border-color); margin-top: 32px; padding: 12px 16px; background: #ffffff; font-size: 0.78rem; color: #64748b; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+        <div style="max-width: 1200px; margin: 0 auto; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px 20px;">
+            <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px;">
+                <strong style="font-weight: 700; color: #0f172a; font-size: 0.85rem;">eLegal</strong>
+                <span style="color: #cbd5e1;">|</span>
+                <span style="color: #475569; font-weight: 600;">EmojiStudios</span>
+                <span style="color: #cbd5e1;">|</span>
+                <span>WhatsApp / Call: <a href="https://wa.me/254707865597" target="_blank" rel="noopener noreferrer" style="color: #334155; font-weight: 600; text-decoration: none;">0707865597</a></span>
+                <span style="color: #cbd5e1;">|</span>
+                <span>Email: <a href="mailto:micahprincemicah001@gmail.com" style="color: #334155; font-weight: 600; text-decoration: none;">micahprincemicah001@gmail.com</a></span>
+            </div>
+            <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px; font-weight: 500;">
+                <a href="/" style="color: #475569; text-decoration: none;">Research Engine</a>
+                <a href="/read" style="color: #475569; text-decoration: none;">Reader Studio</a>
+                <a href="/dev" style="color: #475569; text-decoration: none;">Developer API</a>
+                <a href="/terms" style="color: #475569; text-decoration: underline;">Terms & Conditions</a>
+                <span style="color: #cbd5e1;">•</span>
+                <span style="color: #94a3b8;">&copy; 2026 eLegal</span>
+            </div>
+        </div>
     </footer>
 
     <!-- ─── PREVIEW MODAL ─── -->
@@ -1690,6 +1717,32 @@
             return 0;
         }
 
+        function isKenyanItem(item) {
+            if (!item) return false;
+            const src = (item.source || '').toLowerCase();
+            const url = (item.url || item.sourceUrl || item.readUrl || '').toLowerCase();
+            const citation = String(item.citation || '');
+            const title = String(item.title || item.label || '');
+
+            if (src === 'kenyalaw' || src === 'kenya' || url.includes('kenyalaw.org')) {
+                return true;
+            }
+
+            if (extractCourtType(citation)) {
+                return true;
+            }
+
+            if (/\b(KEHC|KECA|KESC|KEELRC|KLR|eKLR|KEBL|KEPR)\b/i.test(citation + ' ' + title + ' ' + url)) {
+                return true;
+            }
+
+            if (/\b(High Court of Kenya|Court of Appeal of Kenya|Supreme Court of Kenya|Employment and Labour Relations Court|Environment and Land Court|Laws of Kenya|Constitution of Kenya|Penal Code|Civil Procedure Act|Evidence Act|Land Act|Companies Act|Children Act)\b/i.test(citation + ' ' + title)) {
+                return true;
+            }
+
+            return false;
+        }
+
         function getActiveItems() {
             let source = [];
             if (currentFilter === 'saved') {
@@ -1703,6 +1756,12 @@
             let filtered = source;
             if (currentFilter !== 'all' && currentFilter !== 'saved') {
                 filtered = filteredByCategory(source, currentFilter);
+            }
+
+            if (currentSource === 'kenya') {
+                filtered = filtered.filter(item => isKenyanItem(item));
+            } else if (currentSource === 'international') {
+                filtered = filtered.filter(item => !isKenyanItem(item));
             }
 
             if (currentSort === 'newest') {
@@ -1754,51 +1813,35 @@ function createResultItem(item) {
               const badgesEl = document.createElement('div');
               badgesEl.className = 'case-card-badges';
 
-              // Bookmark save button on card
-              const saved = isDocSaved(item);
-              const saveBtn = document.createElement('button');
-              saveBtn.className = `save-card-btn ${saved ? 'saved' : ''}`;
-              saveBtn.title = saved ? 'Remove from Saved' : 'Save Document to Bookmarks';
-              saveBtn.setAttribute('aria-label', 'Bookmark document');
-              saveBtn.innerHTML = saved
-                  ? `<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="#2563eb" stroke="#2563eb" stroke-width="2"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/></svg> Saved`
-                  : `<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/></svg> Save`;
+              // Download button on card
+              const downloadBtn = document.createElement('button');
+              downloadBtn.className = 'save-card-btn download-card-btn';
+              downloadBtn.title = 'Download Document';
+              downloadBtn.setAttribute('aria-label', 'Download document');
+              downloadBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Download`;
 
-              saveBtn.addEventListener('click', (e) => {
+              downloadBtn.addEventListener('click', (e) => {
                   e.stopPropagation();
-                  const isNowSaved = toggleSaveDoc(item);
-                  saveBtn.classList.toggle('saved', isNowSaved);
-                  saveBtn.title = isNowSaved ? 'Remove from Saved' : 'Save Document to Bookmarks';
-                  saveBtn.innerHTML = isNowSaved
-                      ? `<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="#2563eb" stroke="#2563eb" stroke-width="2"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/></svg> Saved`
-                      : `<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/></svg> Save`;
+                  const fileUrl = item.pdfUrl || item.url || item.path || targetUrl;
+                  if (fileUrl && fileUrl.startsWith('http')) {
+                      window.open(fileUrl, '_blank');
+                  } else {
+                      const textContent = `E-LEGAL REPOSITORY DOCUMENT\n============================\nTitle: ${title}\nCitation: ${citation || 'N/A'}\n\nExcerpt / Summary:\n${item.snippet || item.summary || item.content || 'No text content available.'}`;
+                      const blob = new Blob([textContent], { type: 'text/plain;charset=utf-8' });
+                      const downloadLink = document.createElement('a');
+                      downloadLink.href = URL.createObjectURL(blob);
+                      downloadLink.download = `${(title || 'legal_document').replace(/[^a-z0-9]/gi, '_').toLowerCase()}.txt`;
+                      document.body.appendChild(downloadLink);
+                      downloadLink.click();
+                      document.body.removeChild(downloadLink);
+                  }
               });
-              badgesEl.appendChild(saveBtn);
+              badgesEl.appendChild(downloadBtn);
 
               const targetLower = (targetUrl || '').toLowerCase();
               const isPdf = item.isPdf || item.fileType === 'PDF' || targetLower.endsWith('.pdf') || targetLower.includes('.pdf?');
               const isDocx = item.isDocx || item.fileType === 'DOCX' || targetLower.endsWith('.docx') || targetLower.includes('.docx?');
               const isDoc = item.isDoc || item.fileType === 'DOC' || targetLower.endsWith('.doc') || targetLower.includes('.doc?');
-
-              if (isPdf) {
-                  const docBadge = document.createElement('span');
-                  docBadge.className = 'case-badge';
-                  docBadge.style.cssText = 'background: #fee2e2; color: #dc2626; font-weight: 700; border: 1px solid #fca5a5;';
-                  docBadge.textContent = '📄 PDF Document';
-                  badgesEl.appendChild(docBadge);
-              } else if (isDocx) {
-                  const docBadge = document.createElement('span');
-                  docBadge.className = 'case-badge';
-                  docBadge.style.cssText = 'background: #e0f2fe; color: #0284c7; font-weight: 700; border: 1px solid #7dd3fc;';
-                  docBadge.textContent = '📝 DOCX Document';
-                  badgesEl.appendChild(docBadge);
-              } else if (isDoc) {
-                  const docBadge = document.createElement('span');
-                  docBadge.className = 'case-badge';
-                  docBadge.style.cssText = 'background: #fef3c7; color: #d97706; font-weight: 700; border: 1px solid #fcd34d;';
-                  docBadge.textContent = '📝 DOC Document';
-                  badgesEl.appendChild(docBadge);
-              }
 
               const yearStr = item.year || extractDate(citation, updatedAt, item.documentDate);
               if (yearStr) {
@@ -1808,15 +1851,7 @@ function createResultItem(item) {
                   badgesEl.appendChild(yearBadge);
               }
 
-              const docType = item.type || extractDocType(source, category);
-              if (docType) {
-                  const typeBadge = document.createElement('span');
-                  typeBadge.className = 'case-badge case-badge-type';
-                  typeBadge.textContent = docType;
-                  badgesEl.appendChild(typeBadge);
-              }
-
-              const sourceLabel = item.source === 'international' ? '🌍 Global Precedent' : (item.source === 'kenyalaw' ? '🇰🇪 Kenya Law (eKLR)' : getSourceLabel(source, category));
+              const sourceLabel = item.source === 'international' ? 'Global' : (item.source === 'kenyalaw' ? 'Kenyan' : getSourceLabel(source, category));
               if (sourceLabel) {
                   const sourceBadge = document.createElement('span');
                   sourceBadge.className = `case-badge case-badge-source ${item.source || ''}`;
@@ -1851,13 +1886,9 @@ function createResultItem(item) {
 
               metaEl.append(metaRightEl);
 
-              const actionEl = document.createElement('div');
-              actionEl.className = 'case-card-action';
-              actionEl.innerHTML = '<div class="case-card-action-icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></div>';
-
               mainEl.append(headerEl, metaEl);
 
-              card.append(mainEl, actionEl);
+              card.append(mainEl);
 
               card.addEventListener('click', (e) => {
                   if (e.target.closest('a')) return;
@@ -2326,6 +2357,8 @@ function formatMeta(item) {
                 const searchVal = document.getElementById('searchInput')?.value?.trim();
                 if (searchVal) {
                     doSearch();
+                } else {
+                    renderCurrent();
                 }
             });
         });

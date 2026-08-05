@@ -2905,6 +2905,25 @@ function rankResults(results, query, classification = null) {
   });
 }
 
+function isKenyanDoc(doc) {
+  if (!doc) return false;
+  const url = String(doc.url || doc.sourceUrl || doc.readUrl || '').toLowerCase();
+  const citation = String(doc.citation || '');
+  const title = String(doc.title || doc.label || '');
+  const source = String(doc.source || '').toLowerCase();
+
+  if (source === 'kenyalaw' || source === 'kenya' || url.includes('kenyalaw.org')) {
+    return true;
+  }
+  if (/\[\d{4}\]\s*(KECA|KEHC|KESC|KEELRC|KLR|KEBL|KEPR)\b/i.test(title + ' ' + citation)) {
+    return true;
+  }
+  if (/\b(KEHC|KECA|KESC|KEELRC|KLR|eKLR|KEBL|KEPR|Kenya Law|High Court of Kenya|Court of Appeal of Kenya|Supreme Court of Kenya)\b/i.test(citation + ' ' + title)) {
+    return true;
+  }
+  return false;
+}
+
 async function searchWithRetry(query, retries = 1, source = 'all', classification = null) {
   const normalizedQuery = query.trim().replace(/\s+/g, ' ');
   if (!normalizedQuery) return [];
@@ -2912,7 +2931,7 @@ async function searchWithRetry(query, retries = 1, source = 'all', classificatio
   // Respect user preference when 'all', 'kenya', or 'international' is selected
   const effectiveSource = (source && source !== 'all') 
     ? source 
-    : ((classification && ['kenya', 'international'].includes(classification.jurisdiction)) ? 'all' : 'all');
+    : 'all';
 
   const stopWords = new Set(['v', 'vs', 'r', 're', 'the', 'and', 'or', 'in', 'of', 'to', 'at', 'a', 'an', 'for']);
   const sigTokens = normalizedQuery.toLowerCase().split(/\W+/).filter(t => t.length > 1 && !stopWords.has(t));
@@ -3002,7 +3021,14 @@ async function searchWithRetry(query, retries = 1, source = 'all', classificatio
     }
   }
 
-  return rankResults(combined, normalizedQuery, classification).slice(0, 30);
+  let filteredCombined = combined;
+  if (effectiveSource === 'kenya') {
+    filteredCombined = combined.filter(doc => isKenyanDoc(doc));
+  } else if (effectiveSource === 'international') {
+    filteredCombined = combined.filter(doc => !isKenyanDoc(doc));
+  }
+
+  return rankResults(filteredCombined, normalizedQuery, classification).slice(0, 30);
 }
 
 async function fetchLatestKenyaLawItems() {
@@ -3567,6 +3593,18 @@ app.get('/api/health', (req, res) => {
 
 app.get('/dev', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'dev.html'));
+});
+
+app.get('/read', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'read.html'));
+});
+
+app.get('/terms', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'terms.html'));
+});
+
+app.get('/privacy', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'terms.html'));
 });
 
 let searchIndex = null;

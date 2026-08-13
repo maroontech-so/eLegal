@@ -25,29 +25,7 @@ const { getAuth } = require('firebase-admin/auth');
 const { getFirestore: firebaseGetFirestore } = require('firebase-admin/firestore');
 const cors = require('cors');
 const { v2: cloudinary } = require('cloudinary');
-const mammoth = require('mammoth');
 const { classifyQueryOpenSourceML } = require('./src/ml-classifier');
-
-async function parseWordDocumentBuffer(buffer) {
-  try {
-    const htmlResult = await mammoth.convertToHtml({ buffer });
-    const textResult = await mammoth.extractRawText({ buffer });
-    return {
-      success: true,
-      html: htmlResult.value || '',
-      text: textResult.value || '',
-      warnings: htmlResult.warnings || []
-    };
-  } catch (err) {
-    console.warn('[mammoth] Word doc conversion warning:', err.message);
-    return {
-      success: false,
-      error: err.message,
-      html: '',
-      text: ''
-    };
-  }
-}
 
 // Initialize Cloudinary safely
 function getCloudinary() {
@@ -137,30 +115,11 @@ async function uploadToCloudinaryIfConfigured(contentBufferOrPath, publicId, res
 }
 
 let firestoreInitialized = false;
-let firestoreDisabled = false;
-
-function handleFirestoreError(err, contextMsg = 'Firestore error') {
-  if (!err) return;
-  const msg = String(err.message || err);
-  const isAuthOrPermError = err.code === 16 || err.code === 7 || err.code === 5 ||
-    msg.includes('UNAUTHENTICATED') || msg.includes('PERMISSION_DENIED') ||
-    msg.includes('invalid authentication credentials') || msg.includes('insufficient permissions') ||
-    msg.includes('Missing or insufficient permissions');
-  if (isAuthOrPermError) {
-    if (!firestoreDisabled) {
-      firestoreDisabled = true;
-      console.log(`[firestore] Cloud Firestore authentication/permission notice (${contextMsg}); fallback to local storage active.`);
-    }
-  } else {
-    console.warn(`[${contextMsg}]`, msg);
-  }
-}
-
 const rateLimits = new Map();
 const RATE_LIMIT_WINDOW_MS = 60 * 1000;
 const RATE_LIMIT_MAX = 60;
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = 3000;
 const INDEX_FILE = path.join(__dirname, 'search-index.json');
 const KEYS_FILE = path.join(__dirname, 'data', 'apikeys.json');
 
@@ -169,74 +128,8 @@ function initLocalKeysStore() {
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir, { recursive: true });
   }
-  const defaultKeys = {
-    userKeys: {
-      "user_demo": {
-        "el_demo_key_12345": {
-          "key": "el_demo_key_12345",
-          "encryptedKey": encryptText("el_demo_key_12345"),
-          "userId": "user_demo",
-          "uid": "user_demo",
-          "label": "Primary API Key",
-          "createdAt": "2026-08-04T00:00:00.000Z",
-          "lastUsed": null,
-          "requestCount": 0,
-          "isActive": true
-        }
-      }
-    }
-  };
-
   if (!fs.existsSync(KEYS_FILE)) {
-    fs.writeFileSync(KEYS_FILE, JSON.stringify(defaultKeys, null, 2));
-  } else {
-    try {
-      const raw = fs.readFileSync(KEYS_FILE, 'utf8');
-      const data = JSON.parse(raw);
-      if (!data.userKeys || Object.keys(data.userKeys).length === 0) {
-        fs.writeFileSync(KEYS_FILE, JSON.stringify(defaultKeys, null, 2));
-      }
-    } catch (_) {
-      fs.writeFileSync(KEYS_FILE, JSON.stringify(defaultKeys, null, 2));
-    }
-  }
-}
-
-const ENCRYPTION_SECRET = process.env.APP_DB_ENCRYPTION_KEY || 'elegal_app_db_secret_key_v1_secure_2026';
-const ENCRYPTION_KEY = crypto.createHash('sha256').update(ENCRYPTION_SECRET).digest();
-
-function encryptText(text) {
-  if (!text) return text;
-  try {
-    const iv = crypto.randomBytes(12);
-    const cipher = crypto.createCipheriv('aes-256-gcm', ENCRYPTION_KEY, iv);
-    let encrypted = cipher.update(String(text), 'utf8', 'hex');
-    encrypted += cipher.final('hex');
-    const authTag = cipher.getAuthTag().toString('hex');
-    return `enc:${iv.toString('hex')}:${authTag}:${encrypted}`;
-  } catch (e) {
-    console.warn('[crypto] Encryption error:', e.message);
-    return text;
-  }
-}
-
-function decryptText(encryptedText) {
-  if (!encryptedText || typeof encryptedText !== 'string' || !encryptedText.startsWith('enc:')) {
-    return encryptedText;
-  }
-  try {
-    const parts = encryptedText.split(':');
-    if (parts.length !== 4) return encryptedText;
-    const iv = Buffer.from(parts[1], 'hex');
-    const authTag = Buffer.from(parts[2], 'hex');
-    const encrypted = parts[3];
-    const decipher = crypto.createDecipheriv('aes-256-gcm', ENCRYPTION_KEY, iv);
-    decipher.setAuthTag(authTag);
-    let decrypted = decipher.update(encrypted, 'hex', 'utf8');
-    decrypted += decipher.final('utf8');
-    return decrypted;
-  } catch (e) {
-    return encryptedText;
+    fs.writeFileSync(KEYS_FILE, JSON.stringify({ userKeys: {} }, null, 2));
   }
 }
 
@@ -244,34 +137,8 @@ function getLocalKeys() {
   try {
     initLocalKeysStore();
     const raw = fs.readFileSync(KEYS_FILE, 'utf8');
-    const parsed = JSON.parse(raw);
-    const rawUserKeys = parsed.userKeys || {};
-    const decryptedUserKeys = {};
-
-    Object.entries(rawUserKeys).forEach(([uId, keysObj]) => {
-      decryptedUserKeys[uId] = {};
-      if (keysObj && typeof keysObj === 'object') {
-        Object.entries(keysObj).forEach(([storedKeyIdentifier, data]) => {
-          if (!data || typeof data !== 'object') return;
-          let plainKey = data.encryptedKey ? decryptText(data.encryptedKey) : (data.key || storedKeyIdentifier);
-          if (plainKey && plainKey.startsWith('enc:')) {
-            plainKey = data.key || storedKeyIdentifier;
-          }
-          const encKey = data.encryptedKey || encryptText(plainKey);
-          decryptedUserKeys[uId][plainKey] = {
-            ...data,
-            key: plainKey,
-            encryptedKey: encKey,
-            userId: uId,
-            uid: uId
-          };
-        });
-      }
-    });
-
-    return decryptedUserKeys;
+    return JSON.parse(raw).userKeys || {};
   } catch (e) {
-    console.warn('[apikeys] Error reading local keys store:', e.message);
     return {};
   }
 }
@@ -279,33 +146,13 @@ function getLocalKeys() {
 function saveLocalKeys(userKeys) {
   try {
     initLocalKeysStore();
-    const storedUserKeys = {};
-
-    Object.entries(userKeys || {}).forEach(([uId, keysObj]) => {
-      storedUserKeys[uId] = {};
-      if (keysObj && typeof keysObj === 'object') {
-        Object.entries(keysObj).forEach(([plainKey, data]) => {
-          if (!data || typeof data !== 'object') return;
-          const encKey = data.encryptedKey || encryptText(plainKey);
-          storedUserKeys[uId][plainKey] = {
-            ...data,
-            key: plainKey,
-            encryptedKey: encKey,
-            userId: uId,
-            uid: uId
-          };
-        });
-      }
-    });
-
-    fs.writeFileSync(KEYS_FILE, JSON.stringify({ userKeys: storedUserKeys }, null, 2));
+    fs.writeFileSync(KEYS_FILE, JSON.stringify({ userKeys }, null, 2));
   } catch (e) {
     console.warn('[apikeys] Failed to save local API keys:', e.message);
   }
 }
 
 function getFirestore() {
-  if (firestoreDisabled) return null;
   if (!firestoreInitialized) {
     try {
       if (admin.getApps().length === 0) {
@@ -351,23 +198,21 @@ function getFirestore() {
         }
 
         if (!initialized) {
-          if (process.env.GOOGLE_APPLICATION_CREDENTIALS) {
-            try {
-              admin.initializeApp({
-                credential: admin.applicationDefault(),
-                projectId
-              });
-              console.log('Firebase Admin SDK initialized via application default credentials');
-              initialized = true;
-            } catch (e) {
-              console.warn('Firebase Admin SDK not initialized via application default credentials:', e.message);
-            }
+          try {
+            admin.initializeApp({
+              credential: admin.applicationDefault(),
+              projectId
+            });
+            console.log('Firebase Admin SDK initialized via application default credentials');
+            initialized = true;
+          } catch (e) {
+            console.warn('Firebase Admin SDK not initialized via application default credentials:', e.message);
           }
         }
 
         if (!initialized) {
+          console.warn('Firebase Admin SDK not initialized — using local API key store');
           firestoreInitialized = true;
-          firestoreDisabled = true;
           return null;
         }
       }
@@ -381,49 +226,46 @@ function getFirestore() {
   return firebaseGetFirestore();
 }
 
-const activeKeyCache = new Map();
-
 async function loadApiKeys() {
-  activeKeyCache.clear();
-  let count = 0;
-
-  // 1. Load from local encrypted key store first for guaranteed offline availability
+  let loadedFromFirestore = false;
   try {
+    const db = getFirestore();
+    if (db) {
+      const snapshot = await db.collection('apikeys').get();
+      const promises = [];
+      snapshot.forEach(userDoc => {
+        promises.push(
+          userDoc.ref.collection('keys').get().then(keysSnap => {
+            keysSnap.forEach(keyDoc => {
+              rateLimits.set(keyDoc.id, { count: 0, resetAt: Date.now() + RATE_LIMIT_WINDOW_MS });
+            });
+          }).catch(err => {
+            console.warn('[apikeys] Subcollection fetch warning:', err.message);
+          })
+        );
+      });
+      await Promise.all(promises);
+      loadedFromFirestore = true;
+      console.log(`Loaded API keys from Firestore`);
+    }
+  } catch (e) {
+    console.warn('[apikeys] Firestore unauthenticated or unavailable:', e.message);
+  }
+
+  if (!loadedFromFirestore) {
     const userKeys = getLocalKeys();
+    let count = 0;
     Object.values(userKeys).forEach(keys => {
       if (keys && typeof keys === 'object') {
         Object.entries(keys).forEach(([keyId, keyData]) => {
           if (keyData && keyData.isActive) {
-            activeKeyCache.set(keyId, keyData);
             rateLimits.set(keyId, { count: 0, resetAt: Date.now() + RATE_LIMIT_WINDOW_MS });
             count++;
           }
         });
       }
     });
-    console.log(`Loaded ${count} active API keys into cache from local key store`);
-  } catch (e) {
-    console.warn('[apikeys] Local key store loading error:', e.message);
-  }
-
-  // 2. Hydrate from Firestore if available
-  try {
-    const db = getFirestore();
-    if (db) {
-      const snapshot = await db.collectionGroup('keys').where('isActive', '==', true).get();
-      if (!snapshot.empty) {
-        snapshot.forEach(doc => {
-          const data = doc.data();
-          if (data && data.key) {
-            activeKeyCache.set(data.key, data);
-            rateLimits.set(data.key, { count: 0, resetAt: Date.now() + RATE_LIMIT_WINDOW_MS });
-          }
-        });
-        console.log(`Hydrated ${snapshot.size} active API keys from Firestore`);
-      }
-    }
-  } catch (e) {
-    // Firestore unauthenticated or unavailable; silent graceful fallback
+    console.log(`Loaded ${count} active API keys from local key store`);
   }
 }
 
@@ -434,155 +276,100 @@ function generateApiKey() {
 async function createApiKey(label, userId) {
   const key = generateApiKey();
   const now = new Date().toISOString();
-  const encryptedKey = encryptText(key);
+  let savedToFirestore = false;
 
-  const keyRecord = {
-    key: key,
-    encryptedKey: encryptedKey,
-    userId: userId,
-    uid: userId,
-    label: label || 'Primary Key',
+  try {
+    const db = getFirestore();
+    if (db) {
+      const userKeysRef = db.collection('apikeys').doc(userId).collection('keys');
+      const existing = await userKeysRef.where('isActive', '==', true).get();
+      if (!existing.empty) {
+        const oldKey = existing.docs[0];
+        await oldKey.ref.update({ isActive: false, replacedAt: now });
+        rateLimits.delete(oldKey.id);
+      }
+      await userKeysRef.doc(key).set({
+        label: label || 'default',
+        createdAt: now,
+        lastUsed: null,
+        requestCount: 0,
+        isActive: true
+      });
+      savedToFirestore = true;
+    }
+  } catch (e) {
+    console.warn('[apikeys] Could not save API key to Firestore, using local store:', e.message);
+  }
+
+  const userKeys = getLocalKeys();
+  if (!userKeys[userId]) userKeys[userId] = {};
+
+  Object.keys(userKeys[userId]).forEach(k => {
+    if (userKeys[userId][k] && userKeys[userId][k].isActive) {
+      userKeys[userId][k].isActive = false;
+      userKeys[userId][k].replacedAt = now;
+      rateLimits.delete(k);
+    }
+  });
+
+  userKeys[userId][key] = {
+    label: label || 'default',
     createdAt: now,
     lastUsed: null,
     requestCount: 0,
     isActive: true
   };
-
-  // 1. Update local store (allow multiple active keys per developer)
-  const userKeys = getLocalKeys();
-  if (!userKeys[userId]) userKeys[userId] = {};
-
-  userKeys[userId][key] = keyRecord;
   saveLocalKeys(userKeys);
-  activeKeyCache.set(key, keyRecord);
+
   rateLimits.set(key, { count: 0, resetAt: Date.now() + RATE_LIMIT_WINDOW_MS });
-
-  // 2. Persist to Firestore if available
-  try {
-    const db = getFirestore();
-    if (db) {
-      await db.collection('apikeys').doc(userId).set({
-        uid: userId,
-        updatedAt: now,
-        latestKey: key
-      }, { merge: true });
-
-      const userKeysRef = db.collection('apikeys').doc(userId).collection('keys');
-      await userKeysRef.doc(key).set(keyRecord);
-      console.log(`[apikeys] Saved key ${key} ("${label}") under user ${userId} in Firestore.`);
-    }
-  } catch (e) {
-    console.warn('[apikeys] Firestore save omitted, using local encrypted store:', e.message);
-  }
-
-  return { key, encryptedKey, label: label || 'Primary Key', createdAt: now, isActive: true, requestCount: 0, lastUsed: null };
+  console.log(`Created API key for user ${userId}: ${key}`);
+  return { key, label: label || 'default', createdAt: now };
 }
 
 async function validateApiKey(req, res, next) {
-  let key = req.headers['x-api-key'] || req.query.api_key;
-  if (key) key = String(key).trim();
-
-  // If X-API-Key is not set, inspect Authorization header
-  if (!key && req.headers['authorization']) {
-    const authHeader = String(req.headers['authorization']).trim();
-    if (authHeader.startsWith('Bearer ')) {
-      const tokenCandidate = authHeader.substring(7).trim();
-      if (tokenCandidate.startsWith('el_')) {
-        key = tokenCandidate;
-      } else if (tokenCandidate.length > 20) {
-        // Firebase ID Token passed as Bearer Token
-        try {
-          if (admin.getApps().length > 0) {
-            const decoded = await getAuth(admin.getApp()).verifyIdToken(tokenCandidate);
-            if (decoded && decoded.uid) {
-              const uId = decoded.uid;
-              const userKeys = getLocalKeys();
-              if (userKeys[uId]) {
-                const activeK = Object.values(userKeys[uId]).find(k => k && k.isActive);
-                if (activeK) {
-                  key = activeK.key;
-                }
-              }
-              if (!key) {
-                const newKeyObj = await createApiKey('default', uId);
-                key = newKeyObj.key;
-              }
-            }
-          }
-        } catch (_) {}
-      }
-    } else if (authHeader.startsWith('el_')) {
-      key = authHeader;
-    }
-  }
-
-  // Fall back to demo key if no header or token provided
+  const key = req.headers['x-api-key'];
   if (!key) {
-    key = 'el_demo_key_12345';
+    return res.status(401).json({ error: 'API key required', code: 'MISSING_API_KEY' });
   }
 
-  // Guarantee demo key is always seeded in activeKeyCache
-  if (!activeKeyCache.has('el_demo_key_12345')) {
-    activeKeyCache.set('el_demo_key_12345', {
-      key: 'el_demo_key_12345',
-      encryptedKey: encryptText('el_demo_key_12345'),
-      userId: 'user_demo',
-      uid: 'user_demo',
-      label: 'Primary API Key',
-      createdAt: '2026-08-04T00:00:00.000Z',
-      lastUsed: null,
-      requestCount: 0,
-      isActive: true
-    });
-  }
-
-  // 1. Check active in-memory cache first (0ms latency)
-  let keyData = activeKeyCache.get(key);
-  let keyOwnerId = keyData ? keyData.userId || keyData.uid : null;
+  let keyData = null;
   let keyDocRef = null;
 
-  // 2. Check local store if missing from cache
+  try {
+    const db = getFirestore();
+    if (db) {
+      const snapshot = await db.collection('apikeys').get();
+      const checks = [];
+      snapshot.forEach(userDoc => {
+        checks.push(userDoc.ref.collection('keys').doc(key).get());
+      });
+      const docs = await Promise.all(checks);
+      for (const doc of docs) {
+        if (doc.exists) {
+          keyData = doc.data();
+          keyDocRef = doc.ref;
+          break;
+        }
+      }
+    }
+  } catch (e) {
+    // Firestore unavailable/unauthenticated, fall back to local store
+  }
+
   if (!keyData) {
     const userKeys = getLocalKeys();
     for (const uId of Object.keys(userKeys)) {
       if (userKeys[uId] && userKeys[uId][key]) {
         keyData = userKeys[uId][key];
-        keyOwnerId = uId;
-        if (keyData.isActive) {
-          activeKeyCache.set(key, keyData);
-        }
         break;
       }
     }
   }
 
-  // 3. Check Firestore safely if still missing
-  if (!keyData) {
-    try {
-      const db = getFirestore();
-      if (db) {
-        const snapshot = await db.collectionGroup('keys').where('key', '==', key).get();
-        if (!snapshot.empty) {
-          const doc = snapshot.docs[0];
-          keyData = doc.data();
-          keyDocRef = doc.ref;
-          keyOwnerId = keyData.userId || keyData.uid;
-          if (keyData.isActive) {
-            activeKeyCache.set(key, keyData);
-          }
-        }
-      }
-    } catch (_) {}
+  if (!keyData || !keyData.isActive) {
+    return res.status(401).json({ error: 'Invalid API key', code: 'INVALID_API_KEY' });
   }
 
-  // 4. Fall back to demo key if provided key is invalid or inactive
-  if (!keyData || keyData.isActive === false) {
-    key = 'el_demo_key_12345';
-    keyData = activeKeyCache.get(key);
-    keyOwnerId = keyData ? keyData.userId || keyData.uid : 'user_demo';
-  }
-
-  // Rate Limiting (100 requests per 60-second window per API key)
   const now = Date.now();
   const limit = rateLimits.get(key) || { count: 0, resetAt: now + RATE_LIMIT_WINDOW_MS };
   if (now > limit.resetAt) {
@@ -591,46 +378,32 @@ async function validateApiKey(req, res, next) {
   }
   limit.count++;
   rateLimits.set(key, limit);
-
   if (limit.count > RATE_LIMIT_MAX) {
-    const secondsLeft = Math.ceil((limit.resetAt - now) / 1000);
-    return res.status(429).json({
-      error: `Rate limit exceeded. Try again in ${secondsLeft} seconds.`,
-      code: 'RATE_LIMIT_EXCEEDED',
-      retryAfter: secondsLeft,
-      resetAt: new Date(limit.resetAt).toISOString()
-    });
+    return res.status(429).json({ error: 'Rate limit exceeded', code: 'RATE_LIMIT_EXCEEDED', resetAt: new Date(limit.resetAt).toISOString() });
   }
 
-  // Async non-blocking metadata update
   const lastUsed = new Date().toISOString();
   keyData.lastUsed = lastUsed;
   keyData.requestCount = (keyData.requestCount || 0) + 1;
-  activeKeyCache.set(key, keyData);
 
-  setImmediate(async () => {
-    const userKeys = getLocalKeys();
-    if (keyOwnerId && userKeys[keyOwnerId] && userKeys[keyOwnerId][key]) {
-      userKeys[keyOwnerId][key].lastUsed = lastUsed;
-      userKeys[keyOwnerId][key].requestCount = keyData.requestCount;
-      saveLocalKeys(userKeys);
-    }
+  if (keyDocRef) {
     try {
-      const db = getFirestore();
-      if (db && keyOwnerId) {
-        await db.collection('apikeys').doc(keyOwnerId).collection('keys').doc(key).set({
-          lastUsed,
-          requestCount: keyData.requestCount
-        }, { merge: true });
-      } else if (keyDocRef) {
-        await keyDocRef.update({ lastUsed, requestCount: keyData.requestCount });
-      }
+      await keyDocRef.update({ lastUsed, requestCount: keyData.requestCount });
     } catch (_) {}
-  });
+  } else {
+    const userKeys = getLocalKeys();
+    for (const uId of Object.keys(userKeys)) {
+      if (userKeys[uId] && userKeys[uId][key]) {
+        userKeys[uId][key].lastUsed = lastUsed;
+        userKeys[uId][key].requestCount = keyData.requestCount;
+        saveLocalKeys(userKeys);
+        break;
+      }
+    }
+  }
 
   req.apiKey = key;
   req.apiKeyInfo = keyData;
-  req.keyOwnerId = keyOwnerId;
   next();
 }
 
@@ -728,208 +501,11 @@ function initRepositoryStore() {
   }
 }
 
-const SUMMARIES_FILE = path.join(__dirname, 'data', 'repository', 'summaries.json');
-
-function initSummariesStore() {
-  const dir = path.join(__dirname, 'data', 'repository');
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir, { recursive: true });
-  }
-  if (!fs.existsSync(SUMMARIES_FILE)) {
-    fs.writeFileSync(SUMMARIES_FILE, JSON.stringify({ summaries: {}, updatedAt: new Date().toISOString() }, null, 2));
-  }
-}
-
-function getSummaryCacheKey(docKey) {
-  if (!docKey) return null;
-  const cleanKey = String(docKey).trim().toLowerCase().replace(/https?:\/\//i, '').replace(/[^a-z0-9]/g, '_');
-  return crypto.createHash('md5').update(cleanKey).digest('hex');
-}
-
-async function getCachedSummary(docKey) {
-  const hashKey = getSummaryCacheKey(docKey);
-  if (!hashKey) return null;
-
-  initSummariesStore();
-
-  // 1. Check local summaries file
-  try {
-    const raw = fs.readFileSync(SUMMARIES_FILE, 'utf8');
-    const data = JSON.parse(raw);
-    if (data.summaries && data.summaries[hashKey] && data.summaries[hashKey].summaryHtml) {
-      console.log(`[summary-cache] Serving cached brief from local App DB for hash ${hashKey}`);
-      return data.summaries[hashKey].summaryHtml;
-    }
-  } catch (e) {
-    console.warn('[summary-cache] Error reading local summaries store:', e.message);
-  }
-
-  // 2. Check Firestore if available
-  try {
-    const db = getFirestore();
-    if (db) {
-      const doc = await db.collection('summaries').doc(hashKey).get();
-      if (doc.exists && doc.data() && doc.data().summaryHtml) {
-        const summaryHtml = doc.data().summaryHtml;
-        console.log(`[summary-cache] Serving cached brief from Firestore for hash ${hashKey}`);
-        saveCachedSummary(docKey, summaryHtml);
-        return summaryHtml;
-      }
-    }
-  } catch (e) {
-    handleFirestoreError(e, 'summary-cache: Error reading Firestore summary cache');
-  }
-
-  // 3. Check repository metadata
-  try {
-    const docs = getRepositoryDocs();
-    const repoDoc = docs.find(d => {
-      const dKey = d.url || d.sourceUrl || d.citation || d.title;
-      return getSummaryCacheKey(dKey) === hashKey || (d.id && String(docKey).includes(d.id));
-    });
-    if (repoDoc && repoDoc.summaryHtml) {
-      console.log(`[summary-cache] Serving cached brief from repository metadata for doc: ${repoDoc.title}`);
-      return repoDoc.summaryHtml;
-    }
-  } catch (e) {
-    console.warn('[summary-cache] Error checking repository metadata summary:', e.message);
-  }
-
-  return null;
-}
-
-async function saveCachedSummary(docKey, summaryHtml, docMeta = {}) {
-  const hashKey = getSummaryCacheKey(docKey);
-  if (!hashKey || !summaryHtml) return;
-
-  initSummariesStore();
-  const now = new Date().toISOString();
-
-  // 1. Save to local summaries file
-  try {
-    const raw = fs.readFileSync(SUMMARIES_FILE, 'utf8');
-    const data = JSON.parse(raw);
-    if (!data.summaries) data.summaries = {};
-    data.summaries[hashKey] = {
-      docKey,
-      title: docMeta.title || '',
-      citation: docMeta.citation || '',
-      summaryHtml,
-      cachedAt: now
-    };
-    data.updatedAt = now;
-    fs.writeFileSync(SUMMARIES_FILE, JSON.stringify(data, null, 2));
-    console.log(`[summary-cache] Saved brief to local App DB store (hash: ${hashKey})`);
-  } catch (e) {
-    console.warn('[summary-cache] Failed to save local summary:', e.message);
-  }
-
-  // 2. Save to Firestore if available
-  try {
-    const db = getFirestore();
-    if (db) {
-      await db.collection('summaries').doc(hashKey).set({
-        docKey,
-        title: docMeta.title || '',
-        citation: docMeta.citation || '',
-        summaryHtml,
-        cachedAt: now
-      }, { merge: true });
-      console.log(`[summary-cache] Saved brief to Firestore (hash: ${hashKey})`);
-    }
-  } catch (e) {
-    handleFirestoreError(e, 'summary-cache: Failed to save Firestore summary');
-  }
-
-  // 3. Update matching repository doc in doc_metadata.json
-  try {
-    const docs = getRepositoryDocs();
-    const idx = docs.findIndex(d => {
-      const dKey = d.url || d.sourceUrl || d.citation || d.title;
-      return getSummaryCacheKey(dKey) === hashKey || (d.id && String(docKey).includes(d.id));
-    });
-    if (idx >= 0) {
-      docs[idx].summaryHtml = summaryHtml;
-      docs[idx].summaryCachedAt = now;
-      fs.writeFileSync(REPO_INDEX_FILE, JSON.stringify({ docs, updatedAt: now }, null, 2));
-    }
-  } catch (e) {
-    console.warn('[summary-cache] Failed to update repository metadata with summary:', e.message);
-  }
-}
-
-function isLegalDocument(doc) {
-  if (!doc) return false;
-
-  const title = String(doc.title || doc.label || '').trim();
-  const citation = String(doc.citation || '').trim();
-  const rawType = String(doc.type || '').trim();
-  const url = String(doc.url || doc.sourceUrl || doc.readUrl || '').trim().toLowerCase();
-  const snippets = Array.isArray(doc.snippets) ? doc.snippets.join(' ') : String(doc.snippets || '');
-
-  if (title.length < 3) return false;
-
-  // Filter out non-legal pages, blogs, news commentary sites, directory listings, search aggregators
-  const bannedKeywords = [
-    'techtrendske', 'blog', 'editorial', 'what the new law does',
-    'all courts - kenya law', 'home - kenya law', 'search results', 'privacy policy',
-    'terms of service', 'contact us', 'about us', 'newsletter',
-    'googlef3644fe', 'sitemap', 'category/', 'tag/'
-  ];
-  for (const banned of bannedKeywords) {
-    if (title.toLowerCase().includes(banned) || url.includes(banned)) {
-      return false;
-    }
-  }
-  if (url.includes('/login') || url.includes('/signin') || url.includes('/captcha')) {
-    return false;
-  }
-
-  // Precedents / Judgments / Rulings / Advisory Opinions
-  const isCaseOrPrecedent =
-    /\b(v|vs|versus)\b/i.test(title) ||
-    /\[\d{4}\]\s*(KECA|KEHC|KESC|KEELRC|KLR|UKSC|ICJ|ICC|EACHR|BAILII)\b/i.test(title + ' ' + citation) ||
-    /akn\/ke\/judgment\//i.test(url) ||
-    /\b(civil appeal|criminal appeal|petition|miscellaneous cause|constitutional petition|advisory opinion|ruling|judgment|judgement|cause|court|case)\b/i.test(title + ' ' + citation + ' ' + rawType);
-
-  // Legislations / Acts / Constitutions / Statutes / Bills / Gazette Notices
-  const isStatuteOrLegislation =
-    /\b(act|statute|constitution|bill|cap\.|cap\s+\d+|code|gazette notice|legal notice|ordinance|rules|regulations)\b/i.test(title + ' ' + citation + ' ' + rawType) ||
-    /akn\/ke\/(act|bill|gazette)\//i.test(url) ||
-    /^(the|an)?\s*[A-Z][A-Za-z0-9\s,-]+(Act|Code|Constitution|Bill|Ordinance)\b/.test(title);
-
-  // Known official legal document repositories
-  const isOfficialRepoDoc = (url.includes('kenyalaw.org') || url.includes('bailii.org') || url.includes('worldlii.org') || url.includes('law.cornell.edu') || url.includes('justia.com') || url.includes('courtlistener.com') || url.includes('canlii.org') || url.includes('austlii.edu.au')) &&
-    !url.endsWith('/all/') && !url.endsWith('/judgments/') && !url.endsWith('/acts/');
-
-  const validTypes = ['constitution', 'legislation', 'bill', 'gazette notice', 'judgment', 'ruling', 'advisory opinion', 'precedent', 'statute', 'act', 'code'];
-  const isExplicitLegalType = rawType && validTypes.includes(rawType.toLowerCase());
-
-  const isDocumentFile = url.endsWith('.pdf') || url.endsWith('.docx') || url.endsWith('.doc') ||
-    url.includes('.pdf?') || url.includes('.docx?') || url.includes('.doc?') ||
-    Boolean(doc.isPdf) || Boolean(doc.isDocx) || Boolean(doc.isDoc) || Boolean(doc.isDocument);
-
-  if (isDocumentFile) {
-    return true;
-  }
-
-  if (isExplicitLegalType && (isCaseOrPrecedent || isStatuteOrLegislation || isOfficialRepoDoc)) {
-    return true;
-  }
-
-  if (doc.source === 'kenyalaw' || doc.source === 'international' || doc.source === 'local') {
-    return true;
-  }
-
-  return isCaseOrPrecedent || isStatuteOrLegislation || isOfficialRepoDoc;
-}
-
 function getRepositoryDocs() {
   try {
     initRepositoryStore();
     const data = JSON.parse(fs.readFileSync(REPO_INDEX_FILE, 'utf8'));
-    const rawDocs = data.docs || [];
-    return rawDocs.filter(d => isLegalDocument(d));
+    return data.docs || [];
   } catch (e) {
     console.error('Error reading repository docs:', e.message);
     return [];
@@ -973,6 +549,7 @@ function parseSourceLabel(url = '', rawSource = '') {
   if (url.includes('irmct.org') || url.includes('unictr')) return 'IRMCT / ICTR / ICTY';
   if (url.includes('supremecourt.uk') || url.includes('gov.uk')) return 'UK Legal Precedents';
   if (url.includes('law.cornell.edu') || url.includes('justia.com')) return 'US Legal Precedents';
+  if (url.includes('worldlii.org') || url.includes('bailii.org')) return 'International Precedent';
   return rawSource === 'international' ? 'International Precedent' : (rawSource || 'Legal Repository');
 }
 
@@ -1041,63 +618,12 @@ function normalizeFetchUrl(urlStr = '') {
   return normalized;
 }
 
-async function safeFetchWithTimeout(urlStr, options = {}, timeoutMs = 12000) {
-  const normUrl = normalizeFetchUrl(urlStr);
-  if (!normUrl) throw new Error('Invalid URL');
-
-  const headers = {
-    ...getBrowserHeaders(normUrl),
-    ...(options.headers || {})
-  };
-
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), timeoutMs);
-
-  try {
-    const res = await fetch(normUrl, {
-      ...options,
-      headers,
-      signal: controller.signal,
-      redirect: 'follow'
-    });
-    clearTimeout(timer);
-    return res;
-  } catch (firstErr) {
-    clearTimeout(timer);
-
-    if (normUrl.startsWith('https://') && !normUrl.includes('localhost')) {
-      const httpUrl = normUrl.replace('https://', 'http://');
-      try {
-        const retryController = new AbortController();
-        const retryTimer = setTimeout(() => retryController.abort(), 8000);
-        const retryRes = await fetch(httpUrl, {
-          ...options,
-          headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' },
-          signal: retryController.signal,
-          redirect: 'follow'
-        });
-        clearTimeout(retryTimer);
-        return retryRes;
-      } catch (_) {}
-    }
-    throw firstErr;
-  }
-}
-
 function extractPdfUrlFromHtml(rawHtml = '', sourceUrl = '') {
   if (!rawHtml && !sourceUrl) return null;
 
   const normSource = normalizeFetchUrl(sourceUrl);
 
-  // 1. Direct KenyaLaw AKN check: e.g. https://kenyalaw.org/akn/ke/judgment/... -> https://kenyalaw.org/akn/ke/judgment/.../main.pdf
-  if (normSource && normSource.includes('/akn/ke/')) {
-    if (normSource.toLowerCase().endsWith('.pdf')) return normSource;
-    if (normSource.toLowerCase().endsWith('/source')) return normSource;
-    const baseAkn = normSource.replace(/\/+$/, '');
-    return `${baseAkn}/main.pdf`;
-  }
-
-  // 2. Direct KenyaLaw caselaw view check: /caselaw/cases/view/123456 -> /caselaw/cases/export/123456/pdf
+  // 1. Direct KenyaLaw caselaw view check: /caselaw/cases/view/123456 -> /caselaw/cases/export/123456/pdf
   if (normSource && normSource.includes('/caselaw/cases/view/')) {
     try {
       const u = new URL(normSource);
@@ -1112,7 +638,7 @@ function extractPdfUrlFromHtml(rawHtml = '', sourceUrl = '') {
 
   if (!rawHtml) return null;
 
-  // 3. Check href attributes for pdf/export links
+  // 2. Check href attributes for pdf/export links
   const matches = Array.from(rawHtml.matchAll(/href=["']([^"']+)["']/gi));
   for (const match of matches) {
     const href = match[1];
@@ -1124,7 +650,7 @@ function extractPdfUrlFromHtml(rawHtml = '', sourceUrl = '') {
     }
   }
 
-  // 4. Check for Download PDF button link text
+  // 3. Check for Download PDF button link text
   const downloadMatch = rawHtml.match(/<a[^>]+href=["']([^"']+)["'][^>]*>(?:[\s\S]*?Download PDF[\s\S]*?)<\/a>/i);
   if (downloadMatch && downloadMatch[1]) {
     try { return new URL(downloadMatch[1], normSource || 'https://kenyalaw.org').href; } catch (_) {}
@@ -1135,17 +661,9 @@ function extractPdfUrlFromHtml(rawHtml = '', sourceUrl = '') {
 
 function saveDocToRepository(docMeta, contentBufferOrString = null, ext = 'txt') {
   try {
-    if (!isLegalDocument(docMeta)) {
-      console.log(`[saveDocToRepository] Filtering out non-legal document: "${docMeta.title || docMeta.label}"`);
-      return docMeta;
-    }
-
     initRepositoryStore();
     const docs = getRepositoryDocs();
     const enriched = enrichDocumentMetadata(docMeta);
-    if (!isLegalDocument(enriched)) {
-      return docMeta;
-    }
     
     const docId = docMeta.id || ('doc_' + crypto.createHash('md5').update(enriched.url || enriched.title).digest('hex').substring(0, 12));
     enriched.id = docId;
@@ -1227,7 +745,7 @@ function saveDocToRepository(docMeta, contentBufferOrString = null, ext = 'txt')
   }
 }
 
-app.get('/api/pdf-proxy', validateApiKey, async (req, res) => {
+app.get('/api/pdf-proxy', async (req, res) => {
   const sourceUrl = req.query.sourceUrl;
   if (!sourceUrl) {
     return res.status(400).json({ error: 'No source URL provided' });
@@ -1271,16 +789,22 @@ app.get('/api/pdf-proxy', validateApiKey, async (req, res) => {
       targetPdfUrl = extractPdfUrlFromHtml('', normSource) || normSource;
     }
 
-    let response = await safeFetchWithTimeout(targetPdfUrl, {}, 10000);
+    let response = await fetch(targetPdfUrl, {
+      headers: getBrowserHeaders(targetPdfUrl),
+      redirect: 'follow'
+    });
 
-    if ((!response || !response.ok) && targetPdfUrl !== normSource) {
+    if (!response.ok && targetPdfUrl !== normSource) {
       // Retry with original normalized URL
       targetPdfUrl = normSource;
-      response = await safeFetchWithTimeout(targetPdfUrl, {}, 10000);
+      response = await fetch(targetPdfUrl, {
+        headers: getBrowserHeaders(targetPdfUrl),
+        redirect: 'follow'
+      });
     }
 
-    if (!response || !response.ok) {
-      return res.status(502).json({ error: `Failed to fetch document (status ${response ? response.status : 'timeout'})` });
+    if (!response.ok) {
+      return res.status(502).json({ error: `Failed to fetch document (status ${response.status})` });
     }
 
     let contentType = response.headers.get('content-type') || '';
@@ -1419,7 +943,7 @@ app.get('/read/:filename', async (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'read.html'));
 });
 
-app.get('/api/document-content', validateApiKey, async (req, res) => {
+app.get('/api/document-content', async (req, res) => {
   const sourceUrl = req.query.sourceUrl || req.query.url;
   const reqTitle = req.query.title || 'Document';
   const reqYear = req.query.year || '';
@@ -1468,8 +992,11 @@ app.get('/api/document-content', validateApiKey, async (req, res) => {
   const directExportPdfUrl = extractPdfUrlFromHtml('', normSource);
   if (directExportPdfUrl) {
     try {
-      const pdfResp = await safeFetchWithTimeout(directExportPdfUrl, {}, 8000);
-      if (pdfResp && pdfResp.ok) {
+      const pdfResp = await fetch(directExportPdfUrl, {
+        headers: getBrowserHeaders(directExportPdfUrl),
+        redirect: 'follow'
+      });
+      if (pdfResp.ok) {
         const pdfBuffer = Buffer.from(await pdfResp.arrayBuffer());
         if (pdfBuffer.toString('utf8', 0, 10).startsWith('%PDF-')) {
           console.log('[document-content] Successfully downloaded direct PDF export:', directExportPdfUrl);
@@ -1493,15 +1020,18 @@ app.get('/api/document-content', validateApiKey, async (req, res) => {
         }
       }
     } catch (exportErr) {
-      console.warn('[document-content] Direct PDF export fetch attempt warning:', exportErr.message);
+      console.warn('[document-content] Direct PDF export fetch attempt failed:', exportErr.message);
     }
   }
 
   // 3. Fetch HTML document from external source with browser headers
   try {
-    const response = await safeFetchWithTimeout(normSource, {}, 10000);
+    const response = await fetch(normSource, {
+      headers: getBrowserHeaders(normSource),
+      redirect: 'follow'
+    });
 
-    if (!response || !response.ok) {
+    if (!response.ok) {
       const docMeta = enrichDocumentMetadata({
         title: reqTitle,
         url: normSource,
@@ -1509,54 +1039,17 @@ app.get('/api/document-content', validateApiKey, async (req, res) => {
         type: reqType,
         source: reqSource
       });
-      const statusText = response ? `status ${response.status}` : 'timeout';
       return res.json({
         isPdf: false,
         hasPdf: false,
         fallback: true,
         ...docMeta,
-        text: `Content is hosted on external legal registry (${statusText}). Please click "Original Source" above to view directly on official repository.`,
-        html: `<div style="padding: 16px; background-color: #f8fafc; border-radius: 8px; border: 1px solid #e2e8f0;"><p style="font-weight: 600; color: #0f172a; margin-bottom: 8px;">Official Document Record</p><p style="color: #475569; margin-bottom: 12px;">This document record is hosted directly on the external registry portal (${statusText}).</p><a href="${normSource}" target="_blank" rel="noopener noreferrer" style="display: inline-block; padding: 8px 16px; background-color: #0f172a; color: #ffffff; font-weight: 600; text-decoration: none; border-radius: 6px;">Open Original Source ↗</a></div>`
+        text: `Unable to fetch direct content from source (${response.status}). You can click "Original source" above to view it on the official site.`,
+        html: `<p>Unable to fetch direct content from source (${response.status}). You can click "Original source" above to view it on the official site.</p>`
       });
     }
 
     const contentType = response.headers.get('content-type') || '';
-
-    // Check for Word Document (.docx / .doc)
-    const isDocxOrDoc = contentType.includes('officedocument') ||
-      contentType.includes('msword') ||
-      normSource.endsWith('.docx') ||
-      normSource.endsWith('.doc');
-
-    if (isDocxOrDoc) {
-      const buffer = Buffer.from(await response.arrayBuffer());
-      const wordParsed = await parseWordDocumentBuffer(buffer);
-      const isDocx = normSource.endsWith('.docx') || contentType.includes('officedocument');
-      const docTitle = reqTitle !== 'Document' ? reqTitle : (normSource.split('/').pop() || 'Word Document');
-
-      const docMeta = enrichDocumentMetadata({
-        title: docTitle,
-        url: normSource,
-        year: reqYear || extractYearFromText(wordParsed.text) || extractYearFromText(docTitle),
-        type: reqType || classifyDocumentType(docTitle, '', normSource, wordParsed.text),
-        source: reqSource || parseSourceLabel(normSource, 'web')
-      });
-
-      const saved = saveDocToRepository(docMeta, wordParsed.text || wordParsed.html, 'txt');
-
-      return res.json({
-        isPdf: false,
-        isDocx: isDocx,
-        isDoc: !isDocx,
-        fileType: isDocx ? 'DOCX' : 'DOC',
-        cloudinaryUrl: saved.cloudinaryUrl || null,
-        cloudinaryMetaUrl: saved.cloudinaryMetaUrl || null,
-        ...docMeta,
-        text: wordParsed.text || 'Word Document Content',
-        html: wordParsed.html || `<p>${wordParsed.text}</p>`
-      });
-    }
-
     if (contentType.includes('pdf') || normSource.endsWith('.pdf')) {
       const buffer = Buffer.from(await response.arrayBuffer());
       const docMeta = enrichDocumentMetadata({
@@ -1638,7 +1131,7 @@ app.get('/api/document-content', validateApiKey, async (req, res) => {
       html: bodyHtml
     });
   } catch (e) {
-    console.warn('[document-content] Remote document fetch warning:', e.message);
+    console.error('Document content fetch error:', e.message);
     const docMeta = enrichDocumentMetadata({
       title: reqTitle,
       url: normSource,
@@ -1651,41 +1144,9 @@ app.get('/api/document-content', validateApiKey, async (req, res) => {
       hasPdf: false,
       fallback: true,
       ...docMeta,
-      text: `Notice: Remote registry connection (${e.message}). You can view the document directly by clicking "Original Source".`,
-      html: `<div style="padding: 16px; background-color: #f8fafc; border-radius: 8px; border: 1px solid #cbd5e1;"><p style="font-weight: 600; color: #0f172a; margin-bottom: 8px;">Official Document Reference</p><p style="color: #475569; margin-bottom: 12px;">This legal record is hosted on the official registry portal. Click below to inspect directly.</p><a href="${normSource}" target="_blank" rel="noopener noreferrer" style="display: inline-block; padding: 8px 16px; background-color: #0066cc; color: #ffffff; font-weight: 600; text-decoration: none; border-radius: 6px;">Open Original Source ↗</a></div>`
+      text: `Error fetching content: ${e.message}. Click "Original source" to view the original web page.`,
+      html: `<p>Error fetching content: ${e.message}. Click "Original source" to view the original web page.</p>`
     });
-  }
-});
-
-app.get('/api/convert-docx', validateApiKey, async (req, res) => {
-  const docxUrl = req.query.url || req.query.sourceUrl;
-  if (!docxUrl) {
-    return res.status(400).json({ error: 'No URL provided' });
-  }
-
-  try {
-    const normUrl = normalizeFetchUrl(docxUrl);
-    const response = await fetch(normUrl, {
-      headers: getBrowserHeaders(normUrl),
-      redirect: 'follow'
-    });
-
-    if (!response.ok) {
-      return res.status(502).json({ error: `Failed to fetch DOCX document (${response.status})` });
-    }
-
-    const buffer = Buffer.from(await response.arrayBuffer());
-    const parsed = await parseWordDocumentBuffer(buffer);
-
-    return res.json({
-      success: true,
-      text: parsed.text,
-      html: parsed.html,
-      sourceUrl: normUrl
-    });
-  } catch (err) {
-    console.error('convert-docx error:', err.message);
-    return res.status(500).json({ error: 'DOCX processing failed', message: err.message });
   }
 });
 
@@ -1770,15 +1231,45 @@ function generateNativeLegalBrief({ title = 'Legal Document', citation = '', yea
   `;
 }
 
-async function generateGroqBrief({ title, citation, year, type, sourceUrl, text }) {
-  const groqApiKey = process.env.GROQ_API_KEY;
-  if (!groqApiKey) {
-    throw new Error('GROQ_API_KEY is not configured');
+// ── Daily 5-Request AI Rate Limiter per Person/IP ──
+const aiDailyUsageTracker = new Map();
+
+function enforceAiDailyLimit(req, res) {
+  const clientIp = (req.headers['x-forwarded-for'] || req.socket?.remoteAddress || '127.0.0.1').split(',')[0].trim();
+  const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+  const trackerKey = `${clientIp}_${today}`;
+
+  const usageCount = aiDailyUsageTracker.get(trackerKey) || 0;
+  if (usageCount >= 5) {
+    res.status(429).json({
+      error: 'Daily AI Limit Reached (5/5)',
+      message: 'You have reached your daily quota of 5 AI queries today to protect Gemini server limits. Your quota resets at midnight.',
+      dailyLimit: 5,
+      remaining: 0,
+      resetDate: today
+    });
+    return false;
   }
+
+  aiDailyUsageTracker.set(trackerKey, usageCount + 1);
+  res.setHeader('X-AI-Daily-Limit', '5');
+  res.setHeader('X-AI-Daily-Remaining', String(5 - (usageCount + 1)));
+  return true;
+}
+
+app.post('/api/summarize-doc', async (req, res) => {
+  if (!enforceAiDailyLimit(req, res)) return;
+  const { title = 'Legal Document', sourceUrl = '', text = '', year = '', type = '', citation = '' } = req.body || {};
 
   const docText = text ? text.substring(0, 15000) : '';
 
-  const prompt = `You are eLegal Senior High Court Research Clerk & Law Reporter.
+  // 1. Try Gemini API first if available
+  const ai = getAiClient();
+  if (ai) {
+    const models = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-1.5-pro'];
+    for (const model of models) {
+      try {
+        const prompt = `You are eLegal Senior High Court Research Clerk & Law Reporter.
 Generate a 100% substantive, lawyer and law-student friendly Legal Brief for this document.
 
 CRITICAL MANDATES FOR HIGH-DENSITY LEGAL BRIEF:
@@ -1801,7 +1292,7 @@ Respond in clean HTML using this exact structure:
   <div style="background: #f8fafc; border: 1px solid #cbd5e1; border-left: 4px solid #1e3a8a; padding: 12px 16px; border-radius: 6px; margin-bottom: 16px;">
     <h3 style="margin: 0 0 4px 0; font-size: 1.1rem; color: #0f172a;">${title}</h3>
     <div style="font-size: 0.85rem; color: #475569;">
-      <strong>Citation:</strong> ${citation || 'Official Record'} | <strong>Year:</strong> ${year || 'N/A'} | <strong>Classification:</strong> ${type || 'Legal Authority'} | <span style="color: #0d9488; font-weight: 600;">⚡ Groq Llama-3.3 AI Brief</span>
+      <strong>Citation:</strong> ${citation || 'Official Record'} | <strong>Year:</strong> ${year || 'N/A'} | <strong>Classification:</strong> ${type || 'Legal Authority'}
     </div>
   </div>
 
@@ -1831,205 +1322,39 @@ Respond in clean HTML using this exact structure:
   </ul>
 </div>`;
 
-  const groqModels = ['llama-3.3-70b-versatile', 'llama-3.1-8b-instant'];
-  let lastError = null;
-
-  for (const model of groqModels) {
-    try {
-      console.log(`[groq-summarize] Requesting Groq model ${model}...`);
-      const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${groqApiKey}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
+        const response = await ai.models.generateContent({
           model,
-          messages: [
-            { role: 'user', content: prompt }
-          ],
-          temperature: 0.1
-        })
-      });
+          contents: prompt,
+          config: { temperature: 0.1 }
+        });
 
-      if (!response.ok) {
-        const errText = await response.text();
-        console.error(`[groq-summarize] Groq model ${model} HTTP error ${response.status}: ${errText}`);
-        lastError = new Error(`Groq HTTP ${response.status}: ${errText}`);
-        continue;
+        let summaryHtml = response.text || '';
+        summaryHtml = summaryHtml.replace(/```html/gi, '').replace(/```/g, '').trim();
+
+        if (summaryHtml && summaryHtml.length > 100) {
+          return res.json({
+            success: true,
+            source: 'ai_lawyer_brief',
+            summaryHtml
+          });
+        }
+      } catch (err) {
+        console.warn(`[summarize-doc] Gemini call failed on ${model}:`, err.message);
       }
-
-      const data = await response.json();
-      let summaryHtml = data?.choices?.[0]?.message?.content || '';
-      summaryHtml = summaryHtml.replace(/```html/gi, '').replace(/```/g, '').trim();
-
-      if (summaryHtml && summaryHtml.length > 100) {
-        console.log(`[groq-summarize] Successfully generated brief with Groq model ${model} (${summaryHtml.length} chars)`);
-        return summaryHtml;
-      }
-    } catch (err) {
-      console.error(`[groq-summarize] Exception calling Groq model ${model}:`, err.message || err);
-      lastError = err;
     }
   }
 
-  throw lastError || new Error('Failed to generate summary with Groq models');
-}
+  // 2. Standalone Native Legal NLP Brief Generator (Zero API / Zero Cost)
+  const nativeBriefHtml = generateNativeLegalBrief({ title, citation, year, type, sourceUrl, text: docText });
 
-async function generateGeminiBrief({ title, citation, year, type, sourceUrl, text }) {
-  const ai = getAiClient();
-  if (!ai) {
-    throw new Error('GEMINI_API_KEY is missing');
-  }
-
-  const docText = text ? text.substring(0, 15000) : '';
-
-  const prompt = `You are eLegal Senior High Court Research Clerk & Law Reporter.
-Generate a 100% substantive, lawyer and law-student friendly Legal Brief for this document.
-
-CRITICAL MANDATES FOR HIGH-DENSITY LEGAL BRIEF:
-1. STRICT ZERO BLUFF / ZERO FLUFF RULE: NO generic preamble, NO introductory conversational commentary ("Here is a brief...", "In conclusion...").
-2. USE FORMAL JUDICIAL TERMINOLOGY appropriate for Advocates, Judges, Law Students, and Bar Examination preparation.
-3. EXTRACT ACCURATE MATERIAL FACTS, RATIO DECIDENDI, STATUTORY ARTICLES/SECTIONS, AND COURT ORDERS FROM THE TEXT.
-
-DOCUMENT METADATA:
-- Title: ${title}
-- Official Citation: ${citation}
-- Year/Date: ${year}
-- Type/Nature: ${type}
-- Source URL: ${sourceUrl}
-
-DOCUMENT TEXT EXCERPT:
-${docText || 'No full text available. Synthesize strict legal brief from title, citation, and official metadata.'}
-
-Respond in clean HTML using this exact structure:
-<div style="font-family: system-ui, -apple-system, sans-serif; line-height: 1.6; color: #0f172a;">
-  <div style="background: #f8fafc; border: 1px solid #cbd5e1; border-left: 4px solid #1e3a8a; padding: 12px 16px; border-radius: 6px; margin-bottom: 16px;">
-    <h3 style="margin: 0 0 4px 0; font-size: 1.1rem; color: #0f172a;">${title}</h3>
-    <div style="font-size: 0.85rem; color: #475569;">
-      <strong>Citation:</strong> ${citation || 'Official Record'} | <strong>Year:</strong> ${year || 'N/A'} | <strong>Classification:</strong> ${type || 'Legal Authority'} | <span style="color: #0d9488; font-weight: 600;">⚡ Gemini AI Legal Brief</span>
-    </div>
-  </div>
-
-  <h4 style="color: #1e3a8a; border-bottom: 1.5px solid #cbd5e1; padding-bottom: 4px; margin: 16px 0 8px 0; font-size: 0.95rem; text-transform: uppercase;">I. MATERIAL FACTS & PROCEDURAL HISTORY</h4>
-  <ul style="margin: 6px 0 12px 18px; padding: 0;">
-    <li>Exact factual background, party claims, procedural path.</li>
-  </ul>
-
-  <h4 style="color: #1e3a8a; border-bottom: 1.5px solid #cbd5e1; padding-bottom: 4px; margin: 16px 0 8px 0; font-size: 0.95rem; text-transform: uppercase;">II. LEGAL ISSUES BEFORE THE COURT / LEGISLATIVE INTENT</h4>
-  <ul style="margin: 6px 0 12px 18px; padding: 0;">
-    <li>Numbered legal questions framed clearly for litigation or exam analysis.</li>
-  </ul>
-
-  <h4 style="color: #1e3a8a; border-bottom: 1.5px solid #cbd5e1; padding-bottom: 4px; margin: 16px 0 8px 0; font-size: 0.95rem; text-transform: uppercase;">III. RATIO DECIDENDI & HOLDING (BINDING RULE OF LAW)</h4>
-  <ul style="margin: 6px 0 12px 18px; padding: 0;">
-    <li>Core holding, ratio decidendi, and legal principles established.</li>
-  </ul>
-
-  <h4 style="color: #1e3a8a; border-bottom: 1.5px solid #cbd5e1; padding-bottom: 4px; margin: 16px 0 8px 0; font-size: 0.95rem; text-transform: uppercase;">IV. STATUTORY PROVISIONS & PRECEDENTS CITED</h4>
-  <ul style="margin: 6px 0 12px 18px; padding: 0;">
-    <li>Specific Act sections, Constitutional Articles, and cited case laws.</li>
-  </ul>
-
-  <h4 style="color: #1e3a8a; border-bottom: 1.5px solid #cbd5e1; padding-bottom: 4px; margin: 16px 0 8px 0; font-size: 0.95rem; text-transform: uppercase;">V. FINAL DISPOSITION, ORDERS & ADVOCATE BRIEFING NOTES</h4>
-  <ul style="margin: 6px 0 12px 18px; padding: 0;">
-    <li>Court orders, costs, and practical advice on how to cite this precedent.</li>
-  </ul>
-</div>`;
-
-  const models = ['gemini-3.6-flash', 'gemini-flash-latest'];
-  let lastError = null;
-
-  for (const model of models) {
-    try {
-      const response = await ai.models.generateContent({
-        model,
-        contents: prompt
-      });
-
-      let summaryHtml = response.text || '';
-      summaryHtml = summaryHtml.replace(/```html/gi, '').replace(/```/g, '').trim();
-      if (summaryHtml && summaryHtml.length >= 50) {
-        return summaryHtml;
-      }
-    } catch (err) {
-      console.warn(`[gemini-summarize] Model ${model} brief generation error:`, err.message);
-      lastError = err;
-    }
-  }
-
-  throw lastError || new Error('Gemini brief generation empty or invalid');
-}
-
-app.post('/api/summarize-doc', validateApiKey, async (req, res) => {
-  const { title = 'Legal Document', sourceUrl = '', text = '', year = '', type = '', citation = '' } = req.body || {};
-  const docText = text ? text.substring(0, 15000) : '';
-  const docKey = sourceUrl || citation || title;
-
-  // 1. Check Overall App DB summary cache (local file & Firestore & repository metadata)
-  try {
-    const cachedHtml = await getCachedSummary(docKey);
-    if (cachedHtml) {
-      console.log(`[summarize-doc] Serving cached brief from App DB for: "${title}"`);
-      return res.json({
-        success: true,
-        source: 'cached_app_db',
-        summaryHtml: cachedHtml
-      });
-    }
-  } catch (cacheErr) {
-    console.warn('[summarize-doc] App DB summary cache check warning:', cacheErr.message);
-  }
-
-  // 2. Try Gemini AI
-  try {
-    const geminiHtml = await generateGeminiBrief({ title, citation, year, type, sourceUrl, text: docText });
-    await saveCachedSummary(docKey, geminiHtml, { title, citation, year, type, sourceUrl });
-    console.log(`[summarize-doc] Generated Gemini AI brief for: "${title}"`);
-    return res.json({
-      success: true,
-      source: 'gemini_ai_brief',
-      summaryHtml: geminiHtml
-    });
-  } catch (geminiErr) {
-    console.log('[summarize-doc] Gemini brief generation not available or failed:', geminiErr.message);
-  }
-
-  // 3. Try Groq AI
-  try {
-    const groqHtml = await generateGroqBrief({ title, citation, year, type, sourceUrl, text: docText });
-    await saveCachedSummary(docKey, groqHtml, { title, citation, year, type, sourceUrl });
-    console.log(`[summarize-doc] Generated Groq AI brief for: "${title}"`);
-    return res.json({
-      success: true,
-      source: 'groq_ai_brief',
-      summaryHtml: groqHtml
-    });
-  } catch (groqErr) {
-    console.log('[summarize-doc] Groq AI brief generation not available or failed:', groqErr.message);
-  }
-
-  // 4. Standalone Local Rule-Based NLP High-Density Brief Extraction (100% Guaranteed, No API Key Required)
-  try {
-    const localHtml = generateNativeLegalBrief({ title, citation, year, type, sourceUrl, text: docText });
-    await saveCachedSummary(docKey, localHtml, { title, citation, year, type, sourceUrl });
-    console.log(`[summarize-doc] Generated Local NLP Brief for: "${title}"`);
-    return res.json({
-      success: true,
-      source: 'local_nlp_brief',
-      summaryHtml: localHtml
-    });
-  } catch (localErr) {
-    console.error('[summarize-doc] Local brief extraction error:', localErr.message);
-    return res.status(500).json({
-      success: false,
-      error: 'Brief generation failed',
-      details: localErr.message
-    });
-  }
+  return res.json({
+    success: true,
+    source: 'native_nlp_brief',
+    summaryHtml: nativeBriefHtml
+  });
 });
 
-app.get('/api/repository/docs', validateApiKey, (req, res) => {
+app.get('/api/repository/docs', (req, res) => {
   try {
     const docs = getRepositoryDocs();
     res.json({ docs, total: docs.length });
@@ -2372,19 +1697,38 @@ function extractCitationFromText(text) {
   return cleaned.substring(0, 120) || null;
 }
 
-let aiClient = null;
-function getAiClient() {
-  if (!aiClient && process.env.GEMINI_API_KEY) {
-    aiClient = new GoogleGenAI({
-      apiKey: process.env.GEMINI_API_KEY,
-      httpOptions: {
-        headers: {
-          'User-Agent': 'aistudio-build',
+let currentKeyIndex = 0;
+
+function getAiClientObj() {
+  const keysRaw = process.env.GEMINI_API_KEYS || process.env.GEMINI_API_KEY || '';
+  const keys = keysRaw.split(',').map(k => k.trim()).filter(Boolean);
+  if (keys.length === 0) return null;
+
+  const keyIndex = currentKeyIndex % keys.length;
+  const activeKey = keys[keyIndex];
+
+  try {
+    const ai = new GoogleGenAI({ apiKey: activeKey });
+    return {
+      ai,
+      key: activeKey,
+      keyCount: keys.length,
+      rotateKey: () => {
+        if (keys.length > 1) {
+          currentKeyIndex = (currentKeyIndex + 1) % keys.length;
+          console.warn(`[gemini] Quota/rate limit hit. Rotated to API Key #${currentKeyIndex + 1}/${keys.length}`);
         }
       }
-    });
+    };
+  } catch (e) {
+    console.warn('[gemini] GoogleGenAI init error:', e.message);
+    return null;
   }
-  return aiClient;
+}
+
+function getAiClient() {
+  const obj = getAiClientObj();
+  return obj ? obj.ai : null;
 }
 
 /**
@@ -2407,7 +1751,7 @@ async function searchWithGeminiGrounding(query, source = 'all') {
   const scopeText = source === 'kenya'
     ? 'Kenya Law reports, eKLR, Laws of Kenya, Constitution of Kenya, High Court & Court of Appeal judgments'
     : isInternational
-    ? 'General internet legal databases, international precedents, US/UK/Commonwealth court judgments, ICJ, UN Treaties, WorldLII, BAILII, Justia, Cornell Law, and foreign legal repositories (beyond eKLR)'
+    ? 'International legal databases: WorldLII, BAILII, Justia, Cornell LII, ICJ, ICC, ECHR, UN Treaties, WTO, IUS Mundi, and all major common law jurisdictions (UK, US, Canada, Australia, India, South Africa, etc.) – search for case law, statutes, treaties, and legal commentary. Prioritize official PDFs and court judgment documents.'
     : 'Kenya Law statutes/eKLR and global internet legal precedents across all international jurisdictions';
 
   const systemPrompt = `You are eLegal, an advanced legal research engine.
@@ -2415,7 +1759,7 @@ Conduct focused legal research for the query: "${query}".
 Target Jurisdiction / Scope: ${scopeText}.
 
 Search Strategy Instructions:
-1. ${isInternational ? 'Since this is an out-of-Kenya international query, research broadly across the general internet legal resources (e.g. WorldLII, BAILII, Justia, Cornell Law, ICJ, UN Law, foreign courts, legal journals) apart from eKLR.' : 'Search Kenya Law (eKLR) and primary legal sources.'}
+1. ${isInternational ? 'Since this is an out-of-Kenya international query, research broadly across the general internet legal resources (e.g. WorldLII, BAILII, Justia, Cornell Law, ICJ, UN Law, foreign courts, legal journals) apart from eKLR.' : source === 'kenya' ? 'Search Kenya Law (eKLR) and primary legal sources.' : 'Search both Kenya Law and international legal databases.'}
 2. Prioritize direct PDF document links, official court judgment reports, legislation downloads, and legal papers.
 
 Return a JSON array of up to 15 relevant results.
@@ -2432,7 +1776,7 @@ Format each item as a JSON object:
 
 Respond ONLY with a valid JSON array starting with '[' and ending with ']'. No markdown wrapper or extra text.`;
 
-  const models = ['gemini-3.6-flash', 'gemini-flash-latest'];
+  const models = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-1.5-pro'];
 
   for (const model of models) {
     try {
@@ -2506,7 +1850,9 @@ Respond ONLY with a valid JSON array starting with '[' and ending with ']'. No m
     } catch (err) {
       const isQuota = err.message && (err.message.includes('429') || err.message.includes('RESOURCE_EXHAUSTED') || err.message.includes('quota'));
       if (isQuota) {
-        console.warn(`[gemini] Quota limit hit on ${model}, falling back to web search.`);
+        console.warn(`[gemini] Quota limit hit on ${model}. Attempting key rotation...`);
+        const obj = getAiClientObj();
+        if (obj) obj.rotateKey();
         break;
       }
       console.warn(`[gemini] Model ${model} search grounding error:`, err.message);
@@ -2516,78 +1862,19 @@ Respond ONLY with a valid JSON array starting with '[' and ending with ']'. No m
   return [];
 }
 
-function parseDuckDuckGoHtml(html, source) {
-  const results = [];
-  const seen = new Set();
-  const regex = /<a[^>]+href="([^"]*uddg=([^"&]+)[^"]*)"[^>]*>([\s\S]*?)<\/a>/gi;
-  let m;
-
-  const blockedKeywords = [
-    'login', 'signin', 'captcha', 'paywall', 'subscribe', 'register', 'membership',
-    'lexisnexis.com', 'westlaw.com', 'heinonline.org', 'vlex.com', 'bloomberglaw.com',
-    'facebook.com', 'twitter.com', 'instagram.com', 'linkedin.com', 'youtube.com', 'tiktok.com'
-  ];
-
-  while ((m = regex.exec(html)) !== null) {
-    const encodedUrl = m[2];
-    const rawText = m[3].replace(/<[^>]+>/g, '').trim();
-    if (!rawText || rawText.length < 3 || rawText.includes('http://') || rawText.includes('https://') || rawText.startsWith('//')) continue;
-
-    let actualUrl = decodeURIComponent(encodedUrl);
-    if (!actualUrl || actualUrl.includes('duckduckgo.com')) continue;
-    
-    const urlLower = actualUrl.toLowerCase();
-
-    // Skip pages requiring logins or paywalls or captcha blocks
-    if (blockedKeywords.some(kw => urlLower.includes(kw))) {
-      continue;
-    }
-
-    const key = urlLower;
-    if (seen.has(key)) continue;
-    seen.add(key);
-
-    const title = rawText.replace(/^\|\s*/, '').trim();
-    const titleLower = title.toLowerCase();
-    const isKenya = actualUrl.includes('kenyalaw.org');
-    
-    const isPdf = key.endsWith('.pdf') || key.includes('.pdf?') || titleLower.includes('[pdf]') || titleLower.includes('pdf');
-    const isDocx = key.endsWith('.docx') || key.includes('.docx?') || titleLower.includes('[docx]') || titleLower.includes('docx');
-    const isDocFile = key.endsWith('.doc') || key.includes('.doc?') || titleLower.includes('[doc]');
-    const isDocument = isPdf || isDocx || isDocFile || key.includes('/source') || key.includes('/akn/ke/');
-
-    const fileType = isPdf ? 'PDF' : (isDocx ? 'DOCX' : (isDocFile ? 'DOC' : 'DOC'));
-    const score = isPdf ? 98 : (isDocx || isDocFile ? 92 : 80);
-
-    results.push({
-      title,
-      label: title.replace(/^(The|An|A)\s+/i, '').trim(),
-      citation: title,
-      url: actualUrl,
-      readUrl: actualUrl,
-      source: isKenya ? 'kenyalaw' : (source === 'international' || !isKenya ? 'international' : 'local'),
-      isPdf,
-      isDocx,
-      isDoc: isDocFile,
-      isDocument,
-      fileType,
-      score,
-      snippets: [actualUrl]
-    });
-    if (results.length >= 25) break;
-  }
-  return results;
-}
-
 async function searchFastWeb(query, source = 'all') {
+  // Build a rich query that covers both Kenya and international legal databases
   const isIntl = source === 'international';
   const isKenya = source === 'kenya';
   
-  const scopeQuery = isKenya 
-    ? `${query} site:kenyalaw.org`
-    : isIntl
-    ? `${query} site:worldlii.org OR site:bailii.org OR site:justia.com OR site:law.cornell.edu OR site:canlii.org`
-    : query;
+  const sites = isIntl
+    ? ['worldlii.org', 'bailii.org', 'justia.com', 'law.cornell.edu', 'icj-cij.org', 'icc-cpi.int', 'echr.coe.int', 'un.org/en/law', 'treaties.un.org', 'legal.un.org', 'iusmundi.com']
+    : isKenya
+    ? ['kenyalaw.org']
+    : ['kenyalaw.org', 'worldlii.org', 'bailii.org', 'justia.com', 'law.cornell.edu', 'icj-cij.org', 'icc-cpi.int', 'echr.coe.int', 'un.org/en/law', 'treaties.un.org'];
+
+  const siteQuery = `(${sites.map(s => `site:${s}`).join(' OR ')})`;
+  const scopeQuery = `${query} ${siteQuery} filetype:pdf OR case law OR judgment OR statute OR treaty OR ruling`;
 
   try {
     const response = await fetch(`https://html.duckduckgo.com/html/?q=${encodeURIComponent(scopeQuery)}`, {
@@ -2598,160 +1885,45 @@ async function searchFastWeb(query, source = 'all') {
     });
     if (!response.ok) return [];
     const html = await response.text();
-    let results = parseDuckDuckGoHtml(html, source);
+    const results = [];
+    const seen = new Set();
+    const regex = /<a[^>]+href="([^"]*uddg=([^"&]+)[^"]*)"[^>]*>([\s\S]*?)<\/a>/gi;
+    let m;
+    while ((m = regex.exec(html)) !== null) {
+      const encodedUrl = m[2];
+      const rawText = m[3].replace(/<[^>]+>/g, '').trim();
+      if (!rawText || rawText.length < 3 || rawText.includes('http://') || rawText.includes('https://') || rawText.startsWith('//')) continue;
 
-    if (results.length < 3) {
-      // Try spell-corrected or variant query fallback
-      const fixedQuery = query.replace(/\brayland\b/gi, 'rylands').replace(/\br\b/gi, 'regina');
-      if (fixedQuery !== query) {
-        const altScope = isKenya ? `${fixedQuery} site:kenyalaw.org` : fixedQuery;
-        const altResponse = await fetch(`https://html.duckduckgo.com/html/?q=${encodeURIComponent(altScope)}`, {
-          headers: {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
-          }
-        });
-        if (altResponse.ok) {
-          const altHtml = await altResponse.text();
-          const altResults = parseDuckDuckGoHtml(altHtml, source);
-          const seen = new Set(results.map(r => r.url.toLowerCase()));
-          for (const item of altResults) {
-            if (!seen.has(item.url.toLowerCase())) {
-              results.push(item);
-            }
-          }
-        }
-      }
+      let actualUrl = decodeURIComponent(encodedUrl);
+      if (!actualUrl || actualUrl.includes('duckduckgo.com')) continue;
+      
+      const key = actualUrl.toLowerCase();
+      if (seen.has(key)) continue;
+      seen.add(key);
+
+      const title = rawText.replace(/^\|\s*/, '').trim();
+      const isKenyaUrl = actualUrl.includes('kenyalaw.org');
+      const isPdfUrl = actualUrl.endsWith('.pdf') || actualUrl.includes('.pdf?') || title.toLowerCase().includes('[pdf]');
+
+      results.push({
+        title,
+        label: title.replace(/^(The|An|A)\s+/i, '').trim(),
+        citation: title,
+        url: actualUrl,
+        readUrl: actualUrl,
+        source: isKenyaUrl ? 'kenyalaw' : 'international',
+        isPdf: isPdfUrl,
+        fileType: isPdfUrl ? 'PDF' : 'DOC',
+        score: isPdfUrl ? 90 : 80,
+        snippets: [actualUrl]
+      });
+      if (results.length >= 25) break;
     }
     return results;
   } catch (e) {
     console.error('Fast web fallback search error:', e.message);
     return [];
   }
-}
-
-async function fetchInternationalLegalPrecedents(query) {
-  const cleanQ = query.trim().replace(/\s+/g, ' ');
-  const results = [];
-  const seenUrls = new Set();
-
-  let expandedQuery = cleanQ;
-  if (/^r\s+v(s)?\s+/i.test(cleanQ)) {
-    const party = cleanQ.replace(/^r\s+v(s)?\s+/i, '');
-    expandedQuery = `"${cleanQ}" OR "Regina v ${party}" OR "Rex v ${party}" OR "${party}"`;
-  }
-
-  // 1. Wikipedia Legal Precedents API
-  try {
-    const wikiSearchTerm = cleanQ.replace(/\brayland\b/gi, 'Rylands');
-    const wikiUrl = `https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(wikiSearchTerm)}&format=json&origin=*`;
-    const response = await fetch(wikiUrl);
-    if (response.ok) {
-      const data = await response.json();
-      const hits = (data && data.query && data.query.search) || [];
-      for (const hit of hits.slice(0, 10)) {
-        const title = hit.title;
-        const snippet = (hit.snippet || '').replace(/<[^>]+>/g, '').trim();
-        const pageUrl = `https://en.wikipedia.org/wiki/${encodeURIComponent(title.replace(/\s+/g, '_'))}`;
-        if (seenUrls.has(pageUrl.toLowerCase())) continue;
-        seenUrls.add(pageUrl.toLowerCase());
-        
-        results.push({
-          title: title,
-          label: title,
-          citation: `${title} (International Law Precedent)`,
-          url: pageUrl,
-          readUrl: `/read/${encodeURIComponent(sanitizeFilename(title))}?sourceUrl=${encodeURIComponent(pageUrl)}&title=${encodeURIComponent(title)}`,
-          source: 'international',
-          category: 'precedent',
-          isPdf: false,
-          fileType: 'DOC',
-          score: 110,
-          snippets: [snippet]
-        });
-      }
-    }
-  } catch (e) {
-    console.error('fetchInternationalLegalPrecedents Wikipedia error:', e.message);
-  }
-
-  // 2. OpenAlex Global Legal & Scholarly Precedents API
-  try {
-    const oaUrl = `https://api.openalex.org/works?search=${encodeURIComponent(expandedQuery)}&per_page=8`;
-    const oaRes = await fetch(oaUrl);
-    if (oaRes.ok) {
-      const oaData = await oaRes.json();
-      const oaHits = oaData.results || [];
-      for (const hit of oaHits) {
-        const title = hit.title;
-        if (!title || title.length < 5) continue;
-        const year = hit.publication_year ? `[${hit.publication_year}]` : '';
-        const doi = hit.doi || (hit.primary_location && hit.primary_location.landing_page_url) || `https://openalex.org/${hit.id}`;
-        if (seenUrls.has(doi.toLowerCase())) continue;
-        seenUrls.add(doi.toLowerCase());
-
-        let venue = '';
-        if (hit.primary_location && hit.primary_location.source && hit.primary_location.source.display_name) {
-          venue = hit.primary_location.source.display_name;
-        }
-
-        results.push({
-          title: `${title} ${year}`.trim(),
-          label: title,
-          citation: venue ? `${title} ${year} (${venue})` : `${title} ${year} (Global Legal Research)`,
-          url: doi,
-          readUrl: `/read/${encodeURIComponent(sanitizeFilename(title))}?sourceUrl=${encodeURIComponent(doi)}&title=${encodeURIComponent(title)}`,
-          source: 'international',
-          category: 'precedent',
-          isPdf: doi.toLowerCase().endsWith('.pdf'),
-          fileType: doi.toLowerCase().endsWith('.pdf') ? 'PDF' : 'DOC',
-          score: 115,
-          snippets: [venue ? `Published in ${venue}. Global Legal Authority & Precedent` : `Global Legal Scholarship & Precedent`]
-        });
-      }
-    }
-  } catch (e) {
-    console.error('fetchInternationalLegalPrecedents OpenAlex error:', e.message);
-  }
-
-  // 3. CourtListener Open API
-  try {
-    const clUrl = `https://www.courtlistener.com/api/rest/v4/search/?q=${encodeURIComponent(cleanQ)}`;
-    const clRes = await fetch(clUrl);
-    if (clRes.ok) {
-      const clData = await clRes.json();
-      const clHits = clData.results || [];
-      for (const hit of clHits.slice(0, 10)) {
-        const caseName = hit.caseName || hit.case_name;
-        if (!caseName) continue;
-        const cits = Array.isArray(hit.citation) ? hit.citation.join(', ') : (hit.citation || '');
-        const court = hit.court || 'Court of Appeal / High Court';
-        const year = hit.dateFiled ? hit.dateFiled.split('-')[0] : '';
-        const citeString = cits ? `[${year}] ${cits}` : (year ? `[${year}]` : '');
-        const docUrl = hit.absolute_url ? `https://www.courtlistener.com${hit.absolute_url}` : `https://www.courtlistener.com/?q=${encodeURIComponent(caseName)}`;
-        if (seenUrls.has(docUrl.toLowerCase())) continue;
-        seenUrls.add(docUrl.toLowerCase());
-
-        results.push({
-          title: `${caseName} ${citeString}`.trim(),
-          label: caseName,
-          citation: `${caseName} ${citeString} (${court})`.trim(),
-          url: docUrl,
-          readUrl: `/read/${encodeURIComponent(sanitizeFilename(caseName))}?sourceUrl=${encodeURIComponent(docUrl)}&title=${encodeURIComponent(caseName)}`,
-          source: 'international',
-          category: 'precedent',
-          isPdf: false,
-          fileType: 'DOC',
-          score: 120,
-          snippets: [hit.snippet || hit.summary || `${caseName} international legal authority`]
-        });
-      }
-    }
-  } catch (e) {
-    console.error('fetchInternationalLegalPrecedents CourtListener error:', e.message);
-  }
-
-  return results;
 }
 
 async function fetchKenyaLawDirect(query) {
@@ -2843,9 +2015,8 @@ function extractLinks(text) {
 }
 
 function rankResults(results, query, classification = null) {
-  const cleanQuery = query.toLowerCase().trim();
-  const stopWords = new Set(['the', 'and', 'or', 'in', 'of', 'to', 'at', 'a', 'an', 'for']);
-  const queryTerms = cleanQuery.split(/\s+/).filter(t => t.length > 0 && !stopWords.has(t));
+  const stopWords = new Set(['v', 'vs', 'r', 're', 'the', 'and', 'or', 'in', 'of', 'to', 'at', 'a', 'an', 'for']);
+  const queryTerms = query.toLowerCase().split(/\s+/).filter(t => t.length > 1 && !stopWords.has(t));
 
   return results.map(r => {
     const titleLower = (r.title || '').toLowerCase();
@@ -2853,64 +2024,41 @@ function rankResults(results, query, classification = null) {
     const urlLower = (r.url || r.readUrl || '').toLowerCase();
     let score = r.score || 50;
 
-    // Requirement: Prioritize PDF, DOCX, DOC, and official document results
-    const isPdf = Boolean(r.isPdf) || urlLower.endsWith('.pdf') || urlLower.includes('.pdf?') || titleLower.includes('[pdf]') || titleLower.includes('pdf');
-    const isDocx = Boolean(r.isDocx) || urlLower.endsWith('.docx') || urlLower.includes('.docx?') || titleLower.includes('[docx]') || titleLower.includes('docx');
-    const isDocFile = Boolean(r.isDoc) || urlLower.endsWith('.doc') || urlLower.includes('.doc?') || titleLower.includes('[doc]');
-    const isDoc = isPdf || isDocx || isDocFile || urlLower.includes('/doc/') || urlLower.includes('/document/') || urlLower.includes('/cases/') || urlLower.includes('/akn/ke/') || urlLower.includes('kenyalaw.org') || urlLower.includes('bailii.org') || urlLower.includes('worldlii.org') || urlLower.includes('justia.com') || urlLower.includes('law.cornell.edu') || urlLower.includes('canlii.org') || urlLower.includes('austlii.edu.au');
+    // Prioritize PDF and official document results
+    const isPdf = Boolean(r.isPdf) || urlLower.endsWith('.pdf') || urlLower.includes('.pdf?') || titleLower.includes('pdf');
+    const isDoc = isPdf || urlLower.includes('/doc/') || urlLower.includes('/document/') || urlLower.includes('/cases/') || urlLower.includes('/akn/ke/') || urlLower.includes('kenyalaw.org') || urlLower.includes('bailii.org') || urlLower.includes('worldlii.org') || urlLower.includes('justia.com') || urlLower.includes('law.cornell.edu');
 
     r.isPdf = isPdf;
-    r.isDocx = isDocx;
-    r.isDoc = isDocFile;
     r.isDocument = isDoc;
-    r.fileType = isPdf ? 'PDF' : (isDocx ? 'DOCX' : (isDocFile ? 'DOC' : (isDoc ? 'DOC' : 'WEB')));
+    r.fileType = isPdf ? 'PDF' : (isDoc ? 'DOC' : 'WEB');
 
     if (isPdf) {
-      score += 45; // Highest priority boost for PDF files
-    } else if (isDocx || isDocFile) {
-      score += 40; // High priority boost for Word files (DOCX/DOC)
+      score += 45; // Significant priority boost for PDF files
     } else if (isDoc) {
-      score += 25; // Priority boost for formal legal document records
+      score += 25; // Priority boost for formal legal documents
     }
 
-    // Exact title / citation phrase match boost (e.g., "r v stevenson" or "donoghue v stevenson")
-    if (titleLower.includes(cleanQuery) || citationLower.includes(cleanQuery)) {
-      score += 90;
-    }
-
-    // Common variant match (e.g. "regina v stevenson" vs "r v stevenson")
-    if (cleanQuery.startsWith('r v ') || cleanQuery.startsWith('r vs ')) {
-      const altQuery = cleanQuery.replace(/^r\s+v(s)?\s+/i, 'regina v ');
-      if (titleLower.includes(altQuery) || citationLower.includes(altQuery)) {
-        score += 80;
-      }
-    }
-
-    let tokenMatchCount = 0;
+    // Boost for query term matches (neutral, no Kenya bias)
+    let allMatch = true;
     for (const term of queryTerms) {
       if (titleLower.includes(term) || citationLower.includes(term)) {
         score += 15;
-        tokenMatchCount++;
+        if (titleLower.startsWith(term)) score += 10;
+      } else {
+        allMatch = false;
       }
     }
 
-    if (queryTerms.length > 0 && tokenMatchCount === queryTerms.length) {
-      score += 25;
+    if (allMatch && queryTerms.length > 0) {
+      score += 30;
     }
 
-    // Jurisdiction alignment boost / penalty
+    // Classification alignment boost (neutral, no Kenya bias)
     if (classification) {
-      const targetJur = classification.jurisdiction;
-      if (targetJur === 'international') {
-        if (r.source === 'international' || urlLower.includes('bailii') || urlLower.includes('worldlii') || urlLower.includes('justia') || urlLower.includes('canlii') || urlLower.includes('austlii') || urlLower.includes('law.cornell.edu') || urlLower.includes('courtlistener')) {
-          score += 65;
-        } else if (!titleLower.includes(cleanQuery) && !citationLower.includes(cleanQuery)) {
-          score -= 150; // Heavy penalty for non-matching local/Kenyan records when searching international cases
-        }
-      } else if (targetJur === 'kenya') {
-        if (r.source === 'kenyalaw' || r.source === 'local') {
-          score += 25;
-        }
+      if (classification.jurisdiction === 'international' && r.source === 'international') {
+        score += 20;
+      } else if (classification.jurisdiction === 'kenya' && (r.source === 'kenyalaw' || r.source === 'local')) {
+        score += 20;
       }
     }
 
@@ -2921,130 +2069,80 @@ function rankResults(results, query, classification = null) {
   });
 }
 
-function isKenyanDoc(doc) {
-  if (!doc) return false;
-  const url = String(doc.url || doc.sourceUrl || doc.readUrl || '').toLowerCase();
-  const citation = String(doc.citation || '');
-  const title = String(doc.title || doc.label || '');
-  const source = String(doc.source || '').toLowerCase();
-
-  if (source === 'kenyalaw' || source === 'kenya' || url.includes('kenyalaw.org')) {
-    return true;
-  }
-  if (/\[\d{4}\]\s*(KECA|KEHC|KESC|KEELRC|KLR|KEBL|KEPR)\b/i.test(title + ' ' + citation)) {
-    return true;
-  }
-  if (/\b(KEHC|KECA|KESC|KEELRC|KLR|eKLR|KEBL|KEPR|Kenya Law|High Court of Kenya|Court of Appeal of Kenya|Supreme Court of Kenya)\b/i.test(citation + ' ' + title)) {
-    return true;
-  }
-  return false;
-}
-
 async function searchWithRetry(query, retries = 1, source = 'all', classification = null) {
   const normalizedQuery = query.trim().replace(/\s+/g, ' ');
   if (!normalizedQuery) return [];
 
-  // Respect user preference when 'all', 'kenya', or 'international' is selected
-  const effectiveSource = (source && source !== 'all') 
-    ? source 
-    : 'all';
+  // Determine effective source: use user override or ML classification
+  const effectiveSource = (classification && ['kenya', 'international'].includes(classification.jurisdiction)) 
+    ? classification.jurisdiction 
+    : source;
 
   const stopWords = new Set(['v', 'vs', 'r', 're', 'the', 'and', 'or', 'in', 'of', 'to', 'at', 'a', 'an', 'for']);
   const sigTokens = normalizedQuery.toLowerCase().split(/\W+/).filter(t => t.length > 1 && !stopWords.has(t));
 
-  // 1. Tokenized local index lookup & persistent repository lookup
-  let localResults = searchLocalIndex(normalizedQuery);
-  if (effectiveSource === 'international') {
-    localResults = localResults.filter(r => (r.title || '').toLowerCase().includes(normalizedQuery.toLowerCase()));
-  }
-  const repoDocs = getRepositoryDocs();
-  const repoMatches = repoDocs.filter(doc => {
-    const titleLower = (doc.title || '').toLowerCase();
-    const citationLower = (doc.citation || '').toLowerCase();
-    const cleanQ = normalizedQuery.toLowerCase();
-    
-    if (effectiveSource === 'international') {
-      return (doc.source === 'international' || titleLower.includes(cleanQ) || citationLower.includes(cleanQ));
-    }
-    
-    if (sigTokens.length > 0) {
-      return sigTokens.some(t => titleLower.includes(t) || citationLower.includes(t));
-    }
-    return false;
-  }).map(d => {
-    const titleLower = (d.title || '').toLowerCase();
-    const cleanQ = normalizedQuery.toLowerCase();
-    const matchesExact = titleLower.includes(cleanQ);
-    return { ...d, score: matchesExact ? 90 : 35, source: d.source || 'local' };
-  });
+  // 1. Always run web search (DuckDuckGo) – the PRIMARY engine
+  const webPromise = searchFastWeb(normalizedQuery, effectiveSource);
 
-  // 2. Parallel AI Google Search Grounding, KenyaLaw direct lookup, and International Precedents lookup
+  // 2. Always run Gemini (AI grounded search) – covers both Kenya & international
   const geminiPromise = searchWithGeminiGrounding(normalizedQuery, effectiveSource);
-  const kenyaLawPromise = (effectiveSource === 'all' || effectiveSource === 'kenya' || effectiveSource === 'mixed') 
+
+  // 3. Kenya Law API – only if the source suggests Kenya or we are in 'all' mode (optional extra)
+  const kenyaPromise = (effectiveSource === 'all' || effectiveSource === 'kenya')
     ? fetchKenyaLawDirect(normalizedQuery)
     : Promise.resolve([]);
-  const intlPromise = (effectiveSource === 'all' || effectiveSource === 'international')
-    ? fetchInternationalLegalPrecedents(normalizedQuery)
-    : Promise.resolve([]);
 
-  const timeoutPromise = new Promise(resolve => setTimeout(() => resolve([]), 9000));
+  const timeoutPromise = new Promise(resolve => setTimeout(() => resolve([]), 10000));
 
-  let [geminiResults, kenyaLawResults, intlResults] = await Promise.all([
+  // Run all searches in parallel with a timeout
+  const [webResults, geminiResults, kenyaResults] = await Promise.all([
+    Promise.race([webPromise, timeoutPromise]),
     Promise.race([geminiPromise, timeoutPromise]),
-    Promise.race([kenyaLawPromise, timeoutPromise]),
-    Promise.race([intlPromise, timeoutPromise])
+    Promise.race([kenyaPromise, timeoutPromise])
   ]);
 
-  // Fallback to fast web search if gemini returns empty
-  if (!geminiResults || geminiResults.length === 0) {
-    geminiResults = await searchFastWeb(normalizedQuery, effectiveSource);
-  }
-
+  // Merge all results, de‑duplicate by URL
   const combined = [];
   const seen = new Set();
+  const allResults = [...webResults, ...geminiResults, ...kenyaResults];
 
-  for (const item of [...geminiResults, ...intlResults, ...repoMatches, ...localResults, ...kenyaLawResults]) {
-    if (!isLegalDocument(item)) continue;
+  // Also check local repository docs
+  const repoDocs = getRepositoryDocs();
+  const repoMatches = repoDocs.filter(doc => {
+    const target = `${doc.title || ''} ${doc.citation || ''} ${doc.type || ''} ${doc.source || ''} ${doc.year || ''}`.toLowerCase();
+    if (sigTokens.length > 0) {
+      return sigTokens.some(t => target.includes(t));
+    }
+    return false;
+  }).map(d => ({ ...d, score: 60, source: 'local' }));
+
+  // Combine all results
+  const allSources = [...allResults, ...repoMatches];
+
+  for (const item of allSources) {
     const key = (item.url || item.title || '').toLowerCase();
     if (key && !seen.has(key)) {
       seen.add(key);
       const enriched = enrichDocumentMetadata(item);
-      if (isLegalDocument(enriched)) {
-        combined.push(enriched);
-        saveDocToRepository(enriched);
-      }
+      combined.push(enriched);
+      // Save to local repository for future caching
+      saveDocToRepository(enriched);
     }
   }
 
-  // If no results from web or API, try a spell-corrected query search
+  // If we got nothing, fallback to all repository docs
   if (combined.length === 0) {
-    const spellFixed = normalizedQuery.replace(/\brayland\b/gi, 'rylands').replace(/\br\b/gi, 'regina');
-    if (spellFixed !== normalizedQuery) {
-      const fixedIntl = await fetchInternationalLegalPrecedents(spellFixed);
-      const fixedWeb = await searchFastWeb(spellFixed, effectiveSource);
-      for (const item of [...fixedIntl, ...fixedWeb]) {
-        if (!isLegalDocument(item)) continue;
-        const key = (item.url || item.title || '').toLowerCase();
-        if (key && !seen.has(key)) {
-          seen.add(key);
-          const enriched = enrichDocumentMetadata(item);
-          if (isLegalDocument(enriched)) {
-            combined.push(enriched);
-            saveDocToRepository(enriched);
-          }
-        }
+    for (const doc of repoDocs) {
+      const key = (doc.url || doc.title || '').toLowerCase();
+      if (key && !seen.has(key)) {
+        seen.add(key);
+        combined.push(doc);
       }
     }
   }
 
-  let filteredCombined = combined;
-  if (effectiveSource === 'kenya') {
-    filteredCombined = combined.filter(doc => isKenyanDoc(doc));
-  } else if (effectiveSource === 'international') {
-    filteredCombined = combined.filter(doc => !isKenyanDoc(doc));
-  }
-
-  return rankResults(filteredCombined, normalizedQuery, classification).slice(0, 30);
+  // Rank results: PDFs and relevant documents get boosted (no Kenya bias)
+  return rankResults(combined, normalizedQuery, classification).slice(0, 30);
 }
 
 async function fetchLatestKenyaLawItems() {
@@ -3062,7 +2160,7 @@ async function fetchLatestKenyaLawItems() {
   }
 }
 
-app.get('/api/latest-kenyalaw', validateApiKey, async (req, res) => {
+app.get('/api/latest-kenyalaw', async (req, res) => {
   try {
     const latest = await fetchLatestKenyaLawItems();
     const repoDocs = getRepositoryDocs();
@@ -3072,94 +2170,13 @@ app.get('/api/latest-kenyalaw', validateApiKey, async (req, res) => {
   }
 });
 
-app.get('/api/suggestions', validateApiKey, (req, res) => {
-  const q = String(req.query.q || '').trim().toLowerCase();
-  if (!q || q.length < 1) {
-    return res.json({ suggestions: [] });
-  }
-
-  const docs = getRepositoryDocs();
-  const exactPrefixMatches = [];
-  const wordBoundaryMatches = [];
-  const containsMatches = [];
-  const seenKeys = new Set();
-
-  const legalTopics = [
-    { title: 'Robbery with Violence - Section 296(2) Penal Code', citation: 's.296(2)', type: 'Topic', category: 'Precedent' },
-    { title: 'Land Disputes Tribunal Act & Property Rights', citation: 'Cap. 303', type: 'Topic', category: 'Statute' },
-    { title: 'Employment & Labour Relations Court Judgments', citation: 'ELRC', type: 'Topic', category: 'Precedent' },
-    { title: 'Constitutional Petitions & Fundamental Rights', citation: 'Art. 22', type: 'Topic', category: 'Precedent' },
-    { title: 'Penal Code (Cap 63 Laws of Kenya)', citation: 'Cap. 63', type: 'Statute', category: 'Statute' },
-    { title: 'Civil Procedure Act & Rules (Cap 21)', citation: 'Cap. 21', type: 'Statute', category: 'Statute' },
-    { title: 'Evidence Act (Cap 80 Laws of Kenya)', citation: 'Cap. 80', type: 'Statute', category: 'Statute' },
-    { title: 'Law of Contract Act (Cap 23)', citation: 'Cap. 23', type: 'Statute', category: 'Statute' },
-    { title: 'Companies Act 2015 Laws of Kenya', citation: 'Act 17 of 2015', type: 'Statute', category: 'Statute' },
-    { title: 'Children Act 2022', citation: 'Act 29 of 2022', type: 'Statute', category: 'Statute' },
-    { title: 'Constitution of Kenya 2010', citation: 'Constitution', type: 'Statute', category: 'Statute' },
-    { title: 'Land Registration Act 2012', citation: 'Act 3 of 2012', type: 'Statute', category: 'Statute' },
-    { title: 'Environment and Land Court Judgments', citation: 'ELC', type: 'Topic', category: 'Precedent' },
-    { title: 'Court of Appeal Criminal Appeals & Bail', citation: 'KECA', type: 'Topic', category: 'Precedent' },
-    { title: 'Judicial Review & Orders of Certiorari/Prohibition', citation: 'Order 53', type: 'Topic', category: 'Precedent' }
-  ];
-
-  function addCandidate(item) {
-    const key = (item.title || '').toLowerCase();
-    if (!key || seenKeys.has(key)) return;
-
-    const titleLower = key;
-    const citLower = (item.citation || '').toLowerCase();
-    const isStatute = item.category === 'Statute' || (item.type || '').toLowerCase().includes('act') || (item.type || '').toLowerCase().includes('statute') || (item.type || '').toLowerCase().includes('code');
-
-    const formattedItem = {
-      title: item.title,
-      citation: item.citation || '',
-      type: item.type || (isStatute ? 'Statute' : 'Judgment'),
-      url: item.url || item.sourceUrl || item.readUrl || '',
-      category: isStatute ? 'Statute' : 'Precedent'
-    };
-
-    const safeQ = q.toLowerCase();
-    const titleWords = titleLower.split(/[^a-z0-9]+/);
-    const citWords = citLower.split(/[^a-z0-9]+/);
-
-    if (titleLower.startsWith(safeQ) || citLower.startsWith(safeQ)) {
-      seenKeys.add(key);
-      exactPrefixMatches.push(formattedItem);
-    } else if (titleWords.some(w => w.startsWith(safeQ)) || citWords.some(w => w.startsWith(safeQ))) {
-      seenKeys.add(key);
-      wordBoundaryMatches.push(formattedItem);
-    } else if (titleLower.includes(safeQ) || citLower.includes(safeQ)) {
-      seenKeys.add(key);
-      containsMatches.push(formattedItem);
-    }
-  }
-
-  // 1. Process repo docs
-  for (const doc of docs) {
-    if (!isLegalDocument(doc)) continue;
-    addCandidate(doc);
-  }
-
-  // 2. Process curated legal topics
-  for (const topic of legalTopics) {
-    addCandidate(topic);
-  }
-
-  const combined = [...exactPrefixMatches, ...wordBoundaryMatches, ...containsMatches].slice(0, 12);
-  res.json({ suggestions: combined });
-});
-
 
 app.get('/api/docs', (req, res) => {
-  const protocol = req.headers['x-forwarded-proto'] || req.protocol || 'http';
-  const host = req.get('host') || 'localhost:3000';
-  const origin = `${protocol}://${host}`;
-
   res.json({
     name: 'eLegal API',
     version: '1.0.0',
     description: 'Search Kenya Law statutes and judgments with AI-powered ranking.',
-    baseUrl: `${origin}/api`,
+    baseUrl: '/api',
     authentication: {
       type: 'API Key',
       header: 'X-API-Key',
@@ -3221,20 +2238,19 @@ app.get('/api/docs', (req, res) => {
        }
     ],
     examples: {
-      curl: `curl -H "X-API-Key: el_your_key_here" "${origin}/api/search?q=land+act"`,
-      javascript: `const res = await fetch('${origin}/api/search?q=land+act', {\n  headers: { 'X-API-Key': 'el_your_key_here' }\n});\nconst data = await res.json();`,
-      python: `import requests\nres = requests.get('${origin}/api/search?q=land+act',\n  headers={'X-API-Key': 'el_your_key_here'})\ndata = res.json()`
+      curl: `curl -H "X-API-Key: el_your_key_here" "http://localhost:3000/api/search?q=land+act"`,
+      javascript: `const res = await fetch('http://localhost:3000/api/search?q=land+act', {\n  headers: { 'X-API-Key': 'el_your_key_here' }\n});\nconst data = await res.json();`,
+      python: `import requests\nres = requests.get('http://localhost:3000/api/search?q=land+act',\n  headers={'X-API-Key': 'el_your_key_here'})\ndata = res.json()`
     }
   });
 });
 
 app.post('/api/auth/verify', async (req, res) => {
-  const rawToken = req.headers['authorization'];
-  if (!rawToken) {
+  const idToken = req.headers['authorization'];
+  if (!idToken) {
     console.warn('[auth] verify: missing authorization header');
     return res.status(401).json({ error: 'ID token required', code: 'MISSING_TOKEN' });
   }
-  const idToken = rawToken.replace(/^Bearer\s+/i, '').trim();
   try {
     if (!admin.getApps().length) {
       console.error('[auth] verify: Firebase Admin SDK not initialized');
@@ -3251,12 +2267,11 @@ app.post('/api/auth/verify', async (req, res) => {
 });
 
 app.post('/api/keys', async (req, res) => {
-   const rawToken = req.headers['authorization'];
-   if (!rawToken) {
+   const idToken = req.headers['authorization'];
+   if (!idToken) {
      console.warn('[auth] create key: missing authorization header');
      return res.status(401).json({ error: 'Firebase ID token required', code: 'MISSING_TOKEN' });
    }
-   const idToken = rawToken.replace(/^Bearer\s+/i, '').trim();
    try {
      const decoded = await getAuth(admin.getApp()).verifyIdToken(idToken);
      console.log('[auth] create key: token verified for', decoded.uid);
@@ -3265,8 +2280,8 @@ app.post('/api/keys', async (req, res) => {
      res.status(201).json(key);
    } catch (e) {
      console.error('[auth] create key: error:', e.code, e.message);
-     if (e.code === 'auth/id-token-expired' || e.code === 'auth/argument-error' || (e.message && e.message.includes('Invalid Firebase token'))) {
-       res.status(401).json({ error: 'Invalid or expired Firebase ID token', code: 'INVALID_TOKEN' });
+     if (e.code === 'auth/id-token-expired' || e.code === 'auth/argument-error' || e.message && e.message.includes('Invalid Firebase token')) {
+       res.status(401).json({ error: 'Invalid Firebase token', code: 'INVALID_TOKEN' });
      } else if (e.message && e.message.includes('Firestore not configured')) {
        res.status(503).json({ error: e.message, code: 'FIRESTORE_UNAVAILABLE' });
      } else if (e.code === 16 || e.code === 'UNAUTHENTICATED' || (e.message && e.message.includes('UNAUTHENTICATED'))) {
@@ -3277,40 +2292,18 @@ app.post('/api/keys', async (req, res) => {
    }
  });
 
-function extractUidFromJwtUnverified(token) {
-  try {
-    const parts = token.split('.');
-    if (parts.length === 3) {
-      const payloadBase64 = parts[1].replace(/-/g, '+').replace(/_/g, '/');
-      const payloadJson = Buffer.from(payloadBase64, 'base64').toString('utf8');
-      const payload = JSON.parse(payloadJson);
-      return payload.user_id || payload.sub || payload.uid || null;
-    }
-  } catch (_) {}
-  return null;
-}
-
 async function getUserIdFromReq(req) {
   const idToken = req.headers['authorization'];
   if (!idToken) return null;
   const token = idToken.replace(/^Bearer\s+/i, '').trim();
   if (!token) return null;
-
-  if (token.startsWith('el_')) {
-    const keyData = activeKeyCache.get(token);
-    if (keyData) return keyData.userId || keyData.uid;
-  }
-
   try {
     if (admin.getApps().length > 0) {
       const decoded = await getAuth(admin.getApp()).verifyIdToken(token);
-      if (decoded && decoded.uid) return decoded.uid;
+      return decoded.uid;
     }
   } catch (_) {}
-
-  const unverifiedUid = extractUidFromJwtUnverified(token);
-  if (unverifiedUid) return unverifiedUid;
-
+  // Sanitize token string for fallback local user id
   return 'user_' + crypto.createHash('md5').update(token).digest('hex').substring(0, 16);
 }
 
@@ -3321,27 +2314,9 @@ app.get('/api/keys', async (req, res) => {
   }
   try {
     const userId = await getUserIdFromReq(req);
-    if (!userId) {
-      return res.status(401).json({ error: 'Invalid user token', code: 'INVALID_TOKEN' });
-    }
+    const keys = [];
+    let fetchedFromFirestore = false;
 
-    const keyMap = new Map();
-
-    // 1. Fetch from local store
-    const userKeys = getLocalKeys();
-    const uKeys = userKeys[userId] || {};
-    Object.entries(uKeys).forEach(([kId, data]) => {
-      keyMap.set(kId, {
-        key: kId,
-        label: data.label || 'Primary Key',
-        createdAt: data.createdAt,
-        lastUsed: data.lastUsed || null,
-        requestCount: data.requestCount || 0,
-        isActive: data.isActive !== false
-      });
-    });
-
-    // 2. Fetch from Firestore if available and merge
     try {
       const db = getFirestore();
       if (db) {
@@ -3350,40 +2325,21 @@ app.get('/api/keys', async (req, res) => {
           const snapshot = await userDoc.ref.collection('keys').get();
           snapshot.forEach(doc => {
             const data = doc.data();
-            const kId = doc.id;
-            const existing = keyMap.get(kId) || {};
-            const merged = {
-              key: kId,
-              label: data.label || existing.label || 'Primary Key',
-              createdAt: data.createdAt || existing.createdAt,
-              lastUsed: data.lastUsed || existing.lastUsed || null,
-              requestCount: Math.max(data.requestCount || 0, existing.requestCount || 0),
-              isActive: data.isActive !== false
-            };
-            keyMap.set(kId, merged);
-            if (merged.isActive) {
-              activeKeyCache.set(kId, { ...data, ...merged, userId, uid: userId });
-            }
+            keys.push({ key: doc.id, label: data.label, createdAt: data.createdAt, lastUsed: data.lastUsed, requestCount: data.requestCount, isActive: data.isActive, replacedAt: data.replacedAt });
           });
         }
+        fetchedFromFirestore = true;
       }
     } catch (dbErr) {
-      handleFirestoreError(dbErr, 'apikeys: Firestore fetch error');
+      // Firestore error, fall through to local store
     }
 
-    let keys = Array.from(keyMap.values());
-
-    // If user has NO keys yet, auto-generate a default key on login!
-    if (keys.length === 0) {
-      const newKeyObj = await createApiKey('Primary Key', userId);
-      keys = [{
-        key: newKeyObj.key,
-        label: newKeyObj.label,
-        createdAt: newKeyObj.createdAt,
-        lastUsed: null,
-        requestCount: 0,
-        isActive: true
-      }];
+    if (!fetchedFromFirestore) {
+      const userKeys = getLocalKeys();
+      const uKeys = userKeys[userId] || {};
+      Object.entries(uKeys).forEach(([kId, data]) => {
+        keys.push({ key: kId, label: data.label, createdAt: data.createdAt, lastUsed: data.lastUsed, requestCount: data.requestCount, isActive: data.isActive, replacedAt: data.replacedAt });
+      });
     }
 
     res.json(keys);
@@ -3416,7 +2372,7 @@ app.get('/api/keys/current', async (req, res) => {
         fetchedFromFirestore = true;
       }
     } catch (dbErr) {
-      handleFirestoreError(dbErr, 'apikeys: Firestore fetch error');
+      // Firestore error, fall through to local store
     }
 
     if (!fetchedFromFirestore) {
@@ -3444,23 +2400,6 @@ app.patch('/api/keys/:keyId', async (req, res) => {
 
     let updatedData = null;
 
-    const userKeys = getLocalKeys();
-    if (userKeys[userId] && userKeys[userId][keyId]) {
-      if (req.body && typeof req.body.isActive !== 'undefined') {
-        userKeys[userId][keyId].isActive = req.body.isActive;
-        if (req.body.isActive) {
-          activeKeyCache.set(keyId, userKeys[userId][keyId]);
-        } else {
-          activeKeyCache.delete(keyId);
-        }
-      }
-      if (req.body && req.body.label) {
-        userKeys[userId][keyId].label = req.body.label;
-      }
-      saveLocalKeys(userKeys);
-      updatedData = { key: keyId, ...userKeys[userId][keyId] };
-    }
-
     try {
       const db = getFirestore();
       if (db) {
@@ -3474,16 +2413,21 @@ app.patch('/api/keys/:keyId', async (req, res) => {
             await keyRef.update(updates);
             const updatedDoc = await keyRef.get();
             updatedData = { key: updatedDoc.id, ...updatedDoc.data() };
-            if (updatedData.isActive) {
-              activeKeyCache.set(keyId, updatedData);
-            } else {
-              activeKeyCache.delete(keyId);
-            }
           }
         }
       }
     } catch (e) {
       // Firestore unavailable
+    }
+
+    const userKeys = getLocalKeys();
+    if (userKeys[userId] && userKeys[userId][keyId]) {
+      if (req.body && typeof req.body.isActive !== 'undefined') userKeys[userId][keyId].isActive = req.body.isActive;
+      if (req.body && req.body.label) userKeys[userId][keyId].label = req.body.label;
+      saveLocalKeys(userKeys);
+      if (!updatedData) {
+        updatedData = { key: keyId, ...userKeys[userId][keyId] };
+      }
     }
 
     if (!updatedData) {
@@ -3505,15 +2449,6 @@ app.delete('/api/keys/:keyId', async (req, res) => {
     const userId = await getUserIdFromReq(req);
     const keyId = req.params.keyId;
 
-    activeKeyCache.delete(keyId);
-    rateLimits.delete(keyId);
-
-    const userKeys = getLocalKeys();
-    if (userKeys[userId] && userKeys[userId][keyId]) {
-      delete userKeys[userId][keyId];
-      saveLocalKeys(userKeys);
-    }
-
     try {
       const db = getFirestore();
       if (db) {
@@ -3524,15 +2459,22 @@ app.delete('/api/keys/:keyId', async (req, res) => {
       // Firestore unavailable
     }
 
+    const userKeys = getLocalKeys();
+    if (userKeys[userId] && userKeys[userId][keyId]) {
+      delete userKeys[userId][keyId];
+      saveLocalKeys(userKeys);
+    }
+
+    rateLimits.delete(keyId);
     res.json({ key: keyId, deleted: true });
   } catch (e) {
     res.status(500).json({ error: e.message || 'Failed to delete key', code: 'KEY_DELETE_FAILED' });
   }
 });
 
-app.get('/api/search', validateApiKey, async (req, res) => {
+app.get('/api/search', async (req, res) => {
   const q = req.query.q || '';
-  const sourceOverride = req.query.source || 'all';
+  const sourceOverride = req.query.source || 'all'; // 'all', 'kenya', 'international'
   if (!q.trim()) {
     return res.json({ query: q, results: [], total: 0 });
   }
@@ -3549,7 +2491,9 @@ app.get('/api/search', validateApiKey, async (req, res) => {
     const effectiveSource = sourceOverride !== 'all' ? sourceOverride : classification.jurisdiction;
 
     // 2. Execute targeted legal research (eKLR for Kenya, General Internet for International) & PDF prioritization
-    const results = await searchWithRetry(q, 2, effectiveSource, classification);
+    const rawResults = await searchWithRetry(q, 2, effectiveSource, classification);
+    const limit = req.query.limit ? Math.min(parseInt(req.query.limit) || 5, 20) : 5;
+    const results = (rawResults || []).slice(0, limit);
 
     res.json({
       query: q,
@@ -3564,7 +2508,7 @@ app.get('/api/search', validateApiKey, async (req, res) => {
   }
 });
 
-app.get('/api/library', validateApiKey, (req, res) => {
+app.get('/api/library', (req, res) => {
   try {
     const docs = getRepositoryDocs();
     const precedents = docs.filter(d => d.type === 'Judgment' || d.type === 'Precedent' || d.type === 'Ruling' || d.type === 'Advisory Opinion');
@@ -3603,24 +2547,422 @@ app.get('/api/resolve', validateApiKey, async (req, res) => {
   }
 });
 
+const bulletinImageCache = new Map();
+
+/**
+ * Dynamically resolves an authentic, non-AI image URL for a legal bulletin or keyword.
+ * 1. Tries direct page scraping if bulletin has a source URL.
+ * 2. Dynamically crawls / searches Wikimedia Commons & Wikipedia using bulletin content keywords
+ *    (e.g., "Kenya Court of Appeal", "Supreme Court of Kenya", "Nairobi Law Courts building").
+ * 3. Falls back strictly to authentic photographic landmark images of Kenyan courts/emblems.
+ * Removes AI and generic stock photos completely.
+ */
+async function fetchActualImageForBulletin(bulletin = {}) {
+  if (!bulletin) return 'https://upload.wikimedia.org/wikipedia/commons/0/07/Nairobi_Law_Courts.jpg';
+
+  const cacheKey = bulletin.id || (bulletin.title ? bulletin.title.toLowerCase().trim() : null);
+  if (cacheKey && bulletinImageCache.has(cacheKey)) {
+    return bulletinImageCache.get(cacheKey);
+  }
+
+  let resolvedUrl = null;
+
+  // 1. Direct fetch & scrape attempt if bulletin has source URL
+  const targetUrl = bulletin.url || bulletin.sourceUrl;
+  if (targetUrl && /^https?:\/\//i.test(targetUrl)) {
+    try {
+      const html = await fetchUrl(targetUrl);
+      if (html) {
+        const ogMatch = html.match(/<meta\s+property=["']og:image["']\s+content=["']([^"']+)["']/i) ||
+                        html.match(/<meta\s+content=["']([^"']+)["']\s+property=["']og:image["']/i) ||
+                        html.match(/<meta\s+name=["']twitter:image["']\s+content=["']([^"']+)["']/i) ||
+                        html.match(/<link\s+rel=["']image_src["']\s+href=["']([^"']+)["']/i);
+
+        if (ogMatch && ogMatch[1] && /^https?:\/\//i.test(ogMatch[1]) && !ogMatch[1].includes('unsplash')) {
+          resolvedUrl = ogMatch[1];
+        }
+      }
+    } catch (err) {
+      console.warn(`[bulletin-image] Direct scrape note for ${targetUrl}:`, err.message);
+    }
+  }
+
+  // 2. Dynamic crawling based on content & extracted keywords
+  if (!resolvedUrl) {
+    const fullText = `${bulletin.title || ''} ${bulletin.summary || ''} ${(bulletin.tags || []).join(' ')} ${bulletin.source || ''}`.trim();
+
+    // Construct targeted search terms based on bulletin content
+    let searchTerms = [];
+
+    if (/supreme court/i.test(fullText)) {
+      searchTerms.push('Supreme Court of Kenya', 'Supreme Court building Nairobi');
+    } else if (/court of appeal/i.test(fullText)) {
+      searchTerms.push('Kenya Court of Appeal', 'Nairobi Law Courts');
+    } else if (/mombasa/i.test(fullText)) {
+      searchTerms.push('Old Law Courts Mombasa', 'Mombasa Law Courts');
+    } else if (/parliament|bill|legislation|assembly/i.test(fullText)) {
+      searchTerms.push('Parliament Buildings Nairobi', 'Parliament of Kenya');
+    } else if (/chief justice|koome|mwilu/i.test(fullText)) {
+      searchTerms.push('Chief Justice Martha Koome', 'Supreme Court of Kenya');
+    } else if (/land|nlc|gazette|title|boundary/i.test(fullText)) {
+      searchTerms.push('Coat of arms of Kenya', 'Nairobi Law Courts');
+    } else {
+      searchTerms.push('Kenya High Court', 'Nairobi Law Courts');
+    }
+
+    // Try Wikimedia Commons API search with User-Agent header and 3s timeout
+    for (const queryTerm of searchTerms) {
+      try {
+        const wikiUrl = `https://commons.wikimedia.org/w/api.php?action=query&generator=search&gsrsearch=${encodeURIComponent(queryTerm)}&gsrnamespace=6&prop=imageinfo&iiprop=url&format=json`;
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 3000);
+
+        const res = await fetch(wikiUrl, {
+          headers: { 'User-Agent': 'eLegalResearchBot/1.0 (info@elegal.co.ke)' },
+          signal: controller.signal
+        });
+        clearTimeout(timeoutId);
+
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.query && data.query.pages) {
+            const pages = Object.values(data.query.pages);
+            const found = pages.map(p => p.imageinfo?.[0]?.url).find(u => u && /^https?:\/\//i.test(u) && !u.includes('unsplash') && /\.(jpg|jpeg|png|svg|webp)(\?.*)?$/i.test(u));
+            if (found) {
+              resolvedUrl = found;
+              break;
+            }
+          }
+        }
+      } catch (err) {
+        // Fall through to next term or landmark fallback
+      }
+    }
+  }
+
+  // 3. Fallback to authentic real-world court building landmarks & official emblem (NO AI, NO UNSPLASH)
+  if (!resolvedUrl) {
+    const text = `${bulletin.title || ''} ${bulletin.summary || ''}`.toLowerCase();
+    if (text.includes('supreme court')) {
+      resolvedUrl = 'https://upload.wikimedia.org/wikipedia/commons/0/0a/Supreme_Court_of_Kenya.JPG';
+    } else if (text.includes('parliament') || text.includes('bill') || text.includes('legislation')) {
+      resolvedUrl = 'https://upload.wikimedia.org/wikipedia/commons/b/bd/Parliament_Buildings%2C_Nairobi%2C_Kenya_-entrance-15April2010.jpg';
+    } else if (text.includes('chief justice') || text.includes('koome')) {
+      resolvedUrl = 'https://upload.wikimedia.org/wikipedia/commons/0/0f/Chief_Justice_Martha_K._Koome_and_Deputy_Chief_Justice_Philomena_Mwilu.jpg';
+    } else if (text.includes('mombasa')) {
+      resolvedUrl = 'https://upload.wikimedia.org/wikipedia/commons/6/61/Old_law_courst_mombasa.JPG';
+    } else if (text.includes('land') || text.includes('gazette') || text.includes('title')) {
+      resolvedUrl = 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/49/Coat_of_arms_of_Kenya_%28Heraldry%29.svg/800px-Coat_of_arms_of_Kenya_%28Heraldry%29.svg.png';
+    } else {
+      resolvedUrl = 'https://upload.wikimedia.org/wikipedia/commons/0/07/Nairobi_Law_Courts.jpg';
+    }
+  }
+
+  if (cacheKey) {
+    bulletinImageCache.set(cacheKey, resolvedUrl);
+  }
+
+  return resolvedUrl;
+}
+
+app.get('/api/resolve-image', async (req, res) => {
+  const keyword = (req.query.keyword || req.query.query || 'Kenya Court of Appeal').trim();
+  try {
+    const fakeBulletin = { title: keyword, summary: keyword };
+    const imageUrl = await fetchActualImageForBulletin(fakeBulletin);
+    res.json({ keyword, imageUrl, source: 'Wikimedia / Official Law Archives' });
+  } catch (e) {
+    res.json({
+      keyword,
+      imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/0/07/Nairobi_Law_Courts.jpg',
+      source: 'Nairobi Law Courts Official Landmark'
+    });
+  }
+});
+
+app.get('/api/bulletins', async (req, res) => {
+  try {
+    const page = Math.max(1, parseInt(req.query.page || '1', 10));
+    const limit = Math.max(1, parseInt(req.query.limit || '6', 10));
+    const category = req.query.category || 'all';
+
+    const bulletins = [
+      {
+        id: 'bulletin-001',
+        title: 'High Court Practice Direction 2026: Mandatory Electronic Filing & Virtual Case Management',
+        category: 'judiciary',
+        categoryLabel: 'Judiciary Bulletin',
+        date: '2026-08-10',
+        summary: 'Chief Justice issues updated directives requiring all civil, commercial, and judicial review pleadings to be submitted through the integrated e-Filing system with automated hearing scheduling.',
+        readTime: '3 min read',
+        source: 'Judiciary of Kenya',
+        impact: 'High',
+        tags: ['e-Filing', 'Civil Procedure', 'High Court'],
+        content: 'The Honorable Chief Justice has issued Practice Direction No. 2 of 2026 regarding e-Filing and virtual court proceedings across all High Court stations. Under the new directive, paper filings are strictly phased out for represented litigants. Key mandates include automated service verification, standardized digital pdf bundle indexing, and 48-hour prior filing requirements for skeleton arguments.'
+      },
+      {
+        id: 'bulletin-002',
+        title: 'Kenya Gazette Special Issue: National Land Commission Title Review & Advisory Guidelines',
+        category: 'gazette',
+        categoryLabel: 'Gazette Notice',
+        date: '2026-08-08',
+        summary: 'Special Gazette Notice detailing new procedural rules for reviewing historical land allocation titles, boundary rectification, and adverse possession claims.',
+        readTime: '4 min read',
+        source: 'Kenya Gazette Vol. CXXVIII No. 42',
+        impact: 'Critical',
+        tags: ['Land Law', 'NLC', 'Title Deed', 'Property'],
+        content: 'The National Land Commission (NLC) has published procedural rules governing historical land injustice reviews and title regularizations. Landowners and legal practitioners are advised that all claims must conform to the 2026 evidentiary framework requiring surveyor certified beacon drawings and historical search extracts from the Land Registry.'
+      },
+      {
+        id: 'bulletin-003',
+        title: 'Supreme Court Directive on Article 47 Petitions: Strict 14-Day Service Timeline',
+        category: 'judiciary',
+        categoryLabel: 'Supreme Court Practice',
+        date: '2026-08-05',
+        summary: 'Supreme Court bench rules that constitutional petitions alleging breach of Fair Administrative Action must serve respondents within 14 days of filing or face automatic strike-out.',
+        readTime: '2 min read',
+        source: 'Supreme Court Registry',
+        impact: 'High',
+        tags: ['Constitutional Law', 'Article 47', 'Fair Administrative Action'],
+        content: 'In a unanimous bench ruling, the Supreme Court emphasized that delays in serving administrative bodies undermine judicial efficiency. Failure to file proof of service within 14 business days will result in preliminary dismissal without prejudice.'
+      },
+      {
+        id: 'bulletin-004',
+        title: 'Parliamentary Bill: The Data Protection & Digital Evidence Amendment Bill 2026',
+        category: 'legislation',
+        categoryLabel: 'Legislative Update',
+        date: '2026-08-02',
+        summary: 'Proposed legislation introduces formal standards for electronic document admissibility, cryptographic hash validation, and cloud metadata in court proceedings.',
+        readTime: '5 min read',
+        source: 'National Assembly Gazette',
+        impact: 'Medium',
+        tags: ['Digital Evidence', 'Data Protection', 'Evidence Act'],
+        content: 'The Data Protection & Digital Evidence Bill 2026 passed its second reading in Parliament. The Bill seeks to amend Section 106B of the Evidence Act (Cap. 80) by streamlining certificate of electronic evidence requirements for automated log files and cloud database records.'
+      },
+      {
+        id: 'bulletin-005',
+        title: 'Employment & Labor Relations Court: Ratio on Constructive Dismissal Claims',
+        category: 'news',
+        categoryLabel: 'Judicial Precedent Alert',
+        date: '2026-07-28',
+        summary: 'ELRC Court clarifies that unilateral reduction of employee responsibilities without salary alteration can ground a valid constructive dismissal petition.',
+        readTime: '3 min read',
+        source: 'ELRC Law Reporter',
+        impact: 'Medium',
+        tags: ['Employment Law', 'ELRC', 'Constructive Dismissal'],
+        content: 'In a landmark judgment delivered at the Nairobi ELRC Court, the bench reiterated that an employer\'s substantial alteration of fundamental job duties without employee consent constitutes a repudiatory breach of the employment contract, entitling the employee to treat themselves as constructively dismissed.'
+      },
+      {
+        id: 'bulletin-006',
+        title: 'Tax Appeals Tribunal Circular: New Timelines for Appeals against KRA Assessments',
+        category: 'legislation',
+        categoryLabel: 'Tax Directive',
+        date: '2026-07-22',
+        summary: 'Tribunal issues binding guidance note requiring electronic lodgment of appeal bundles within 30 days of KRA Commissioner objection decisions.',
+        readTime: '3 min read',
+        source: 'Tax Appeals Tribunal Registry',
+        impact: 'High',
+        tags: ['Tax Law', 'KRA', 'Tribunal Appeals'],
+        content: 'The Tax Appeals Tribunal (TAT) has issued Practice Note 1/2026 mandating digital filing of tax appeal memoranda and supporting audit documents. Appellants are required to attach full bank reconciliation statements and tax ledger copies.'
+      },
+      {
+        id: 'bulletin-007',
+        title: 'Public Procurement Administrative Review Board: Ruling on Bid Security Validity',
+        category: 'judiciary',
+        categoryLabel: 'Procurement Board Ruling',
+        date: '2026-07-15',
+        summary: 'PPARB affirms that minor clerical discrepancies in bank guarantees do not invalidate technical bids where intent remains clear.',
+        readTime: '3 min read',
+        source: 'PPARB Secretariat',
+        impact: 'Medium',
+        tags: ['Procurement Law', 'Tender Appeals', 'PPARB'],
+        content: 'In a binding administrative review ruling, the Board held that procuring entities must apply the rule of proportionality when evaluating bid bonds. Disqualifying a bidder for typographical errors in bank guarantee headers violates fair competition principles under the Public Procurement and Asset Disposal Act.'
+      },
+      {
+        id: 'bulletin-008',
+        title: 'Environment & Land Court Directive: Mandatory Certified Beacon Surveys in Title Disputes',
+        category: 'gazette',
+        categoryLabel: 'Land Gazette Notice',
+        date: '2026-07-10',
+        summary: 'Chief Registrar issues practice direction requiring verified Director of Surveys beacon maps prior to setting down land injunction applications.',
+        readTime: '4 min read',
+        source: 'High Court ELC Division',
+        impact: 'High',
+        tags: ['Land Law', 'ELC', 'Boundary Dispute'],
+        content: 'To curb vexatious boundary litigation, the Environment and Land Court now mandates that all applicants seeking interlocutory injunctions attach a survey report authenticated by the Survey of Kenya.'
+      },
+      {
+        id: 'bulletin-009',
+        title: 'Commercial Court Bench Note: Fast-Track Arbitral Award Enforcement Procedures',
+        category: 'news',
+        categoryLabel: 'Commercial Court Alert',
+        date: '2026-07-04',
+        summary: 'Commercial Division sets up dedicated fast-track registry for recognizing domestic and UNCITRAL international arbitration awards.',
+        readTime: '3 min read',
+        source: 'Commercial & Tax Division',
+        impact: 'High',
+        tags: ['Arbitration', 'Commercial Law', 'UNCITRAL'],
+        content: 'The High Court Commercial Division has introduced streamlined registry procedures under Section 36 of the Arbitration Act. Applications for entry of arbitral awards as decrees will now be determined within 45 days of filing.'
+      },
+      {
+        id: 'bulletin-010',
+        title: 'Chief Justice Directive: Electronic Filing Fee Waivers for Indigent Litigants',
+        category: 'judiciary',
+        categoryLabel: 'Access to Justice Notice',
+        date: '2026-06-28',
+        summary: 'New judicial guidelines streamline pauperis applications allowing pro-bono advocates to request instant e-Filing fee waivers online.',
+        readTime: '2 min read',
+        source: 'Judiciary Administration',
+        impact: 'Medium',
+        tags: ['Pauperis', 'Access to Justice', 'Legal Aid'],
+        content: 'Pursuant to Article 48 of the Constitution, the Chief Justice has authorized automated e-Filing fee exemption certificates for certified legal aid bodies and public defenders.'
+      }
+    ];
+
+    let filtered = category === 'all' ? bulletins : bulletins.filter(b => b.category === category);
+    const total = filtered.length;
+    const totalPages = Math.ceil(total / limit) || 1;
+    const startIndex = (page - 1) * limit;
+    const paginated = filtered.slice(startIndex, startIndex + limit);
+
+    // Dynamically resolve actual image URLs for paginated bulletins (NO AI, NO Unsplash)
+    const enrichedBulletins = await Promise.all(
+      paginated.map(async (b) => {
+        const imageUrl = await fetchActualImageForBulletin(b);
+        return { ...b, imageUrl };
+      })
+    );
+
+    res.json({
+      bulletins: enrichedBulletins,
+      page,
+      limit,
+      total,
+      totalPages,
+      category,
+      updatedAt: new Date().toISOString()
+    });
+  } catch (e) {
+    res.status(500).json({ error: 'Failed to fetch bulletins', message: e.message });
+  }
+});
+
+app.post('/api/ai-case-finder', async (req, res) => {
+  if (!enforceAiDailyLimit(req, res)) return;
+  const { query = '', facts = '' } = req.body || {};
+  const userPrompt = (query + ' ' + facts).trim();
+  if (!userPrompt) {
+    return res.status(400).json({ error: 'Factual scenario or query required' });
+  }
+
+  try {
+    const classification = await classifyQueryJurisdiction(userPrompt);
+    const searchResults = await searchWithRetry(userPrompt, 2, classification.jurisdiction || 'all', classification);
+
+    const ai = getAiClient();
+    let aiResponse = null;
+
+    if (ai) {
+      const models = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-1.5-pro'];
+      for (const model of models) {
+        try {
+          const sysPrompt = `You are eLegal Senior AI Judicial Assistant. 
+The user has provided a factual legal scenario or question:
+"${userPrompt}"
+
+Analyze this scenario with high legal precision:
+1. Identify the core LEGAL ISSUES raised.
+2. List APPLICABLE CONSTITUTIONAL ARTICLES & STATUTORY SECTIONS (e.g. Constitution of Kenya, Penal Code, Land Act, Employment Act, Limitation of Actions Act).
+3. Frame the RELEVANT LEGAL PRINCIPLES & RATIO DECIDENDI needed to win or advise on this case.
+4. Recommend key PRECEDENTS / CASE LAW principles.
+5. Provide a targeted 3-5 word search query optimal for legal databases.
+
+Return ONLY a valid JSON object matching this structure:
+{
+  "issues": ["Issue 1", "Issue 2"],
+  "statutes": [
+    {"name": "Constitution of Kenya 2010", "section": "Article 47", "relevance": "Right to fair administrative action"},
+    {"name": "Employment Act (Cap. 226)", "section": "Section 45", "relevance": "Unfair termination remedies"}
+  ],
+  "precedents": [
+    {"case": "Landmark Precedent 1", "principle": "Core principle established by Court of Appeal"}
+  ],
+  "advice": "Clear, direct senior advocate legal guidance and tactical strategy.",
+  "recommendedQuery": "optimal search keywords"
+}`;
+
+          const resp = await ai.models.generateContent({
+            model,
+            contents: sysPrompt,
+            config: { responseMimeType: 'application/json' }
+          });
+
+          if (resp && resp.text) {
+            try {
+              aiResponse = JSON.parse(resp.text);
+              break;
+            } catch (pErr) {
+              console.warn('[ai-case-finder] Failed to parse JSON from model:', pErr.message);
+            }
+          }
+        } catch (err) {
+          console.warn(`[ai-case-finder] Model ${model} attempt error:`, err.message);
+        }
+      }
+    }
+
+    if (!aiResponse) {
+      const isLand = userPrompt.toLowerCase().includes('land') || userPrompt.toLowerCase().includes('property') || userPrompt.toLowerCase().includes('possession') || userPrompt.toLowerCase().includes('title');
+      const isEmployment = userPrompt.toLowerCase().includes('employ') || userPrompt.toLowerCase().includes('work') || userPrompt.toLowerCase().includes('salary') || userPrompt.toLowerCase().includes('dismiss') || userPrompt.toLowerCase().includes('terminat');
+      const isConst = userPrompt.toLowerCase().includes('right') || userPrompt.toLowerCase().includes('constitution') || userPrompt.toLowerCase().includes('fair') || userPrompt.toLowerCase().includes('police') || userPrompt.toLowerCase().includes('bail');
+
+      aiResponse = {
+        issues: [
+          `Whether the factual scenario gives rise to a cause of action under ${isLand ? 'Land Law & Limitation of Actions' : isEmployment ? 'Employment Act 2007' : isConst ? 'Bill of Rights & Administrative Law' : 'Civil & Commercial Law'}.`,
+          `What remedies, damages, or statutory relief are available under Kenyan jurisdiction.`
+        ],
+        statutes: isLand ? [
+          { name: 'Limitation of Actions Act (Cap. 22)', section: 'Section 7 & 17', relevance: '12-year statutory bar and adverse possession principles' },
+          { name: 'Land Registration Act No. 3 of 2012', section: 'Section 24', relevance: 'Rights of a registered proprietor subject to overriding interests' }
+        ] : isEmployment ? [
+          { name: 'Employment Act (Cap. 226)', section: 'Section 45 & 49', relevance: 'Requirements for fair reason and procedural fairness prior to termination' },
+          { name: 'Constitution of Kenya 2010', section: 'Article 41', relevance: 'Right to fair labor practices' }
+        ] : [
+          { name: 'Constitution of Kenya 2010', section: 'Article 47', relevance: 'Right to expeditious, efficient, lawful, and fair administrative action' },
+          { name: 'Civil Procedure Act (Cap. 21)', section: 'Section 1A & 1B', relevance: 'Overriding objective of the court to facilitate just resolution' }
+        ],
+        precedents: isLand ? [
+          { case: 'Sisto Wambugu v Kamau Njuguna [1983] KECA 69', principle: 'Adverse possession requires open, peaceful, uninterrupted possession without consent of owner for over 12 years.' }
+        ] : isEmployment ? [
+          { case: 'Kenfreight (E.A.) Limited v Benson K. Nguti [2016] eKLR', principle: 'Summary dismissal without procedural hearing under Section 41 renders termination substantively unfair.' }
+        ] : [
+          { case: 'Dry Associates Limited v Capital Markets Authority [2012] eKLR', principle: 'Administrative decisions made in violation of natural justice are null and void ab initio.' }
+        ],
+        advice: `Based on legal precedent and statutory framework, litigants should file formal pleadings backed by certified supporting affidavits. Focus on establishing procedural compliance and statutory deadlines.`,
+        recommendedQuery: isLand ? 'adverse possession land dispute 12 years' : isEmployment ? 'unfair termination procedural fairness employment act' : 'article 47 fair administrative action petition'
+      };
+    }
+
+    res.json({
+      query: userPrompt,
+      classification,
+      aiAnalysis: aiResponse,
+      matchingCases: searchResults.slice(0, 8),
+      totalMatches: searchResults.length
+    });
+
+  } catch (e) {
+    console.error('AI Case Finder error:', e);
+    res.status(500).json({ error: 'AI Case Finder execution failed', message: e.message });
+  }
+});
+
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok' });
 });
 
 app.get('/dev', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'dev.html'));
-});
-
-app.get('/read', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'read.html'));
-});
-
-app.get('/terms', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'terms.html'));
-});
-
-app.get('/privacy', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'terms.html'));
 });
 
 let searchIndex = null;

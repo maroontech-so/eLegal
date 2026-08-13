@@ -3,24 +3,11 @@
 
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-    <title>eLegal Document Reader Studio — Read, Analyze & Cite Legal Precedents 📚</title>
-    <meta name="description" content="Interactive legal document reader studio featuring PDF & Word DOCX viewers, Google Gemini AI legal analysis, case ratio extraction, and OSCOLA/Bluebook citation generator.">
-    
-    <!-- Open Graph / Social Sharing -->
-    <meta property="og:type" content="article">
-    <meta property="og:url" content="https://elegal-hteg.onrender.com/read">
-    <meta property="og:title" content="eLegal Legal Reader & AI Assistant Studio ⚖️">
-    <meta property="og:description" content="⚡ Deep dive into case judgments, statutes, and constitutional acts with instant AI case summaries, ratio decidendi extraction, and academic citations.">
-    <meta property="og:image" content="/share-thumbnail.png">
-    <meta property="og:image:secure_url" content="/share-thumbnail.png">
-    <meta property="og:image:alt" content="eLegal Document Reader Studio Preview">
-
-    <!-- Twitter -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="eLegal Legal Reader & AI Assistant Studio ⚖️">
-    <meta name="twitter:description" content="⚡ Deep dive into case judgments, statutes, and constitutional acts with instant AI case summaries, ratio decidendi extraction, and academic citations.">
-    <meta name="twitter:image" content="/share-thumbnail.png">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes" />
+    <title>eLegal | Kenya Judicial Document & Statute Reader</title>
+    <meta name="description" content="Read Kenya eKLR court decisions, legal precedents, and Acts of Parliament with AI-grounded legal brief summarization." />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://elegal.or.ke/read" />
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet" />
     <style>
@@ -282,13 +269,13 @@
         }
 
         /* ============================================================
-           VIEWER CONTAINER & ZOOM BAR
+           VIEWER CONTAINER
            ============================================================ */
         .viewer-container {
             flex: 1;
             overflow-y: auto;
-            overflow-x: auto;
-            padding: 16px 12px 100px 12px;
+            overflow-x: hidden;
+            padding: 20px 12px 100px 12px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -296,65 +283,6 @@
             -webkit-overflow-scrolling: touch;
             width: 100%;
             max-width: 100vw;
-            touch-action: pan-x pan-y;
-        }
-
-        .pdf-zoom-bar {
-            display: inline-flex;
-            align-items: center;
-            gap: 2px;
-            background: var(--surface-bg);
-            padding: 2px 6px;
-            border-radius: var(--radius-sm);
-            border: 1px solid var(--border-color);
-            user-select: none;
-            touch-action: none;
-            flex-shrink: 0;
-        }
-
-        .zoom-btn {
-            background: transparent;
-            border: none;
-            color: var(--text-primary);
-            width: 24px;
-            height: 24px;
-            border-radius: 4px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: background var(--transition-fast);
-            font-weight: 600;
-            font-size: 0.75rem;
-        }
-        .zoom-btn:hover {
-            background: var(--accent-green-light);
-            color: var(--accent-green);
-        }
-        .zoom-btn:active {
-            transform: scale(0.92);
-        }
-        .zoom-btn.reset-btn {
-            width: auto;
-            padding: 0 6px;
-            font-size: 0.7rem;
-            font-family: var(--font-body);
-        }
-
-        .zoom-level {
-            font-size: 0.7rem;
-            font-weight: 600;
-            color: var(--text-secondary);
-            min-width: 36px;
-            text-align: center;
-            font-family: var(--font-body);
-        }
-
-        /* Hide court, ruling, year, source badges so zoom control sits in top navbar */
-        .badge-year,
-        .badge-type,
-        .badge-source {
-            display: none !important;
         }
 
         /* ============================================================
@@ -367,38 +295,27 @@
             align-items: center;
             gap: 16px;
             max-width: var(--max-width-content);
-            transform-origin: top center;
-            transition: transform 0.08s ease-out;
-            will-change: transform;
         }
 
         .page-wrapper {
-            background: #ffffff;
-            border-radius: var(--radius-md);
+            background: white;
+            border-radius: var(--radius-sm);
             overflow: hidden;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            box-shadow: var(--shadow-sm);
             transition: box-shadow var(--transition-med);
             width: 100%;
-            max-width: var(--max-width-content);
             display: flex;
             justify-content: center;
-            align-items: center;
-            padding: 12px;
-            box-sizing: border-box;
-            position: relative;
         }
         .page-wrapper:hover {
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+            box-shadow: var(--shadow-md);
         }
         .page-wrapper canvas {
             display: block;
             max-width: 100%;
             height: auto !important;
+            width: 100% !important;
             object-fit: contain;
-            margin: 0 auto;
-            image-rendering: auto;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
         }
 
         /* ============================================================
@@ -761,16 +678,10 @@
             overflow-y: auto;
             padding: clamp(20px, 3vh, 32px) clamp(18px, 3vw, 28px);
             font-family: var(--font-body);
-            font-size: clamp(0.9375rem, 1.1vw, 1rem);
+            font-size: clamp(0.875rem, 1vw, 0.9375rem);
             line-height: 1.7;
             color: var(--text-primary);
             -webkit-overflow-scrolling: touch;
-        }
-
-        /* Focus mode element removal */
-        div#summaryOverlay > div > div#summaryContent > div:nth-of-type(1) > div:nth-of-type(1),
-        #summaryContent > div:first-child > div:first-child {
-            display: none !important;
         }
         .summary-body h4 {
             font-family: var(--font-display);
@@ -1274,17 +1185,6 @@
             <span class="doc-title" id="docTitle">Loading document...</span>
         </div>
         <div class="toolbar-right">
-            <!-- PDF Zoom Controls in Top Nav Bar -->
-            <div id="pdfZoomControls" class="pdf-zoom-bar" style="display: none;">
-                <button id="btnZoomOut" class="zoom-btn" title="Zoom Out (−)">
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                </button>
-                <span id="zoomLevelDisplay" class="zoom-level">100%</span>
-                <button id="btnZoomIn" class="zoom-btn" title="Zoom In (+)">
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                </button>
-                <button id="btnZoomReset" class="zoom-btn reset-btn" title="Reset Zoom">Fit</button>
-            </div>
             <span class="badge badge-year" id="badgeYear" style="display:none;">Year</span>
             <span class="badge badge-type" id="badgeType" style="display:none;">Type</span>
             <span class="badge" id="badgeSource" style="display:none;">Source</span>
@@ -1294,14 +1194,6 @@
                     <path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z" />
                 </svg>
                 <span id="btnBookmarkText">Save</span>
-            </button>
-            <button id="btnDownload" class="source-btn" style="cursor: pointer; display: inline-flex; align-items: center; gap: 4px;" title="Download PDF document">
-                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                    <polyline points="7 10 12 15 17 10"/>
-                    <line x1="12" y1="15" x2="12" y2="3"/>
-                </svg>
-                <span>Download</span>
             </button>
             <a href="#" id="externalLink" class="source-btn" style="display:none;" target="_blank" rel="noopener noreferrer">
                 Original source
@@ -1363,26 +1255,6 @@
         </div>
     </div>
 
-    <!-- ─── FOOTER ─── -->
-    <footer style="border-top: 1px solid #e2e8f0; margin-top: 32px; padding: 12px 16px; background: #ffffff; font-size: 0.78rem; color: #64748b; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
-        <div style="max-width: 1200px; margin: 0 auto; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px 20px;">
-           <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px;">
-                <strong style="font-weight: 700; color: #0f172a; font-size: 0.85rem;">eLegal</strong>
-                <span style="color: #cbd5e1;">|</span>
-                <span style="color: #475569; font-weight: 600;">EmojiStudios</span>
-                <span style="color: #cbd5e1;">|</span>
-                <span style="color: #475569; font-weight: 600;">&copy; 2026 eLegal</span>
-
-            </div>
-            <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px; font-weight: 500;">
-                <a href="/" style="color: #475569; text-decoration: none;">Research Engine</a>
-                <a href="/dev" style="color: #475569; text-decoration: none;">Developer API</a>
-                <a href="/terms" style="color: #475569; text-decoration: underline;">Terms & Conditions</a>
-                <span style="color: #cbd5e1;">•</span>
-            </div>
-        </div>
-    </footer>
-
     <script src="/lib/pdf.min.js"></script>
     <script>
         pdfjsLib.GlobalWorkerOptions.workerSrc = '/lib/pdf.worker.min.js';
@@ -1434,52 +1306,12 @@
             }
         });
 
-        function getSummaryLocalStorageKey() {
-            const rawKey = sourceUrl || loadedDocData?.citation || displayTitle || filename || '';
-            return 'elegal_summary_' + String(rawKey).replace(/[^a-zA-Z0-9_-]/g, '_').substring(0, 100).toLowerCase();
-        }
-
-        function getCachedSummaryFromLocalStorage() {
-            try {
-                const key = getSummaryLocalStorageKey();
-                const cached = localStorage.getItem(key);
-                if (cached && cached.length > 50) {
-                    return cached;
-                }
-            } catch (e) {
-                console.warn('LocalStorage summary read error:', e);
-            }
-            return null;
-        }
-
-        function saveSummaryToLocalStorage(html) {
-            try {
-                if (html && html.length > 50) {
-                    const key = getSummaryLocalStorageKey();
-                    localStorage.setItem(key, html);
-                }
-            } catch (e) {
-                console.warn('LocalStorage summary save error:', e);
-            }
-        }
-
         fabSummaryBtn.addEventListener('click', async () => {
             summaryOverlay.classList.add('active');
-
             if (cachedSummaryHtml) {
                 summaryContent.innerHTML = cachedSummaryHtml;
                 return;
             }
-
-            // Check Browser LocalStorage cache first
-            const localCachedHtml = getCachedSummaryFromLocalStorage();
-            if (localCachedHtml) {
-                console.log('[localStorage] Loaded brief from browser cache');
-                cachedSummaryHtml = localCachedHtml;
-                summaryContent.innerHTML = cachedSummaryHtml;
-                return;
-            }
-
             summaryContent.innerHTML = `
                 <div class="state-message" style="padding: 40px 0;">
                     <h3>Generating Legal Brief</h3>
@@ -1487,13 +1319,9 @@
                 </div>
             `;
             try {
-                const activeApiKey = localStorage.getItem('elegal_api_key') || 'el_demo_key_12345';
                 const res = await fetch('/api/summarize-doc', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-API-Key': activeApiKey
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         title: loadedDocData?.title || displayTitle,
                         sourceUrl: sourceUrl || '',
@@ -1503,15 +1331,10 @@
                         citation: loadedDocData?.citation || ''
                     })
                 });
-                const text = await res.text();
-                if (!text || text.trim() === '' || text.trim() === 'undefined') {
-                    throw new Error('Summary response was empty');
-                }
-                const data = JSON.parse(text);
+                const data = await res.json();
                 if (data.success && data.summaryHtml) {
                     cachedSummaryHtml = data.summaryHtml;
                     summaryContent.innerHTML = cachedSummaryHtml;
-                    saveSummaryToLocalStorage(cachedSummaryHtml);
                 } else {
                     summaryContent.innerHTML = `<p class="error-msg">Could not generate summary at this moment.</p>`;
                 }
@@ -1532,8 +1355,7 @@
         function getSavedDocs() {
             try {
                 const raw = localStorage.getItem(SAVED_DOCS_KEY);
-                if (!raw || raw === 'undefined' || raw === 'null') return [];
-                return JSON.parse(raw);
+                return raw ? JSON.parse(raw) : [];
             } catch (e) {
                 return [];
             }
@@ -1629,139 +1451,6 @@
         }
 
         let textFontSize = 1.0625;
-        let pdfZoomScale = 1.0;
-        let loadedPdfArrayBuffer = null;
-
-        /* ─── PDF Zoom & Pinch-to-Zoom Controller ─── */
-        function setPdfZoom(scale) {
-            pdfZoomScale = Math.min(Math.max(scale, 0.5), 3.5);
-
-            const zoomLevelDisplay = document.getElementById('zoomLevelDisplay');
-            if (zoomLevelDisplay) {
-                zoomLevelDisplay.textContent = Math.round(pdfZoomScale * 100) + '%';
-            }
-
-            const targetContainer = (pagesContainer && pagesContainer.style.display !== 'none') ? pagesContainer :
-                                    (textReaderContainer && textReaderContainer.style.display !== 'none' ? textReaderContainer : null);
-
-            if (targetContainer) {
-                targetContainer.style.transform = `scale(${pdfZoomScale})`;
-                targetContainer.style.transformOrigin = 'top center';
-                targetContainer.style.transition = 'transform 0.06s ease-out';
-
-                const unscaledHeight = targetContainer.offsetHeight;
-                if (pdfZoomScale > 1) {
-                    const extraHeight = unscaledHeight * (pdfZoomScale - 1);
-                    targetContainer.style.marginBottom = `${extraHeight + 40}px`;
-                } else {
-                    targetContainer.style.marginBottom = '0px';
-                }
-            }
-        }
-
-        const btnZoomOut = document.getElementById('btnZoomOut');
-        const btnZoomIn = document.getElementById('btnZoomIn');
-        const btnZoomReset = document.getElementById('btnZoomReset');
-
-        if (btnZoomOut) btnZoomOut.addEventListener('click', () => setPdfZoom(pdfZoomScale - 0.15));
-        if (btnZoomIn) btnZoomIn.addEventListener('click', () => setPdfZoom(pdfZoomScale + 0.15));
-        if (btnZoomReset) btnZoomReset.addEventListener('click', () => setPdfZoom(1.0));
-
-        /* ─── Pinch-to-Zoom Gesture for PDF Canvas ─── */
-        const viewerContainer = document.getElementById('viewerContainer');
-        let initialPinchDistance = null;
-        let startPinchScale = 1.0;
-
-        if (viewerContainer) {
-            viewerContainer.addEventListener('touchstart', (e) => {
-                if (e.touches.length === 2) {
-                    initialPinchDistance = Math.hypot(
-                        e.touches[0].clientX - e.touches[1].clientX,
-                        e.touches[0].clientY - e.touches[1].clientY
-                    );
-                    startPinchScale = pdfZoomScale;
-                }
-            }, { passive: true });
-
-            viewerContainer.addEventListener('touchmove', (e) => {
-                if (e.touches.length === 2 && initialPinchDistance) {
-                    e.preventDefault(); // Prevent full UI scaling
-                    const currentDistance = Math.hypot(
-                        e.touches[0].clientX - e.touches[1].clientX,
-                        e.touches[0].clientY - e.touches[1].clientY
-                    );
-                    const factor = currentDistance / initialPinchDistance;
-                    setPdfZoom(startPinchScale * factor);
-                }
-            }, { passive: false });
-
-            viewerContainer.addEventListener('touchend', (e) => {
-                if (e.touches.length < 2) {
-                    initialPinchDistance = null;
-                }
-            }, { passive: true });
-
-            // Trackpad pinch or Ctrl + mouse wheel
-            viewerContainer.addEventListener('wheel', (e) => {
-                if (e.ctrlKey || e.metaKey) {
-                    e.preventDefault();
-                    const delta = e.deltaY < 0 ? 0.1 : -0.1;
-                    setPdfZoom(pdfZoomScale + delta);
-                }
-            }, { passive: false });
-        }
-
-        /* ─── DOWNLOAD PDF BUTTON HANDLER ─── */
-        const btnDownload = document.getElementById('btnDownload');
-        if (btnDownload) {
-            btnDownload.addEventListener('click', async () => {
-                let downloadFileName = (displayTitle || 'legal_document').replace(/[^a-zA-Z0-9_\- ]/g, '_').replace(/_+/g, '_').trim() || 'eLegal_Document';
-                if (!downloadFileName.toLowerCase().endsWith('.pdf')) {
-                    downloadFileName += '.pdf';
-                }
-
-                let pdfBlob = null;
-
-                if (loadedPdfArrayBuffer) {
-                    pdfBlob = new Blob([loadedPdfArrayBuffer], { type: 'application/pdf' });
-                } else if (sourceUrl) {
-                    const originalHtml = btnDownload.innerHTML;
-                    try {
-                        btnDownload.innerHTML = `
-                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <circle cx="12" cy="12" r="10" stroke-opacity="0.25"/>
-                                <path d="M12 2a10 10 0 0 1 10 10" stroke-linecap="round"/>
-                            </svg>
-                            <span>Downloading...</span>`;
-
-                        const pdfUrl = buildKenyaLawPdfUrl(sourceUrl) || sourceUrl;
-                        const proxyUrl = `/api/pdf-proxy?sourceUrl=${encodeURIComponent(pdfUrl)}`;
-                        const res = await fetch(proxyUrl, { headers: { 'X-API-Key': getActiveApiKey() } });
-                        if (res.ok) {
-                            const buffer = await res.arrayBuffer();
-                            pdfBlob = new Blob([buffer], { type: 'application/pdf' });
-                        }
-                    } catch (err) {
-                        console.warn('PDF download fetch failed:', err);
-                    } finally {
-                        btnDownload.innerHTML = originalHtml;
-                    }
-                }
-
-                if (pdfBlob) {
-                    const blobUrl = URL.createObjectURL(pdfBlob);
-                    const link = document.createElement('a');
-                    link.href = blobUrl;
-                    link.download = downloadFileName;
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-                    setTimeout(() => URL.revokeObjectURL(blobUrl), 10000);
-                } else {
-                    alert('PDF is not available for direct download for this document.');
-                }
-            });
-        }
 
         /* ─── Helper: Detect Kenya Law (KLR) source ─── */
         function isKenyaLawSource(url) {
@@ -1773,8 +1462,11 @@
         /* ─── Helper: Build PDF URL for Kenya Law source ─── */
         function buildKenyaLawPdfUrl(baseUrl) {
             if (!baseUrl) return null;
+            // If the URL already ends with /source, use as-is
             if (baseUrl.endsWith('/source')) return baseUrl;
+            // If it ends with /, append source
             if (baseUrl.endsWith('/')) return baseUrl + 'source';
+            // Otherwise append /source
             return baseUrl + '/source';
         }
 
@@ -1785,91 +1477,41 @@
             return u.endsWith('.docx') || u.endsWith('.doc');
         }
 
-        /* ─── Helper: Render PDF from ArrayBuffer with Clear Readable Quality ─── */
+        /* ─── Helper: Render PDF from ArrayBuffer ─── */
         async function renderPdfFromBuffer(arrayBuffer, totalPagesOverride) {
-            loadedPdfArrayBuffer = arrayBuffer; // Cache array buffer for download
-            const pdfZoomControls = document.getElementById('pdfZoomControls');
-            if (pdfZoomControls) pdfZoomControls.style.display = 'flex';
-
-            const pdfDoc = await pdfjsLib.getDocument({
-                data: arrayBuffer,
-                cMapUrl: 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/cmaps/',
-                cMapPacked: true,
-                standardFontDataUrl: 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/standard_fonts/'
-            }).promise;
-
+            const pdfDoc = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
             const totalPages = totalPagesOverride || pdfDoc.numPages;
             pageInfoEl.textContent = `${totalPages} page${totalPages !== 1 ? 's' : ''}`;
             loadingEl.style.display = 'none';
 
-            // High-DPI device resolution scaling factor (capped between 1.5x and 2.0x for crisp antialiased text without pixel distortion)
-            const deviceRatio = window.devicePixelRatio || 1;
-            const outputScale = Math.min(Math.max(deviceRatio, 1.5), 2.0);
-
             const firstPage = await pdfDoc.getPage(1);
             const firstViewport = firstPage.getViewport({ scale: 1 });
-            const availableWidth = Math.min(window.innerWidth - 32, 920);
-            const baseFitScale = Math.max((availableWidth - 24) / firstViewport.width, 1.25);
-
-            pagesContainer.innerHTML = ''; // Clear container before rendering
+            const availableWidth = Math.min(window.innerWidth - 40, 900);
+            const fitScale = Math.min(availableWidth / firstViewport.width, 1.8);
 
             for (let i = 1; i <= totalPages; i++) {
                 const page = await pdfDoc.getPage(i);
-
-                // Logical viewport for CSS layout
-                const displayViewport = page.getViewport({ scale: baseFitScale });
-
-                // High-Resolution viewport for canvas bitmap buffer
-                const renderViewport = page.getViewport({ scale: baseFitScale * outputScale });
+                const viewport = page.getViewport({ scale: fitScale });
 
                 const canvas = document.createElement('canvas');
-                const ctx = canvas.getContext('2d', {
-                    alpha: false,
-                    willReadFrequently: false
-                });
-
-                // Set actual canvas bitmap buffer resolution
-                canvas.width = Math.round(renderViewport.width);
-                canvas.height = Math.round(renderViewport.height);
-
-                // Set logical CSS size matching display viewport
-                canvas.style.width = Math.round(displayViewport.width) + 'px';
-                canvas.style.height = Math.round(displayViewport.height) + 'px';
-
-                // Fill canvas with pure solid white before drawing text
-                ctx.fillStyle = '#ffffff';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-                // High quality image smoothing algorithms
-                ctx.imageSmoothingEnabled = true;
-                ctx.imageSmoothingQuality = 'high';
+                canvas.height = viewport.height;
+                canvas.width = viewport.width;
 
                 const wrapper = document.createElement('div');
                 wrapper.className = 'page-wrapper';
                 wrapper.appendChild(canvas);
                 pagesContainer.appendChild(wrapper);
 
-                const renderContext = {
-                    canvasContext: ctx,
-                    viewport: renderViewport,
-                    intent: 'display'
-                };
-
-                await page.render(renderContext).promise;
+                await page.render({ canvasContext: canvas.getContext('2d'), viewport }).promise;
             }
             return true;
         }
 
-        function getActiveApiKey() {
-            return localStorage.getItem('elegal_api_key') || 'el_demo_key_12345';
-        }
-
         /* ─── Helper: Convert DOCX to PDF using server API ─── */
         async function convertDocxToPdf(docxUrl) {
+            // Assume server endpoint: /api/convert-docx?url=...
             const convertUrl = `/api/convert-docx?url=${encodeURIComponent(docxUrl)}`;
-            const response = await fetch(convertUrl, {
-                headers: { 'X-API-Key': getActiveApiKey() }
-            });
+            const response = await fetch(convertUrl);
             if (!response.ok) throw new Error(`Conversion failed: ${response.status}`);
             const arrayBuffer = await response.arrayBuffer();
             // Validate PDF header
@@ -1883,15 +1525,12 @@
 
         /* ─── Render PDF from Kenya Law source ─── */
         async function renderKenyaLawPdf(sourceUrl) {
-            const pdfUrl = buildKenyaLawPdfUrl(sourceUrl) || sourceUrl;
+            const pdfUrl = buildKenyaLawPdfUrl(sourceUrl);
             if (!pdfUrl) return false;
 
             try {
-                // Fetch via server PDF proxy to prevent browser CORS block
-                const proxyUrl = `/api/pdf-proxy?sourceUrl=${encodeURIComponent(pdfUrl)}`;
-                const response = await fetch(proxyUrl, {
-                    headers: { 'X-API-Key': getActiveApiKey() }
-                });
+                // First, fetch the source (could be PDF or DOCX)
+                const response = await fetch(pdfUrl);
                 if (!response.ok) return false;
 
                 const arrayBuffer = await response.arrayBuffer();
@@ -1899,11 +1538,20 @@
                 const header = String.fromCharCode.apply(null, Array.from(bytes));
 
                 if (header.startsWith('%PDF')) {
-                    // It's a PDF, render it
+                    // It's already a PDF, render it
                     await renderPdfFromBuffer(arrayBuffer);
                     return true;
                 } else {
-                    // Attempt conversion if server returned non-PDF format
+                    // Probably a DOCX or other format - attempt conversion
+                    // We need to get the actual file URL from the response? The response is the file itself.
+                    // We can try to convert the fetched buffer, but we need to send it to server for conversion.
+                    // Since we already have the buffer, we can send it via FormData to a conversion endpoint.
+                    // Alternatively, we can use the original pdfUrl as the source for conversion.
+                    // Let's use the conversion endpoint that takes a URL.
+                    // But we already have the file content; we can send it as a blob.
+                    // For simplicity, we'll use the conversion endpoint with the URL.
+                    // However, if the source URL is the /source endpoint, it might require authentication? We'll assume server can fetch it.
+                    // Let's try to convert using the same URL.
                     const convertedPdf = await convertDocxToPdf(pdfUrl);
                     await renderPdfFromBuffer(convertedPdf);
                     return true;
@@ -1919,29 +1567,15 @@
             loadingEl.style.display = 'none';
             pagesContainer.style.display = 'none';
             textReaderContainer.style.display = 'flex';
-            
-            if (data.isDocx || data.fileType === 'DOCX') {
-                pageInfoEl.textContent = 'DOCX Document View';
-            } else if (data.isDoc || data.fileType === 'DOC') {
-                pageInfoEl.textContent = 'DOC Document View';
-            } else {
-                pageInfoEl.textContent = 'Text View';
-            }
+            pageInfoEl.textContent = 'Text View';
 
             if (data.year) {
                 badgeYear.textContent = data.year;
                 badgeYear.style.display = 'inline-block';
             }
             if (data.type) {
-                badgeType.textContent = data.isDocx ? 'DOCX Document' : (data.isDoc ? 'DOC Document' : data.type);
+                badgeType.textContent = data.type;
                 badgeType.style.display = 'inline-block';
-                if (data.isDocx) {
-                    badgeType.style.background = '#e0f2fe';
-                    badgeType.style.color = '#0284c7';
-                } else if (data.isDoc) {
-                    badgeType.style.background = '#fef3c7';
-                    badgeType.style.color = '#d97706';
-                }
             }
             if (data.source) {
                 badgeSource.textContent = data.source;
@@ -2343,18 +1977,12 @@
                     `/api/document-content?sourceUrl=${encodeURIComponent(sourceUrl)}&title=${encodeURIComponent(displayTitle)}&year=${encodeURIComponent(reqYear)}&type=${encodeURIComponent(reqType)}&source=${encodeURIComponent(reqSource)}` :
                     `/read/${encodeURIComponent(filename)}?raw=1`;
 
-                const res = await fetch(fetchTarget, {
-                    headers: { 'X-API-Key': getActiveApiKey() }
-                });
+                const res = await fetch(fetchTarget);
                 if (!res.ok) {
                     throw new Error(`Failed to load document (${res.status})`);
                 }
 
-                const text = await res.text();
-                if (!text || text.trim() === '' || text.trim() === 'undefined') {
-                    throw new Error('Document data received was empty.');
-                }
-                const data = JSON.parse(text);
+                const data = await res.json();
                 loadedDocData = data;
 
                 // If API says it's a PDF, try to render it
@@ -2363,9 +1991,7 @@
                 if (preferPdf) {
                     try {
                         const pdfUrl = data.pdfUrl || `/api/pdf-proxy?sourceUrl=${encodeURIComponent(sourceUrl)}`;
-                        const pdfRes = await fetch(pdfUrl, {
-                            headers: { 'X-API-Key': getActiveApiKey() }
-                        });
+                        const pdfRes = await fetch(pdfUrl);
                         if (pdfRes.ok) {
                             const arrayBuffer = await pdfRes.arrayBuffer();
                             const bytes = new Uint8Array(arrayBuffer.slice(0, 5));
@@ -2386,16 +2012,6 @@
             } catch (e) {
                 showError(e.message);
             }
-        }
-
-        const backBtn = document.querySelector('.back-btn');
-        if (backBtn) {
-            backBtn.addEventListener('click', (e) => {
-                if (window.history.length > 1 && document.referrer.includes(window.location.host)) {
-                    e.preventDefault();
-                    window.history.back();
-                }
-            });
         }
 
         loadDocument();

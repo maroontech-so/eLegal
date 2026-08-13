@@ -1,11 +1,5 @@
-# eLegal Robots.txt - Legal E-Repository & API Service
 User-agent: *
 Allow: /
-Allow: /read
-Allow: /dev
-Allow: /api/docs
-Allow: /api/search
-Allow: /api/library
+Disallow: /api/keys
 
-# Sitemap location
-Sitemap: https://elegal-hteg.onrender.com/sitemap.xml
+Sitemap: https://elegal.or.ke/sitemap.xml

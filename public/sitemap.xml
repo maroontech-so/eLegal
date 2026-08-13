@@ -1,187 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-        xmlns:xhtml="http://www.w3.org/1999/xhtml"
-        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"
-        xmlns:news="http://www.google.com/schemas/sitemap-news/0.9"
-        xmlns:mobile="http://www.google.com/schemas/sitemap-mobile/1.0"
-        xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">
-
-  <!-- ============================================================ -->
-  <!-- 1. HOMEPAGE & CORE WEB PLATFORM PAGES                       -->
-  <!-- ============================================================ -->
-
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
   <url>
-    <loc>https://elegal-hteg.onrender.com/</loc>
-    <lastmod>2026-08-04</lastmod>
+    <loc>https://elegal.or.ke/</loc>
+    <lastmod>2026-08-13</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
-    <xhtml:link rel="alternate" hreflang="en" href="https://elegal-hteg.onrender.com/"/>
-    <xhtml:link rel="alternate" hreflang="en-ke" href="https://elegal-hteg.onrender.com/?source=kenya"/>
-    <xhtml:link rel="alternate" hreflang="en-gb" href="https://elegal-hteg.onrender.com/?source=international"/>
-    <image:image>
-      <image:loc>https://elegal-hteg.onrender.com/logo.png</image:loc>
-      <image:title>eLegal Emblem and Branding</image:title>
-      <image:caption>Official logo of the eLegal Legal E-Repository &amp; Research Platform</image:caption>
-    </image:image>
-    <mobile:mobile/>
   </url>
-
   <url>
-    <loc>https://elegal-hteg.onrender.com/read</loc>
-    <lastmod>2026-08-04</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.95</priority>
-    <xhtml:link rel="alternate" hreflang="en" href="https://elegal-hteg.onrender.com/read"/>
-    <mobile:mobile/>
-  </url>
-
-  <url>
-    <loc>https://elegal-hteg.onrender.com/dev</loc>
-    <lastmod>2026-08-04</lastmod>
+    <loc>https://elegal.or.ke/dev</loc>
+    <lastmod>2026-08-13</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>0.90</priority>
-    <xhtml:link rel="alternate" hreflang="en" href="https://elegal-hteg.onrender.com/dev"/>
-    <mobile:mobile/>
+    <priority>0.8</priority>
   </url>
-
-  <!-- ============================================================ -->
-  <!-- 2. REPOSITORY JURISDICTION SECTIONS                         -->
-  <!-- ============================================================ -->
-
   <url>
-    <loc>https://elegal-hteg.onrender.com/?source=all</loc>
-    <lastmod>2026-08-04</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.85</priority>
-  </url>
-
-  <url>
-    <loc>https://elegal-hteg.onrender.com/?source=kenya</loc>
-    <lastmod>2026-08-04</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.90</priority>
-  </url>
-
-  <url>
-    <loc>https://elegal-hteg.onrender.com/?source=international</loc>
-    <lastmod>2026-08-04</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.85</priority>
-  </url>
-
-  <!-- ============================================================ -->
-  <!-- 3. FEATURED LEGAL PRECEDENTS & CONSTITUTIONAL STATUTES      -->
-  <!-- ============================================================ -->
-
-  <url>
-    <loc>https://elegal-hteg.onrender.com/read.html?title=The%20Constitution%20of%20Kenya%2C%202010&amp;sourceUrl=https%3A%2F%2Fkenyalaw.org%2Fakn%2Fke%2Fact%2F2010%2Fconstitution%2Feng%402010-09-03&amp;year=2010&amp;type=Constitution&amp;source=Kenya%20Law%20(eKLR)</loc>
-    <lastmod>2026-08-04</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.85</priority>
-  </url>
-
-  <url>
-    <loc>https://elegal-hteg.onrender.com/read.html?title=Penal%20Code%20(Cap.%2063)&amp;sourceUrl=https%3A%2F%2Fkenyalaw.org%2Fakn%2Fke%2Fact%2F1930%2F10%2Feng%402023-12-11&amp;year=1930&amp;type=Legislation&amp;source=Kenya%20Law%20(eKLR)</loc>
-    <lastmod>2026-08-04</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.80</priority>
-  </url>
-
-  <url>
-    <loc>https://elegal-hteg.onrender.com/read.html?title=Limitation%20of%20Actions%20Act%20(Cap.%2022)&amp;sourceUrl=https%3A%2F%2Fkenyalaw.org%2Fakn%2Fke%2Fact%2F1968%2F21%2Feng%402022-12-31&amp;year=1968&amp;type=Legislation&amp;source=Kenya%20Law%20(eKLR)</loc>
-    <lastmod>2026-08-04</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.80</priority>
-  </url>
-
-  <url>
-    <loc>https://elegal-hteg.onrender.com/read.html?title=Sisto%20Wambugu%20v%20Kamau%20Njuguna%20%5B1983%5D%20KECA%2069%20(KLR)&amp;sourceUrl=https%3A%2F%2Fkenyalaw.org%2Fcaselaw%2Fcases%2Fview%2F12345&amp;year=1983&amp;type=Judgment&amp;source=Kenya%20Law%20(eKLR)</loc>
-    <lastmod>2026-08-04</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.80</priority>
-  </url>
-
-  <!-- ============================================================ -->
-  <!-- 4. DEVELOPER REST API SERVICES & ENDPOINTS                   -->
-  <!-- ============================================================ -->
-
-  <url>
-    <loc>https://elegal-hteg.onrender.com/api/docs</loc>
-    <lastmod>2026-08-04</lastmod>
+    <loc>https://elegal.or.ke/read</loc>
+    <lastmod>2026-08-13</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>0.80</priority>
-    <xhtml:link rel="alternate" hreflang="en" href="https://elegal-hteg.onrender.com/api/docs"/>
+    <priority>0.7</priority>
   </url>
-
-  <url>
-    <loc>https://elegal-hteg.onrender.com/api/search</loc>
-    <lastmod>2026-08-04</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.75</priority>
-  </url>
-
-  <url>
-    <loc>https://elegal-hteg.onrender.com/api/library</loc>
-    <lastmod>2026-08-04</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.75</priority>
-  </url>
-
-  <url>
-    <loc>https://elegal-hteg.onrender.com/api/resolve</loc>
-    <lastmod>2026-08-04</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.70</priority>
-  </url>
-
-  <url>
-    <loc>https://elegal-hteg.onrender.com/api/keys</loc>
-    <lastmod>2026-08-04</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.70</priority>
-  </url>
-
-  <url>
-    <loc>https://elegal-hteg.onrender.com/api/auth/verify</loc>
-    <lastmod>2026-08-04</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.50</priority>
-  </url>
-
-  <url>
-    <loc>https://elegal-hteg.onrender.com/api/health</loc>
-    <lastmod>2026-08-04</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.50</priority>
-  </url>
-
-  <!-- ============================================================ -->
-  <!-- 5. STATIC ASSETS & METADATA                                  -->
-  <!-- ============================================================ -->
-
-  <url>
-    <loc>https://elegal-hteg.onrender.com/sitemap.xml</loc>
-    <lastmod>2026-08-04</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.30</priority>
-  </url>
-
-  <url>
-    <loc>https://elegal-hteg.onrender.com/robots.txt</loc>
-    <lastmod>2026-08-04</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.30</priority>
-  </url>
-
-  <url>
-    <loc>https://elegal-hteg.onrender.com/logo.png</loc>
-    <lastmod>2026-08-04</lastmod>
-    <changefreq>yearly</changefreq>
-    <priority>0.20</priority>
-    <image:image>
-      <image:loc>https://elegal-hteg.onrender.com/logo.png</image:loc>
-      <image:title>eLegal Official Brand Logo</image:title>
-    </image:image>
-  </url>
-
 </urlset>

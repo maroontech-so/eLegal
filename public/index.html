@@ -1364,20 +1364,20 @@
             }
         }
 
-        /* RESULT ITEM (3-COLUMN GRID DOCKET CARD) - 20% HEIGHT REDUCTION */
+        /* RESULT ITEM (3-COLUMN GRID DOCKET CARD) - 60% HEIGHT REDUCTION */
         .case-card {
             display: flex;
             flex-direction: column;
             justify-content: space-between;
             background: var(--surface-bg);
             border-radius: var(--radius-md);
-            padding: 11px 13px;
+            padding: 6px 12px;
             border: 1px solid var(--border-color);
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
             cursor: pointer;
             transition: all 0.2s ease;
             position: relative;
-            min-height: 108px;
+            min-height: 48px;
         }
 
         .case-card:hover {
@@ -1387,11 +1387,11 @@
         }
 
         .case-card-title {
-            font-size: 0.88rem;
+            font-size: 0.83rem;
             font-weight: 700;
             color: var(--text-primary);
-            line-height: 1.32;
-            margin: 4px 0 6px 0;
+            line-height: 1.25;
+            margin: 2px 0 3px 0;
             display: -webkit-box;
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
@@ -1407,7 +1407,7 @@
             align-items: center;
             justify-content: space-between;
             margin-top: auto;
-            padding-top: 6px;
+            padding-top: 3px;
             border-top: 1px solid var(--border-subtle);
         }
 
@@ -2001,18 +2001,18 @@
             box-shadow: 0 12px 36px rgba(168, 85, 247, 0.25) !important;
         }
 
-        /* E-Repository Clean Cards Layout */
+        /* E-Repository Clean Cards Layout (60% Height Reduction) */
         .case-card {
             background: var(--surface-bg);
             border: 1px solid var(--border-color);
-            border-radius: var(--radius-lg);
-            padding: 16px 20px;
+            border-radius: var(--radius-md);
+            padding: 6px 12px;
             box-shadow: var(--shadow-sm);
             transition: all 0.25s ease;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            min-height: 125px;
+            min-height: 50px;
         }
 
         .case-card:hover {
@@ -2022,30 +2022,30 @@
         }
 
         .case-card-title {
-            font-size: 0.98rem;
+            font-size: 0.84rem;
             font-weight: 700;
             color: var(--text-primary);
-            line-height: 1.4;
-            margin: 6px 0 10px 0;
+            line-height: 1.25;
+            margin: 2px 0 3px 0;
         }
 
         /* Thin & Compact Precedent Cards on Home Teaser */
         .compact-precedents-grid .case-card {
-            padding: 10px 14px;
-            min-height: auto;
-            border-radius: var(--radius-md);
-            gap: 4px;
+            padding: 5px 10px;
+            min-height: 42px;
+            border-radius: var(--radius-sm, 6px);
+            gap: 2px;
         }
 
         .compact-precedents-grid .case-card-title {
-            font-size: 0.88rem;
-            margin: 2px 0 4px 0;
-            line-height: 1.35;
+            font-size: 0.82rem;
+            margin: 1px 0 2px 0;
+            line-height: 1.22;
         }
 
         .compact-precedents-grid .case-badge {
-            font-size: 0.7rem;
-            padding: 2px 6px;
+            font-size: 0.68rem;
+            padding: 1px 5px;
         }
     </style>
 </head>
@@ -2096,9 +2096,7 @@
                         </div>
                     </div>
 
-                    <h1 style="font-size: 2.1rem; font-weight: 800; color: var(--text-primary); letter-spacing: -0.03em; line-height: 1.25; margin-bottom: 8px;">
-                        Kenya Legal AI Research Platform & Judicial Precedent Engine
-                    </h1>
+                    
                     <p style="color: var(--text-secondary); font-size: 0.98rem; max-width: 720px; margin: 0 auto; line-height: 1.5;">
                         Instant access to eKLR court rulings, Supreme Court precedents, Kenya Gazette notices, statutory acts, and AI-grounded legal analysis.
                     </p>
@@ -3918,7 +3916,7 @@
             card.className = 'case-card';
 
             const topMeta = document.createElement('div');
-            topMeta.style.cssText = 'display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;';
+            topMeta.style.cssText = 'display: flex; align-items: center; justify-content: space-between; margin-bottom: 2px;';
 
             const badgesEl = document.createElement('div');
             badgesEl.className = 'case-card-badges';

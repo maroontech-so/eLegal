@@ -16,7 +16,7 @@
       "year": "2026",
       "type": "Precedent",
       "id": "doc_44aa77a24e10",
-      "cachedAt": "2026-08-16T12:56:56.235Z"
+      "cachedAt": "2026-08-16T16:42:49.010Z"
     },
     {
       "title": "Justia :: Free Law &amp; Legal Information for Lawyers, Students, Business ...",
@@ -27,14 +27,14 @@
       "source": "US Legal Precedents",
       "isPdf": false,
       "fileType": "DOC",
-      "score": 80,
+      "score": 60,
       "snippets": [
         "https://www.justia.com/"
       ],
       "year": "2026",
       "type": "Precedent",
       "id": "doc_d50dcabed985",
-      "cachedAt": "2026-08-16T15:28:16.199Z"
+      "cachedAt": "2026-08-16T16:42:49.018Z"
     },
     {
       "title": "African Court Cases | Details of a case",
@@ -42,17 +42,17 @@
       "citation": "African Court Cases | Details of a case",
       "url": "https://www.african-court.org/cpmt/details-case/0062012",
       "readUrl": "/read.html?title=African%20Court%20Cases%20%7C%20Details%20of%20a%20case&sourceUrl=https%3A%2F%2Fwww.african-court.org%2Fcpmt%2Fdetails-case%2F0062012&year=2026&type=Precedent&source=International%20Precedent",
-      "source": "International Precedent",
+      "source": "local",
       "isPdf": false,
       "fileType": "DOC",
-      "score": 80,
+      "score": 60,
       "snippets": [
         "https://www.african-court.org/cpmt/details-case/0062012"
       ],
       "year": "2026",
       "type": "Precedent",
       "id": "doc_5bf22b18237f",
-      "cachedAt": "2026-08-16T15:16:43.921Z"
+      "cachedAt": "2026-08-16T16:42:49.113Z"
     },
     {
       "title": "Southern African Legal Information Institute",
@@ -70,7 +70,7 @@
       "year": "2026",
       "type": "Precedent",
       "id": "doc_f0e4a738b996",
-      "cachedAt": "2026-08-16T12:56:59.791Z"
+      "cachedAt": "2026-08-16T16:42:49.302Z"
     },
     {
       "title": "Kudheiha Workers Union v Sucham Investments Limited t/a Amani Tiwi Beach Resort (Cause E032 of 2023) [2024] KEELRC 436 (KLR) (29 February 2024) (Judgment)",
@@ -218,7 +218,7 @@
       "year": "2026",
       "type": "Precedent",
       "id": "doc_1d778c77c6a8",
-      "cachedAt": "2026-08-16T15:33:45.135Z"
+      "cachedAt": "2026-08-16T16:42:49.309Z"
     },
     {
       "title": "LII: Court opinions",
@@ -236,7 +236,7 @@
       "year": "2026",
       "type": "Precedent",
       "id": "doc_dafff5aff7ea",
-      "cachedAt": "2026-08-16T12:57:00.515Z"
+      "cachedAt": "2026-08-16T16:42:49.328Z"
     },
     {
       "title": "Welcome to LII | Legal Information Institute",
@@ -254,7 +254,7 @@
       "year": "2026",
       "type": "Precedent",
       "id": "doc_b2151296b41a",
-      "cachedAt": "2026-08-16T12:57:00.923Z"
+      "cachedAt": "2026-08-16T16:42:49.334Z"
     },
     {
       "title": "U.S. Case Law, Court Opinions &amp; Decisions :: Justia",
@@ -272,7 +272,7 @@
       "year": "2026",
       "type": "Precedent",
       "id": "doc_f2bff4d5d762",
-      "cachedAt": "2026-08-16T12:57:01.450Z"
+      "cachedAt": "2026-08-16T16:42:49.341Z"
     },
     {
       "title": "Justia :: Search Justia.com",
@@ -290,7 +290,7 @@
       "year": "2026",
       "type": "Precedent",
       "id": "doc_e8d2f5f08e5e",
-      "cachedAt": "2026-08-16T12:57:02.038Z"
+      "cachedAt": "2026-08-16T16:42:49.347Z"
     },
     {
       "title": "U.S. Law, Case Law, Codes, Statutes &amp; Regulations",
@@ -308,7 +308,7 @@
       "year": "2026",
       "type": "Legislation",
       "id": "doc_870ead3ab210",
-      "cachedAt": "2026-08-16T12:57:02.565Z"
+      "cachedAt": "2026-08-16T16:42:49.355Z"
     },
     {
       "title": "Basic Structure and Tiered Amendment Processes ... - African Law Matters",
@@ -388,17 +388,17 @@
       "citation": "PDF JUDGMENT",
       "url": "https://www.afronomicslaw.org/sites/default/files/pdf/BBI%20Consolidated%20Judgment%20-%20Final%20Version%20-%20As%20Delivered.pdf",
       "readUrl": "/read.html?title=PDF%20JUDGMENT&sourceUrl=https%3A%2F%2Fwww.afronomicslaw.org%2Fsites%2Fdefault%2Ffiles%2Fpdf%2FBBI%2520Consolidated%2520Judgment%2520-%2520Final%2520Version%2520-%2520As%2520Delivered.pdf&year=2026&type=Judgment&source=International%20Precedent",
-      "source": "International Precedent",
+      "source": "local",
       "isPdf": true,
       "fileType": "PDF",
-      "score": 90,
+      "score": 60,
       "snippets": [
         "https://www.afronomicslaw.org/sites/default/files/pdf/BBI%20Consolidated%20Judgment%20-%20Final%20Version%20-%20As%20Delivered.pdf"
       ],
       "year": "2026",
       "type": "Judgment",
       "id": "doc_bdf50f56bec0",
-      "cachedAt": "2026-08-16T15:28:16.745Z"
+      "cachedAt": "2026-08-16T16:42:49.363Z"
     },
     {
       "title": "Judgments - TanzLII",
@@ -424,17 +424,17 @@
       "citation": "No Vacancy - YouTube",
       "url": "https://www.youtube.com/watch?v=NswNzDEWjCY",
       "readUrl": "/read.html?title=No%20Vacancy%20-%20YouTube&sourceUrl=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DNswNzDEWjCY&year=2026&type=Precedent&source=International%20Precedent",
-      "source": "International Precedent",
+      "source": "local",
       "isPdf": false,
       "fileType": "DOC",
-      "score": 80,
+      "score": 60,
       "snippets": [
         "https://www.youtube.com/watch?v=NswNzDEWjCY"
       ],
       "year": "2026",
       "type": "Precedent",
       "id": "doc_2f355ab8641a",
-      "cachedAt": "2026-08-16T15:16:43.914Z"
+      "cachedAt": "2026-08-16T16:42:49.369Z"
     },
     {
       "title": "Supreme Court: Burden to Establish Validity of Land Title Falls on ...",
@@ -452,7 +452,7 @@
       "year": "2026",
       "type": "Precedent",
       "id": "doc_e71d95aba414",
-      "cachedAt": "2026-08-16T15:33:45.227Z"
+      "cachedAt": "2026-08-16T16:42:49.375Z"
     },
     {
       "title": "The Statute of Limitations: Kenya&#x27;s Limitation of Actions Act - Wacu ...",
@@ -506,7 +506,7 @@
       "year": "2025",
       "type": "Precedent",
       "id": "doc_8b6df41206a0",
-      "cachedAt": "2026-08-16T12:57:03.996Z"
+      "cachedAt": "2026-08-16T16:42:49.381Z"
     },
     {
       "title": "Oregon Judicial Department : Supreme Court Opinions : Supreme Court ...",
@@ -524,7 +524,7 @@
       "year": "2025",
       "type": "Precedent",
       "id": "doc_e0869e062810",
-      "cachedAt": "2026-08-16T12:57:04.427Z"
+      "cachedAt": "2026-08-16T16:42:49.392Z"
     },
     {
       "title": "Joel Kyatha Mbaluka t/a Mbaluka & Associates Advocates v Daniel Ochieng Ogola t/a Ogola Okello & Co Advocates [2019] KECA 504 (KLR)",
@@ -1098,7 +1098,7 @@
       "year": "2026",
       "type": "Precedent",
       "id": "doc_676cd9ac3238",
-      "cachedAt": "2026-08-16T12:57:05.156Z"
+      "cachedAt": "2026-08-16T16:42:49.397Z"
     },
     {
       "title": "Kenya Information and Communications Act",
@@ -1347,7 +1347,7 @@
       "year": "2026",
       "type": "Precedent",
       "id": "doc_f0d1a27cbb94",
-      "cachedAt": "2026-08-16T12:57:05.541Z"
+      "cachedAt": "2026-08-16T16:42:49.403Z"
     },
     {
       "title": "Rulings - The Judiciary",
@@ -1373,17 +1373,17 @@
       "citation": "Research Guides: How To Find Free Case Law Online: Introduction",
       "url": "https://guides.loc.gov/free-case-law",
       "readUrl": "/read.html?title=Research%20Guides%3A%20How%20To%20Find%20Free%20Case%20Law%20Online%3A%20Introduction&sourceUrl=https%3A%2F%2Fguides.loc.gov%2Ffree-case-law&year=2026&type=Precedent&source=International%20Precedent",
-      "source": "International Precedent",
+      "source": "local",
       "isPdf": false,
       "fileType": "DOC",
-      "score": 80,
+      "score": 60,
       "snippets": [
         "https://guides.loc.gov/free-case-law"
       ],
       "year": "2026",
       "type": "Precedent",
       "id": "doc_639dc059a339",
-      "cachedAt": "2026-08-16T15:28:16.736Z"
+      "cachedAt": "2026-08-16T16:42:49.408Z"
     },
     {
       "title": "Judgment Records Search - Check Court Judgments &amp; Liens",
@@ -1549,7 +1549,7 @@
       "year": "2026",
       "type": "Precedent",
       "id": "doc_8a71fa3f8fbf",
-      "cachedAt": "2026-08-16T12:57:06.098Z"
+      "cachedAt": "2026-08-16T16:42:49.415Z"
     },
     {
       "title": "Case",
@@ -1567,7 +1567,7 @@
       "year": "2026",
       "type": "Precedent",
       "id": "doc_0e60df6ccf45",
-      "cachedAt": "2026-08-16T12:57:06.337Z"
+      "cachedAt": "2026-08-16T16:42:49.421Z"
     },
     {
       "title": "CourtListener - Non-Profit Free Legal Search Engine and Alert System",
@@ -1575,17 +1575,17 @@
       "citation": "CourtListener - Non-Profit Free Legal Search Engine and Alert System",
       "url": "https://www.courtlistener.com/",
       "readUrl": "/read.html?title=CourtListener%20-%20Non-Profit%20Free%20Legal%20Search%20Engine%20and%20Alert%20System&sourceUrl=https%3A%2F%2Fwww.courtlistener.com%2F&year=2026&type=Precedent&source=International%20Precedent",
-      "source": "International Precedent",
+      "source": "local",
       "isPdf": false,
       "fileType": "DOC",
-      "score": 80,
+      "score": 60,
       "snippets": [
         "https://www.courtlistener.com/"
       ],
       "year": "2026",
       "type": "Precedent",
       "id": "doc_3c33ff48922e",
-      "cachedAt": "2026-08-16T15:28:16.655Z"
+      "cachedAt": "2026-08-16T16:42:49.426Z"
     },
     {
       "title": "Baker v. Carr - Wikipedia",
@@ -1639,7 +1639,7 @@
       "year": "2026",
       "type": "Precedent",
       "id": "doc_444510352fd3",
-      "cachedAt": "2026-08-16T12:57:07.401Z"
+      "cachedAt": "2026-08-16T16:42:49.432Z"
     },
     {
       "title": "CourtListener and Caselaw Access Project - How To Find Free Case Law ...",
@@ -1657,7 +1657,7 @@
       "year": "2026",
       "type": "Precedent",
       "id": "doc_a8841aa26453",
-      "cachedAt": "2026-08-16T12:57:07.720Z"
+      "cachedAt": "2026-08-16T16:42:49.437Z"
     },
     {
       "title": "Kassim Onyango Mumbo v Mumias Sugar Company Limited [2020] KEELRC 1216 (KLR)",
@@ -1811,7 +1811,7 @@
       "year": "2025",
       "type": "Precedent",
       "id": "doc_8c1f80412020",
-      "cachedAt": "2026-08-16T12:57:07.725Z"
+      "cachedAt": "2026-08-16T16:42:49.748Z"
     },
     {
       "title": "High Court (Organization and Administration) Act",
@@ -2438,7 +2438,7 @@
       "year": "2025",
       "type": "Precedent",
       "id": "doc_274f31af1097",
-      "cachedAt": "2026-08-16T12:57:07.735Z"
+      "cachedAt": "2026-08-16T16:42:49.755Z"
     },
     {
       "title": "All courts - 2025 - Kenya Law",
@@ -2474,7 +2474,7 @@
       "year": "2025",
       "type": "Precedent",
       "id": "doc_2cabdb5cc775",
-      "cachedAt": "2026-08-16T12:57:07.740Z"
+      "cachedAt": "2026-08-16T16:42:49.762Z"
     },
     {
       "title": "Supreme Court - 2026 - Kenya Law",
@@ -2536,17 +2536,17 @@
       "citation": "Case Summaries and Court Judgments - sheriaplex.com",
       "url": "https://www.sheriaplex.com/case-summaries/",
       "readUrl": "/read.html?title=Case%20Summaries%20and%20Court%20Judgments%20-%20sheriaplex.com&sourceUrl=https%3A%2F%2Fwww.sheriaplex.com%2Fcase-summaries%2F&year=2026&type=Judgment&source=International%20Precedent",
-      "source": "International Precedent",
+      "source": "local",
       "isPdf": false,
       "fileType": "DOC",
-      "score": 80,
+      "score": 60,
       "snippets": [
         "https://www.sheriaplex.com/case-summaries/"
       ],
       "year": "2026",
       "type": "Judgment",
       "id": "doc_5a61530dd324",
-      "cachedAt": "2026-08-16T15:28:15.637Z",
+      "cachedAt": "2026-08-16T16:42:49.767Z",
       "pdfUrl": null,
       "contentFile": "doc_5a61530dd324.txt",
       "contentType": "text/plain"
@@ -2567,7 +2567,7 @@
       "year": "2025",
       "type": "Precedent",
       "id": "doc_d2e66882b302",
-      "cachedAt": "2026-08-16T12:57:08.134Z"
+      "cachedAt": "2026-08-16T16:42:49.773Z"
     },
     {
       "title": "Kenya Gazette - 2026 - Kenya Law",
@@ -2593,17 +2593,17 @@
       "citation": "Supreme Court Rulings",
       "url": "https://supremecourt.judiciary.go.ke/supreme-court-rulings/",
       "readUrl": "/read.html?title=Supreme%20Court%20Rulings&sourceUrl=https%3A%2F%2Fsupremecourt.judiciary.go.ke%2Fsupreme-court-rulings%2F&year=2026&type=Ruling&source=International%20Precedent",
-      "source": "International Precedent",
+      "source": "local",
       "isPdf": false,
       "fileType": "DOC",
-      "score": 80,
+      "score": 60,
       "snippets": [
         "https://supremecourt.judiciary.go.ke/supreme-court-rulings/"
       ],
       "year": "2026",
       "type": "Ruling",
       "id": "doc_7cce5316c19b",
-      "cachedAt": "2026-08-16T15:28:15.336Z"
+      "cachedAt": "2026-08-16T16:42:50.124Z"
     },
     {
       "title": "High Court Declares Kenya&#x27;s Next General Election Should Be Held in ...",
@@ -2621,7 +2621,7 @@
       "year": "2025",
       "type": "Precedent",
       "id": "doc_74edd929f650",
-      "cachedAt": "2026-08-16T12:57:08.158Z"
+      "cachedAt": "2026-08-16T16:42:50.129Z"
     },
     {
       "title": "Judgements - Judiciary of Kenya",
@@ -2629,17 +2629,17 @@
       "citation": "Judgements - Judiciary of Kenya",
       "url": "https://supremecourt.judiciary.go.ke/judgements/",
       "readUrl": "/read.html?title=Judgements%20-%20Judiciary%20of%20Kenya&sourceUrl=https%3A%2F%2Fsupremecourt.judiciary.go.ke%2Fjudgements%2F&year=2026&type=Judgment&source=International%20Precedent",
-      "source": "International Precedent",
+      "source": "local",
       "isPdf": false,
       "fileType": "DOC",
-      "score": 80,
+      "score": 60,
       "snippets": [
         "https://supremecourt.judiciary.go.ke/judgements/"
       ],
       "year": "2026",
       "type": "Judgment",
       "id": "doc_52b693930694",
-      "cachedAt": "2026-08-16T15:28:15.307Z"
+      "cachedAt": "2026-08-16T16:42:50.134Z"
     },
     {
       "title": "M'Tuerandu v Republic (Criminal Appeal E025 of 2021) [2025] KECA 2221 (KLR) (19 December 2025) (Judgment)",
@@ -3799,14 +3799,14 @@
       "source": "Kenya Law (eKLR)",
       "isPdf": false,
       "fileType": "DOC",
-      "score": 80,
+      "score": 60,
       "snippets": [
         "https://new.kenyalaw.org/"
       ],
       "year": "2026",
       "type": "Precedent",
       "id": "doc_d12907d80e0b",
-      "cachedAt": "2026-08-16T15:16:43.847Z"
+      "cachedAt": "2026-08-16T16:42:50.139Z"
     },
     {
       "title": "Courts | Kenya Law Help",
@@ -4060,7 +4060,7 @@
       "year": "2025",
       "type": "Precedent",
       "id": "doc_64f320e7c30b",
-      "cachedAt": "2026-08-16T12:57:08.527Z",
+      "cachedAt": "2026-08-16T16:42:50.146Z",
       "cloudinaryMetaUrl": "https://res.cloudinary.com/dm2o4um39/raw/upload/v1785610728/elegal_doc_64f320e7c30b_metadata"
     },
     {
@@ -4356,5 +4356,5 @@
       "score": 60
     }
   ],
-  "updatedAt": "2026-08-16T15:33:55.390Z"
+  "updatedAt": "2026-08-16T16:42:50.146Z"
 }

@@ -532,6 +532,11 @@ async function validateApiKeyOptional(req, res, next) {
 
 app.use(express.static('public'));
 app.use('/lib', express.static('public/lib'));
+app.use((req, res, next) => {
+  res.setHeader('X-Robots-Tag', 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1');
+  next();
+});
+
 app.use(express.json({ limit: '10mb' }));
 
 app.use(cors({

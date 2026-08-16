@@ -1,22 +1,19 @@
-# Allow all search engine crawlers (Googlebot, Bingbot, DuckDuckBot, etc.)
+# Standard Robots.txt for LexsHub / eLegal Legal AI Platform
+# Allow 100% indexing and crawling for all search engine bots
+
 User-agent: *
-Allow: /
+Disallow:
 
-# Explicitly allow all public application routes
-Allow: /
-Allow: /home
-Allow: /e-repository
-Allow: /ai-case-finder
-Allow: /bulletins
-Allow: /practice
-Allow: /saved
-Allow: /dev
-Allow: /read
-Allow: /privacy
-Allow: /terms
-Allow: /PrivacyTerms
+User-agent: Googlebot
+Disallow:
 
-# XML Sitemaps for Search Engine Indexing
+User-agent: Googlebot-Smartphone
+Disallow:
+
+User-agent: Bingbot
+Disallow:
+
+# Sitemaps
 Sitemap: https://www.lexshub.xyz/sitemap.xml
 Sitemap: https://lexshub.xyz/sitemap.xml
 Sitemap: https://elegal.or.ke/sitemap.xml

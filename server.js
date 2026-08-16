@@ -225,7 +225,7 @@ function getFirestore() {
           }
         }
 
-        if (!initialized) {
+        if (!initialized && process.env.GOOGLE_APPLICATION_CREDENTIALS) {
           try {
             admin.initializeApp({
               credential: admin.applicationDefault(),
@@ -2401,6 +2401,77 @@ app.get('/api/latest-kenyalaw', async (req, res) => {
     res.status(500).json({ error: e.message });
   }
 });
+const LEGAL_SUGGESTION_CORPUS = [
+  { text: "Limitation of Actions Act Cap 22 - Section 7 & 38 Adverse Possession", tag: "Statute", type: "statute" },
+  { text: "Land Act No. 6 of 2012", tag: "Statute", type: "statute" },
+  { text: "Land Registration Act 2012 Section 28 Overriding Interests", tag: "Statute", type: "statute" },
+  { text: "Constitution of Kenya 2010 Article 47 Fair Administrative Action", tag: "Constitution", type: "statute" },
+  { text: "Constitution of Kenya 2010 Article 22 Right to Instituting Court Proceedings", tag: "Constitution", type: "statute" },
+  { text: "Constitution of Kenya 2010 Article 50 Fair Hearing", tag: "Constitution", type: "statute" },
+  { text: "Constitution of Kenya 2010 Article 165 High Court Jurisdiction", tag: "Constitution", type: "statute" },
+  { text: "Constitution of Kenya 2010 Article 163 Supreme Court Jurisdiction", tag: "Constitution", type: "statute" },
+  { text: "Evidence Act Cap 80 Section 106B Electronic Records Admissibility", tag: "Evidence", type: "statute" },
+  { text: "Employment Act 2007 Section 45 Constructive Dismissal & Unfair Termination", tag: "Employment", type: "statute" },
+  { text: "Penal Code Cap 63 Section 203 Murder & Malice Aforethought", tag: "Criminal Law", type: "statute" },
+  { text: "Criminal Procedure Code Cap 75 Section 211 Case to Answer", tag: "Criminal Law", type: "statute" },
+  { text: "Mtana Lewa v Kahindi Ngala [2015] eKLR", tag: "Precedent", type: "case" },
+  { text: "Isack M'Inanga Kieba v Isaaya Theuri M'Lintari [2018] eKLR", tag: "Supreme Court", type: "case" },
+  { text: "Donoghue v Stevenson [1932] AC 562 Duty of Care", tag: "Precedent", type: "case" },
+  { text: "Salomon v Salomon & Co Ltd [1897] AC 22 Corporate Personality", tag: "Corporate Law", type: "case" },
+  { text: "Carlill v Carbolic Smoke Ball Co [1893] 1 QB 256 Offer & Acceptance", tag: "Contract Law", type: "case" },
+  { text: "Hadley v Baxendale [1854] EWHC J70 Remoteness of Damage", tag: "Contract Law", type: "case" },
+  { text: "R v Dudley and Stephens [1884] 14 QBD 273 Defense of Necessity", tag: "Criminal Law", type: "case" },
+  { text: "Woolmington v DPP [1935] AC 462 Golden Thread Presumption of Innocence", tag: "Precedent", type: "case" },
+  { text: "High Court e-Filing & Virtual Case Management Guidelines 2026", tag: "Directive", type: "topic" },
+  { text: "Environment and Land Court (ELC) Practice Directions", tag: "Directive", type: "topic" },
+  { text: "Employment and Labour Relations Court (ELRC) Rules 2024", tag: "Directive", type: "topic" },
+  { text: "Judicial Review Certiorari Mandamus & Prohibition", tag: "Public Law", type: "topic" },
+  { text: "Adverse Possession 12 Years Uninterrupted Occupation", tag: "Land Law", type: "topic" },
+  { text: "Section 106B Certificate of Electronic Evidence", tag: "Evidence", type: "topic" }
+];
+
+app.get(['/api/suggestions', '/api/v1/suggestions'], (req, res) => {
+  const q = (req.query.q || '').trim().toLowerCase();
+  if (!q || q.length < 2) {
+    return res.json({ query: q, suggestions: [] });
+  }
+
+  const suggestions = [];
+  const seen = new Set();
+
+  // 1. Search local static legal corpus
+  LEGAL_SUGGESTION_CORPUS.forEach(item => {
+    if (item.text.toLowerCase().includes(q) || item.tag.toLowerCase().includes(q)) {
+      if (!seen.has(item.text.toLowerCase())) {
+        seen.add(item.text.toLowerCase());
+        suggestions.push({ query: item.text, tag: item.tag, type: item.type });
+      }
+    }
+  });
+
+  // 2. Search local repository docs
+  try {
+    const docs = getRepositoryDocs();
+    docs.forEach(d => {
+      const title = d.title || '';
+      const citation = d.citation || '';
+      const textToMatch = `${title} ${citation}`.toLowerCase();
+      if (textToMatch.includes(q)) {
+        const itemText = citation ? `${title} (${citation})` : title;
+        if (itemText && !seen.has(itemText.toLowerCase())) {
+          seen.add(itemText.toLowerCase());
+          suggestions.push({ query: itemText, tag: d.type === 'statute' ? 'Statute' : 'Precedent', type: d.type || 'case' });
+        }
+      }
+    });
+  } catch (_) {}
+
+  res.json({
+    query: q,
+    suggestions: suggestions.slice(0, 8)
+  });
+});
+
 
 
 app.get('/api/docs', (req, res) => {

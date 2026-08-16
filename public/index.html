@@ -1160,40 +1160,67 @@
             right: 0;
             background: #FFFFFF;
             border: 1px solid var(--border-color);
-            border-radius: var(--radius-md);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
-            z-index: 200;
+            border-radius: var(--radius-lg, 12px);
+            box-shadow: 0 16px 36px rgba(0, 0, 0, 0.16);
+            z-index: 2000;
             display: none;
-            max-height: 280px;
+            max-height: 320px;
             overflow-y: auto;
+            backdrop-filter: blur(12px);
+        }
+
+        [data-theme="dark"] .search-suggestions-dropdown {
+            background: #1E293B;
+            border-color: #334155;
+            box-shadow: 0 16px 36px rgba(0, 0, 0, 0.5);
         }
 
         .search-suggestion-item {
-            padding: 10px 16px;
-            font-size: 0.86rem;
+            padding: 11px 16px;
+            font-size: 0.88rem;
             color: var(--text-primary);
             display: flex;
             align-items: center;
             justify-content: space-between;
             cursor: pointer;
             border-bottom: 1px solid var(--border-subtle);
-            transition: background 0.15s ease;
+            transition: all 0.15s ease;
         }
 
         .search-suggestion-item:last-child {
             border-bottom: none;
         }
 
-        .search-suggestion-item:hover {
-            background: #F1F5F9;
+        .search-suggestion-item:hover,
+        .search-suggestion-item.active {
+            background: rgba(37, 99, 235, 0.08);
             color: var(--accent-blue);
+            padding-left: 20px;
+        }
+
+        [data-theme="dark"] .search-suggestion-item:hover,
+        [data-theme="dark"] .search-suggestion-item.active {
+            background: rgba(59, 130, 246, 0.18);
+        }
+
+        .suggestion-title strong {
+            color: var(--accent-blue);
+            font-weight: 700;
         }
 
         .suggestion-tag {
             font-size: 0.72rem;
+            font-weight: 600;
             font-family: 'SFMono-Regular', Consolas, monospace;
-            color: var(--text-tertiary);
+            color: var(--accent-blue);
+            background: rgba(37, 99, 235, 0.08);
+            border: 1px solid rgba(37, 99, 235, 0.2);
+            padding: 2px 8px;
+            border-radius: 6px;
             text-transform: uppercase;
+            letter-spacing: 0.03em;
+            margin-left: 12px;
+            white-space: nowrap;
         }
 
         .page-btn:hover:not(:disabled) {
@@ -3715,38 +3742,80 @@
             { query: 'High Court e-Filing virtual case management guidelines 2026', tag: 'Directive' }
         ];
 
-        function handleSearchInput(val) {
-            const dropdown = document.getElementById('searchSuggestionsDropdown');
-            if (!dropdown) return;
-            const text = (val || '').trim().toLowerCase();
+        let activeSuggestionIndex = -1;
+        let suggestionDebounceTimer = null;
 
+        async function fetchLiveSuggestions(val) {
+            const query = (val || '').trim();
+            if (!query || query.length < 2) return [];
+
+            try {
+                const res = await fetch(`/api/suggestions?q=${encodeURIComponent(query)}`);
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data && Array.isArray(data.suggestions) && data.suggestions.length > 0) {
+                        return data.suggestions;
+                    }
+                }
+            } catch (_) {}
+
+            // Fallback to local array filtering
+            return FREQUENT_SUGGESTIONS.filter(item =>
+                item.query.toLowerCase().includes(query.toLowerCase()) || (item.tag && item.tag.toLowerCase().includes(query.toLowerCase()))
+            ).map(i => ({ query: i.query, tag: i.tag, type: 'topic' })).slice(0, 6);
+        }
+
+        function handleSearchInput(val) {
+            handleAutocompleteInput(val, 'searchInput', 'searchSuggestionsDropdown', executeMainSearch);
+        }
+
+        function handleRepoSearchInput(val) {
+            syncSearchInputs(val);
+            handleAutocompleteInput(val, 'repoSearchInput', 'repoSuggestionsDropdown', executeRepoSearch);
+        }
+
+        function handleAutocompleteInput(val, inputId, dropdownId, searchAction) {
+            const dropdown = document.getElementById(dropdownId);
+            if (!dropdown) return;
+
+            clearTimeout(suggestionDebounceTimer);
+            activeSuggestionIndex = -1;
+
+            const text = (val || '').trim();
             if (!text || text.length < 2) {
                 dropdown.style.display = 'none';
+                dropdown.innerHTML = '';
                 return;
             }
 
-            const matches = FREQUENT_SUGGESTIONS.filter(item =>
-                item.query.toLowerCase().includes(text) || item.tag.toLowerCase().includes(text)
-            ).slice(0, 6);
+            suggestionDebounceTimer = setTimeout(async () => {
+                const matches = await fetchLiveSuggestions(text);
+                if (matches.length === 0) {
+                    dropdown.style.display = 'none';
+                    dropdown.innerHTML = '';
+                    return;
+                }
 
-            if (matches.length === 0) {
-                dropdown.style.display = 'none';
-                return;
-            }
+                dropdown.innerHTML = matches.map((m, idx) => {
+                    const iconName = m.type === 'statute' ? 'book' : m.type === 'case' ? 'scale' : 'search';
+                    return `
+                        <div class="search-suggestion-item" data-index="${idx}" onclick="selectSuggestionItem('${inputId}', '${dropdownId}', '${escapeJsString(m.query)}')">
+                            <span class="suggestion-title">
+                                <i data-lucide="${iconName}" style="width: 14px; height: 14px; margin-right: 8px; vertical-align: middle; color: var(--accent-blue);"></i>
+                                ${highlightMatch(m.query, text)}
+                            </span>
+                            <span class="suggestion-tag">${escapeHtml(m.tag || 'Topic')}</span>
+                        </div>
+                    `;
+                }).join('');
 
-            dropdown.innerHTML = matches.map(m => `
-                <div class="search-suggestion-item" onclick="selectSuggestion('${escapeJsString(m.query)}')">
-                    <span><i data-lucide="search" style="width: 14px; height: 14px; margin-right: 8px; vertical-align: middle; color: var(--text-tertiary);"></i>${highlightMatch(m.query, text)}</span>
-                    <span class="suggestion-tag">${escapeHtml(m.tag)}</span>
-                </div>
-            `).join('');
-
-            dropdown.style.display = 'block';
-            if (window.lucide) lucide.createIcons();
+                dropdown.style.display = 'block';
+                if (window.lucide) lucide.createIcons();
+            }, 120);
         }
 
         function highlightMatch(str, query) {
-            const idx = str.toLowerCase().indexOf(query);
+            const idx = str.toLowerCase().indexOf(query.toLowerCase());
             if (idx === -1) return escapeHtml(str);
             const before = str.substring(0, idx);
             const match = str.substring(idx, idx + query.length);
@@ -3754,19 +3823,78 @@
             return `${escapeHtml(before)}<strong>${escapeHtml(match)}</strong>${escapeHtml(after)}`;
         }
 
-        function selectSuggestion(queryText) {
-            const input = document.getElementById('searchInput');
+        function selectSuggestionItem(inputId, dropdownId, queryText) {
+            const input = document.getElementById(inputId);
             if (input) input.value = queryText;
-            const dropdown = document.getElementById('searchSuggestionsDropdown');
+            syncSearchInputs(queryText);
+            const dropdown = document.getElementById(dropdownId);
             if (dropdown) dropdown.style.display = 'none';
-            doSearch();
+            activeSuggestionIndex = -1;
+
+            if (inputId === 'repoSearchInput') {
+                executeRepoSearch(queryText);
+            } else {
+                executeMainSearch(queryText);
+            }
+        }
+
+        function selectSuggestion(queryText) {
+            selectSuggestionItem('searchInput', 'searchSuggestionsDropdown', queryText);
+        }
+
+        function setupAutocompleteKeyboardNav(inputId, dropdownId, searchAction) {
+            const input = document.getElementById(inputId);
+            if (!input) return;
+
+            input.addEventListener('keydown', (e) => {
+                const dropdown = document.getElementById(dropdownId);
+                if (!dropdown || dropdown.style.display === 'none') return;
+
+                const items = dropdown.querySelectorAll('.search-suggestion-item');
+                if (items.length === 0) return;
+
+                if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    activeSuggestionIndex = (activeSuggestionIndex + 1) % items.length;
+                    updateSuggestionHighlight(items);
+                } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    activeSuggestionIndex = (activeSuggestionIndex - 1 + items.length) % items.length;
+                    updateSuggestionHighlight(items);
+                } else if (e.key === 'Enter') {
+                    if (activeSuggestionIndex >= 0 && activeSuggestionIndex < items.length) {
+                        e.preventDefault();
+                        items[activeSuggestionIndex].click();
+                    }
+                } else if (e.key === 'Escape') {
+                    dropdown.style.display = 'none';
+                    activeSuggestionIndex = -1;
+                }
+            });
+        }
+
+        function updateSuggestionHighlight(items) {
+            items.forEach((item, idx) => {
+                if (idx === activeSuggestionIndex) {
+                    item.classList.add('active');
+                    item.scrollIntoView({ block: 'nearest' });
+                } else {
+                    item.classList.remove('active');
+                }
+            });
         }
 
         document.addEventListener('click', (e) => {
-            const dropdown = document.getElementById('searchSuggestionsDropdown');
-            const searchWrap = document.getElementById('standardSearchWrap');
-            if (dropdown && searchWrap && !searchWrap.contains(e.target)) {
-                dropdown.style.display = 'none';
+            const dropdown1 = document.getElementById('searchSuggestionsDropdown');
+            const wrap1 = document.getElementById('standardSearchWrap');
+            if (dropdown1 && wrap1 && !wrap1.contains(e.target)) {
+                dropdown1.style.display = 'none';
+            }
+
+            const dropdown2 = document.getElementById('repoSuggestionsDropdown');
+            const wrap2 = document.getElementById('repoSearchWrap');
+            if (dropdown2 && wrap2 && !wrap2.contains(e.target)) {
+                dropdown2.style.display = 'none';
             }
         });
 
@@ -3976,6 +4104,10 @@
         /* ─── INIT ─── */
         function initApp() {
             updateSavedCountBadge();
+            if (typeof setupAutocompleteKeyboardNav === 'function') {
+                setupAutocompleteKeyboardNav('searchInput', 'searchSuggestionsDropdown', executeMainSearch);
+                setupAutocompleteKeyboardNav('repoSearchInput', 'repoSuggestionsDropdown', executeRepoSearch);
+            }
             const currentPath = window.location.pathname || '/home';
             navigateTo(currentPath, false);
             if (typeof lucide !== 'undefined') lucide.createIcons();

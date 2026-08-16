@@ -1942,9 +1942,12 @@ Respond ONLY with a valid JSON array starting with '[' and ending with ']'. No m
 
   const modelsToTry = GEMINI_MODELS.slice(0, 2);
   for (const model of modelsToTry) {
+    const aiClient = getAiClient();
+    if (!aiClient) break;
+
     try {
       const response = await Promise.race([
-        ai.models.generateContent({
+        aiClient.models.generateContent({
           model,
           contents: systemPrompt,
           config: {
@@ -1952,7 +1955,7 @@ Respond ONLY with a valid JSON array starting with '[' and ending with ']'. No m
             temperature: 0.2
           }
         }),
-        new Promise((_, reject) => setTimeout(() => reject(new Error('Gemini timeout')), 2500))
+        new Promise((_, reject) => setTimeout(() => reject(new Error('Gemini timeout')), 5000))
       ]);
 
       const results = [];
@@ -2048,7 +2051,7 @@ async function searchFastWeb(query, source = 'all') {
   const scopeQuery = `${query} ${siteQuery} filetype:pdf OR case law OR judgment OR statute OR treaty OR ruling`;
 
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 6000);
+  const timeoutId = setTimeout(() => controller.abort(), 5000);
   try {
     const response = await fetch(`https://html.duckduckgo.com/html/?q=${encodeURIComponent(scopeQuery)}`, {
       headers: {
@@ -2327,8 +2330,8 @@ async function searchWithRetry(query, retries = 1, source = 'all', classificatio
     ? fetchKenyaLawDirect(normalizedQuery).catch(() => [])
     : Promise.resolve([]);
 
-  // 3.5-second timeout for external search queries
-  const timeoutPromise = new Promise(resolve => setTimeout(() => resolve([]), 3500));
+  // 5.5-second timeout for external search queries
+  const timeoutPromise = new Promise(resolve => setTimeout(() => resolve([]), 5500));
 
   // Run all searches in parallel with a 1.5-second timeout
   const [webResults, geminiResults, kenyaResults] = await Promise.all([

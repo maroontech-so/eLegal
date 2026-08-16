@@ -30,13 +30,28 @@
       "el_1e2179ab2937c295d084010b37317796": {
         "label": "New Secret Key",
         "createdAt": "2026-08-16T09:08:52.669Z",
-        "lastUsed": "2026-08-16T13:28:38.879Z",
-        "requestCount": 3,
+        "lastUsed": "2026-08-16T15:16:33.805Z",
+        "requestCount": 4,
         "isActive": true,
-        "lastCall": "2026-08-16T13:28:38.879Z",
-        "totalCalls": 3,
-        "expenditure": 0.006,
+        "lastCall": "2026-08-16T15:16:33.805Z",
+        "totalCalls": 4,
+        "expenditure": 0.008,
         "callsRecord": [
+          {
+            "timestamp": "2026-08-16T15:16:33.805Z",
+            "endpoint": "/api/search",
+            "method": "GET",
+            "type": "search",
+            "statusCode": 200,
+            "cost": 0.002,
+            "totalTime": 2345,
+            "backEndTime": 2318,
+            "otherTime": 2,
+            "requestMediation": 0,
+            "responseMediation": 21,
+            "authTime": 4,
+            "throttling": 0
+          },
           {
             "timestamp": "2026-08-16T13:28:38.879Z",
             "endpoint": "/api/search",
@@ -84,6 +99,21 @@
           }
         ],
         "usageHistory": [
+          {
+            "timestamp": "2026-08-16T15:16:33.805Z",
+            "endpoint": "/api/search",
+            "method": "GET",
+            "type": "search",
+            "statusCode": 200,
+            "cost": 0.002,
+            "totalTime": 2345,
+            "backEndTime": 2318,
+            "otherTime": 2,
+            "requestMediation": 0,
+            "responseMediation": 21,
+            "authTime": 4,
+            "throttling": 0
+          },
           {
             "timestamp": "2026-08-16T13:28:38.879Z",
             "endpoint": "/api/search",
@@ -337,6 +367,15 @@
       "el_8bb79dace9a93221f3e7562191be185e": {
         "label": "Primary Secret Key",
         "createdAt": "2026-08-16T12:45:20.962Z",
+        "lastUsed": null,
+        "requestCount": 0,
+        "isActive": true
+      }
+    },
+    "user_a1debe4d85ce0ffd": {
+      "el_f48d7ddd1c69ae5c26ff15c0f4089bbc": {
+        "label": "Primary Secret Key",
+        "createdAt": "2026-08-16T15:21:18.468Z",
         "lastUsed": null,
         "requestCount": 0,
         "isActive": true

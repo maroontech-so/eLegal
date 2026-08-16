@@ -952,6 +952,10 @@
         <span class="status-dot"></span>
         <span>Operational</span>
       </div>
+      <button class="btn-secondary" onclick="copyDocAsMarkdownForLLM()" style="background: rgba(16, 185, 129, 0.12); border-color: rgba(16, 185, 129, 0.35); color: #34D399; font-weight: 700;" title="Copy complete API documentation as Markdown for ChatGPT / Claude / Cursor LLMs">
+        <i data-lucide="sparkles" style="width: 14px; height: 14px; color: #34D399;"></i>
+        <span>Copy for LLM</span>
+      </button>
       <a href="/" class="btn-secondary">
         <i data-lucide="arrow-left" style="width: 14px; height: 14px;"></i>
         App Home
@@ -1076,9 +1080,15 @@
       <!-- Active Documentation Section -->
       <section class="doc-section">
         
-        <div class="hero-elegal-tag">
-          <span class="hero-pulse-dot"></span>
-          <span id="displayBadgeText">eLegal Intelligence API • Core v1.0</span>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+          <div class="hero-elegal-tag" style="margin-bottom: 0;">
+            <span class="hero-pulse-dot"></span>
+            <span id="displayBadgeText">eLegal Intelligence API • Core v1.0</span>
+          </div>
+          <button class="btn-secondary" onclick="copyDocAsMarkdownForLLM()" style="background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.35); color: #34D399; font-size: 0.78rem; font-weight: 700; padding: 6px 14px; display: inline-flex; align-items: center; gap: 6px;">
+            <i data-lucide="sparkles" style="width: 14px; height: 14px; color: #34D399;"></i>
+            <span>Copy as Markdown for LLM</span>
+          </button>
         </div>
 
         <h1 class="doc-title" id="displayTitle">Overview & Authentication</h1>
@@ -1335,6 +1345,60 @@
           </div>
         </div>
       </div>
+
+  <!-- Authentication Modal Overlay -->
+  <div class="modal-overlay" id="authModal">
+    <div class="modal-card" style="max-width: 420px; width: 100%;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+        <h2 style="font-size: 1.15rem; font-weight: 700; color: #fff; margin: 0; display: flex; align-items: center; gap: 8px;">
+          <i data-lucide="key" style="width: 18px; height: 18px; color: var(--accent-emerald);"></i>
+          Developer Account Sign In
+        </h2>
+        <button onclick="toggleAuthModal()" style="background: none; border: none; color: var(--text-muted); cursor: pointer; padding: 4px;">
+          <i data-lucide="x" style="width: 18px; height: 18px;"></i>
+        </button>
+      </div>
+      <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 20px;">
+        Sign in to manage your eLegal Developer API keys, monitor real-time request usage, and access rate limits.
+      </p>
+
+      <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px;">
+        <button class="btn-secondary" onclick="loginWithProvider('Google')" style="justify-content: center; width: 100%; padding: 10px; font-weight: 600;">
+          <i data-lucide="chrome" style="width: 16px; height: 16px; color: #4285F4;"></i>
+          Continue with Google
+        </button>
+        <button class="btn-secondary" onclick="loginWithProvider('GitHub')" style="justify-content: center; width: 100%; padding: 10px; font-weight: 600;">
+          <i data-lucide="github" style="width: 16px; height: 16px;"></i>
+          Continue with GitHub
+        </button>
+      </div>
+
+      <div style="display: flex; align-items: center; margin-bottom: 20px;">
+        <div style="flex: 1; height: 1px; background: rgba(255,255,255,0.1);"></div>
+        <span style="padding: 0 10px; font-size: 0.75rem; color: var(--text-muted);">OR WITH EMAIL</span>
+        <div style="flex: 1; height: 1px; background: rgba(255,255,255,0.1);"></div>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px;">
+        <div>
+          <label style="display: block; font-size: 0.78rem; font-weight: 600; color: var(--text-muted); margin-bottom: 6px;">Developer Email</label>
+          <input type="email" id="emailInput" class="input-field" placeholder="dev@company.com" style="width: 100%;">
+        </div>
+        <div>
+          <label style="display: block; font-size: 0.78rem; font-weight: 600; color: var(--text-muted); margin-bottom: 6px;">Password</label>
+          <input type="password" id="passwordInput" class="input-field" placeholder="••••••••" style="width: 100%;">
+        </div>
+        <button class="btn-primary" onclick="handleEmailAuth()" style="justify-content: center; width: 100%; padding: 10px; margin-top: 4px;">
+          <i data-lucide="log-in" style="width: 16px; height: 16px;"></i>
+          Sign In / Create Account
+        </button>
+      </div>
+
+      <div style="font-size: 0.75rem; color: var(--text-dim); text-align: center;">
+        By continuing, you agree to eLegal API Terms of Service & Privacy Policy.
+      </div>
+    </div>
+  </div>
 
   <!-- Toast Notification -->
   <div class="toast" id="toast"></div>
@@ -1872,9 +1936,9 @@
     }
 
     async function handleCreateApiKey() {
-      const labelInput = document.getElementById('newKeyLabelInput');
+      const labelInput = document.getElementById('newKeyLabelInputPage') || document.getElementById('newKeyLabelInput');
       const label = (labelInput?.value || '').trim() || 'New Secret Key';
-      const btn = document.getElementById('btnGenerateKey');
+      const btn = document.getElementById('btnGenerateKeyPage') || document.getElementById('btnGenerateKey');
 
       if (btn) {
         btn.disabled = true;
@@ -1892,14 +1956,17 @@
         let newKeyObj;
         if (res.ok) {
           newKeyObj = await res.json();
+          if (!currentDeveloperKeys.some(k => k.key === newKeyObj.key)) {
+            currentDeveloperKeys.unshift(newKeyObj);
+          }
         } else {
           const rawKey = 'el_live_' + Math.random().toString(36).substring(2, 12) + Math.random().toString(36).substring(2, 10);
           newKeyObj = { key: rawKey, label, createdAt: new Date().toISOString().split('T')[0], lastUsed: 'Never', requestCount: 0, isActive: true };
           currentDeveloperKeys.unshift(newKeyObj);
         }
 
-        const secretEl = document.getElementById('newKeySecretText');
-        const alertBox = document.getElementById('newKeyAlertBox');
+        const secretEl = document.getElementById('newKeySecretTextPage') || document.getElementById('newKeySecretText');
+        const alertBox = document.getElementById('newKeyAlertBoxPage') || document.getElementById('newKeyAlertBox');
         if (secretEl) secretEl.textContent = newKeyObj.key;
         if (alertBox) alertBox.style.display = 'block';
         if (labelInput) labelInput.value = '';
@@ -1908,15 +1975,15 @@
         localStorage.setItem('elegal_api_key', userApiKey);
 
         showToast('New API key generated successfully!');
-        loadDeveloperKeys();
+        renderKeysListAndAnalytics(currentDeveloperKeys);
       } catch (e) {
         console.error('Create key error:', e);
         showToast('Key generation fallback activated');
         const rawKey = 'el_live_' + Math.random().toString(36).substring(2, 12);
         const newKeyObj = { key: rawKey, label, createdAt: new Date().toISOString().split('T')[0], lastUsed: 'Never', requestCount: 0, isActive: true };
         currentDeveloperKeys.unshift(newKeyObj);
-        const secretEl = document.getElementById('newKeySecretText');
-        const alertBox = document.getElementById('newKeyAlertBox');
+        const secretEl = document.getElementById('newKeySecretTextPage') || document.getElementById('newKeySecretText');
+        const alertBox = document.getElementById('newKeyAlertBoxPage') || document.getElementById('newKeyAlertBox');
         if (secretEl) secretEl.textContent = rawKey;
         if (alertBox) alertBox.style.display = 'block';
         if (labelInput) labelInput.value = '';
@@ -1928,6 +1995,22 @@
         }
         if (window.lucide) lucide.createIcons();
       }
+    }
+
+    function recordApiKeyUsage(usedKey) {
+      const keyToMatch = usedKey || userApiKey;
+      if (!currentDeveloperKeys || currentDeveloperKeys.length === 0) {
+        currentDeveloperKeys = getMockDeveloperKeys();
+      }
+      let foundKey = currentDeveloperKeys.find(k => k.key === keyToMatch);
+      if (!foundKey && currentDeveloperKeys.length > 0) {
+        foundKey = currentDeveloperKeys[0];
+      }
+      if (foundKey) {
+        foundKey.requestCount = (foundKey.requestCount || 0) + 1;
+        foundKey.lastUsed = 'Just now';
+      }
+      renderKeysListAndAnalytics(currentDeveloperKeys);
     }
 
     async function toggleKeyStatus(keyId, currentActiveState) {
@@ -1987,7 +2070,7 @@
         }
         const res = await window._fbSignInWithPopup(firebaseAuth, provider);
         showToast(`Signed in as ${res.user.displayName || res.user.email}`);
-        document.getElementById('authModal').classList.remove('show');
+        document.getElementById('authModal')?.classList.remove('show');
         openProfileModal();
       } catch (e) {
         console.error('Provider login error:', e);
@@ -2020,7 +2103,7 @@
           }
         }
         showToast(`Signed in as ${res.user.email}`);
-        document.getElementById('authModal').classList.remove('show');
+        document.getElementById('authModal')?.classList.remove('show');
         openProfileModal();
       } catch (e) {
         console.error('Email auth error:', e);
@@ -2044,7 +2127,9 @@
 
     function toggleAuthModal() {
       const modal = document.getElementById('authModal');
-      modal.classList.toggle('show');
+      if (modal) {
+        modal.classList.toggle('show');
+      }
     }
 
     function showToast(msg) {
@@ -2057,6 +2142,211 @@
     function copyText(txt) {
       navigator.clipboard.writeText(txt);
       showToast('Copied to clipboard!');
+    }
+
+    function generateFullMarkdownForLLM() {
+      const activeKey = 'YOUR_SECRET_API_KEY';
+      const baseUrl = window.location.origin || 'http://localhost:3000';
+
+      return `# eLegal REST API — Full Developer Documentation for LLM Context
+
+> **System Prompt / Context Notice for AI Assistants (ChatGPT, Claude, Cursor, Copilot)**
+> This document contains the complete REST API specifications for the eLegal Kenya Judicial Precedent & Legal Intelligence Platform. Use these schemas, endpoints, and authentication rules to generate integration code, HTTP requests, client SDKs, or legal tech applications.
+
+---
+
+## 1. System Overview & Authentication
+
+- **Base URL:** \`${baseUrl}\`
+- **Format:** JSON (\`Content-Type: application/json\`, \`Accept: application/json\`)
+- **Authentication Method:** Custom Request Header
+- **Authentication Header:** \`X-API-Key: ${activeKey}\`
+
+### Rate Limits & Quotas
+- **Free Tier:** 100 requests / minute
+- **Developer Pro Tier:** 1,000 requests / minute
+- **HTTP 429:** Returned when rate limit is exceeded. Check \`Retry-After\` header.
+
+---
+
+## 2. API Endpoints Reference
+
+### 2.1. Search Legal Precedents
+- **Endpoint:** \`GET /api/search\`
+- **Description:** Search Kenya court rulings, Supreme Court decisions, Court of Appeal precedents, High Court judgments, and Employment & Land Court cases.
+- **Headers Required:**
+  - \`X-API-Key\`: Confidential developer API secret key.
+  - \`Accept\`: \`application/json\`
+- **Query Parameters:**
+  - \`q\` (string, required): Keywords, case names, legal principles, or judge names (e.g. \`Constitutional Rights Amendment\`).
+  - \`category\` (string, optional): Court division filter (e.g. \`Civil\`, \`Criminal\`, \`Constitutional\`, \`Land\`).
+  - \`limit\` (number, optional): Max number of results to return (default: 10, max: 50).
+- **Example cURL Request:**
+\`\`\`bash
+curl -X GET "${baseUrl}/api/search?q=Constitutional+Rights&category=Civil&limit=5" \\
+  -H "Accept: application/json" \\
+  -H "X-API-Key: ${activeKey}"
+\`\`\`
+- **Response Payload Schema (200 OK):**
+\`\`\`json
+{
+  "query": "Constitutional Rights",
+  "total": 5,
+  "category": "Civil",
+  "results": [
+    {
+      "id": "eLegal-2026-SC-001",
+      "title": "Republic v. Attorney General & 2 Others Ex-Parte Okiya Omtatah",
+      "citation": "[2026] eKLR 104",
+      "court": "Supreme Court of Kenya",
+      "date": "2026-02-14",
+      "summary": "Landmark Supreme Court ruling establishing public participation standards under Article 118 of the Constitution of Kenya.",
+      "score": 0.98,
+      "pdfUrl": "/pdf/eLegal-2026-SC-001.pdf"
+    }
+  ]
+}
+\`\`\`
+
+---
+
+### 2.2. Citation & Case Reference Resolver
+- **Endpoint:** \`GET /api/resolve\`
+- **Description:** Resolve citation strings (e.g. \`[2024] eKLR 452\` or \`Civil Appeal 12 of 2022\`) to canonical case metadata and PDF links.
+- **Headers Required:**
+  - \`X-API-Key\`: Confidential developer API secret key.
+- **Query Parameters:**
+  - \`citation\` (string, required): eKLR or law report citation string.
+- **Example cURL Request:**
+\`\`\`bash
+curl -X GET "${baseUrl}/api/resolve?citation=%5B2024%5D+eKLR+452" \\
+  -H "Accept: application/json" \\
+  -H "X-API-Key: ${activeKey}"
+\`\`\`
+- **Response Payload Schema (200 OK):**
+\`\`\`json
+{
+  "citation": "[2024] eKLR 452",
+  "status": "resolved",
+  "case": {
+    "title": "Gitobu Imanyara v. Attorney General",
+    "court": "Court of Appeal at Nairobi",
+    "decisionDate": "2024-05-18",
+    "neutralCitation": "[2024] KECA 452 (KLR)",
+    "pdfDownloadUrl": "${baseUrl}/pdf/resolved-452.pdf"
+  }
+}
+\`\`\`
+
+---
+
+### 2.3. Statutory Archive & Acts of Parliament Library
+- **Endpoint:** \`GET /api/library\`
+- **Description:** Retrieve statutory legislation, Kenya Gazette notices, and constitutional provisions.
+- **Headers Required:**
+  - \`X-API-Key\`: Confidential developer API secret key.
+- **Query Parameters:**
+  - \`act\` (string, optional): Act title or Cap number (e.g. \`Penal Code Cap 63\`).
+  - \`year\` (number, optional): Enactment year.
+- **Example cURL Request:**
+\`\`\`bash
+curl -X GET "${baseUrl}/api/library?act=Penal+Code+Cap+63" \\
+  -H "Accept: application/json" \\
+  -H "X-API-Key: ${activeKey}"
+\`\`\`
+- **Response Payload Schema (200 OK):**
+\`\`\`json
+{
+  "act": "Penal Code Cap 63",
+  "status": "available",
+  "provisions": [
+    {
+      "section": "Section 24",
+      "heading": "General Punishment for Felonies",
+      "text": "Where any person is convicted of a felony under this Code..."
+    }
+  ]
+}
+\`\`\`
+
+---
+
+### 2.4. Public Health & System Latency Probe
+- **Endpoint:** \`GET /api/health\`
+- **Description:** Check cluster daemon status, database responsiveness, and service uptime. Does not consume quota.
+- **Headers Required:** None
+- **Example cURL Request:**
+\`\`\`bash
+curl -X GET "${baseUrl}/api/health"
+\`\`\`
+- **Response Payload Schema (200 OK):**
+\`\`\`json
+{
+  "status": "ok",
+  "timestamp": "2026-08-16T12:00:00Z",
+  "latencyMs": 14,
+  "service": "eLegal Intelligence REST Engine"
+}
+\`\`\`
+
+---
+
+## 3. Developer API Keys Management Endpoints
+
+### 3.1. Generate Secret API Key
+- **Endpoint:** \`POST /api/keys\`
+- **Headers Required:** \`Authorization: <Firebase_ID_Token>\`
+- **Body Payload:**
+\`\`\`json
+{
+  "label": "Production Mobile App Key"
+}
+\`\`\`
+
+### 3.2. List Account API Keys & Metrics
+- **Endpoint:** \`GET /api/keys\`
+- **Headers Required:** \`Authorization: <Firebase_ID_Token>\`
+
+### 3.3. Pause / Resume API Key
+- **Endpoint:** \`PATCH /api/keys/:keyId\`
+- **Headers Required:** \`Authorization: <Firebase_ID_Token>\`
+- **Body Payload:**
+\`\`\`json
+{
+  "isActive": false
+}
+\`\`\`
+
+### 3.4. Revoke / Delete API Key
+- **Endpoint:** \`DELETE /api/keys/:keyId\`
+- **Headers Required:** \`Authorization: <Firebase_ID_Token>\`
+
+---
+
+## 4. Integration Guidelines for AI Applications
+
+1. **Header Placement:** Always send \`X-API-Key\` in the HTTP request header, not as a URL query parameter, to prevent secret leakages in server access logs.
+2. **Error Handling Rules:**
+   - \`401 Unauthorized\`: Invalid or paused key.
+   - \`429 Too Many Requests\`: Pause request dispatch and retry after the duration specified in the \`Retry-After\` header.
+3. **Payload Grounding:** Use the \`summary\`, \`citation\`, and \`pdfUrl\` fields from \`GET /api/search\` responses to ground AI response citations accurately.
+`;
+    }
+
+    async function copyDocAsMarkdownForLLM() {
+      const md = generateFullMarkdownForLLM();
+      try {
+        await navigator.clipboard.writeText(md);
+        showToast('Copied complete API documentation as Markdown for LLMs!');
+      } catch (e) {
+        const ta = document.createElement('textarea');
+        ta.value = md;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+        showToast('Copied complete API documentation as Markdown for LLMs!');
+      }
     }
 
     // Switch Active Topic
@@ -2220,7 +2510,7 @@
       const topic = TOPICS[activeTopicKey];
       const url = buildFullUrl();
       const method = topic.method;
-      const key = userApiKey;
+      const key = 'YOUR_SECRET_API_KEY';
       let snippet = '';
 
       if (activeLang === 'curl') {
@@ -2331,6 +2621,7 @@ puts response.body`;
       const statusEl = document.getElementById('respStatus');
 
       respBox.innerHTML = '<span class="tok-cmnt">// Executing eLegal API request...</span>';
+      recordApiKeyUsage(userApiKey);
 
       try {
         const headers = { 'Content-Type': 'application/json' };

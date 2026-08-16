@@ -2145,7 +2145,25 @@
             margin: 1px 0 2px 0;
         }
 
-        /* Thin & Compact Precedent Cards on Home Teaser */
+        /* Thin & Compact Precedent Cards on Home Teaser (3x3 Grid on wider screens) */
+        .compact-precedents-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+        }
+
+        @media (min-width: 640px) {
+            .compact-precedents-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (min-width: 992px) {
+            .compact-precedents-grid {
+                grid-template-columns: repeat(3, 1fr) !important;
+            }
+        }
+
         .compact-precedents-grid .case-card {
             padding: 4px 8px;
             min-height: 32px;
@@ -2270,9 +2288,9 @@
                 </div>
             </section>
 
-            <!-- Precedents Teaser: Clean List with Small Height Case Cards -->
+            <!-- Precedents Teaser: 3x3 Grid on Wider Screens -->
             <section style="margin-bottom: 24px;">
-                <div id="homePrecedentsPreviewGrid" class="results compact-precedents-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 10px;"></div>
+                <div id="homePrecedentsPreviewGrid" class="results compact-precedents-grid"></div>
             </section>
 
             <!-- Daily Bulletins Teaser -->
@@ -2825,7 +2843,7 @@
 
             // Background async revalidation with fast /api/home-precedents
             try {
-                const res = await fetchApi(`${API_BASE}/home-precedents?limit=4`);
+                const res = await fetchApi(`${API_BASE}/home-precedents?limit=9`);
                 if (res.ok) {
                     const data = await res.json();
                     if (data.precedents && data.precedents.length > 0) {
@@ -3235,7 +3253,7 @@
             }
         }
 
-        /* ─── FALLBACK PRECEDENTS DATA (INSTANT STARTUP PREVIEWS - PRECEDENTS ONLY, NO STATUTES, KENYA LAW SOURCE, PARTY V PARTY) ─── */
+        /* ─── FALLBACK PRECEDENTS DATA (INSTANT STARTUP PREVIEWS - 9 PRECEDENTS, NO STATUTES, KENYA LAW SOURCE, PARTY V PARTY) ─── */
         const FALLBACK_PRECEDENTS = [
             {
                 id: 'home_prec_2026_01',
@@ -3248,7 +3266,27 @@
                 readUrl: '/read.html?title=Law%20Society%20of%20Kenya%20v%20Attorney%20General%20%26%202%20others%20%5B2026%5D%20KECA%2014%20(KLR)&sourceUrl=https%3A%2F%2Fkenyalaw.org%2Fakn%2Fke%2Fjudgment%2Fkeca%2F2026%2F14%2Feng%402026-02-10&year=2026&type=Judgment&source=Kenya%20Law%20(Court%20of%20Appeal)'
             },
             {
-                id: 'home_prec_2025_02',
+                id: 'home_prec_2026_02',
+                title: 'Kangethe v Sun Power Products Ltd (Brown\'s Food Company) [2026] KEELRC 2125 (KLR)',
+                label: 'Kangethe v Sun Power Products Ltd (Brown\'s Food Company) [2026] KEELRC 2125 (KLR)',
+                citation: 'Kangethe v Sun Power Products Ltd (Brown\'s Food Company) [2026] KEELRC 2125 (KLR)',
+                year: '2026',
+                type: 'Judgment',
+                source: 'Kenya Law (ELRC)',
+                readUrl: '/read.html?title=Kangethe%20v%20Sun%20Power%20Products%20Ltd%20(Brown%26%23x27%3Bs%20Food%20Company)%20(Petition%20E064%20...&sourceUrl=https%3A%2F%2Fkenyalaw.org%2Fakn%2Fke%2Fjudgment%2Fkeelrc%2F2026%2F2125%2F&year=2026&type=Judgment&source=Kenya%20Law%20(ELRC)'
+            },
+            {
+                id: 'home_prec_2026_03',
+                title: 'Achievo Limited v Commissioner, Legal Services & Board Coordination (KRA) [2026] KEHC 5319 (KLR)',
+                label: 'Achievo Limited v Commissioner, Legal Services & Board Coordination (KRA) [2026] KEHC 5319 (KLR)',
+                citation: 'Achievo Limited v Commissioner, Legal Services & Board Coordination (KRA) [2026] KEHC 5319 (KLR)',
+                year: '2026',
+                type: 'Ruling',
+                source: 'Kenya Law (High Court)',
+                readUrl: '/read.html?title=Achievo%20Limited%20v%20Commissioner%2C%20Legal%20Services%20%26%20Board%20Coordination%20(KRA)%20(Civil%20Appeal%20(Application)%20E188%20of%202025)%20%5B2026%5D%20KEHC%205319%20(KLR)%20(Commercial%20and%20Tax)%20(10%20April%202026)%20(Ruling)&sourceUrl=https%3A%2F%2Fkenyalaw.org%2Fakn%2Fke%2Fjudgment%2Fkehc%2F2026%2F5319%2Feng%402026-04-10&year=2025&type=Ruling&source=Kenya%20Law%20(High%20Court)'
+            },
+            {
+                id: 'home_prec_2025_04',
                 title: 'Rapando v Ojwang & 3 others [2025] KESC 4 (KLR)',
                 label: 'Rapando v Ojwang & 3 others [2025] KESC 4 (KLR)',
                 citation: 'Rapando v Ojwang & 3 others [2025] KESC 4 (KLR)',
@@ -3258,7 +3296,7 @@
                 readUrl: '/read.html?title=Rapando%20v%20Ojwang%20%26%203%20others%20%5B2025%5D%20KESC%204%20(KLR)&sourceUrl=https%3A%2F%2Fkenyalaw.org%2Fakn%2Fke%2Fjudgment%2Fkesc%2F2025%2F4%2Feng%402025-01-20&year=2025&type=Judgment&source=Kenya%20Law%20(Supreme%20Court)'
             },
             {
-                id: 'home_prec_2025_03',
+                id: 'home_prec_2025_05',
                 title: 'Kesi v Krystalline Salt Limited [2025] KEELRC 1097 (KLR)',
                 label: 'Kesi v Krystalline Salt Limited [2025] KEELRC 1097 (KLR)',
                 citation: 'Kesi v Krystalline Salt Limited [2025] KEELRC 1097 (KLR)',
@@ -3268,7 +3306,17 @@
                 readUrl: '/read.html?title=Kesi%20v%20Krystalline%20Salt%20Limited%20%5B2025%5D%20KEELRC%201097%20(KLR)&sourceUrl=https%3A%2F%2Fkenyalaw.org%2Fakn%2Fke%2Fjudgment%2Fkeelrc%2F2025%2F1097%2Feng%402025-04-03&year=2025&type=Judgment&source=Kenya%20Law%20(ELRC)'
             },
             {
-                id: 'home_prec_2024_04',
+                id: 'home_prec_2025_06',
+                title: 'Tom Brown Limited & another v County Executive Committee Member [2025] KEELC 7228 (KLR)',
+                label: 'Tom Brown Limited & another v County Executive Committee Member [2025] KEELC 7228 (KLR)',
+                citation: 'Tom Brown Limited & another v County Executive Committee Member [2025] KEELC 7228 (KLR)',
+                year: '2025',
+                type: 'Judgment',
+                source: 'Kenya Law (eKLR)',
+                readUrl: '/read.html?title=Tom%20Brown%20Limited%20%26amp%3B%20another%20v%20County%20Executive%20Committee%20Member%20in%20...&sourceUrl=https%3A%2F%2Fnew.kenyalaw.org%2Fakn%2Fke%2Fjudgment%2Fkeelc%2F2025%2F7228%2Feng%402025-10-23%2Fsource&year=2025&type=Judgment&source=Kenya%20Law%20(eKLR)'
+            },
+            {
+                id: 'home_prec_2024_07',
                 title: 'Kudheiha Workers Union v Sucham Investments Limited t/a Amani Tiwi Beach Resort [2024] KEELRC 436 (KLR)',
                 label: 'Kudheiha Workers Union v Sucham Investments Limited t/a Amani Tiwi Beach Resort [2024] KEELRC 436 (KLR)',
                 citation: 'Kudheiha Workers Union v Sucham Investments Limited t/a Amani Tiwi Beach Resort [2024] KEELRC 436 (KLR)',
@@ -3276,6 +3324,26 @@
                 type: 'Judgment',
                 source: 'Kenya Law (ELRC)',
                 readUrl: '/read.html?title=Kudheiha%20Workers%20Union%20v%20Sucham%20Investments%20Limited%20t%2Fa%20Amani%20Tiwi%20Beach%20Resort%20%5B2024%5D%20KEELRC%20436%20(KLR)&sourceUrl=https%3A%2F%2Fkenyalaw.org%2Fakn%2Fke%2Fjudgment%2Fkeelrc%2F2024%2F436%2Feng%402024-02-29&year=2024&type=Judgment&source=Kenya%20Law%20(ELRC)'
+            },
+            {
+                id: 'home_prec_2021_08',
+                title: 'Linda Nzemba Mcgaw v Crown Motors Group Ltd [2021] KEELRC 1033 (KLR)',
+                label: 'Linda Nzemba Mcgaw v Crown Motors Group Ltd [2021] KEELRC 1033 (KLR)',
+                citation: 'Linda Nzemba Mcgaw v Crown Motors Group Ltd [2021] KEELRC 1033 (KLR)',
+                year: '2021',
+                type: 'Judgment',
+                source: 'Kenya Law (ELRC)',
+                readUrl: '/read.html?title=Linda%20Nzemba%20Mcgaw%20v%20Crown%20Motors%20Group%20Ltd%20%5B2021%5D%20KEELRC%201033%20(KLR)&sourceUrl=http%3A%2F%2Fkenyalaw.org%2Fcaselaw%2Fcases%2Fview%2F221033%2F&year=2021&type=Judgment&source=Kenya%20Law%20(ELRC)'
+            },
+            {
+                id: 'home_prec_2020_09',
+                title: 'Mobutu v BGP Kenya Limited [2020] KEELRC 1172 (KLR)',
+                label: 'Mobutu v BGP Kenya Limited [2020] KEELRC 1172 (KLR)',
+                citation: 'Mobutu v BGP Kenya Limited [2020] KEELRC 1172 (KLR)',
+                year: '2020',
+                type: 'Judgment',
+                source: 'Kenya Law (ELRC)',
+                readUrl: '/read.html?title=Mobutu%20v%20BGP%20Kenya%20Limited%20%5B2020%5D%20KEELRC%201172%20(KLR)&sourceUrl=http%3A%2F%2Fkenyalaw.org%2Fcaselaw%2Fcases%2Fview%2F201172%2F&year=2020&type=Judgment&source=Kenya%20Law%20(ELRC)'
             }
         ];
 

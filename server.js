@@ -3390,7 +3390,7 @@ app.get('/api/home-precedents', (req, res) => {
       return yB - yA;
     });
 
-    const limit = Math.max(1, parseInt(req.query.limit || '4', 10));
+    const limit = Math.max(1, parseInt(req.query.limit || '9', 10));
     const items = precedentsOnly.slice(0, limit).map(d => enrichDocumentMetadata(d));
 
     res.json({

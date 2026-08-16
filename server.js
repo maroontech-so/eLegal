@@ -3324,18 +3324,19 @@ app.get('/api/bulletins', async (req, res) => {
     const startIndex = (page - 1) * limit;
     const paginated = bulletins.slice(startIndex, startIndex + limit);
 
-    // Dynamically ensure every bulletin embeds a direct remote web image URL (NO local storage)
-    const enrichedBulletins = await Promise.all(
-      paginated.map(async (b) => {
-        const imageUrl = b.imageUrl || b.image_url || await fetchActualImageForBulletin(b);
-        return {
-          ...b,
-          sourceUrl: b.sourceUrl || b.url || 'http://kenyalaw.org',
-          url: b.url || b.sourceUrl || 'http://kenyalaw.org',
-          imageUrl
-        };
-      })
-    );
+    // Fast instant map for bulletins (0ms latency, static high-res landmarks)
+    const enrichedBulletins = paginated.map((b) => {
+      let imageUrl = b.imageUrl || b.image_url;
+      if (!imageUrl || imageUrl.includes('unsplash')) {
+        imageUrl = 'https://upload.wikimedia.org/wikipedia/commons/0/07/Nairobi_Law_Courts.jpg';
+      }
+      return {
+        ...b,
+        sourceUrl: b.sourceUrl || b.url || 'http://kenyalaw.org',
+        url: b.url || b.sourceUrl || 'http://kenyalaw.org',
+        imageUrl
+      };
+    });
 
     res.json({
       bulletins: enrichedBulletins,
@@ -3348,6 +3349,47 @@ app.get('/api/bulletins', async (req, res) => {
     });
   } catch (e) {
     res.status(500).json({ error: 'Failed to fetch bulletins', message: e.message });
+  }
+});
+
+// Dedicated fast endpoint for Home Tab Precedents Preview (Precedents only, no statutes, Kenya Law source, party vs party titles)
+app.get('/api/home-precedents', (req, res) => {
+  try {
+    const docs = getRepositoryDocs();
+    const precedentsOnly = docs.filter(d => {
+      const type = (d.type || '').toLowerCase();
+      const title = (d.title || d.label || d.citation || '').toLowerCase();
+      const source = (d.source || '').toLowerCase();
+
+      // 1. Strict Exclusion: Ignore Statutes, Acts, Bills, Gazettes, Constitutions
+      if (type === 'legislation' || type === 'bill' || type === 'gazette notice' || type === 'constitution') return false;
+      if (/\b(act|statute|bill|gazette|constitution|cap\.?|section)\b/i.test(title)) return false;
+
+      // 2. Strict Kenya Law Source requirement
+      const isKenyaLaw = source.includes('kenya law') || source.includes('eklr') || (d.url && d.url.includes('kenyalaw.org'));
+      if (!isKenyaLaw) return false;
+
+      // 3. Strict Title requirement: Must contain "v" / "v." / "vs" party vs party separator!
+      const hasPartyVsParty = /\b(v|v\.|vs|versus)\b/i.test(d.title || d.citation || d.label || '');
+      return hasPartyVsParty;
+    });
+
+    // Sort by year descending (latest first)
+    precedentsOnly.sort((a, b) => {
+      const yA = parseInt(a.year || '2000', 10);
+      const yB = parseInt(b.year || '2000', 10);
+      return yB - yA;
+    });
+
+    const limit = Math.max(1, parseInt(req.query.limit || '4', 10));
+    const items = precedentsOnly.slice(0, limit).map(d => enrichDocumentMetadata(d));
+
+    res.json({
+      success: true,
+      precedents: items
+    });
+  } catch (e) {
+    res.status(500).json({ error: 'Failed to fetch home precedents', message: e.message });
   }
 });
 
@@ -3525,17 +3567,15 @@ async function ensureInitialized() {
   } catch (e) {
     console.warn('Failed to init repository store:', e.message);
   }
-  try {
-    await loadApiKeys();
-  } catch (e) {
-    console.warn('Failed to load API keys from Firestore:', e.message);
-  }
+  loadApiKeys().catch(e => console.warn('Non-blocking API keys load note:', e.message));
   try {
     searchIndex = buildSearchIndex();
   } catch (e) {
     console.warn('Failed to build search index:', e.message);
   }
-  fetchLatestKenyaLawItems().catch(err => console.warn('Background eKLR fetch warning:', err.message));
+  setTimeout(() => {
+    fetchLatestKenyaLawItems().catch(err => console.warn('Background eKLR fetch warning:', err.message));
+  }, 10000);
 }
 
 

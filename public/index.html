@@ -2817,25 +2817,25 @@
         async function loadHomePrecedentsPreview() {
             const grid = document.getElementById('homePrecedentsPreviewGrid');
             if (!grid) return;
+
+            // Render INSTANT fallback precedents immediately (0ms latency, pure precedents, Kenya Law, Party v Party)
+            grid.innerHTML = '';
+            FALLBACK_PRECEDENTS.forEach(item => grid.appendChild(createResultItem(item)));
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+
+            // Background async revalidation with fast /api/home-precedents
             try {
-                const res = await fetchApi(`${API_BASE}/search?q=precedent&limit=4`);
+                const res = await fetchApi(`${API_BASE}/home-precedents?limit=4`);
                 if (res.ok) {
                     const data = await res.json();
-                    grid.innerHTML = '';
-                    const items = (data.results || []).slice(0, 4);
-                    if (items.length > 0) {
-                        items.forEach(item => grid.appendChild(createResultItem(item)));
+                    if (data.precedents && data.precedents.length > 0) {
+                        grid.innerHTML = '';
+                        data.precedents.forEach(item => grid.appendChild(createResultItem(item)));
                         if (typeof lucide !== 'undefined') lucide.createIcons();
-                        return;
                     }
                 }
             } catch (e) {
-                console.warn('Precedents preview load notice:', e);
-            }
-            if (typeof FALLBACK_SEARCH_RESULTS !== 'undefined') {
-                grid.innerHTML = '';
-                FALLBACK_SEARCH_RESULTS.slice(0, 4).forEach(item => grid.appendChild(createResultItem(item)));
-                if (typeof lucide !== 'undefined') lucide.createIcons();
+                console.warn('Precedents preview refresh notice:', e);
             }
         }
 
@@ -2857,14 +2857,21 @@
         async function loadHomeTeaserBulletins() {
             const grid = document.getElementById('homeBulletinsTeaserGrid');
             if (!grid) return;
+
+            // Render INSTANT fallback bulletins immediately (0ms latency)
+            renderBulletinsToGrid(FALLBACK_BULLETINS.slice(0, 3), grid);
+
+            // Background async revalidation with fast /api/bulletins
             try {
                 const res = await fetchApi(`${API_BASE}/bulletins?page=1&limit=3&category=all`);
                 if (res.ok) {
                     const data = await res.json();
-                    renderBulletinsToGrid(data.bulletins || [], grid);
+                    if (data.bulletins && data.bulletins.length > 0) {
+                        renderBulletinsToGrid(data.bulletins.slice(0, 3), grid);
+                    }
                 }
             } catch (e) {
-                renderBulletinsToGrid(FALLBACK_BULLETINS.slice(0, 3), grid);
+                console.warn('Bulletins teaser refresh notice:', e);
             }
         }
 
@@ -3212,6 +3219,50 @@
                 renderEmpty('Library unavailable', e.message);
             }
         }
+
+        /* ─── FALLBACK PRECEDENTS DATA (INSTANT STARTUP PREVIEWS - PRECEDENTS ONLY, NO STATUTES, KENYA LAW SOURCE, PARTY V PARTY) ─── */
+        const FALLBACK_PRECEDENTS = [
+            {
+                id: 'home_prec_2026_01',
+                title: 'Law Society of Kenya v Attorney General & 2 others [2026] KECA 14 (KLR)',
+                label: 'Law Society of Kenya v Attorney General & 2 others [2026] KECA 14 (KLR)',
+                citation: 'Law Society of Kenya v Attorney General & 2 others [2026] KECA 14 (KLR)',
+                year: '2026',
+                type: 'Judgment',
+                source: 'Kenya Law (Court of Appeal)',
+                readUrl: '/read.html?title=Law%20Society%20of%20Kenya%20v%20Attorney%20General%20%26%202%20others%20%5B2026%5D%20KECA%2014%20(KLR)&sourceUrl=https%3A%2F%2Fkenyalaw.org%2Fakn%2Fke%2Fjudgment%2Fkeca%2F2026%2F14%2Feng%402026-02-10&year=2026&type=Judgment&source=Kenya%20Law%20(Court%20of%20Appeal)'
+            },
+            {
+                id: 'home_prec_2025_02',
+                title: 'Rapando v Ojwang & 3 others [2025] KESC 4 (KLR)',
+                label: 'Rapando v Ojwang & 3 others [2025] KESC 4 (KLR)',
+                citation: 'Rapando v Ojwang & 3 others [2025] KESC 4 (KLR)',
+                year: '2025',
+                type: 'Judgment',
+                source: 'Kenya Law (Supreme Court)',
+                readUrl: '/read.html?title=Rapando%20v%20Ojwang%20%26%203%20others%20%5B2025%5D%20KESC%204%20(KLR)&sourceUrl=https%3A%2F%2Fkenyalaw.org%2Fakn%2Fke%2Fjudgment%2Fkesc%2F2025%2F4%2Feng%402025-01-20&year=2025&type=Judgment&source=Kenya%20Law%20(Supreme%20Court)'
+            },
+            {
+                id: 'home_prec_2025_03',
+                title: 'Kesi v Krystalline Salt Limited [2025] KEELRC 1097 (KLR)',
+                label: 'Kesi v Krystalline Salt Limited [2025] KEELRC 1097 (KLR)',
+                citation: 'Kesi v Krystalline Salt Limited [2025] KEELRC 1097 (KLR)',
+                year: '2025',
+                type: 'Judgment',
+                source: 'Kenya Law (ELRC)',
+                readUrl: '/read.html?title=Kesi%20v%20Krystalline%20Salt%20Limited%20%5B2025%5D%20KEELRC%201097%20(KLR)&sourceUrl=https%3A%2F%2Fkenyalaw.org%2Fakn%2Fke%2Fjudgment%2Fkeelrc%2F2025%2F1097%2Feng%402025-04-03&year=2025&type=Judgment&source=Kenya%20Law%20(ELRC)'
+            },
+            {
+                id: 'home_prec_2024_04',
+                title: 'Kudheiha Workers Union v Sucham Investments Limited t/a Amani Tiwi Beach Resort [2024] KEELRC 436 (KLR)',
+                label: 'Kudheiha Workers Union v Sucham Investments Limited t/a Amani Tiwi Beach Resort [2024] KEELRC 436 (KLR)',
+                citation: 'Kudheiha Workers Union v Sucham Investments Limited t/a Amani Tiwi Beach Resort [2024] KEELRC 436 (KLR)',
+                year: '2024',
+                type: 'Judgment',
+                source: 'Kenya Law (ELRC)',
+                readUrl: '/read.html?title=Kudheiha%20Workers%20Union%20v%20Sucham%20Investments%20Limited%20t%2Fa%20Amani%20Tiwi%20Beach%20Resort%20%5B2024%5D%20KEELRC%20436%20(KLR)&sourceUrl=https%3A%2F%2Fkenyalaw.org%2Fakn%2Fke%2Fjudgment%2Fkeelrc%2F2024%2F436%2Feng%402024-02-29&year=2024&type=Judgment&source=Kenya%20Law%20(ELRC)'
+            }
+        ];
 
         /* ─── FALLBACK BULLETINS DATA (GUARANTEED STARTUP DISPLAY) ─── */
         const FALLBACK_BULLETINS = [

@@ -1925,14 +1925,17 @@ Respond ONLY with a valid JSON array starting with '[' and ending with ']'. No m
 
   for (const model of GEMINI_MODELS) {
     try {
-      const response = await ai.models.generateContent({
-        model,
-        contents: systemPrompt,
-        config: {
-          tools: [{ googleSearch: {} }],
-          temperature: 0.2
-        }
-      });
+      const response = await Promise.race([
+        ai.models.generateContent({
+          model,
+          contents: systemPrompt,
+          config: {
+            tools: [{ googleSearch: {} }],
+            temperature: 0.2
+          }
+        }),
+        new Promise((_, reject) => setTimeout(() => reject(new Error('Gemini timeout')), 2000))
+      ]);
 
       const results = [];
       let text = response.text || '';

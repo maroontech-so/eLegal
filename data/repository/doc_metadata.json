@@ -27,14 +27,14 @@
       "source": "US Legal Precedents",
       "isPdf": false,
       "fileType": "DOC",
-      "score": 60,
+      "score": 80,
       "snippets": [
         "https://www.justia.com/"
       ],
       "year": "2026",
       "type": "Precedent",
       "id": "doc_d50dcabed985",
-      "cachedAt": "2026-08-16T12:56:57.448Z"
+      "cachedAt": "2026-08-16T15:28:16.199Z"
     },
     {
       "title": "African Court Cases | Details of a case",
@@ -388,17 +388,17 @@
       "citation": "PDF JUDGMENT",
       "url": "https://www.afronomicslaw.org/sites/default/files/pdf/BBI%20Consolidated%20Judgment%20-%20Final%20Version%20-%20As%20Delivered.pdf",
       "readUrl": "/read.html?title=PDF%20JUDGMENT&sourceUrl=https%3A%2F%2Fwww.afronomicslaw.org%2Fsites%2Fdefault%2Ffiles%2Fpdf%2FBBI%2520Consolidated%2520Judgment%2520-%2520Final%2520Version%2520-%2520As%2520Delivered.pdf&year=2026&type=Judgment&source=International%20Precedent",
-      "source": "local",
+      "source": "International Precedent",
       "isPdf": true,
       "fileType": "PDF",
-      "score": 60,
+      "score": 90,
       "snippets": [
         "https://www.afronomicslaw.org/sites/default/files/pdf/BBI%20Consolidated%20Judgment%20-%20Final%20Version%20-%20As%20Delivered.pdf"
       ],
       "year": "2026",
       "type": "Judgment",
       "id": "doc_bdf50f56bec0",
-      "cachedAt": "2026-08-16T12:55:47.459Z"
+      "cachedAt": "2026-08-16T15:28:16.745Z"
     },
     {
       "title": "Judgments - TanzLII",
@@ -1373,17 +1373,17 @@
       "citation": "Research Guides: How To Find Free Case Law Online: Introduction",
       "url": "https://guides.loc.gov/free-case-law",
       "readUrl": "/read.html?title=Research%20Guides%3A%20How%20To%20Find%20Free%20Case%20Law%20Online%3A%20Introduction&sourceUrl=https%3A%2F%2Fguides.loc.gov%2Ffree-case-law&year=2026&type=Precedent&source=International%20Precedent",
-      "source": "local",
+      "source": "International Precedent",
       "isPdf": false,
       "fileType": "DOC",
-      "score": 60,
+      "score": 80,
       "snippets": [
         "https://guides.loc.gov/free-case-law"
       ],
       "year": "2026",
       "type": "Precedent",
       "id": "doc_639dc059a339",
-      "cachedAt": "2026-08-16T12:57:05.801Z"
+      "cachedAt": "2026-08-16T15:28:16.736Z"
     },
     {
       "title": "Judgment Records Search - Check Court Judgments &amp; Liens",
@@ -1575,17 +1575,17 @@
       "citation": "CourtListener - Non-Profit Free Legal Search Engine and Alert System",
       "url": "https://www.courtlistener.com/",
       "readUrl": "/read.html?title=CourtListener%20-%20Non-Profit%20Free%20Legal%20Search%20Engine%20and%20Alert%20System&sourceUrl=https%3A%2F%2Fwww.courtlistener.com%2F&year=2026&type=Precedent&source=International%20Precedent",
-      "source": "local",
+      "source": "International Precedent",
       "isPdf": false,
       "fileType": "DOC",
-      "score": 60,
+      "score": 80,
       "snippets": [
         "https://www.courtlistener.com/"
       ],
       "year": "2026",
       "type": "Precedent",
       "id": "doc_3c33ff48922e",
-      "cachedAt": "2026-08-16T12:57:06.939Z"
+      "cachedAt": "2026-08-16T15:28:16.655Z"
     },
     {
       "title": "Baker v. Carr - Wikipedia",
@@ -2531,11 +2531,11 @@
       "cachedAt": "2026-08-16T11:17:24.545Z"
     },
     {
-      "title": "Case Summaries and Court Judgments",
-      "label": "Case Summaries and Court Judgments",
-      "citation": "Case Summaries and Court Judgments",
+      "title": "Case Summaries and Court Judgments - sheriaplex.com",
+      "label": "Case Summaries and Court Judgments - sheriaplex.com",
+      "citation": "Case Summaries and Court Judgments - sheriaplex.com",
       "url": "https://www.sheriaplex.com/case-summaries/",
-      "readUrl": "/read.html?title=Case%20Summaries%20and%20Court%20Judgments&sourceUrl=https%3A%2F%2Fwww.sheriaplex.com%2Fcase-summaries%2F&year=2026&type=Judgment&source=International%20Precedent",
+      "readUrl": "/read.html?title=Case%20Summaries%20and%20Court%20Judgments%20-%20sheriaplex.com&sourceUrl=https%3A%2F%2Fwww.sheriaplex.com%2Fcase-summaries%2F&year=2026&type=Judgment&source=International%20Precedent",
       "source": "International Precedent",
       "isPdf": false,
       "fileType": "DOC",
@@ -2546,7 +2546,7 @@
       "year": "2026",
       "type": "Judgment",
       "id": "doc_5a61530dd324",
-      "cachedAt": "2026-08-16T15:16:43.863Z",
+      "cachedAt": "2026-08-16T15:28:15.637Z",
       "pdfUrl": null,
       "contentFile": "doc_5a61530dd324.txt",
       "contentType": "text/plain"
@@ -2593,17 +2593,17 @@
       "citation": "Supreme Court Rulings",
       "url": "https://supremecourt.judiciary.go.ke/supreme-court-rulings/",
       "readUrl": "/read.html?title=Supreme%20Court%20Rulings&sourceUrl=https%3A%2F%2Fsupremecourt.judiciary.go.ke%2Fsupreme-court-rulings%2F&year=2026&type=Ruling&source=International%20Precedent",
-      "source": "local",
+      "source": "International Precedent",
       "isPdf": false,
       "fileType": "DOC",
-      "score": 60,
+      "score": 80,
       "snippets": [
         "https://supremecourt.judiciary.go.ke/supreme-court-rulings/"
       ],
       "year": "2026",
       "type": "Ruling",
       "id": "doc_7cce5316c19b",
-      "cachedAt": "2026-08-16T12:51:09.777Z"
+      "cachedAt": "2026-08-16T15:28:15.336Z"
     },
     {
       "title": "High Court Declares Kenya&#x27;s Next General Election Should Be Held in ...",
@@ -2629,17 +2629,17 @@
       "citation": "Judgements - Judiciary of Kenya",
       "url": "https://supremecourt.judiciary.go.ke/judgements/",
       "readUrl": "/read.html?title=Judgements%20-%20Judiciary%20of%20Kenya&sourceUrl=https%3A%2F%2Fsupremecourt.judiciary.go.ke%2Fjudgements%2F&year=2026&type=Judgment&source=International%20Precedent",
-      "source": "local",
+      "source": "International Precedent",
       "isPdf": false,
       "fileType": "DOC",
-      "score": 60,
+      "score": 80,
       "snippets": [
         "https://supremecourt.judiciary.go.ke/judgements/"
       ],
       "year": "2026",
       "type": "Judgment",
       "id": "doc_52b693930694",
-      "cachedAt": "2026-08-16T12:55:48.762Z"
+      "cachedAt": "2026-08-16T15:28:15.307Z"
     },
     {
       "title": "M'Tuerandu v Republic (Criminal Appeal E025 of 2021) [2025] KECA 2221 (KLR) (19 December 2025) (Judgment)",
@@ -4206,7 +4206,7 @@
       "year": "2026",
       "type": "Judgment",
       "id": "doc_008e3427fb86",
-      "cachedAt": "2026-08-16T15:16:43.881Z",
+      "cachedAt": "2026-08-16T15:28:15.626Z",
       "cloudinaryMetaUrl": "https://res.cloudinary.com/dm2o4um39/raw/upload/v1785609847/elegal_doc_008e3427fb86_metadata",
       "isPdf": false,
       "fileType": "DOC"
@@ -4225,7 +4225,7 @@
       "year": "2026",
       "type": "Judgment",
       "id": "doc_fb842e9f8783",
-      "cachedAt": "2026-08-16T15:16:43.871Z",
+      "cachedAt": "2026-08-16T15:28:15.195Z",
       "cloudinaryMetaUrl": "https://res.cloudinary.com/dm2o4um39/raw/upload/v1785609847/elegal_doc_fb842e9f8783_metadata",
       "isPdf": false,
       "fileType": "DOC"
@@ -4282,7 +4282,7 @@
       "year": "2026",
       "type": "Judgment",
       "id": "doc_1956fbbc3eb4",
-      "cachedAt": "2026-08-16T15:16:43.838Z",
+      "cachedAt": "2026-08-16T15:28:14.944Z",
       "cloudinaryMetaUrl": "https://res.cloudinary.com/dm2o4um39/raw/upload/v1785609847/elegal_doc_1956fbbc3eb4_metadata",
       "isPdf": false,
       "fileType": "DOC"
@@ -4356,5 +4356,5 @@
       "score": 60
     }
   ],
-  "updatedAt": "2026-08-16T15:16:46.239Z"
+  "updatedAt": "2026-08-16T15:28:16.745Z"
 }

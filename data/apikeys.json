@@ -30,13 +30,28 @@
       "el_1e2179ab2937c295d084010b37317796": {
         "label": "New Secret Key",
         "createdAt": "2026-08-16T09:08:52.669Z",
-        "lastUsed": "2026-08-16T15:16:33.805Z",
-        "requestCount": 4,
+        "lastUsed": "2026-08-16T15:28:04.298Z",
+        "requestCount": 5,
         "isActive": true,
-        "lastCall": "2026-08-16T15:16:33.805Z",
-        "totalCalls": 4,
-        "expenditure": 0.008,
+        "lastCall": "2026-08-16T15:28:04.298Z",
+        "totalCalls": 5,
+        "expenditure": 0.01,
         "callsRecord": [
+          {
+            "timestamp": "2026-08-16T15:28:04.298Z",
+            "endpoint": "/api/search",
+            "method": "GET",
+            "type": "search",
+            "statusCode": 200,
+            "cost": 0.002,
+            "totalTime": 12,
+            "backEndTime": 5,
+            "otherTime": 2,
+            "requestMediation": 0,
+            "responseMediation": 16,
+            "authTime": 3,
+            "throttling": 0
+          },
           {
             "timestamp": "2026-08-16T15:16:33.805Z",
             "endpoint": "/api/search",
@@ -99,6 +114,21 @@
           }
         ],
         "usageHistory": [
+          {
+            "timestamp": "2026-08-16T15:28:04.298Z",
+            "endpoint": "/api/search",
+            "method": "GET",
+            "type": "search",
+            "statusCode": 200,
+            "cost": 0.002,
+            "totalTime": 12,
+            "backEndTime": 5,
+            "otherTime": 2,
+            "requestMediation": 0,
+            "responseMediation": 16,
+            "authTime": 3,
+            "throttling": 0
+          },
           {
             "timestamp": "2026-08-16T15:16:33.805Z",
             "endpoint": "/api/search",

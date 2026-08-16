@@ -1924,7 +1924,8 @@ Format each item as a JSON object:
 
 Respond ONLY with a valid JSON array starting with '[' and ending with ']'. No markdown wrapper or extra text.`;
 
-  for (const model of GEMINI_MODELS) {
+  const modelsToTry = GEMINI_MODELS.slice(0, 2);
+  for (const model of modelsToTry) {
     try {
       const response = await Promise.race([
         ai.models.generateContent({
@@ -1935,7 +1936,7 @@ Respond ONLY with a valid JSON array starting with '[' and ending with ']'. No m
             temperature: 0.2
           }
         }),
-        new Promise((_, reject) => setTimeout(() => reject(new Error('Gemini timeout')), 2000))
+        new Promise((_, reject) => setTimeout(() => reject(new Error('Gemini timeout')), 2500))
       ]);
 
       const results = [];
@@ -1997,9 +1998,14 @@ Respond ONLY with a valid JSON array starting with '[' and ending with ']'. No m
         return results;
       }
     } catch (err) {
+      if (err.message === 'Gemini timeout') {
+        console.warn(`[gemini] Model ${model} timed out after 2.5s.`);
+        break; // Stop immediately on timeout to keep search fast
+      }
+
       const isQuota = err.message && (err.message.includes('429') || err.message.includes('RESOURCE_EXHAUSTED') || err.message.includes('quota'));
       if (isQuota) {
-        console.warn(`[gemini] Quota limit hit on ${model}. Rotating API key & trying next fallback model...`);
+        console.warn(`[gemini] Quota limit hit on ${model}. Rotating API key...`);
         const obj = getAiClientObj();
         if (obj) obj.rotateKey();
       } else {
@@ -2026,7 +2032,7 @@ async function searchFastWeb(query, source = 'all') {
   const scopeQuery = `${query} ${siteQuery} filetype:pdf OR case law OR judgment OR statute OR treaty OR ruling`;
 
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 3000);
+  const timeoutId = setTimeout(() => controller.abort(), 6000);
   try {
     const response = await fetch(`https://html.duckduckgo.com/html/?q=${encodeURIComponent(scopeQuery)}`, {
       headers: {
@@ -2279,25 +2285,6 @@ function generateDynamicLegalFallback(query, source = 'kenya') {
     });
   }
 
-  if (results.length === 0) {
-    results.push({
-      title: `${query.charAt(0).toUpperCase() + query.slice(1)} - Official eKLR Precedents & Statutory Analysis`,
-      label: query,
-      citation: "[2026] eKLR Authority Report",
-      url: `http://kenyalaw.org/caselaw/search/?q=${encodeURIComponent(query)}`,
-      readUrl: `http://kenyalaw.org/caselaw/search/?q=${encodeURIComponent(query)}`,
-      source: source === 'international' ? 'international' : 'kenyalaw',
-      isPdf: false,
-      court: "Supreme Court / High Court",
-      year: 2026,
-      snippets: [
-        `Legal research and binding judicial precedents for ${query}.`,
-        `Includes ratio decidendi, statutory interpretation, and court rulings across Kenya Law and common law authorities.`
-      ],
-      ratioDecidendi: `Applicable statutory provisions and judicial authorities governing ${query}.`
-    });
-  }
-
   return results;
 }
 
@@ -2324,8 +2311,8 @@ async function searchWithRetry(query, retries = 1, source = 'all', classificatio
     ? fetchKenyaLawDirect(normalizedQuery).catch(() => [])
     : Promise.resolve([]);
 
-  // Fast 1.5-second timeout for external search queries
-  const timeoutPromise = new Promise(resolve => setTimeout(() => resolve([]), 1500));
+  // 3.5-second timeout for external search queries
+  const timeoutPromise = new Promise(resolve => setTimeout(() => resolve([]), 3500));
 
   // Run all searches in parallel with a 1.5-second timeout
   const [webResults, geminiResults, kenyaResults] = await Promise.all([

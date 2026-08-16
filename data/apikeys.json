@@ -12,6 +12,15 @@
         "requestCount": 94,
         "isActive": true
       }
+    },
+    "o1I78NihdYdcNDLzcaS6PmbXayo2": {
+      "el_1e2179ab2937c295d084010b37317796": {
+        "label": "New Secret Key",
+        "createdAt": "2026-08-16T09:08:52.669Z",
+        "lastUsed": null,
+        "requestCount": 0,
+        "isActive": true
+      }
     }
   }
 }

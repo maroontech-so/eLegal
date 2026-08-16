@@ -407,6 +407,14 @@ async function validateApiKey(req, res, next) {
   next();
 }
 
+async function validateApiKeyOptional(req, res, next) {
+  const key = req.headers['x-api-key'];
+  if (!key) {
+    return next();
+  }
+  return validateApiKey(req, res, next);
+}
+
 app.use(express.static('public'));
 app.use('/lib', express.static('public/lib'));
 app.use(express.json({ limit: '10mb' }));
@@ -2340,6 +2348,15 @@ app.get('/api/keys', async (req, res) => {
       Object.entries(uKeys).forEach(([kId, data]) => {
         keys.push({ key: kId, label: data.label, createdAt: data.createdAt, lastUsed: data.lastUsed, requestCount: data.requestCount, isActive: data.isActive, replacedAt: data.replacedAt });
       });
+    }
+
+    if (keys.length === 0) {
+      try {
+        const initialKey = await createApiKey('Primary Secret Key', userId);
+        keys.push(initialKey);
+      } catch (err) {
+        console.warn('Auto key creation error:', err);
+      }
     }
 
     res.json(keys);

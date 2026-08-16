@@ -1534,6 +1534,11 @@ function fetchUrl(url) {
       res.on('error', reject);
     });
 
+    request.setTimeout(3000, () => {
+      request.destroy();
+      reject(new Error('fetchUrl timeout'));
+    });
+
     request.on('error', (err) => {
       console.error('fetchUrl error:', err.message);
       reject(err);

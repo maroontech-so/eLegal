@@ -1,5 +1,13 @@
 User-agent: *
 Allow: /
+Allow: /home
+Allow: /e-repository
+Allow: /ai-case-finder
+Allow: /bulletins
+Allow: /practice
+Allow: /saved
+Allow: /dev
+Allow: /read
 Disallow: /api/keys
 
 Sitemap: https://elegal.or.ke/sitemap.xml

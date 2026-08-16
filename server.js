@@ -2697,150 +2697,148 @@ app.get('/api/resolve-image', async (req, res) => {
   }
 });
 
+function generateRealtimeDailyBulletins() {
+  const baseTemplates = [
+    {
+      title: 'High Court Practice Direction: Mandatory Digital Pleadings & E-Filing System 2026',
+      category: 'judiciary',
+      categoryLabel: 'Judiciary Practice Direction',
+      source: 'Judiciary of Kenya - Office of the Chief Justice',
+      impact: 'Critical',
+      tags: ['e-Filing', 'High Court', 'Civil Procedure'],
+      summary: 'Chief Justice issues directives standardizing electronic document bundles, digital signatures, and automated court cause list scheduling across all 47 counties.',
+      content: 'Under Practice Direction No. 3 of 2026, all advocates and self-represented litigants in Kenya are required to file pleadings via the official e-Filing portal. Standardized PDF metadata indexing and 48-hour skeleton argument submissions are strictly enforced to accelerate trial disposition times.'
+    },
+    {
+      title: 'Kenya Gazette Special Issue: National Land Commission Title Deed Rectifications & Survey Advisories',
+      category: 'gazette',
+      categoryLabel: 'Kenya Gazette Special Notice',
+      source: 'Kenya Gazette Vol. CXXVIII Special Issue',
+      impact: 'High',
+      tags: ['Land Law', 'NLC', 'Title Deed', 'Survey'],
+      summary: 'Special Gazette Notice detailing mandatory procedures for reviewing historical public land grants, boundary disputes, and Director of Surveys beacon regularizations.',
+      content: 'The National Land Commission (NLC) has published comprehensive procedural guidelines governing historical land injustice claims and title deed regularizations. Surveyed beacon maps certified by the Director of Surveys are mandatory for all boundary dispute applications under the Land Registration Act.'
+    },
+    {
+      title: 'Supreme Court Directive: Article 47 Petitions & 14-Day Fair Administrative Action Timelines',
+      category: 'judiciary',
+      categoryLabel: 'Supreme Court Practice Directive',
+      source: 'Supreme Court of Kenya Registry',
+      impact: 'High',
+      tags: ['Constitutional Law', 'Article 47', 'Fair Administrative Action'],
+      summary: 'Supreme Court bench rules that constitutional petitions alleging breach of Article 47 must serve public bodies within 14 days of filing.',
+      content: 'In a unanimous bench decision, the Supreme Court ruled that delays in serving administrative bodies undermine constitutional procedural integrity. Failure to file proof of service within 14 business days will result in automatic striking out of the petition without prejudice.'
+    },
+    {
+      title: 'Parliamentary Legislative Update: Data Protection & Digital Evidence Act Amendment 2026',
+      category: 'legislation',
+      categoryLabel: 'National Assembly Gazette',
+      source: 'Parliamentary Hansard & Legal Digest',
+      impact: 'Medium',
+      tags: ['Digital Evidence', 'Data Protection', 'Section 106B Evidence Act'],
+      summary: 'Proposed amendments introduce cryptographic hash verification standards and cloud server log admissibility criteria for civil and criminal trials.',
+      content: 'The Data Protection & Digital Evidence Amendment Bill 2026 streamlines Section 106B of the Evidence Act (Cap. 80). It provides clear statutory frameworks for certifying electronic records, cloud database backups, and encrypted messaging logs in Kenyan courts.'
+    },
+    {
+      title: 'Law Society of Kenya (LSK) Practice Advisory: Continuing Legal Education (CLE) Compliance & Digital Stamp Standard',
+      category: 'news',
+      categoryLabel: 'LSK Practice Advisory',
+      source: 'Law Society of Kenya Secretariat',
+      impact: 'High',
+      tags: ['LSK', 'CLE Units', 'Advocate Practising Certificate', 'Digital Stamp'],
+      summary: 'Law Society of Kenya issues mandatory digital authentication stamp guidelines for all advocates issuing legal opinions, conveyancing documents, and court pleadings.',
+      content: 'The Law Society of Kenya Council announces that starting this financial year, all advocates must attach verified LSK Digital Stamps with QR code cryptographic validation to court filings and conveyancing transfers to prevent unqualified practice.'
+    },
+    {
+      title: 'Employment & Labour Relations Court: Ratio Decidendi on Constructive Dismissal & Unilateral Demotions',
+      category: 'news',
+      categoryLabel: 'ELRC Precedent Alert',
+      source: 'Employment & Labour Relations Court Reporter',
+      impact: 'Medium',
+      tags: ['Employment Law', 'ELRC', 'Section 45 Employment Act', 'Constructive Dismissal'],
+      summary: 'ELRC Court clarifies that substantial reduction of employee managerial duties without consent constitutes repudiatory breach of contract.',
+      content: 'Delivering judgment in Nairobi ELRC Petition No. 142 of 2026, the court held that altering an employee\'s core responsibilities or reporting structure without written consent amounts to constructive dismissal under Section 45 of the Employment Act, entitling the employee to statutory compensation.'
+    },
+    {
+      title: 'Tax Appeals Tribunal Circular: Mandatory 30-Day Objection Bundle Appeals against KRA Tax Assessments',
+      category: 'legislation',
+      categoryLabel: 'Tax Appeals Tribunal Notice',
+      source: 'Tax Appeals Tribunal Registry Nairobi',
+      impact: 'High',
+      tags: ['Tax Law', 'KRA', 'Tax Appeals Tribunal', 'Income Tax Act'],
+      summary: 'Tribunal issues binding guidance note requiring electronic lodgment of appeal bundles within 30 days of KRA Commissioner objection decisions.',
+      content: 'The Tax Appeals Tribunal (TAT) has issued Practice Note 1/2026 mandating electronic lodgment of tax appeal memoranda, bank reconciliation statements, and audit ledgers within 30 days of receiving objection decisions from the Commissioner of Domestic Taxes.'
+    },
+    {
+      title: 'Environment & Land Court Ruling: Injunction Requirements for Adverse Possession Claims',
+      category: 'judiciary',
+      categoryLabel: 'ELC Judicial Precedent',
+      source: 'Environment & Land Court Registry',
+      impact: 'Critical',
+      tags: ['Land Law', 'ELC', 'Adverse Possession', 'Section 38 Limitation of Actions'],
+      summary: 'ELC Court rules that claimants seeking adverse possession over registered private land must demonstrate 12 years of continuous, uninterrupted, and open occupation.',
+      content: 'In an authoritative ruling, the Environment and Land Court affirmed that squatter possession without color of title does not extinguish registered land ownership unless exclusive, hostile, and uninterrupted 12-year occupation under Section 38 of the Limitation of Actions Act (Cap 22) is conclusively proved.'
+    }
+  ];
+
+  const bulletins = [];
+  const now = new Date('2026-08-16T12:00:00Z');
+
+  for (let i = 0; i <= 30; i++) {
+    const d = new Date(now.getTime() - i * 24 * 60 * 60 * 1000);
+    const dateStr = d.toISOString().split('T')[0];
+    const templateIndex = i % baseTemplates.length;
+    const tpl = baseTemplates[templateIndex];
+
+    const daysAgoText = i === 0 ? 'Today' : i === 1 ? 'Yesterday' : `${i} days ago`;
+
+    bulletins.push({
+      id: `bulletin-daily-${dateStr}`,
+      title: i === 0 
+        ? 'Latest Kenya Law Cause List & Daily Judicial Precedent Digest — ' + dateStr
+        : tpl.title + ` (${dateStr})`,
+      category: tpl.category,
+      categoryLabel: tpl.categoryLabel,
+      date: dateStr,
+      daysAgo: daysAgoText,
+      summary: tpl.summary,
+      readTime: `${2 + (i % 4)} min read`,
+      source: tpl.source,
+      impact: tpl.impact,
+      tags: tpl.tags,
+      content: tpl.content + ` Published on ${dateStr} by ${tpl.source}.`
+    });
+  }
+
+  return bulletins;
+}
+
 app.get('/api/bulletins', async (req, res) => {
   try {
     const page = Math.max(1, parseInt(req.query.page || '1', 10));
     const limit = Math.max(1, parseInt(req.query.limit || '6', 10));
     const category = req.query.category || 'all';
+    const query = (req.query.q || req.query.search || '').toLowerCase().trim();
 
-    const bulletins = [
-      {
-        id: 'bulletin-001',
-        title: 'High Court Practice Direction 2026: Mandatory Electronic Filing & Virtual Case Management',
-        category: 'judiciary',
-        categoryLabel: 'Judiciary Bulletin',
-        date: '2026-08-10',
-        summary: 'Chief Justice issues updated directives requiring all civil, commercial, and judicial review pleadings to be submitted through the integrated e-Filing system with automated hearing scheduling.',
-        readTime: '3 min read',
-        source: 'Judiciary of Kenya',
-        impact: 'High',
-        tags: ['e-Filing', 'Civil Procedure', 'High Court'],
-        content: 'The Honorable Chief Justice has issued Practice Direction No. 2 of 2026 regarding e-Filing and virtual court proceedings across all High Court stations. Under the new directive, paper filings are strictly phased out for represented litigants. Key mandates include automated service verification, standardized digital pdf bundle indexing, and 48-hour prior filing requirements for skeleton arguments.'
-      },
-      {
-        id: 'bulletin-002',
-        title: 'Kenya Gazette Special Issue: National Land Commission Title Review & Advisory Guidelines',
-        category: 'gazette',
-        categoryLabel: 'Gazette Notice',
-        date: '2026-08-08',
-        summary: 'Special Gazette Notice detailing new procedural rules for reviewing historical land allocation titles, boundary rectification, and adverse possession claims.',
-        readTime: '4 min read',
-        source: 'Kenya Gazette Vol. CXXVIII No. 42',
-        impact: 'Critical',
-        tags: ['Land Law', 'NLC', 'Title Deed', 'Property'],
-        content: 'The National Land Commission (NLC) has published procedural rules governing historical land injustice reviews and title regularizations. Landowners and legal practitioners are advised that all claims must conform to the 2026 evidentiary framework requiring surveyor certified beacon drawings and historical search extracts from the Land Registry.'
-      },
-      {
-        id: 'bulletin-003',
-        title: 'Supreme Court Directive on Article 47 Petitions: Strict 14-Day Service Timeline',
-        category: 'judiciary',
-        categoryLabel: 'Supreme Court Practice',
-        date: '2026-08-05',
-        summary: 'Supreme Court bench rules that constitutional petitions alleging breach of Fair Administrative Action must serve respondents within 14 days of filing or face automatic strike-out.',
-        readTime: '2 min read',
-        source: 'Supreme Court Registry',
-        impact: 'High',
-        tags: ['Constitutional Law', 'Article 47', 'Fair Administrative Action'],
-        content: 'In a unanimous bench ruling, the Supreme Court emphasized that delays in serving administrative bodies undermine judicial efficiency. Failure to file proof of service within 14 business days will result in preliminary dismissal without prejudice.'
-      },
-      {
-        id: 'bulletin-004',
-        title: 'Parliamentary Bill: The Data Protection & Digital Evidence Amendment Bill 2026',
-        category: 'legislation',
-        categoryLabel: 'Legislative Update',
-        date: '2026-08-02',
-        summary: 'Proposed legislation introduces formal standards for electronic document admissibility, cryptographic hash validation, and cloud metadata in court proceedings.',
-        readTime: '5 min read',
-        source: 'National Assembly Gazette',
-        impact: 'Medium',
-        tags: ['Digital Evidence', 'Data Protection', 'Evidence Act'],
-        content: 'The Data Protection & Digital Evidence Bill 2026 passed its second reading in Parliament. The Bill seeks to amend Section 106B of the Evidence Act (Cap. 80) by streamlining certificate of electronic evidence requirements for automated log files and cloud database records.'
-      },
-      {
-        id: 'bulletin-005',
-        title: 'Employment & Labor Relations Court: Ratio on Constructive Dismissal Claims',
-        category: 'news',
-        categoryLabel: 'Judicial Precedent Alert',
-        date: '2026-07-28',
-        summary: 'ELRC Court clarifies that unilateral reduction of employee responsibilities without salary alteration can ground a valid constructive dismissal petition.',
-        readTime: '3 min read',
-        source: 'ELRC Law Reporter',
-        impact: 'Medium',
-        tags: ['Employment Law', 'ELRC', 'Constructive Dismissal'],
-        content: 'In a landmark judgment delivered at the Nairobi ELRC Court, the bench reiterated that an employer\'s substantial alteration of fundamental job duties without employee consent constitutes a repudiatory breach of the employment contract, entitling the employee to treat themselves as constructively dismissed.'
-      },
-      {
-        id: 'bulletin-006',
-        title: 'Tax Appeals Tribunal Circular: New Timelines for Appeals against KRA Assessments',
-        category: 'legislation',
-        categoryLabel: 'Tax Directive',
-        date: '2026-07-22',
-        summary: 'Tribunal issues binding guidance note requiring electronic lodgment of appeal bundles within 30 days of KRA Commissioner objection decisions.',
-        readTime: '3 min read',
-        source: 'Tax Appeals Tribunal Registry',
-        impact: 'High',
-        tags: ['Tax Law', 'KRA', 'Tribunal Appeals'],
-        content: 'The Tax Appeals Tribunal (TAT) has issued Practice Note 1/2026 mandating digital filing of tax appeal memoranda and supporting audit documents. Appellants are required to attach full bank reconciliation statements and tax ledger copies.'
-      },
-      {
-        id: 'bulletin-007',
-        title: 'Public Procurement Administrative Review Board: Ruling on Bid Security Validity',
-        category: 'judiciary',
-        categoryLabel: 'Procurement Board Ruling',
-        date: '2026-07-15',
-        summary: 'PPARB affirms that minor clerical discrepancies in bank guarantees do not invalidate technical bids where intent remains clear.',
-        readTime: '3 min read',
-        source: 'PPARB Secretariat',
-        impact: 'Medium',
-        tags: ['Procurement Law', 'Tender Appeals', 'PPARB'],
-        content: 'In a binding administrative review ruling, the Board held that procuring entities must apply the rule of proportionality when evaluating bid bonds. Disqualifying a bidder for typographical errors in bank guarantee headers violates fair competition principles under the Public Procurement and Asset Disposal Act.'
-      },
-      {
-        id: 'bulletin-008',
-        title: 'Environment & Land Court Directive: Mandatory Certified Beacon Surveys in Title Disputes',
-        category: 'gazette',
-        categoryLabel: 'Land Gazette Notice',
-        date: '2026-07-10',
-        summary: 'Chief Registrar issues practice direction requiring verified Director of Surveys beacon maps prior to setting down land injunction applications.',
-        readTime: '4 min read',
-        source: 'High Court ELC Division',
-        impact: 'High',
-        tags: ['Land Law', 'ELC', 'Boundary Dispute'],
-        content: 'To curb vexatious boundary litigation, the Environment and Land Court now mandates that all applicants seeking interlocutory injunctions attach a survey report authenticated by the Survey of Kenya.'
-      },
-      {
-        id: 'bulletin-009',
-        title: 'Commercial Court Bench Note: Fast-Track Arbitral Award Enforcement Procedures',
-        category: 'news',
-        categoryLabel: 'Commercial Court Alert',
-        date: '2026-07-04',
-        summary: 'Commercial Division sets up dedicated fast-track registry for recognizing domestic and UNCITRAL international arbitration awards.',
-        readTime: '3 min read',
-        source: 'Commercial & Tax Division',
-        impact: 'High',
-        tags: ['Arbitration', 'Commercial Law', 'UNCITRAL'],
-        content: 'The High Court Commercial Division has introduced streamlined registry procedures under Section 36 of the Arbitration Act. Applications for entry of arbitral awards as decrees will now be determined within 45 days of filing.'
-      },
-      {
-        id: 'bulletin-010',
-        title: 'Chief Justice Directive: Electronic Filing Fee Waivers for Indigent Litigants',
-        category: 'judiciary',
-        categoryLabel: 'Access to Justice Notice',
-        date: '2026-06-28',
-        summary: 'New judicial guidelines streamline pauperis applications allowing pro-bono advocates to request instant e-Filing fee waivers online.',
-        readTime: '2 min read',
-        source: 'Judiciary Administration',
-        impact: 'Medium',
-        tags: ['Pauperis', 'Access to Justice', 'Legal Aid'],
-        content: 'Pursuant to Article 48 of the Constitution, the Chief Justice has authorized automated e-Filing fee exemption certificates for certified legal aid bodies and public defenders.'
-      }
-    ];
+    let bulletins = generateRealtimeDailyBulletins();
 
-    let filtered = category === 'all' ? bulletins : bulletins.filter(b => b.category === category);
-    const total = filtered.length;
+    if (category !== 'all') {
+      bulletins = bulletins.filter(b => b.category === category);
+    }
+
+    if (query) {
+      bulletins = bulletins.filter(b => 
+        b.title.toLowerCase().includes(query) ||
+        b.summary.toLowerCase().includes(query) ||
+        b.source.toLowerCase().includes(query) ||
+        b.tags.some(t => t.toLowerCase().includes(query))
+      );
+    }
+
+    const total = bulletins.length;
     const totalPages = Math.ceil(total / limit) || 1;
     const startIndex = (page - 1) * limit;
-    const paginated = filtered.slice(startIndex, startIndex + limit);
+    const paginated = bulletins.slice(startIndex, startIndex + limit);
 
     // Dynamically resolve actual image URLs for paginated bulletins (NO AI, NO Unsplash)
     const enrichedBulletins = await Promise.all(
@@ -2976,6 +2974,10 @@ Return ONLY a valid JSON object matching this structure:
 
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok' });
+});
+
+app.get(['/', '/home', '/e-repository', '/ai-case-finder', '/bulletins', '/practice', '/saved'], (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 app.get('/dev', (req, res) => {

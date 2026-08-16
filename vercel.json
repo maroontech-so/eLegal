@@ -20,6 +20,10 @@
       "dest": "/public/dev.html"
     },
     {
+      "src": "/read/(.*)",
+      "dest": "/public/read.html"
+    },
+    {
       "src": "/read",
       "dest": "/public/read.html"
     },
@@ -30,6 +34,10 @@
     {
       "src": "/robots.txt",
       "dest": "/public/robots.txt"
+    },
+    {
+      "src": "/(home|e-repository|ai-case-finder|bulletins|practice|saved)",
+      "dest": "/public/index.html"
     },
     {
       "src": "/(.*)",

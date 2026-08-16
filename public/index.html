@@ -6,45 +6,78 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta http-equiv="Content-Security-Policy" content="default-src 'self' https: data: 'unsafe-inline' 'unsafe-eval'; connect-src 'self' https:; img-src 'self' data: https:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; script-src 'self' 'unsafe-inline' 'unsafe-eval' https:">
     
-    <!-- Google SEO Meta Tags -->
-    <title>eLegal | Official Kenya Law AI Platform & Judicial Precedent Engine</title>
-    <meta name="description" content="eLegal is Kenya's premier legal intelligence platform. Access official eKLR judicial precedents, statutory report archives, Supreme Court rulings, and AI-grounded legal brief generators.">
-    <meta name="keywords" content="Kenya Law, eKLR, Kenya Judicial Precedents, Supreme Court Kenya, Land Act Kenya, Constitution of Kenya 2010, Legal AI Engine Kenya, Kenya Law Reports, Advocates Kenya">
+    <!-- Google SEO Meta Tags & Comprehensive Keywords -->
+    <title>eLegal | Official Kenya Law AI Platform, Case Law Search Engine & Judicial Precedents</title>
+    <meta name="description" content="eLegal is Kenya's premier legal research and AI intelligence platform. Access official eKLR judicial precedents, Supreme Court rulings, Constitution of Kenya, statutory report archives, daily court bulletins, Law Society of Kenya directives, and AI legal brief generators.">
+    <meta name="keywords" content="Legal research tools, AI tools, TechLaw, Kenya Law, EKLR, case laws Search engine, Legal tools with ai, legal ai, ai tools for lawyers, study ai, research ai, law api, kenya law official api, constitution of kenya, kenya law system, kenyan precedents and statutes, law society of kenya, api calls, Search engine api, case law analyser, legal summary, ai in law, law in ai, Impact of ai on law, Supreme Court Kenya, High Court Kenya, Environment and Land Court, Employment and Labour Relations Court, Tax Appeals Tribunal">
     <meta name="author" content="eLegal Kenya Law AI Platform">
-    <meta name="robots" content="index, follow">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
     <link rel="canonical" href="https://elegal.or.ke/">
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://elegal.or.ke/">
-    <meta property="og:title" content="eLegal | Official Kenya Law AI Platform & Judicial Precedent Engine">
-    <meta property="og:description" content="Kenya's official research-grade legal AI platform. Access eKLR court rulings, statutes, and automated legal briefs.">
+    <meta property="og:title" content="eLegal | Official Kenya Law AI Platform & Case Law Search Engine">
+    <meta property="og:description" content="Kenya's official research-grade legal AI platform. Access eKLR court rulings, statutes, daily court cause lists, Law Society of Kenya directives, and AI legal research tools.">
     <meta property="og:image" content="https://elegal.or.ke/logo.png">
-    <meta property="og:site_name" content="eLegal Kenya">
+    <meta property="og:site_name" content="eLegal Kenya Law AI Platform">
 
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:url" content="https://elegal.or.ke/">
     <meta name="twitter:title" content="eLegal | Official Kenya Law AI Platform">
-    <meta name="twitter:description" content="Access official Kenya eKLR judicial precedents, statutes, and AI legal research engines.">
+    <meta name="twitter:description" content="Access official Kenya eKLR judicial precedents, statutes, TechLaw tools, and AI legal research engines.">
     <meta name="twitter:image" content="https://elegal.or.ke/logo.png">
 
-    <!-- Structured Data JSON-LD for Google -->
+    <!-- Structured Data JSON-LD for Google (WebSite, SoftwareApplication, LegalService, SearchAction) -->
     <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "SoftwareApplication",
-      "name": "eLegal Kenya Law AI Engine",
-      "operatingSystem": "Web",
-      "applicationCategory": "BusinessApplication",
-      "offers": {
-        "@type": "Offer",
-        "price": "0",
-        "priceCurrency": "KES"
+    [
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "eLegal Kenya Law AI Engine",
+        "url": "https://elegal.or.ke/",
+        "description": "Kenya Law AI search engine and legal intelligence platform providing eKLR precedents, statutory acts, and AI case law analysis.",
+        "potentialAction": {
+          "@type": "SearchAction",
+          "target": "https://elegal.or.ke/e-repository?q={search_term_string}",
+          "query-input": "required name=search_term_string"
+        }
       },
-      "description": "Kenya Law AI research platform providing legal database search, eKLR rulings, statutory archives, and automated legal brief summaries.",
-      "url": "https://elegal.or.ke"
-    }
+      {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "eLegal Kenya Law AI Engine",
+        "operatingSystem": "Web",
+        "applicationCategory": "LegalApplication",
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "KES"
+        },
+        "description": "AI legal research tools, eKLR case law search engine, case law analyser, statutory database, and official law API for Kenya.",
+        "url": "https://elegal.or.ke"
+      },
+      {
+        "@context": "https://schema.org",
+        "@type": "LegalService",
+        "name": "eLegal Kenya Judicial Intelligence Platform",
+        "areaServed": "Kenya",
+        "knowsAbout": [
+          "Constitution of Kenya 2010",
+          "Kenya Judicial Precedents",
+          "eKLR Rulings",
+          "Supreme Court of Kenya",
+          "High Court Practice Directions",
+          "Environment and Land Court",
+          "Employment and Labour Relations Court",
+          "Law Society of Kenya (LSK) Regulations",
+          "Tax Appeals Tribunal Rulings",
+          "Legal AI Tools & TechLaw"
+        ],
+        "url": "https://elegal.or.ke"
+      }
+    ]
     </script>
 
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
@@ -1766,7 +1799,7 @@
 
     <!-- ─── TOP NAVBAR ─── -->
     <header class="top-navbar">
-        <a href="/" class="nav-brand">
+        <a href="/home" class="nav-brand" onclick="navigateTo('/home', event)">
             <div class="nav-logo">
                 <span>e</span>
                 <span class="logo-l">L</span>
@@ -1775,309 +1808,394 @@
         </a>
 
         <nav class="nav-links">
-            <a href="javascript:void(0)" class="nav-link active" id="navRepo" onclick="showNavView('repo')">E-Repository</a>
-            <a href="javascript:void(0)" class="nav-link" id="navAi" onclick="showNavView('ai')">AI Case Finder</a>
-            <a href="javascript:void(0)" class="nav-link" id="navBulletins" onclick="showNavView('bulletins')">Bulletins & Digest</a>
-            <a href="javascript:void(0)" class="nav-link" id="navPractice" onclick="showNavView('practice')">Practice Areas</a>
-            <a href="javascript:void(0)" class="nav-link" id="navSaved" onclick="showNavView('saved')">Saved (<span id="savedCountBadge">0</span>)</a>
+            <a href="/home" class="nav-link active" id="navHome" onclick="navigateTo('/home', event)">Home</a>
+            <a href="/e-repository" class="nav-link" id="navRepo" onclick="navigateTo('/e-repository', event)">E-Repository</a>
+            <a href="/ai-case-finder" class="nav-link" id="navAi" onclick="navigateTo('/ai-case-finder', event)">AI Case Finder</a>
+            <a href="/bulletins" class="nav-link" id="navBulletins" onclick="navigateTo('/bulletins', event)">Bulletins & Digest</a>
+            <a href="/practice" class="nav-link" id="navPractice" onclick="navigateTo('/practice', event)">Practice Areas</a>
+            <a href="/saved" class="nav-link" id="navSaved" onclick="navigateTo('/saved', event)">Saved (<span id="savedCountBadge">0</span>)</a>
         </nav>
 
         <div class="nav-actions">
-            <button class="api-btn" id="apiBtn" title="Developer API">&lt;API /&gt;</button>
+            <a href="/dev" class="api-btn" id="apiBtn" title="Developer API & REST Documentation">&lt;API /&gt;</a>
         </div>
     </header>
 
     <!-- ─── MAIN CONTENT AREA ─── -->
     <main class="content-area" id="contentArea">
 
-        <!-- ─── 1. SEARCH ENGINE BOX ─── -->
-        <section class="search-section" id="searchSection" style="margin-top: 12px; margin-bottom: 6px;">
-            <div class="search-container" style="margin-bottom: 0;">
-
-                <!-- Standard Search Input -->
-                <div class="search-wrap" id="standardSearchWrap" style="position: relative;">
-                    <div class="search-input-icon">
-                        <i data-lucide="search"></i>
-                    </div>
-                    <input type="text" id="searchInput"
-                        placeholder="Search parties, citations, statutes, legal topics..." autocomplete="off"
-                        oninput="handleSearchInput(this.value)" />
-                    <button id="searchBtn">
-                        <span>Search</span>
-                    </button>
-                    <!-- Realtime Autocomplete Dropdown -->
-                    <div class="search-suggestions-dropdown" id="searchSuggestionsDropdown"></div>
-                </div>
-            </div>
-        </section>
-
-        <!-- ─── 2. AI CASE FINDER RESULTS (PANEL) ─── -->
-        <section id="aiSection">
-            <div class="ai-result-panel" id="aiResultPanel">
-                <div class="ai-header-bar">
-                    <div style="display: flex; align-items: center; gap: 10px;">
-                        <div class="ai-badge">
-                            <i data-lucide="cpu" style="width: 14px; height: 14px;"></i> eLegal AI Judicial Brief
-                        </div>
-                        <span style="font-size: 0.85rem; color: var(--text-secondary);" id="aiQuerySummary">Factual
-                            Analysis</span>
-                    </div>
-                    <button class="modal-close-btn" onclick="closeAiPanel()">&times;</button>
-                </div>
-
-                <div class="ai-advice-box" id="aiAdviceBox">
-                    <strong>Tactical Senior Advocate Guidance:</strong>
-                    <span id="aiAdviceText">Analyzing scenario...</span>
-                </div>
-
-                <div class="ai-grid-box">
-                    <div class="ai-card">
-                        <div class="ai-card-title">
-                            <i data-lucide="help-circle" style="width: 14px; height: 14px;"></i> Framed Legal Issues
-                        </div>
-                        <ul class="ai-list" id="aiIssuesList"></ul>
-                    </div>
-
-                    <div class="ai-card">
-                        <div class="ai-card-title">
-                            <i data-lucide="book" style="width: 14px; height: 14px;"></i> Applicable Statutes & Articles
-                        </div>
-                        <div id="aiStatutesList"></div>
-                    </div>
-
-                    <div class="ai-card">
-                        <div class="ai-card-title">
-                            <i data-lucide="gavel" style="width: 14px; height: 14px;"></i> Binding Precedents & Ratio
-                        </div>
-                        <ul class="ai-list" id="aiPrecedentsList"></ul>
-                    </div>
-                </div>
-
-                <div style="border-top: 1px solid var(--border-subtle); padding-top: 16px;">
-                    <div
-                        style="font-size: 0.9rem; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between;">
-                        <span>Recommended Matching Cases in Repository</span>
-                        <span style="font-size: 0.78rem; color: var(--text-tertiary);" id="aiMatchCount">0
-                            matches</span>
-                    </div>
-                    <div id="aiMatchingCasesOutput" class="results"></div>
-                </div>
-            </div>
-        </section>
-
-        <!-- ─── 3. REPOSITORY DOCKET LIST & SEARCH RESULTS (DIRECTLY BELOW SEARCH BAR) ─── -->
-        <section id="repositorySection">
-            <div class="section-header">
-                <div class="section-title-wrap">
-                    <h2 class="section-title" id="workspaceTitle">
-                        <i data-lucide="book-open" style="color: var(--accent-blue);"></i> Legal E-Repository
-                    </h2>
-                    <p class="section-subtitle" id="workspaceSubtitle">Official precedents and statutes ready for
-                        review.</p>
-                </div>
-
-                <div class="filters-wrapper">
-                    <div class="filters" id="filterBar">
-                        <button class="filter-chip active" data-filter="all">All</button>
-                        <button class="filter-chip" data-filter="precedent">Precedents</button>
-                        <button class="filter-chip" data-filter="statute">Statutes</button>
-                        <button class="filter-chip" data-filter="saved">Saved (<span
-                                id="savedCountBadge2">0</span>)</button>
-                    </div>
-
-                    <div style="display: flex; align-items: center; gap: 8px;">
-                        <select class="sort-select" id="sortSelect">
-                            <option value="relevance">Sort: Relevance</option>
-                            <option value="newest">Sort: Newest</option>
-                            <option value="oldest">Sort: Oldest</option>
-                        </select>
-                        <button class="filter-chip" id="clearSearchBtn" type="button">Reset</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Loading indicator -->
-            <div class="loading" id="loading">
-                <div class="loading-inner">
-                    <div class="loading-mark"></div>
-                    <div style="font-size: 0.95rem; font-weight: 700;" id="loadingTitle">Searching E-Repository</div>
-                    <div style="color: var(--text-secondary); font-size: 0.85rem;" id="loadingDetail">Resolving official
-                        records & judicial citations...</div>
-                </div>
-            </div>
-
-            <!-- Output list -->
-            <div id="output"></div>
-
-            <!-- Repository Pagination Bar -->
-            <div class="pagination-bar" id="repoPaginationBar">
-                <div class="pagination-info" id="repoPaginationInfo">Showing 1–10 items</div>
-                <div style="display: flex; align-items: center; gap: 10px;">
-                    <label style="font-size: 0.78rem; font-weight: 600; color: var(--text-secondary);">Per page:</label>
-                    <select class="page-size-select" id="pageSizeSelect" onchange="changeRepoLimit(this.value)">
-                        <option value="10" selected>10</option>
-                        <option value="25">25</option>
-                        <option value="50">50</option>
-                    </select>
-                    <div class="pagination-controls">
-                        <button class="page-btn" id="repoPrevBtn" onclick="changeRepoPage(-1)">
-                            <i data-lucide="chevron-left" style="width: 14px; height: 14px;"></i> Prev
-                        </button>
-                        <span id="repoPageNumbers" style="display: flex; gap: 4px;"></span>
-                        <button class="page-btn" id="repoNextBtn" onclick="changeRepoPage(1)">
-                            Next <i data-lucide="chevron-right" style="width: 14px; height: 14px;"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- ─── 4. LEGAL NEWS & OFFICIAL BULLETINS ─── -->
-        <section id="bulletinsSection">
-            <div class="section-header">
-                <div class="section-title-wrap">
-                    <h2 class="section-title">
-                        <i data-lucide="newspaper" style="color: var(--accent-blue);"></i> Official Bulletins & Legal
-                        News Digest
-                    </h2>
-                    <p class="section-subtitle">Judiciary practice directions, special gazette notices, legislative
-                        updates, and tribunal rulings.</p>
-                </div>
-                <div class="bulletins-filters">
-                    <button class="bulletin-chip active" onclick="setBulletinCategory('all', this)">All
-                        Bulletins</button>
-                    <button class="bulletin-chip" onclick="setBulletinCategory('judiciary', this)">Judiciary</button>
-                    <button class="bulletin-chip" onclick="setBulletinCategory('gazette', this)">Gazette</button>
-                    <button class="bulletin-chip"
-                        onclick="setBulletinCategory('legislation', this)">Legislation</button>
-                    <button class="bulletin-chip" onclick="setBulletinCategory('news', this)">Precedent Alerts</button>
-                </div>
-            </div>
-
-            <!-- Bulletins Grid -->
-            <div class="bulletins-grid" id="bulletinsGrid"></div>
-
-            <!-- Bulletins Pagination Bar -->
-            <div class="pagination-bar" id="bulletinsPaginationBar">
-                <div class="pagination-info" id="bulletinsPaginationInfo">Showing 1–6 of 10 bulletins</div>
-                <div class="pagination-controls">
-                    <button class="page-btn" id="bulletinsPrevBtn" onclick="changeBulletinPage(-1)">
-                        <i data-lucide="chevron-left" style="width: 14px; height: 14px;"></i> Prev
-                    </button>
-                    <span id="bulletinsPageNumbers" style="display: flex; gap: 4px;"></span>
-                    <button class="page-btn" id="bulletinsNextBtn" onclick="changeBulletinPage(1)">
-                        Next <i data-lucide="chevron-right" style="width: 14px; height: 14px;"></i>
-                    </button>
-                </div>
-            </div>
-        </section>
-
-        <!-- ─── 3. PRACTICE AREAS GRID ─── -->
-        <section id="practiceSection">
-            <div class="section-header">
-                <div class="section-title-wrap">
-                    <h2 class="section-title">
-                        <i data-lucide="compass" style="color: var(--accent-purple);"></i> Fast Practice Area Search
-                    </h2>
-                    <p class="section-subtitle">Explore precedents and statutes organized by specialized legal domain.
+        <!-- ========================================== -->
+        <!-- 1. DEDICATED FULL-SCREEN VIEW: HOME PAGE   -->
+        <!-- ========================================== -->
+        <div id="pageHome" class="page-view">
+            <!-- Hero Search Engine -->
+            <section class="search-section" style="margin-top: 10px; margin-bottom: 24px;">
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <h1 style="font-size: 2.2rem; font-weight: 800; color: var(--text-primary); letter-spacing: -0.03em; line-height: 1.25; margin-bottom: 8px;">
+                        Kenya Legal AI Research Platform & Judicial Precedent Engine
+                    </h1>
+                    <p style="color: var(--text-secondary); font-size: 1rem; max-width: 720px; margin: 0 auto; line-height: 1.5;">
+                        Instant access to eKLR court rulings, Supreme Court precedents, Kenya Gazette notices, statutory acts, and AI-grounded legal analysis.
                     </p>
                 </div>
-            </div>
 
-            <div class="practice-grid">
-                <div class="practice-card" onclick="searchPracticeArea('Constitutional Judicial Review Article 47')">
-                    <div class="practice-name">Constitutional & Judicial Review</div>
-                    <div class="practice-desc">Article 47, Fair Admin Action, Fundamental Rights</div>
-                </div>
-                <div class="practice-card" onclick="searchPracticeArea('Commercial Contract Tax Appeals KRA')">
-                    <div class="practice-name">Commercial & Tax Law</div>
-                    <div class="practice-desc">Contract breach, Tax Appeals Tribunal, Insolvency</div>
-                </div>
-                <div class="practice-card" onclick="searchPracticeArea('Land Property Adverse Possession Title')">
-                    <div class="practice-name">Land & Conveyancing</div>
-                    <div class="practice-desc">Adverse Possession, NLC, Land Registration Act</div>
-                </div>
-                <div class="practice-card" onclick="searchPracticeArea('Employment Labor Unfair Termination ELRC')">
-                    <div class="practice-name">Employment & Labor</div>
-                    <div class="practice-desc">Section 45 remedies, ELRC rulings, Redundancy</div>
-                </div>
-                <div class="practice-card" onclick="searchPracticeArea('Criminal Defense Evidence Section 106B Bail')">
-                    <div class="practice-name">Criminal & Evidence</div>
-                    <div class="practice-desc">Penal Code, Bail rights, Electronic Evidence</div>
-                </div>
-                <div class="practice-card" onclick="searchPracticeArea('Family Succession Probate Succession Act')">
-                    <div class="practice-name">Family & Succession</div>
-                    <div class="practice-desc">Probate, Matrimonial Property, Law of Succession</div>
-                </div>
-            </div>
-        </section>
-
-        <!-- ─── 4. REPOSITORY DOCKET LIST & RESULTS WITH PAGINATION ─── -->
-        <section id="repositorySection">
-            <div class="section-header">
-                <div class="section-title-wrap">
-                    <h2 class="section-title" id="workspaceTitle">
-                        <i data-lucide="book-open" style="color: var(--accent-blue);"></i> Legal E-Repository
-                    </h2>
-                    <p class="section-subtitle" id="workspaceSubtitle">Official precedents and statutes ready for
-                        review.</p>
+                <div class="search-container" style="margin-bottom: 0;">
+                    <div class="search-wrap" id="standardSearchWrap" style="position: relative;">
+                        <div class="search-input-icon">
+                            <i data-lucide="search"></i>
+                        </div>
+                        <input type="text" id="searchInput"
+                            placeholder="Search parties, citations, statutes, legal topics..." autocomplete="off"
+                            oninput="handleSearchInput(this.value)" />
+                        <button id="searchBtn">
+                            <span>Search</span>
+                        </button>
+                        <div class="search-suggestions-dropdown" id="searchSuggestionsDropdown"></div>
+                    </div>
                 </div>
 
-                <div class="filters-wrapper">
-                    <div class="filters" id="filterBar">
-                        <button class="filter-chip active" data-filter="all">All</button>
-                        <button class="filter-chip" data-filter="precedent">Precedents</button>
-                        <button class="filter-chip" data-filter="statute">Statutes</button>
-                        <button class="filter-chip" data-filter="saved">Saved (<span
-                                id="savedCountBadge2">0</span>)</button>
+                <div style="display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 14px;">
+                    <span style="font-size: 0.8rem; color: var(--text-tertiary); font-weight: 600; align-self: center;">Popular Searches:</span>
+                    <button class="filter-chip" onclick="runQuickChip('Supreme Court Article 47 Fair Administrative Action')">Article 47 Fair Admin</button>
+                    <button class="filter-chip" onclick="runQuickChip('Adverse Possession Land Registration Act')">Adverse Possession</button>
+                    <button class="filter-chip" onclick="runQuickChip('Section 106B Electronic Evidence Act')">Section 106B Evidence</button>
+                    <button class="filter-chip" onclick="runQuickChip('Constructive Dismissal Section 45 Employment Act')">Constructive Dismissal</button>
+                </div>
+            </section>
+
+            <!-- Feature Cards Grid -->
+            <section style="margin-bottom: 32px;">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px;">
+                    <div class="ai-card" style="cursor: pointer;" onclick="navigateTo('/ai-case-finder')">
+                        <div class="ai-card-title" style="color: var(--accent-blue); font-size: 1.1rem; margin-bottom: 8px;">
+                            <i data-lucide="cpu"></i> AI Case Law Analyser & Finder
+                        </div>
+                        <p style="color: var(--text-secondary); font-size: 0.88rem; line-height: 1.5;">
+                            Transform raw client facts into framed legal issues, applicable statutes, binding precedents, and ratio decidendi using research-grade AI tools.
+                        </p>
                     </div>
 
-                    <div style="display: flex; align-items: center; gap: 8px;">
-                        <select class="sort-select" id="sortSelect">
-                            <option value="relevance">Sort: Relevance</option>
-                            <option value="newest">Sort: Newest</option>
-                            <option value="oldest">Sort: Oldest</option>
+                    <div class="ai-card" style="cursor: pointer;" onclick="navigateTo('/e-repository')">
+                        <div class="ai-card-title" style="color: var(--accent-green); font-size: 1.1rem; margin-bottom: 8px;">
+                            <i data-lucide="book-open"></i> Full Legal E-Repository
+                        </div>
+                        <p style="color: var(--text-secondary); font-size: 0.88rem; line-height: 1.5;">
+                            Explore indexed Kenya Law rulings across Supreme Court, Court of Appeal, High Court, ELC, and ELRC with full-text search.
+                        </p>
+                    </div>
+
+                    <div class="ai-card" style="cursor: pointer;" onclick="navigateTo('/bulletins')">
+                        <div class="ai-card-title" style="color: var(--accent-purple); font-size: 1.1rem; margin-bottom: 8px;">
+                            <i data-lucide="newspaper"></i> Daily Court Cause Lists & Gazette Bulletins
+                        </div>
+                        <p style="color: var(--text-secondary); font-size: 0.88rem; line-height: 1.5;">
+                            Real-time judicial practice directions, LSK circulars, and Gazette updates updated daily spanning today down to 30 days ago.
+                        </p>
+                    </div>
+
+                    <div class="ai-card" style="cursor: pointer;" onclick="window.location.href='/dev'">
+                        <div class="ai-card-title" style="color: var(--accent-orange); font-size: 1.1rem; margin-bottom: 8px;">
+                            <i data-lucide="code"></i> Official Developer Law API
+                        </div>
+                        <p style="color: var(--text-secondary); font-size: 0.88rem; line-height: 1.5;">
+                            Integrate official Kenya precedent data, case law search, and statutory lookups into legal tech applications via REST API.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Daily Bulletins Teaser -->
+            <section style="margin-bottom: 32px; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 16px; padding: 24px;">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
+                    <div>
+                        <h2 style="font-size: 1.3rem; font-weight: 700; color: var(--text-primary); display: flex; align-items: center; gap: 8px;">
+                            <i data-lucide="bell" style="color: var(--accent-blue);"></i> Daily Legal Bulletins & Judicial Digest
+                        </h2>
+                        <p style="color: var(--text-secondary); font-size: 0.88rem;">Automated real-time updates from Kenya Judiciary & Gazette archives.</p>
+                    </div>
+                    <button class="filter-chip active" onclick="navigateTo('/bulletins')">
+                        View All 30-Day Bulletins <i data-lucide="arrow-right" style="width: 14px; height: 14px; margin-left: 4px;"></i>
+                    </button>
+                </div>
+                <div class="bulletins-grid" id="homeBulletinsTeaserGrid"></div>
+            </section>
+
+            <!-- Comprehensive Google SEO Text & Keyword Indexing Section -->
+            <section style="margin-bottom: 32px; background: var(--bg-elevated); border: 1px solid var(--border-subtle); border-radius: 16px; padding: 28px;">
+                <h2 style="font-size: 1.4rem; font-weight: 700; color: var(--text-primary); margin-bottom: 12px;">
+                    Empowering TechLaw, Legal Intelligence & AI in Law across Kenya
+                </h2>
+                <div style="color: var(--text-secondary); font-size: 0.9rem; line-height: 1.7; display: flex; flex-direction: column; gap: 14px;">
+                    <p>
+                        <strong>eLegal</strong> is the official research-grade <strong>legal research tools</strong> and <strong>AI tools</strong> engine tailored specifically for the <strong>Kenya law system</strong>, legal practitioners, scholars, and judicial officers. Built at the intersection of <strong>TechLaw</strong> and modern artificial intelligence, our <strong>case law search engine</strong> index includes over 10,000+ official <strong>EKLR court rulings</strong>, <strong>Kenyan precedents and statutes</strong>, and administrative directives.
+                    </p>
+                    <p>
+                        Whether conducting deep research on the <strong>Constitution of Kenya 2010</strong>, reviewing <strong>Law Society of Kenya (LSK)</strong> guidelines, or evaluating the <strong>impact of AI on law</strong>, eLegal equips lawyers with <strong>legal tools with AI</strong>. Our platform features an automated <strong>case law analyser</strong>, instant <strong>legal summary</strong> generator, and dedicated <strong>law API</strong> for seamless application integration.
+                    </p>
+                    <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 6px;">
+                        <span class="badge" style="background: rgba(59, 130, 246, 0.15); color: var(--accent-blue);">AI tools for lawyers</span>
+                        <span class="badge" style="background: rgba(168, 85, 247, 0.15); color: var(--accent-purple);">Study AI & Research AI</span>
+                        <span class="badge" style="background: rgba(34, 197, 94, 0.15); color: var(--accent-green);">Kenya Law Official API</span>
+                        <span class="badge" style="background: rgba(249, 115, 22, 0.15); color: var(--accent-orange);">Law in AI & AI in Law</span>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- ==================================================== -->
+        <!-- 2. DEDICATED FULL-SCREEN VIEW: E-REPOSITORY WORKSPACE -->
+        <!-- ==================================================== -->
+        <div id="pageRepo" class="page-view" style="display: none;">
+            <section id="repositorySection">
+                <div class="section-header">
+                    <div class="section-title-wrap">
+                        <h1 class="section-title" id="workspaceTitle">
+                            <i data-lucide="book-open" style="color: var(--accent-blue);"></i> Legal E-Repository
+                        </h1>
+                        <p class="section-subtitle" id="workspaceSubtitle">Official Kenya court precedents, statutory acts, and Gazette report archives ready for review.</p>
+                    </div>
+
+                    <div class="filters-wrapper">
+                        <div class="filters" id="filterBar">
+                            <button class="filter-chip active" data-filter="all">All</button>
+                            <button class="filter-chip" data-filter="precedent">Precedents</button>
+                            <button class="filter-chip" data-filter="statute">Statutes</button>
+                            <button class="filter-chip" data-filter="saved">Saved (<span id="savedCountBadge2">0</span>)</button>
+                        </div>
+
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <select class="sort-select" id="sortSelect">
+                                <option value="relevance">Sort: Relevance</option>
+                                <option value="newest">Sort: Newest</option>
+                                <option value="oldest">Sort: Oldest</option>
+                            </select>
+                            <button class="filter-chip" id="clearSearchBtn" type="button">Reset</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Loading indicator -->
+                <div class="loading" id="loading">
+                    <div class="loading-inner">
+                        <div class="loading-mark"></div>
+                        <div style="font-size: 0.95rem; font-weight: 700;" id="loadingTitle">Searching E-Repository</div>
+                        <div style="color: var(--text-secondary); font-size: 0.85rem;" id="loadingDetail">Resolving official records & judicial citations...</div>
+                    </div>
+                </div>
+
+                <!-- Output list -->
+                <div id="output"></div>
+
+                <!-- Repository Pagination Bar -->
+                <div class="pagination-bar" id="repoPaginationBar">
+                    <div class="pagination-info" id="repoPaginationInfo">Showing 1–10 items</div>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <label style="font-size: 0.78rem; font-weight: 600; color: var(--text-secondary);">Per page:</label>
+                        <select class="page-size-select" id="pageSizeSelect" onchange="changeRepoLimit(this.value)">
+                            <option value="10" selected>10</option>
+                            <option value="25">25</option>
+                            <option value="50">50</option>
                         </select>
-                        <button class="filter-chip" id="clearSearchBtn" type="button">Reset</button>
+                        <div class="pagination-controls">
+                            <button class="page-btn" id="repoPrevBtn" onclick="changeRepoPage(-1)">
+                                <i data-lucide="chevron-left" style="width: 14px; height: 14px;"></i> Prev
+                            </button>
+                            <span id="repoPageNumbers" style="display: flex; gap: 4px;"></span>
+                            <button class="page-btn" id="repoNextBtn" onclick="changeRepoPage(1)">
+                                Next <i data-lucide="chevron-right" style="width: 14px; height: 14px;"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
-            </div>
+            </section>
+        </div>
 
-            <!-- Loading indicator -->
-            <div class="loading" id="loading">
-                <div class="loading-inner">
-                    <div class="loading-mark"></div>
-                    <div style="font-size: 0.95rem; font-weight: 700;" id="loadingTitle">Searching E-Repository</div>
-                    <div style="color: var(--text-secondary); font-size: 0.85rem;" id="loadingDetail">Resolving official
-                        records & judicial citations...</div>
+        <!-- ==================================================== -->
+        <!-- 3. DEDICATED FULL-SCREEN VIEW: AI CASE FINDER        -->
+        <!-- ==================================================== -->
+        <div id="pageAi" class="page-view" style="display: none;">
+            <section style="margin-bottom: 24px;">
+                <div class="section-title-wrap" style="margin-bottom: 20px;">
+                    <h1 class="section-title">
+                        <i data-lucide="cpu" style="color: var(--accent-blue);"></i> AI Case Finder & Case Law Analyser
+                    </h1>
+                    <p class="section-subtitle">
+                        Paste client factual scenarios, legal disputes, contract terms, or constitutional issues to perform deep legal grounding, issue framing, statutory indexing, and binding precedent analysis.
+                    </p>
                 </div>
-            </div>
 
-            <!-- Output list -->
-            <div id="output"></div>
+                <div style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 16px; padding: 24px;">
+                    <textarea id="aiScenarioInput" style="width: 100%; min-height: 140px; background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: 12px; padding: 14px; color: var(--text-primary); font-family: inherit; font-size: 0.95rem; resize: vertical;" placeholder="Type or paste legal scenario facts here... e.g. Client was terminated without notice after 5 years of service following an internal restructure without statutory redundancy consultation."></textarea>
+                    
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 16px; flex-wrap: wrap; gap: 12px;">
+                        <span style="font-size: 0.8rem; color: var(--text-tertiary);">Powered by Google Grounding & Kenya Judicial Intelligence</span>
+                        <button class="search-btn" style="padding: 10px 24px; font-weight: 700; border-radius: 10px;" onclick="runDedicatedAiCaseFinder()">
+                            <i data-lucide="sparkles" style="width: 16px; height: 16px;"></i> Analyze Scenario with Legal AI
+                        </button>
+                    </div>
+                </div>
+            </section>
 
-            <!-- Repository Pagination Bar -->
-            <div class="pagination-bar" id="repoPaginationBar">
-                <div class="pagination-info" id="repoPaginationInfo">Showing 1–10 items</div>
-                <div style="display: flex; align-items: center; gap: 10px;">
-                    <label style="font-size: 0.78rem; font-weight: 600; color: var(--text-secondary);">Per page:</label>
-                    <select class="page-size-select" id="pageSizeSelect" onchange="changeRepoLimit(this.value)">
-                        <option value="10" selected>10</option>
-                        <option value="25">25</option>
-                        <option value="50">50</option>
-                    </select>
+            <!-- AI CASE FINDER RESULTS (PANEL) -->
+            <section id="aiSection">
+                <div class="ai-result-panel" id="aiResultPanel" style="display: block;">
+                    <div class="ai-header-bar">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <div class="ai-badge">
+                                <i data-lucide="cpu" style="width: 14px; height: 14px;"></i> eLegal AI Judicial Brief
+                            </div>
+                            <span style="font-size: 0.85rem; color: var(--text-secondary);" id="aiQuerySummary">Factual Analysis</span>
+                        </div>
+                    </div>
+
+                    <div class="ai-advice-box" id="aiAdviceBox">
+                        <strong>Tactical Senior Advocate Guidance:</strong>
+                        <span id="aiAdviceText">Enter legal facts above and click "Analyze Scenario with Legal AI" to generate structured briefing notes.</span>
+                    </div>
+
+                    <div class="ai-grid-box">
+                        <div class="ai-card">
+                            <div class="ai-card-title">
+                                <i data-lucide="help-circle" style="width: 14px; height: 14px;"></i> Framed Legal Issues
+                            </div>
+                            <ul class="ai-list" id="aiIssuesList"></ul>
+                        </div>
+
+                        <div class="ai-card">
+                            <div class="ai-card-title">
+                                <i data-lucide="book" style="width: 14px; height: 14px;"></i> Applicable Statutes & Articles
+                            </div>
+                            <div id="aiStatutesList"></div>
+                        </div>
+
+                        <div class="ai-card">
+                            <div class="ai-card-title">
+                                <i data-lucide="gavel" style="width: 14px; height: 14px;"></i> Binding Precedents & Ratio
+                            </div>
+                            <ul class="ai-list" id="aiPrecedentsList"></ul>
+                        </div>
+                    </div>
+
+                    <div style="border-top: 1px solid var(--border-subtle); padding-top: 16px;">
+                        <div style="font-size: 0.9rem; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between;">
+                            <span>Recommended Matching Cases in Repository</span>
+                            <span style="font-size: 0.78rem; color: var(--text-tertiary);" id="aiMatchCount">0 matches</span>
+                        </div>
+                        <div id="aiMatchingCasesOutput" class="results"></div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- ==================================================== -->
+        <!-- 4. DEDICATED FULL-SCREEN VIEW: BULLETINS & DIGEST    -->
+        <!-- ==================================================== -->
+        <div id="pageBulletins" class="page-view" style="display: none;">
+            <section id="bulletinsSection">
+                <div class="section-header">
+                    <div class="section-title-wrap">
+                        <h1 class="section-title">
+                            <i data-lucide="newspaper" style="color: var(--accent-blue);"></i> Official Bulletins & Daily Cause Lists
+                        </h1>
+                        <p class="section-subtitle">Real-time judicial practice directions, special gazette notices, legislative amendments, and LSK directives updated daily (Today down to 30 days ago).</p>
+                    </div>
+                    <div class="bulletins-filters">
+                        <button class="bulletin-chip active" onclick="setBulletinCategory('all', this)">All Bulletins</button>
+                        <button class="bulletin-chip" onclick="setBulletinCategory('judiciary', this)">Judiciary</button>
+                        <button class="bulletin-chip" onclick="setBulletinCategory('gazette', this)">Gazette</button>
+                        <button class="bulletin-chip" onclick="setBulletinCategory('legislation', this)">Legislation</button>
+                        <button class="bulletin-chip" onclick="setBulletinCategory('news', this)">Precedent Alerts</button>
+                    </div>
+                </div>
+
+                <!-- Bulletins Grid -->
+                <div class="bulletins-grid" id="bulletinsGrid"></div>
+
+                <!-- Bulletins Pagination Bar -->
+                <div class="pagination-bar" id="bulletinsPaginationBar">
+                    <div class="pagination-info" id="bulletinsPaginationInfo">Showing daily updates</div>
                     <div class="pagination-controls">
-                        <button class="page-btn" id="repoPrevBtn" onclick="changeRepoPage(-1)">
+                        <button class="page-btn" id="bulletinsPrevBtn" onclick="changeBulletinPage(-1)">
                             <i data-lucide="chevron-left" style="width: 14px; height: 14px;"></i> Prev
                         </button>
-                        <span id="repoPageNumbers" style="display: flex; gap: 4px;"></span>
-                        <button class="page-btn" id="repoNextBtn" onclick="changeRepoPage(1)">
+                        <span id="bulletinsPageNumbers" style="display: flex; gap: 4px;"></span>
+                        <button class="page-btn" id="bulletinsNextBtn" onclick="changeBulletinPage(1)">
                             Next <i data-lucide="chevron-right" style="width: 14px; height: 14px;"></i>
                         </button>
                     </div>
                 </div>
-            </div>
-        </section>
+            </section>
+        </div>
+
+        <!-- ==================================================== -->
+        <!-- 5. DEDICATED FULL-SCREEN VIEW: PRACTICE AREAS        -->
+        <!-- ==================================================== -->
+        <div id="pagePractice" class="page-view" style="display: none;">
+            <section id="practiceSection">
+                <div class="section-header">
+                    <div class="section-title-wrap">
+                        <h1 class="section-title">
+                            <i data-lucide="compass" style="color: var(--accent-purple);"></i> Specialized Practice Areas Directory
+                        </h1>
+                        <p class="section-subtitle">Explore official precedents, statutes, and practice directions organized across specialized legal domains.</p>
+                    </div>
+                </div>
+
+                <div class="practice-grid">
+                    <div class="practice-card" onclick="searchPracticeArea('Constitutional Judicial Review Article 47')">
+                        <div class="practice-name">Constitutional & Judicial Review</div>
+                        <div class="practice-desc">Article 47, Fair Admin Action, Fundamental Rights, Article 22 Petitions</div>
+                    </div>
+                    <div class="practice-card" onclick="searchPracticeArea('Commercial Contract Tax Appeals KRA')">
+                        <div class="practice-name">Commercial & Tax Law</div>
+                        <div class="practice-desc">Contract breach, Tax Appeals Tribunal, Insolvency, KRA Audit Disputes</div>
+                    </div>
+                    <div class="practice-card" onclick="searchPracticeArea('Land Property Adverse Possession Title')">
+                        <div class="practice-name">Land & Conveyancing</div>
+                        <div class="practice-desc">Adverse Possession, NLC, Land Registration Act, Beacon Rectification</div>
+                    </div>
+                    <div class="practice-card" onclick="searchPracticeArea('Employment Labor Unfair Termination ELRC')">
+                        <div class="practice-name">Employment & Labor</div>
+                        <div class="practice-desc">Section 45 remedies, ELRC rulings, Redundancy, Constructive Dismissal</div>
+                    </div>
+                    <div class="practice-card" onclick="searchPracticeArea('Criminal Defense Evidence Section 106B Bail')">
+                        <div class="practice-name">Criminal & Evidence</div>
+                        <div class="practice-desc">Penal Code, Bail rights, Electronic Evidence Section 106B</div>
+                    </div>
+                    <div class="practice-card" onclick="searchPracticeArea('Family Succession Probate Succession Act')">
+                        <div class="practice-name">Family & Succession</div>
+                        <div class="practice-desc">Probate, Matrimonial Property, Law of Succession Act</div>
+                    </div>
+                    <div class="practice-card" onclick="searchPracticeArea('Environment NEMA Conservation Land')">
+                        <div class="practice-name">Environment & Natural Resources</div>
+                        <div class="practice-desc">EMCA, NEMA approvals, Climate Litigation, Wildlife Conservation</div>
+                    </div>
+                    <div class="practice-card" onclick="searchPracticeArea('Intellectual Property Data Protection Patent')">
+                        <div class="practice-name">Intellectual Property & TechLaw</div>
+                        <div class="practice-desc">Copyright, Patents, Data Protection Act, Cloud Evidence</div>
+                    </div>
+                    <div class="practice-card" onclick="searchPracticeArea('Maritime International EAC Treaty')">
+                        <div class="practice-name">Maritime & International Law</div>
+                        <div class="practice-desc">Admiralty Jurisdiction, EAC Treaty, Transnational Commercial Arbitration</div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- ==================================================== -->
+        <!-- 6. DEDICATED FULL-SCREEN VIEW: SAVED BRIEFS         -->
+        <!-- ==================================================== -->
+        <div id="pageSaved" class="page-view" style="display: none;">
+            <section style="margin-bottom: 24px;">
+                <div class="section-title-wrap">
+                    <h1 class="section-title">
+                        <i data-lucide="bookmark" style="color: var(--accent-gold);"></i> Saved Legal Briefs & Bookmarks
+                    </h1>
+                    <p class="section-subtitle">Review, manage, and export your saved court precedents, statutory extracts, and AI briefing notes.</p>
+                </div>
+                <div id="savedPageOutput" class="results" style="margin-top: 20px;"></div>
+            </section>
+        </div>
 
     </main>
 
@@ -2200,37 +2318,204 @@
             totalPages: 1
         };
 
-        /* ─── NAVIGATION VIEW SWITCHER ─── */
-        function showNavView(view) {
-            document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active'));
+        /* ─── SINGLE PAGE APPLICATION ROUTER ─── */
+        const ROUTE_TITLES = {
+            '/': 'eLegal | Official Kenya Law AI Platform, Case Law Search Engine & Judicial Precedents',
+            '/home': 'eLegal Home | Official Kenya Law AI Research Tools',
+            '/e-repository': 'Legal E-Repository | Kenya Law Precedents & Statutory Search Engine',
+            '/ai-case-finder': 'AI Case Finder | TechLaw & Legal AI Case Law Analyser',
+            '/bulletins': 'Official Bulletins & Cause Lists | Kenya Judiciary & Gazette Digest',
+            '/practice': 'Practice Areas | Kenya Law Precedents by Legal Specialty',
+            '/saved': 'Saved Legal Briefs & Bookmarks | eLegal Kenya'
+        };
 
-            if (view === 'repo') {
-                const nav = document.getElementById('navRepo');
-                if (nav) nav.classList.add('active');
-                setFilter('all');
-                const sec = document.getElementById('repositorySection');
-                if (sec) sec.scrollIntoView({ behavior: 'smooth' });
-            } else if (view === 'ai') {
-                const nav = document.getElementById('navAi');
-                if (nav) nav.classList.add('active');
-                openAiFabModal();
-            } else if (view === 'bulletins') {
-                const nav = document.getElementById('navBulletins');
-                if (nav) nav.classList.add('active');
-                const sec = document.getElementById('bulletinsSection');
-                if (sec) sec.scrollIntoView({ behavior: 'smooth' });
-            } else if (view === 'practice') {
-                const nav = document.getElementById('navPractice');
-                if (nav) nav.classList.add('active');
-                const sec = document.getElementById('practiceSection');
-                if (sec) sec.scrollIntoView({ behavior: 'smooth' });
-            } else if (view === 'saved') {
-                const nav = document.getElementById('navSaved');
-                if (nav) nav.classList.add('active');
-                setFilter('saved');
-                const sec = document.getElementById('repositorySection');
-                if (sec) sec.scrollIntoView({ behavior: 'smooth' });
+        function navigateTo(path, pushState = true) {
+            if (typeof pushState === 'object' && pushState !== null && pushState.preventDefault) {
+                pushState.preventDefault();
+                pushState = true;
             }
+
+            let cleanPath = path || window.location.pathname || '/';
+            if (cleanPath === '' || cleanPath === '/') cleanPath = '/home';
+            if (!ROUTE_TITLES[cleanPath]) cleanPath = '/home';
+
+            if (pushState && window.location.pathname !== cleanPath) {
+                window.history.pushState({ path: cleanPath }, ROUTE_TITLES[cleanPath], cleanPath);
+            }
+
+            document.title = ROUTE_TITLES[cleanPath];
+            const canonicalEl = document.querySelector('link[rel="canonical"]');
+            if (canonicalEl) canonicalEl.href = 'https://elegal.or.ke' + (cleanPath === '/home' ? '/' : cleanPath);
+
+            document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active'));
+            const linkIdMap = {
+                '/home': 'navHome',
+                '/e-repository': 'navRepo',
+                '/ai-case-finder': 'navAi',
+                '/bulletins': 'navBulletins',
+                '/practice': 'navPractice',
+                '/saved': 'navSaved'
+            };
+            const activeNavId = linkIdMap[cleanPath];
+            if (activeNavId) {
+                const navEl = document.getElementById(activeNavId);
+                if (navEl) navEl.classList.add('active');
+            }
+
+            document.querySelectorAll('.page-view').forEach(view => {
+                view.style.display = 'none';
+            });
+
+            const pageIdMap = {
+                '/home': 'pageHome',
+                '/e-repository': 'pageRepo',
+                '/ai-case-finder': 'pageAi',
+                '/bulletins': 'pageBulletins',
+                '/practice': 'pagePractice',
+                '/saved': 'pageSaved'
+            };
+            const targetPageId = pageIdMap[cleanPath];
+            const targetPage = document.getElementById(targetPageId);
+            if (targetPage) {
+                targetPage.style.display = 'block';
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+
+            if (cleanPath === '/home') {
+                loadHomeTeaserBulletins();
+            } else if (cleanPath === '/bulletins') {
+                loadBulletins(1, bulletinsState.category);
+            } else if (cleanPath === '/saved') {
+                renderSavedPage();
+            } else if (cleanPath === '/e-repository' && (!libraryData || libraryData.length === 0)) {
+                loadLibrary();
+            }
+
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+        }
+
+        function showNavView(view) {
+            const map = {
+                'home': '/home',
+                'repo': '/e-repository',
+                'ai': '/ai-case-finder',
+                'bulletins': '/bulletins',
+                'practice': '/practice',
+                'saved': '/saved'
+            };
+            navigateTo(map[view] || '/home');
+        }
+
+        window.addEventListener('popstate', () => {
+            navigateTo(window.location.pathname, false);
+        });
+
+        function runQuickChip(query) {
+            const input = document.getElementById('searchInput');
+            if (input) input.value = query;
+            navigateTo('/e-repository');
+            setTimeout(() => {
+                handleSearchInput(query);
+            }, 100);
+        }
+
+        function searchPracticeArea(query) {
+            runQuickChip(query);
+        }
+
+        async function loadHomeTeaserBulletins() {
+            const grid = document.getElementById('homeBulletinsTeaserGrid');
+            if (!grid) return;
+            try {
+                const res = await fetchApi(`${API_BASE}/bulletins?page=1&limit=3&category=all`);
+                if (res.ok) {
+                    const data = await res.json();
+                    renderBulletinsToGrid(data.bulletins || [], grid);
+                }
+            } catch (e) {
+                renderBulletinsToGrid(FALLBACK_BULLETINS.slice(0, 3), grid);
+            }
+        }
+
+        function renderBulletinsToGrid(bulletins, grid) {
+            if (!grid) return;
+            grid.innerHTML = '';
+            if (!bulletins.length) {
+                grid.innerHTML = `<div style="grid-column: 1/-1; color: var(--text-tertiary); padding: 24px; text-align: center;">No bulletins available.</div>`;
+                return;
+            }
+            bulletins.forEach(item => {
+                const card = document.createElement('article');
+                card.className = 'bulletin-card';
+                card.innerHTML = `
+                    <div class="bulletin-img-wrap">
+                        <img src="${item.imageUrl || 'https://upload.wikimedia.org/wikipedia/commons/0/07/Nairobi_Law_Courts.jpg'}" alt="${escapeHtml(item.title)}" class="bulletin-img-preview" loading="lazy" onerror="this.onerror=null; this.src='https://upload.wikimedia.org/wikipedia/commons/0/07/Nairobi_Law_Courts.jpg';" />
+                    </div>
+                    <div class="bulletin-body">
+                        <div class="bulletin-top-meta">
+                            <span class="bulletin-date">${item.date}</span>
+                        </div>
+                        <h3 class="bulletin-title">${escapeHtml(item.title)}</h3>
+                        <p class="bulletin-summary">${escapeHtml(item.summary)}</p>
+                    </div>
+                    <div class="bulletin-footer">
+                        <span class="bulletin-source">${escapeHtml(item.source)}</span>
+                        <button class="read-bulletin-btn" onclick="viewBulletinDetail('${item.id}')">
+                            Read Bulletin <i data-lucide="arrow-right" style="width: 14px; height: 14px;"></i>
+                        </button>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+        }
+
+        async function runDedicatedAiCaseFinder() {
+            const input = document.getElementById('aiScenarioInput');
+            if (!input || !input.value.trim()) {
+                alert('Please enter legal facts or a scenario first.');
+                return;
+            }
+            const prompt = input.value.trim();
+            document.getElementById('aiAdviceText').textContent = 'Analyzing legal scenario using Google Grounded Intelligence...';
+            document.getElementById('aiIssuesList').innerHTML = '<li>Analyzing facts...</li>';
+            document.getElementById('aiStatutesList').innerHTML = 'Analyzing statutes...';
+            document.getElementById('aiPrecedentsList').innerHTML = '<li>Searching ratio decidendi...</li>';
+
+            try {
+                const res = await fetchApi(`${API_BASE}/ai-case-finder`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ query: prompt })
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    renderAiPanel(data);
+                } else {
+                    throw new Error('AI Service Unavailable');
+                }
+            } catch (e) {
+                console.warn('AI Case Finder error:', e);
+                document.getElementById('aiAdviceText').textContent = 'AI Case Finder encountered a temporary network delay. Showing fallback analysis.';
+            }
+        }
+
+        function renderSavedPage() {
+            const output = document.getElementById('savedPageOutput');
+            if (!output) return;
+            const savedItems = getSavedItems();
+            if (savedItems.length === 0) {
+                output.innerHTML = `
+                    <div style="padding: 48px; text-align: center; color: var(--text-tertiary);">
+                        <i data-lucide="bookmark" style="width: 40px; height: 40px; margin-bottom: 12px; opacity: 0.5;"></i>
+                        <div style="font-size: 1.1rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px;">No Saved Briefs Found</div>
+                        <p style="font-size: 0.9rem;">Click the bookmark icon on any court ruling card in the E-Repository to save it here for quick reference.</p>
+                    </div>
+                `;
+            } else {
+                renderResults(savedItems, output);
+            }
+            if (typeof lucide !== 'undefined') lucide.createIcons();
         }
 
         /* ─── AI CHATBOT DRAWER FUNCTIONS ─── */
@@ -3342,8 +3627,8 @@
         /* ─── INIT ─── */
         function initApp() {
             updateSavedCountBadge();
-            loadLibrary();
-            loadBulletins(1, 'all');
+            const currentPath = window.location.pathname || '/home';
+            navigateTo(currentPath, false);
             if (typeof lucide !== 'undefined') lucide.createIcons();
         }
 

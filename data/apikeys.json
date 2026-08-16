@@ -38,6 +38,199 @@
           }
         ]
       }
+    },
+    "z5YjU4YVx8VMrO63xoJwU7l3pMJ3": {
+      "el_f26eaf120aa1cf8edfe6cc4b194def1c": {
+        "label": "Primary Secret Key",
+        "createdAt": "2026-08-16T12:18:10.964Z",
+        "lastUsed": "2026-08-16T12:54:49.501Z",
+        "requestCount": 7,
+        "isActive": true,
+        "lastCall": "2026-08-16T12:54:49.501Z",
+        "totalCalls": 7,
+        "expenditure": 0.014,
+        "callsRecord": [
+          {
+            "timestamp": "2026-08-16T12:54:49.501Z",
+            "endpoint": "/api/search",
+            "method": "GET",
+            "type": "search",
+            "statusCode": 200,
+            "cost": 0.002,
+            "totalTime": 405,
+            "backEndTime": 381,
+            "otherTime": 1,
+            "requestMediation": 0,
+            "responseMediation": 20,
+            "authTime": 3,
+            "throttling": 0
+          },
+          {
+            "timestamp": "2026-08-16T12:49:47.208Z",
+            "endpoint": "/api/search",
+            "method": "GET",
+            "type": "search",
+            "statusCode": 200,
+            "cost": 0.002,
+            "totalTime": 12,
+            "backEndTime": 5,
+            "otherTime": 1,
+            "requestMediation": 0,
+            "responseMediation": 26,
+            "authTime": 2,
+            "throttling": 0
+          },
+          {
+            "timestamp": "2026-08-16T12:46:21.626Z",
+            "endpoint": "/api/search",
+            "method": "GET",
+            "type": "search",
+            "statusCode": 200,
+            "cost": 0.002,
+            "totalTime": 93,
+            "backEndTime": 63,
+            "otherTime": 2,
+            "requestMediation": 0,
+            "responseMediation": 24,
+            "authTime": 4,
+            "throttling": 0
+          },
+          {
+            "timestamp": "2026-08-16T12:37:58.186Z",
+            "endpoint": "/api/resolve",
+            "method": "GET",
+            "type": "other",
+            "statusCode": 200,
+            "cost": 0.002,
+            "totalTime": 390,
+            "backEndTime": 363,
+            "otherTime": 3,
+            "requestMediation": 0,
+            "responseMediation": 21,
+            "authTime": 3,
+            "throttling": 0
+          },
+          {
+            "timestamp": "2026-08-16T12:32:37.236Z",
+            "endpoint": "/api/search",
+            "method": "GET",
+            "type": "search",
+            "statusCode": 200,
+            "cost": 0.002
+          },
+          {
+            "timestamp": "2026-08-16T12:32:15.675Z",
+            "endpoint": "/api/search",
+            "method": "GET",
+            "type": "search",
+            "statusCode": 200,
+            "cost": 0.002
+          },
+          {
+            "timestamp": "2026-08-16T12:24:10.979Z",
+            "endpoint": "/api/resolve",
+            "method": "GET",
+            "type": "other",
+            "statusCode": 200,
+            "cost": 0.002
+          }
+        ],
+        "usageHistory": [
+          {
+            "timestamp": "2026-08-16T12:54:49.501Z",
+            "endpoint": "/api/search",
+            "method": "GET",
+            "type": "search",
+            "statusCode": 200,
+            "cost": 0.002,
+            "totalTime": 405,
+            "backEndTime": 381,
+            "otherTime": 1,
+            "requestMediation": 0,
+            "responseMediation": 20,
+            "authTime": 3,
+            "throttling": 0
+          },
+          {
+            "timestamp": "2026-08-16T12:49:47.208Z",
+            "endpoint": "/api/search",
+            "method": "GET",
+            "type": "search",
+            "statusCode": 200,
+            "cost": 0.002,
+            "totalTime": 12,
+            "backEndTime": 5,
+            "otherTime": 1,
+            "requestMediation": 0,
+            "responseMediation": 26,
+            "authTime": 2,
+            "throttling": 0
+          },
+          {
+            "timestamp": "2026-08-16T12:46:21.626Z",
+            "endpoint": "/api/search",
+            "method": "GET",
+            "type": "search",
+            "statusCode": 200,
+            "cost": 0.002,
+            "totalTime": 93,
+            "backEndTime": 63,
+            "otherTime": 2,
+            "requestMediation": 0,
+            "responseMediation": 24,
+            "authTime": 4,
+            "throttling": 0
+          },
+          {
+            "timestamp": "2026-08-16T12:37:58.186Z",
+            "endpoint": "/api/resolve",
+            "method": "GET",
+            "type": "other",
+            "statusCode": 200,
+            "cost": 0.002,
+            "totalTime": 390,
+            "backEndTime": 363,
+            "otherTime": 3,
+            "requestMediation": 0,
+            "responseMediation": 21,
+            "authTime": 3,
+            "throttling": 0
+          },
+          {
+            "timestamp": "2026-08-16T12:32:37.236Z",
+            "endpoint": "/api/search",
+            "method": "GET",
+            "type": "search",
+            "statusCode": 200,
+            "cost": 0.002
+          },
+          {
+            "timestamp": "2026-08-16T12:32:15.675Z",
+            "endpoint": "/api/search",
+            "method": "GET",
+            "type": "search",
+            "statusCode": 200,
+            "cost": 0.002
+          },
+          {
+            "timestamp": "2026-08-16T12:24:10.979Z",
+            "endpoint": "/api/resolve",
+            "method": "GET",
+            "type": "other",
+            "statusCode": 200,
+            "cost": 0.002
+          }
+        ]
+      }
+    },
+    "usMJFNfa9QbMHoi4bmBAa1xMa4R2": {
+      "el_8bb79dace9a93221f3e7562191be185e": {
+        "label": "Primary Secret Key",
+        "createdAt": "2026-08-16T12:45:20.962Z",
+        "lastUsed": null,
+        "requestCount": 0,
+        "isActive": true
+      }
     }
   }
 }

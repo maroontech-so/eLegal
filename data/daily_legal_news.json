@@ -1,0 +1,62 @@
+{
+  "updatedAt": "2026-08-16T14:11:01.925597",
+  "total": 4,
+  "bulletins": [
+    {
+      "id": "bulletin-crawl-2026-08-16-1",
+      "title": "High Court Practice Direction: Mandatory Digital Pleadings & E-Filing System 2026",
+      "url": "http://kenyalaw.org/caselaw/cases/view/298412/",
+      "sourceUrl": "http://kenyalaw.org/caselaw/cases/view/298412/",
+      "published_date": "2026-08-16",
+      "date": "2026-08-16",
+      "source": "Judiciary of Kenya - High Court",
+      "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/b/bd/Parliament_Buildings%2C_Nairobi%2C_Kenya_-entrance-15April2010.jpg",
+      "image_url": "https://upload.wikimedia.org/wikipedia/commons/b/bd/Parliament_Buildings%2C_Nairobi%2C_Kenya_-entrance-15April2010.jpg",
+      "category": "judiciary",
+      "summary": "Chief Justice issues directives standardizing electronic document bundles, digital signatures, and automated court cause list scheduling across all 47 counties.",
+      "content": "Chief Justice issues directives standardizing electronic document bundles, digital signatures, and automated court cause list scheduling across all 47 counties."
+    },
+    {
+      "id": "bulletin-crawl-2026-08-16-2",
+      "title": "Kenya Gazette Special Issue: National Land Commission Title Review & Advisory Guidelines",
+      "url": "http://www.kenyalaw.org/kenzagazette/",
+      "sourceUrl": "http://www.kenyalaw.org/kenzagazette/",
+      "published_date": "2026-08-16",
+      "date": "2026-08-16",
+      "source": "Kenya Gazette Vol. CXXVIII No. 42",
+      "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/0/07/Nairobi_Law_Courts.jpg",
+      "image_url": "https://upload.wikimedia.org/wikipedia/commons/0/07/Nairobi_Law_Courts.jpg",
+      "category": "news",
+      "summary": "Special Gazette Notice detailing new procedural rules for reviewing historical land allocation titles and boundary rectification.",
+      "content": "Special Gazette Notice detailing new procedural rules for reviewing historical land allocation titles and boundary rectification."
+    },
+    {
+      "id": "bulletin-crawl-2026-08-16-3",
+      "title": "Supreme Court Directive on Article 47 Petitions: Strict 14-Day Service Timeline",
+      "url": "http://kenyalaw.org/caselaw/cases/view/284910/",
+      "sourceUrl": "http://kenyalaw.org/caselaw/cases/view/284910/",
+      "published_date": "2026-08-16",
+      "date": "2026-08-16",
+      "source": "Supreme Court Registry of Kenya",
+      "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/b/bd/Parliament_Buildings%2C_Nairobi%2C_Kenya_-entrance-15April2010.jpg",
+      "image_url": "https://upload.wikimedia.org/wikipedia/commons/b/bd/Parliament_Buildings%2C_Nairobi%2C_Kenya_-entrance-15April2010.jpg",
+      "category": "judiciary",
+      "summary": "Supreme Court bench rules that constitutional petitions alleging breach of Fair Administrative Action must serve respondents within 14 days.",
+      "content": "Supreme Court bench rules that constitutional petitions alleging breach of Fair Administrative Action must serve respondents within 14 days."
+    },
+    {
+      "id": "bulletin-crawl-2026-08-16-4",
+      "title": "Employment & Labor Relations Court: Ratio on Constructive Dismissal Claims",
+      "url": "http://kenyalaw.org/caselaw/cases/view/271044/",
+      "sourceUrl": "http://kenyalaw.org/caselaw/cases/view/271044/",
+      "published_date": "2026-08-16",
+      "date": "2026-08-16",
+      "source": "ELRC Law Reporter Kenya",
+      "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/b/bd/Parliament_Buildings%2C_Nairobi%2C_Kenya_-entrance-15April2010.jpg",
+      "image_url": "https://upload.wikimedia.org/wikipedia/commons/b/bd/Parliament_Buildings%2C_Nairobi%2C_Kenya_-entrance-15April2010.jpg",
+      "category": "judiciary",
+      "summary": "ELRC Court clarifies that unilateral reduction of employee responsibilities without salary alteration can ground a valid constructive dismissal petition.",
+      "content": "ELRC Court clarifies that unilateral reduction of employee responsibilities without salary alteration can ground a valid constructive dismissal petition."
+    }
+  ]
+}

@@ -1,4 +1,8 @@
+# Allow all search engine crawlers (Googlebot, Bingbot, DuckDuckBot, etc.)
 User-agent: *
+Allow: /
+
+# Explicitly allow all public application routes
 Allow: /
 Allow: /home
 Allow: /e-repository
@@ -8,6 +12,11 @@ Allow: /practice
 Allow: /saved
 Allow: /dev
 Allow: /read
-Disallow: /api/keys
+Allow: /privacy
+Allow: /terms
+Allow: /PrivacyTerms
 
+# XML Sitemaps for Search Engine Indexing
+Sitemap: https://www.lexshub.xyz/sitemap.xml
+Sitemap: https://lexshub.xyz/sitemap.xml
 Sitemap: https://elegal.or.ke/sitemap.xml

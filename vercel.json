@@ -12,6 +12,14 @@
   ],
   "routes": [
     {
+      "src": "/robots.txt",
+      "dest": "/public/robots.txt"
+    },
+    {
+      "src": "/sitemap.xml",
+      "dest": "/public/sitemap.xml"
+    },
+    {
       "src": "/api/(.*)",
       "dest": "/server.js"
     },
@@ -28,15 +36,7 @@
       "dest": "/public/read.html"
     },
     {
-      "src": "/sitemap.xml",
-      "dest": "/public/sitemap.xml"
-    },
-    {
-      "src": "/robots.txt",
-      "dest": "/public/robots.txt"
-    },
-    {
-      "src": "/(home|e-repository|ai-case-finder|bulletins|practice|saved)",
+      "src": "/(home|e-repository|ai-case-finder|bulletins|practice|saved|privacy|terms|PrivacyTerms)",
       "dest": "/public/index.html"
     },
     {

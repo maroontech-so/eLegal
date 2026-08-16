@@ -247,7 +247,7 @@
             gap: 10px;
         }
 
-        .api-btn {
+        .api-btn, .api-btn:hover, .api-btn:focus, .api-btn:visited, .api-btn:active {
             background: var(--surface-bg);
             color: var(--text-primary);
             border: 1px solid var(--border-color);
@@ -257,6 +257,7 @@
             font-weight: 600;
             box-shadow: var(--shadow-sm);
             letter-spacing: 0.03em;
+            text-decoration: none !important;
         }
 
         .api-btn:hover {
@@ -264,6 +265,7 @@
             transform: translateY(-1px);
             border-color: var(--accent-blue);
             color: var(--accent-blue);
+            text-decoration: none !important;
         }
 
         /* ─── BACKGROUND MESH OVERLAY ─── */
@@ -1020,17 +1022,34 @@
             transform: translateY(-1px);
         }
 
-        /* ─── AI CITATION CARDS WITH 3-LINE SUMMARY ─── */
+        /* ─── AI CITATION CARDS & GRID LAYOUT ─── */
+        .ai-precedents-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+            gap: 16px;
+            margin-top: 10px;
+        }
+
         .ai-citation-card {
             background: #F8FAFC;
             border: 1px solid #CBD5E1;
             border-left: 4px solid var(--accent-purple);
             border-radius: var(--radius-md);
-            padding: 14px;
-            margin-top: 10px;
+            padding: 16px;
+            margin-top: 0;
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            justify-content: space-between;
+            gap: 10px;
+            height: 100%;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+            transition: all 0.2s ease;
+        }
+
+        .ai-citation-card:hover {
+            box-shadow: 0 4px 12px rgba(124, 58, 237, 0.15);
+            border-color: var(--accent-purple);
+            transform: translateY(-2px);
         }
 
         .ai-citation-title {
@@ -1041,7 +1060,7 @@
 
         .ai-citation-summary {
             font-size: 0.84rem;
-            line-height: 1.45;
+            line-height: 1.48;
             color: #334155;
             display: -webkit-box;
             -webkit-line-clamp: 3;
@@ -1051,7 +1070,7 @@
 
         .ai-citation-action {
             align-self: flex-start;
-            margin-top: 4px;
+            margin-top: 6px;
             display: inline-flex;
             align-items: center;
             gap: 5px;
@@ -1902,6 +1921,105 @@
                 flex: 1 1 100%;
             }
         }
+
+        /* ─── DEDICATED E-REPOSITORY SEARCH BAR & WORKSPACE STYLING ─── */
+        #repoSearchInput {
+            width: 100%;
+            height: clamp(52px, 6.5vh, 64px);
+            border: 1.5px solid var(--border-color);
+            border-radius: 99px;
+            background: var(--surface-bg);
+            color: var(--text-primary);
+            font-size: clamp(0.92rem, 1.4vw, 1.05rem);
+            padding: 0 170px 0 54px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+            transition: all 0.25s ease;
+        }
+
+        #repoSearchInput:focus {
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15), 0 8px 24px rgba(37, 99, 235, 0.12);
+        }
+
+        #repoSearchBtn {
+            position: absolute;
+            right: 8px;
+            top: 8px;
+            bottom: 8px;
+            border-radius: 99px;
+            padding: 0 24px;
+            background: linear-gradient(135deg, var(--accent-blue) 0%, #1D4ED8 100%);
+            color: white;
+            font-size: 0.92rem;
+            font-weight: 700;
+            border: none;
+            box-shadow: 0 4px 14px rgba(37, 99, 235, 0.28);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        #repoSearchBtn:hover {
+            background: linear-gradient(135deg, #1D4ED8 0%, #1E40AF 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 18px rgba(37, 99, 235, 0.38);
+        }
+
+        /* Hero AI Card Dark Styling */
+        .hero-ai-card:hover {
+            transform: translateY(-3px) scale(1.01);
+            border-color: rgba(192, 132, 252, 0.6) !important;
+            box-shadow: 0 12px 36px rgba(168, 85, 247, 0.25) !important;
+        }
+
+        /* E-Repository Clean Cards Layout */
+        .case-card {
+            background: var(--surface-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 16px 20px;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.25s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 125px;
+        }
+
+        .case-card:hover {
+            border-color: var(--accent-blue);
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+
+        .case-card-title {
+            font-size: 0.98rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            line-height: 1.4;
+            margin: 6px 0 10px 0;
+        }
+
+        /* Thin & Compact Precedent Cards on Home Teaser */
+        .compact-precedents-grid .case-card {
+            padding: 10px 14px;
+            min-height: auto;
+            border-radius: var(--radius-md);
+            gap: 4px;
+        }
+
+        .compact-precedents-grid .case-card-title {
+            font-size: 0.88rem;
+            margin: 2px 0 4px 0;
+            line-height: 1.35;
+        }
+
+        .compact-precedents-grid .case-badge {
+            font-size: 0.7rem;
+            padding: 2px 6px;
+        }
     </style>
 </head>
 
@@ -1940,12 +2058,21 @@
         <!-- ========================================== -->
         <div id="pageHome" class="page-view">
             <!-- Hero Search Engine -->
-            <section class="search-section" style="margin-top: 10px; margin-bottom: 24px;">
-                <div style="text-align: center; margin-bottom: 20px;">
-                    <h1 style="font-size: 2.2rem; font-weight: 800; color: var(--text-primary); letter-spacing: -0.03em; line-height: 1.25; margin-bottom: 8px;">
+            <section class="search-section" style="margin-top: 10px; margin-bottom: 28px;">
+                <div style="text-align: center; margin-bottom: 24px;">
+                    <!-- Hero Branding Logo from public/logo.html -->
+                    <div class="hero-logo-container" style="text-align: center; margin-bottom: 18px;">
+                        <div class="elegal-hero-logo" style="display: inline-flex; align-items: center; font-family: 'Fredoka', 'Outfit', sans-serif; font-size: clamp(46px, 5.5vw, 68px); font-weight: 700; color: var(--text-primary); user-select: none;">
+                            <span class="logo-e" style="margin-right: 1px; letter-spacing: -2px;">e</span>
+                            <div class="logo-l-container" style="display: inline-flex; align-items: center; justify-content: center; background-color: var(--text-primary); color: var(--app-bg); width: clamp(54px, 6.5vw, 76px); height: clamp(54px, 6.5vw, 76px); border-radius: 50%; margin: 0 4px; font-size: clamp(42px, 5vw, 60px); padding-bottom: 5px; padding-left: 2px; box-sizing: border-box;">L</div>
+                            <span class="logo-egal" style="letter-spacing: -2px; margin-left: -2px;">egal</span>
+                        </div>
+                    </div>
+
+                    <h1 style="font-size: 2.1rem; font-weight: 800; color: var(--text-primary); letter-spacing: -0.03em; line-height: 1.25; margin-bottom: 8px;">
                         Kenya Legal AI Research Platform & Judicial Precedent Engine
                     </h1>
-                    <p style="color: var(--text-secondary); font-size: 1rem; max-width: 720px; margin: 0 auto; line-height: 1.5;">
+                    <p style="color: var(--text-secondary); font-size: 0.98rem; max-width: 720px; margin: 0 auto; line-height: 1.5;">
                         Instant access to eKLR court rulings, Supreme Court precedents, Kenya Gazette notices, statutory acts, and AI-grounded legal analysis.
                     </p>
                 </div>
@@ -1957,66 +2084,23 @@
                         </div>
                         <input type="text" id="searchInput"
                             placeholder="Search parties, citations, statutes, legal topics..." autocomplete="off"
-                            oninput="handleSearchInput(this.value)" />
-                        <button id="searchBtn">
+                            oninput="handleSearchInput(this.value)"
+                            onkeydown="if(event.key === 'Enter'){ executeMainSearch(); }" />
+                        <button id="searchBtn" onclick="executeMainSearch()">
                             <span>Search</span>
                         </button>
                         <div class="search-suggestions-dropdown" id="searchSuggestionsDropdown"></div>
                     </div>
                 </div>
-
-                <div style="display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 14px;">
-                    <span style="font-size: 0.8rem; color: var(--text-tertiary); font-weight: 600; align-self: center;">Popular Searches:</span>
-                    <button class="filter-chip" onclick="runQuickChip('Supreme Court Article 47 Fair Administrative Action')">Article 47 Fair Admin</button>
-                    <button class="filter-chip" onclick="runQuickChip('Adverse Possession Land Registration Act')">Adverse Possession</button>
-                    <button class="filter-chip" onclick="runQuickChip('Section 106B Electronic Evidence Act')">Section 106B Evidence</button>
-                    <button class="filter-chip" onclick="runQuickChip('Constructive Dismissal Section 45 Employment Act')">Constructive Dismissal</button>
-                </div>
             </section>
 
-            <!-- Feature Cards Grid -->
-            <section style="margin-bottom: 32px;">
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px;">
-                    <div class="ai-card" style="cursor: pointer;" onclick="navigateTo('/ai-case-finder')">
-                        <div class="ai-card-title" style="color: var(--accent-blue); font-size: 1.1rem; margin-bottom: 8px;">
-                            <i data-lucide="cpu"></i> AI Case Law Analyser & Finder
-                        </div>
-                        <p style="color: var(--text-secondary); font-size: 0.88rem; line-height: 1.5;">
-                            Transform raw client facts into framed legal issues, applicable statutes, binding precedents, and ratio decidendi using research-grade AI tools.
-                        </p>
-                    </div>
-
-                    <div class="ai-card" style="cursor: pointer;" onclick="navigateTo('/e-repository')">
-                        <div class="ai-card-title" style="color: var(--accent-green); font-size: 1.1rem; margin-bottom: 8px;">
-                            <i data-lucide="book-open"></i> Full Legal E-Repository
-                        </div>
-                        <p style="color: var(--text-secondary); font-size: 0.88rem; line-height: 1.5;">
-                            Explore indexed Kenya Law rulings across Supreme Court, Court of Appeal, High Court, ELC, and ELRC with full-text search.
-                        </p>
-                    </div>
-
-                    <div class="ai-card" style="cursor: pointer;" onclick="navigateTo('/bulletins')">
-                        <div class="ai-card-title" style="color: var(--accent-purple); font-size: 1.1rem; margin-bottom: 8px;">
-                            <i data-lucide="newspaper"></i> Daily Court Cause Lists & Gazette Bulletins
-                        </div>
-                        <p style="color: var(--text-secondary); font-size: 0.88rem; line-height: 1.5;">
-                            Real-time judicial practice directions, LSK circulars, and Gazette updates updated daily spanning today down to 30 days ago.
-                        </p>
-                    </div>
-
-                    <div class="ai-card" style="cursor: pointer;" onclick="window.location.href='/dev'">
-                        <div class="ai-card-title" style="color: var(--accent-orange); font-size: 1.1rem; margin-bottom: 8px;">
-                            <i data-lucide="code"></i> Official Developer Law API
-                        </div>
-                        <p style="color: var(--text-secondary); font-size: 0.88rem; line-height: 1.5;">
-                            Integrate official Kenya precedent data, case law search, and statutory lookups into legal tech applications via REST API.
-                        </p>
-                    </div>
-                </div>
+            <!-- Precedents Teaser: Clean List with Small Height Case Cards -->
+            <section style="margin-bottom: 24px;">
+                <div id="homePrecedentsPreviewGrid" class="results compact-precedents-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 10px;"></div>
             </section>
 
             <!-- Daily Bulletins Teaser -->
-            <section style="margin-bottom: 32px; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 16px; padding: 24px;">
+            <section style="margin-bottom: 32px; background: var(--surface-bg); border: 1px solid var(--border-color); border-radius: var(--radius-xl); padding: 24px; box-shadow: var(--shadow-sm);">
                 <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
                     <div>
                         <h2 style="font-size: 1.3rem; font-weight: 700; color: var(--text-primary); display: flex; align-items: center; gap: 8px;">
@@ -2025,32 +2109,28 @@
                         <p style="color: var(--text-secondary); font-size: 0.88rem;">Automated real-time updates from Kenya Judiciary & Gazette archives.</p>
                     </div>
                     <button class="filter-chip active" onclick="navigateTo('/bulletins')">
-                        View All 30-Day Bulletins <i data-lucide="arrow-right" style="width: 14px; height: 14px; margin-left: 4px;"></i>
+                        View all <i data-lucide="arrow-right" style="width: 14px; height: 14px; margin-left: 4px;"></i>
                     </button>
                 </div>
                 <div class="bulletins-grid" id="homeBulletinsTeaserGrid"></div>
             </section>
 
-            <!-- Comprehensive Google SEO Text & Keyword Indexing Section -->
-            <section style="margin-bottom: 32px; background: var(--bg-elevated); border: 1px solid var(--border-subtle); border-radius: 16px; padding: 28px;">
-                <h2 style="font-size: 1.4rem; font-weight: 700; color: var(--text-primary); margin-bottom: 12px;">
-                    Empowering TechLaw, Legal Intelligence & AI in Law across Kenya
-                </h2>
-                <div style="color: var(--text-secondary); font-size: 0.9rem; line-height: 1.7; display: flex; flex-direction: column; gap: 14px;">
-                    <p>
-                        <strong>eLegal</strong> is the official research-grade <strong>legal research tools</strong> and <strong>AI tools</strong> engine tailored specifically for the <strong>Kenya law system</strong>, legal practitioners, scholars, and judicial officers. Built at the intersection of <strong>TechLaw</strong> and modern artificial intelligence, our <strong>case law search engine</strong> index includes over 10,000+ official <strong>EKLR court rulings</strong>, <strong>Kenyan precedents and statutes</strong>, and administrative directives.
-                    </p>
-                    <p>
-                        Whether conducting deep research on the <strong>Constitution of Kenya 2010</strong>, reviewing <strong>Law Society of Kenya (LSK)</strong> guidelines, or evaluating the <strong>impact of AI on law</strong>, eLegal equips lawyers with <strong>legal tools with AI</strong>. Our platform features an automated <strong>case law analyser</strong>, instant <strong>legal summary</strong> generator, and dedicated <strong>law API</strong> for seamless application integration.
-                    </p>
-                    <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 6px;">
-                        <span class="badge" style="background: rgba(59, 130, 246, 0.15); color: var(--accent-blue);">AI tools for lawyers</span>
-                        <span class="badge" style="background: rgba(168, 85, 247, 0.15); color: var(--accent-purple);">Study AI & Research AI</span>
-                        <span class="badge" style="background: rgba(34, 197, 94, 0.15); color: var(--accent-green);">Kenya Law Official API</span>
-                        <span class="badge" style="background: rgba(249, 115, 22, 0.15); color: var(--accent-orange);">Law in AI & AI in Law</span>
-                    </div>
+            <!-- Visually hidden from UI, fully indexed by Google & SEO crawlers -->
+            <div style="position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;" aria-hidden="false">
+                <h2>Empowering TechLaw, Legal Intelligence & AI in Law across Kenya</h2>
+                <p>
+                    eLegal is the official research-grade legal research tools and AI tools engine tailored specifically for the Kenya law system, legal practitioners, scholars, and judicial officers. Built at the intersection of TechLaw and modern artificial intelligence, our case law search engine index includes over 10,000+ official EKLR court rulings, Kenyan precedents and statutes, and administrative directives.
+                </p>
+                <p>
+                    Whether conducting deep research on the Constitution of Kenya 2010, reviewing Law Society of Kenya (LSK) guidelines, or evaluating the impact of AI on law, eLegal equips lawyers with legal tools with AI. Our platform features an automated case law analyser, instant legal summary generator, and dedicated law API for seamless application integration.
+                </p>
+                <div>
+                    <span>AI tools for lawyers</span>
+                    <span>Study AI & Research AI</span>
+                    <span>Kenya Law Official API</span>
+                    <span>Law in AI & AI in Law</span>
                 </div>
-            </section>
+            </div>
         </div>
 
         <!-- ==================================================== -->
@@ -2077,7 +2157,7 @@
                                 oninput="handleRepoSearchInput(this.value)"
                                 onkeydown="if(event.key === 'Enter'){ executeRepoSearch(); }" />
                             <button id="repoSearchBtn" onclick="executeRepoSearch()">
-                                <span>Search Repository</span>
+                                <span>Search</span>
                             </button>
                             <div class="search-suggestions-dropdown" id="repoSuggestionsDropdown"></div>
                         </div>
@@ -2176,11 +2256,6 @@
                         </div>
                     </div>
 
-                    <div class="ai-advice-box" id="aiAdviceBox">
-                        <strong>Tactical Senior Advocate Guidance:</strong>
-                        <span id="aiAdviceText">Enter legal facts above and click "Analyze Scenario with Legal AI" to generate structured briefing notes.</span>
-                    </div>
-
                     <div class="ai-grid-box">
                         <div class="ai-card">
                             <div class="ai-card-title">
@@ -2196,11 +2271,11 @@
                             <div id="aiStatutesList"></div>
                         </div>
 
-                        <div class="ai-card">
+                        <div class="ai-card" style="grid-column: 1 / -1; margin-top: 10px;">
                             <div class="ai-card-title">
-                                <i data-lucide="gavel" style="width: 14px; height: 14px;"></i> Binding Precedents & Ratio
+                                <i data-lucide="gavel" style="width: 14px; height: 14px;"></i> Binding Precedents & Ratio Decidendi
                             </div>
-                            <ul class="ai-list" id="aiPrecedentsList"></ul>
+                            <div class="ai-precedents-grid" id="aiPrecedentsList"></div>
                         </div>
                     </div>
 
@@ -2511,6 +2586,7 @@
 
             if (cleanPath === '/home') {
                 loadHomeTeaserBulletins();
+                loadHomePrecedentsPreview();
             } else if (cleanPath === '/bulletins') {
                 loadBulletins(1, bulletinsState.category);
             } else if (cleanPath === '/saved') {
@@ -2538,11 +2614,62 @@
             navigateTo(window.location.pathname, false);
         });
 
+        function executeMainSearch() {
+            const input = document.getElementById('searchInput');
+            const query = input ? input.value.trim() : '';
+            if (!query) return;
+            navigateTo('/e-repository');
+            setTimeout(() => {
+                const repoInput = document.getElementById('repoSearchInput');
+                if (repoInput) repoInput.value = query;
+                executeRepoSearch(query);
+            }, 120);
+        }
+
+        function executeRepoSearch(customQuery) {
+            const repoInput = document.getElementById('repoSearchInput');
+            const mainInput = document.getElementById('searchInput');
+            const query = customQuery || (repoInput ? repoInput.value.trim() : '') || (mainInput ? mainInput.value.trim() : '');
+            if (!query) return;
+            handleSearchInput(query);
+        }
+
+        function handleRepoSearchInput(value) {
+            handleSearchInput(value);
+        }
+
+        async function loadHomePrecedentsPreview() {
+            const grid = document.getElementById('homePrecedentsPreviewGrid');
+            if (!grid) return;
+            try {
+                const res = await fetchApi(`${API_BASE}/search?q=precedent&limit=4`);
+                if (res.ok) {
+                    const data = await res.json();
+                    grid.innerHTML = '';
+                    const items = (data.results || []).slice(0, 4);
+                    if (items.length > 0) {
+                        items.forEach(item => grid.appendChild(createResultItem(item)));
+                        if (typeof lucide !== 'undefined') lucide.createIcons();
+                        return;
+                    }
+                }
+            } catch (e) {
+                console.warn('Precedents preview load notice:', e);
+            }
+            if (typeof FALLBACK_SEARCH_RESULTS !== 'undefined') {
+                grid.innerHTML = '';
+                FALLBACK_SEARCH_RESULTS.slice(0, 4).forEach(item => grid.appendChild(createResultItem(item)));
+                if (typeof lucide !== 'undefined') lucide.createIcons();
+            }
+        }
+
         function runQuickChip(query) {
             const input = document.getElementById('searchInput');
             if (input) input.value = query;
             navigateTo('/e-repository');
             setTimeout(() => {
+                const repoInput = document.getElementById('repoSearchInput');
+                if (repoInput) repoInput.value = query;
                 handleSearchInput(query);
             }, 100);
         }
@@ -2614,7 +2741,8 @@
                 return;
             }
             const prompt = input.value.trim();
-            document.getElementById('aiAdviceText').textContent = 'Analyzing legal scenario using Google Grounded Intelligence...';
+            const advEl = document.getElementById('aiAdviceText');
+            if (advEl) advEl.textContent = 'Analyzing legal scenario using Google Grounded Intelligence...';
             document.getElementById('aiIssuesList').innerHTML = '<li>Analyzing facts...</li>';
             document.getElementById('aiStatutesList').innerHTML = 'Analyzing statutes...';
             document.getElementById('aiPrecedentsList').innerHTML = '<li>Searching ratio decidendi...</li>';
@@ -2633,7 +2761,8 @@
                 }
             } catch (e) {
                 console.warn('AI Case Finder error:', e);
-                document.getElementById('aiAdviceText').textContent = 'AI Case Finder encountered a temporary network delay. Showing fallback analysis.';
+                const advElErr = document.getElementById('aiAdviceText');
+                if (advElErr) advElErr.textContent = 'AI Case Finder encountered a temporary network delay. Showing fallback analysis.';
             }
         }
 
@@ -3222,7 +3351,8 @@
             setSearchLoading(true);
             document.getElementById('aiResultPanel').classList.add('active');
             document.getElementById('aiSection').scrollIntoView({ behavior: 'smooth' });
-            document.getElementById('aiAdviceText').textContent = 'Analyzing factual scenario against Kenyan legal precedents & statutory frameworks...';
+            const advEl = document.getElementById('aiAdviceText');
+            if (advEl) advEl.textContent = 'Analyzing factual scenario against Kenyan legal precedents & statutory frameworks...';
 
             try {
                 const res = await fetchApi(`${API_BASE}/ai-case-finder`, {
@@ -3235,7 +3365,8 @@
                 const data = await res.json();
                 renderAiResult(data);
             } catch (e) {
-                document.getElementById('aiAdviceText').textContent = `AI Analysis Note: ${e.message}`;
+                const advElErr = document.getElementById('aiAdviceText');
+                if (advElErr) advElErr.textContent = `AI Analysis Note: ${e.message}`;
             } finally {
                 setSearchLoading(false);
             }
@@ -3244,7 +3375,8 @@
         function renderAiResult(data) {
             const analysis = data.aiAnalysis || {};
             document.getElementById('aiQuerySummary').textContent = `Query: "${(data.query || '').substring(0, 45)}..."`;
-            document.getElementById('aiAdviceText').textContent = analysis.advice || 'Follow statutory timelines and file certified pleadings.';
+            const advEl = document.getElementById('aiAdviceText');
+            if (advEl) advEl.textContent = analysis.advice || 'Follow statutory timelines and file certified pleadings.';
 
             // Issues
             const issuesList = document.getElementById('aiIssuesList');

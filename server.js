@@ -1848,23 +1848,39 @@ function extractCitationFromText(text) {
 let currentKeyIndex = 0;
 
 function getAiClientObj() {
-  const keysRaw = process.env.GEMINI_API_KEYS || process.env.GEMINI_API_KEY || '';
-  const keys = keysRaw.split(',').map(k => k.trim()).filter(Boolean);
-  if (keys.length === 0) return null;
+  const keysList = [];
+  const rawSources = [process.env.GEMINI_API_KEYS, process.env.GEMINI_API_KEY];
 
-  const keyIndex = currentKeyIndex % keys.length;
-  const activeKey = keys[keyIndex];
+  for (const envKey of Object.keys(process.env)) {
+    if (/^GEMINI_API_KEY_\d+$/i.test(envKey) || /^GEMINI_KEY_\d+$/i.test(envKey)) {
+      rawSources.push(process.env[envKey]);
+    }
+  }
+
+  for (const src of rawSources) {
+    if (!src) continue;
+    const splitKeys = String(src).split(/[,;\s\n]+/).map(k => k.trim()).filter(Boolean);
+    for (const k of splitKeys) {
+      if (!keysList.includes(k)) keysList.push(k);
+    }
+  }
+
+  if (keysList.length === 0) return null;
+
+  const keyIndex = currentKeyIndex % keysList.length;
+  const activeKey = keysList[keyIndex];
 
   try {
     const ai = new GoogleGenAI({ apiKey: activeKey });
     return {
       ai,
       key: activeKey,
-      keyCount: keys.length,
+      keyCount: keysList.length,
+      keyIndex: keyIndex + 1,
       rotateKey: () => {
-        if (keys.length > 1) {
-          currentKeyIndex = (currentKeyIndex + 1) % keys.length;
-          console.warn(`[gemini] Quota/rate limit hit. Rotated to API Key #${currentKeyIndex + 1}/${keys.length}`);
+        if (keysList.length > 1) {
+          currentKeyIndex = (currentKeyIndex + 1) % keysList.length;
+          console.warn(`[gemini] Quota/rate limit hit. Rotated to API Key #${(currentKeyIndex % keysList.length) + 1}/${keysList.length}`);
         }
       }
     };

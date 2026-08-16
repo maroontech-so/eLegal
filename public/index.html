@@ -2875,6 +2875,15 @@
             }
         }
 
+        const DISTINCT_BULLETIN_IMAGES = [
+            'https://upload.wikimedia.org/wikipedia/commons/0/07/Nairobi_Law_Courts.jpg',
+            'https://upload.wikimedia.org/wikipedia/commons/0/0a/Supreme_Court_of_Kenya.JPG',
+            'https://upload.wikimedia.org/wikipedia/commons/b/bd/Parliament_Buildings%2C_Nairobi%2C_Kenya_-entrance-15April2010.jpg',
+            'https://upload.wikimedia.org/wikipedia/commons/0/0f/Chief_Justice_Martha_K._Koome_and_Deputy_Chief_Justice_Philomena_Mwilu.jpg',
+            'https://upload.wikimedia.org/wikipedia/commons/6/61/Old_law_courst_mombasa.JPG',
+            'https://upload.wikimedia.org/wikipedia/commons/thumb/4/49/Coat_of_arms_of_Kenya_%28Heraldry%29.svg/800px-Coat_of_arms_of_Kenya_%28Heraldry%29.svg.png'
+        ];
+
         function renderBulletinsToGrid(bulletins, grid) {
             if (!grid) return;
             grid.innerHTML = '';
@@ -2882,33 +2891,39 @@
                 grid.innerHTML = `<div style="grid-column: 1/-1; color: var(--text-tertiary); padding: 24px; text-align: center;">No bulletins available.</div>`;
                 return;
             }
-            bulletins.forEach(item => {
+            const isHomeGrid = !grid.id || grid.id === 'homeBulletinsTeaserGrid';
+
+            bulletins.forEach((item, index) => {
                 const card = document.createElement('article');
                 card.className = 'bulletin-card';
+                card.style.cursor = 'pointer';
+                card.onclick = () => {
+                    if (isHomeGrid) {
+                        navigateTo('/bulletins');
+                    } else {
+                        viewBulletinDetail(item.id);
+                    }
+                };
+
+                const fallbackImg = DISTINCT_BULLETIN_IMAGES[index % DISTINCT_BULLETIN_IMAGES.length];
+                const displayImg = (item.imageUrl && !item.imageUrl.includes('Nairobi_Law_Courts.jpg')) ? item.imageUrl : fallbackImg;
+
                 card.innerHTML = `
                     <div class="bulletin-img-wrap">
-                        <img src="${item.imageUrl || 'https://upload.wikimedia.org/wikipedia/commons/0/07/Nairobi_Law_Courts.jpg'}" alt="${escapeHtml(item.title)}" class="bulletin-img-preview" loading="lazy" onerror="this.onerror=null; this.src='https://upload.wikimedia.org/wikipedia/commons/0/07/Nairobi_Law_Courts.jpg';" />
+                        <img src="${displayImg}" alt="${escapeHtml(item.title)}" class="bulletin-img-preview" loading="lazy" onerror="this.onerror=null; this.src='${fallbackImg}';" />
                     </div>
                     <div class="bulletin-body">
                         <div class="bulletin-top-meta">
-                            <span class="bulletin-date">${item.date}</span>
+                            <span class="bulletin-date">${escapeHtml(item.date || '')}</span>
                             <span class="bulletin-category-tag ${item.category || ''}">${escapeHtml(item.categoryLabel || item.category || 'News')}</span>
                         </div>
                         <h3 class="bulletin-title">${escapeHtml(item.title)}</h3>
                         <p class="bulletin-summary">${escapeHtml(item.summary)}</p>
-                        <div class="bulletin-action-buttons">
-                            <a href="${item.url || item.sourceUrl || 'http://kenyalaw.org'}" target="_blank" rel="noopener" class="bulletin-btn-source" onclick="event.stopPropagation();">
-                                <i data-lucide="external-link" style="width: 12px; height: 12px;"></i> Read Full Story
-                            </a>
-                            <button type="button" class="bulletin-btn-precedents" onclick="event.stopPropagation(); findRelatedPrecedentsForBulletin('${escapeJsString(item.title)}', '${escapeJsString((item.tags || []).join(' '))}');">
-                                <i data-lucide="search" style="width: 12px; height: 12px;"></i> Find Precedents
-                            </button>
-                        </div>
                     </div>
-                    <div class="bulletin-footer">
-                        <span class="bulletin-source">${escapeHtml(item.source)}</span>
-                        <button class="read-bulletin-btn" onclick="viewBulletinDetail('${item.id}')">
-                            Read Bulletin <i data-lucide="arrow-right" style="width: 14px; height: 14px;"></i>
+                    <div class="bulletin-footer" style="display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: auto; padding-top: 12px; border-top: 1px solid var(--border-subtle);">
+                        <span class="bulletin-source" style="font-size: 0.78rem; color: var(--text-tertiary); max-width: 55%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${escapeHtml(item.source || 'Judiciary of Kenya')}</span>
+                        <button type="button" class="read-bulletin-btn" style="background: var(--brand-orange); color: #fff; border: none; border-radius: 6px; padding: 6px 16px; font-size: 0.8rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s ease;" onclick="event.stopPropagation(); ${isHomeGrid ? "navigateTo('/bulletins');" : `viewBulletinDetail('${item.id}');`}">
+                            Read <i data-lucide="arrow-right" style="width: 14px; height: 14px;"></i>
                         </button>
                     </div>
                 `;
@@ -3388,39 +3403,38 @@
 
         function renderBulletins(bulletins) {
             const grid = document.getElementById('bulletinsGrid');
+            if (!grid) return;
             grid.innerHTML = '';
             if (!bulletins.length) {
                 grid.innerHTML = `<div style="grid-column: 1/-1; color: var(--text-tertiary); padding: 32px; text-align: center;">No bulletins available in this category.</div>`;
                 return;
             }
 
-            bulletins.forEach(item => {
+            bulletins.forEach((item, index) => {
                 const card = document.createElement('article');
                 card.className = 'bulletin-card';
+                card.style.cursor = 'pointer';
+                card.onclick = () => viewBulletinDetail(item.id);
+
+                const fallbackImg = DISTINCT_BULLETIN_IMAGES[index % DISTINCT_BULLETIN_IMAGES.length];
+                const displayImg = (item.imageUrl && !item.imageUrl.includes('Nairobi_Law_Courts.jpg')) ? item.imageUrl : fallbackImg;
+
                 card.innerHTML = `
                     <div class="bulletin-img-wrap">
-                        <img src="${item.imageUrl || 'https://upload.wikimedia.org/wikipedia/commons/0/07/Nairobi_Law_Courts.jpg'}" alt="${escapeHtml(item.title)}" class="bulletin-img-preview" loading="lazy" onerror="this.onerror=null; this.src='https://upload.wikimedia.org/wikipedia/commons/0/07/Nairobi_Law_Courts.jpg';" />
+                        <img src="${displayImg}" alt="${escapeHtml(item.title)}" class="bulletin-img-preview" loading="lazy" onerror="this.onerror=null; this.src='${fallbackImg}';" />
                     </div>
                     <div class="bulletin-body">
                         <div class="bulletin-top-meta">
-                            <span class="bulletin-date">${item.date}</span>
+                            <span class="bulletin-date">${escapeHtml(item.date || '')}</span>
                             <span class="bulletin-category-tag ${item.category || ''}">${escapeHtml(item.categoryLabel || item.category || 'News')}</span>
                         </div>
                         <h3 class="bulletin-title">${escapeHtml(item.title)}</h3>
                         <p class="bulletin-summary">${escapeHtml(item.summary)}</p>
-                        <div class="bulletin-action-buttons">
-                            <a href="${item.url || item.sourceUrl || 'http://kenyalaw.org'}" target="_blank" rel="noopener" class="bulletin-btn-source" onclick="event.stopPropagation();">
-                                <i data-lucide="external-link" style="width: 12px; height: 12px;"></i> Read Full Story
-                            </a>
-                            <button type="button" class="bulletin-btn-precedents" onclick="event.stopPropagation(); findRelatedPrecedentsForBulletin('${escapeJsString(item.title)}', '${escapeJsString((item.tags || []).join(' '))}');">
-                                <i data-lucide="search" style="width: 12px; height: 12px;"></i> Find Precedents
-                            </button>
-                        </div>
                     </div>
-                    <div class="bulletin-footer">
-                        <span class="bulletin-source">${escapeHtml(item.source)}</span>
-                        <button class="read-bulletin-btn" onclick="viewBulletinDetail('${item.id}')">
-                            Read Bulletin <i data-lucide="arrow-right" style="width: 14px; height: 14px;"></i>
+                    <div class="bulletin-footer" style="display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: auto; padding-top: 12px; border-top: 1px solid var(--border-subtle);">
+                        <span class="bulletin-source" style="font-size: 0.78rem; color: var(--text-tertiary); max-width: 55%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${escapeHtml(item.source || 'Judiciary of Kenya')}</span>
+                        <button type="button" class="read-bulletin-btn" style="background: var(--brand-orange); color: #fff; border: none; border-radius: 6px; padding: 6px 16px; font-size: 0.8rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s ease;" onclick="event.stopPropagation(); viewBulletinDetail('${item.id}');">
+                            Read <i data-lucide="arrow-right" style="width: 14px; height: 14px;"></i>
                         </button>
                     </div>
                 `;

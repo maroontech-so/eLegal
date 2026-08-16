@@ -3324,11 +3324,20 @@ app.get('/api/bulletins', async (req, res) => {
     const startIndex = (page - 1) * limit;
     const paginated = bulletins.slice(startIndex, startIndex + limit);
 
-    // Fast instant map for bulletins (0ms latency, static high-res landmarks)
-    const enrichedBulletins = paginated.map((b) => {
+    const DISTINCT_BULLETIN_IMAGES = [
+      'https://upload.wikimedia.org/wikipedia/commons/0/07/Nairobi_Law_Courts.jpg',
+      'https://upload.wikimedia.org/wikipedia/commons/0/0a/Supreme_Court_of_Kenya.JPG',
+      'https://upload.wikimedia.org/wikipedia/commons/b/bd/Parliament_Buildings%2C_Nairobi%2C_Kenya_-entrance-15April2010.jpg',
+      'https://upload.wikimedia.org/wikipedia/commons/0/0f/Chief_Justice_Martha_K._Koome_and_Deputy_Chief_Justice_Philomena_Mwilu.jpg',
+      'https://upload.wikimedia.org/wikipedia/commons/6/61/Old_law_courst_mombasa.JPG',
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/4/49/Coat_of_arms_of_Kenya_%28Heraldry%29.svg/800px-Coat_of_arms_of_Kenya_%28Heraldry%29.svg.png'
+    ];
+
+    // Fast instant map for bulletins (0ms latency, distinct high-res landmarks)
+    const enrichedBulletins = paginated.map((b, index) => {
       let imageUrl = b.imageUrl || b.image_url;
-      if (!imageUrl || imageUrl.includes('unsplash')) {
-        imageUrl = 'https://upload.wikimedia.org/wikipedia/commons/0/07/Nairobi_Law_Courts.jpg';
+      if (!imageUrl || imageUrl.includes('unsplash') || imageUrl.includes('Nairobi_Law_Courts.jpg')) {
+        imageUrl = DISTINCT_BULLETIN_IMAGES[(startIndex + index) % DISTINCT_BULLETIN_IMAGES.length];
       }
       return {
         ...b,

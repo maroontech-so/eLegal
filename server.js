@@ -2567,6 +2567,8 @@ app.get('/api/keys', async (req, res) => {
           break;
         }
       }
+    }
+
     if (!keyData && (keyId === 'admin_' || keyId.startsWith('admin_'))) {
       keyData = {
         key: keyId,

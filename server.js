@@ -115,6 +115,29 @@ async function uploadToCloudinaryIfConfigured(contentBufferOrPath, publicId, res
 }
 
 let firestoreInitialized = false;
+let firestoreDisabled = false;
+
+const GEMINI_MODELS = [
+  'gemini-3.6-flash',
+  'gemini-3.5-flash',
+  'gemini-3.5-flash-lite',
+  'gemini-3.1-flash-lite',
+  'gemini-2.5-flash-lite',
+  'gemini-2.5-flash'
+];
+
+function handleFirestoreError(e, context = 'Firestore') {
+  const msg = String(e && e.message ? e.message : e);
+  if (msg.includes('UNAUTHENTICATED') || msg.includes('authentication credentials') || msg.includes('permission-denied') || msg.includes('16 UNAUTHENTICATED')) {
+    if (!firestoreDisabled) {
+      firestoreDisabled = true;
+      console.warn(`[firebase] Firestore authentication unavailable (${context}). Disabling Firestore and falling back to local JSON key store.`);
+    }
+  } else {
+    console.warn(`[firebase] ${context} error:`, msg);
+  }
+}
+
 const rateLimits = new Map();
 const RATE_LIMIT_WINDOW_MS = 60 * 1000;
 const RATE_LIMIT_MAX = 60;
@@ -153,6 +176,7 @@ function saveLocalKeys(userKeys) {
 }
 
 function getFirestore() {
+  if (firestoreDisabled) return null;
   if (!firestoreInitialized) {
     try {
       if (admin.getApps().length === 0) {
@@ -220,6 +244,7 @@ function getFirestore() {
       console.log('[firebase] Firestore client ready');
     } catch (e) {
       console.warn('Firebase Admin SDK initialization failed:', e.message);
+      firestoreDisabled = true;
       return null;
     }
   }
@@ -240,7 +265,7 @@ async function loadApiKeys() {
               rateLimits.set(keyDoc.id, { count: 0, resetAt: Date.now() + RATE_LIMIT_WINDOW_MS });
             });
           }).catch(err => {
-            console.warn('[apikeys] Subcollection fetch warning:', err.message);
+            handleFirestoreError(err, 'loadApiKeys subcollection');
           })
         );
       });
@@ -249,7 +274,7 @@ async function loadApiKeys() {
       console.log(`Loaded API keys from Firestore`);
     }
   } catch (e) {
-    console.warn('[apikeys] Firestore unauthenticated or unavailable:', e.message);
+    handleFirestoreError(e, 'loadApiKeys');
   }
 
   if (!loadedFromFirestore) {
@@ -298,7 +323,7 @@ async function createApiKey(label, userId) {
       savedToFirestore = true;
     }
   } catch (e) {
-    console.warn('[apikeys] Could not save API key to Firestore, using local store:', e.message);
+    handleFirestoreError(e, 'createApiKey');
   }
 
   const userKeys = getLocalKeys();
@@ -326,14 +351,28 @@ async function createApiKey(label, userId) {
   return { key, label: label || 'default', createdAt: now };
 }
 
+function extractApiKeyFromReq(req) {
+  const headerKey = req.headers['x-api-key'] || req.headers['X-API-Key'];
+  if (headerKey) return headerKey.trim();
+  const auth = req.headers['authorization'];
+  if (auth && typeof auth === 'string') {
+    const trimmed = auth.trim();
+    if (trimmed.startsWith('Bearer el_')) {
+      return trimmed.replace(/^Bearer\s+/i, '').trim();
+    }
+  }
+  return null;
+}
+
 async function validateApiKey(req, res, next) {
-  const key = req.headers['x-api-key'];
+  const key = extractApiKeyFromReq(req);
   if (!key) {
-    return res.status(401).json({ error: 'API key required', code: 'MISSING_API_KEY' });
+    return res.status(401).json({ error: 'API key required. Provide X-API-Key header or Bearer token.', code: 'MISSING_API_KEY' });
   }
 
   let keyData = null;
   let keyDocRef = null;
+  let ownerUserId = null;
 
   try {
     const db = getFirestore();
@@ -341,19 +380,20 @@ async function validateApiKey(req, res, next) {
       const snapshot = await db.collection('apikeys').get();
       const checks = [];
       snapshot.forEach(userDoc => {
-        checks.push(userDoc.ref.collection('keys').doc(key).get());
+        checks.push(userDoc.ref.collection('keys').doc(key).get().then(doc => ({ doc, userId: userDoc.id })));
       });
-      const docs = await Promise.all(checks);
-      for (const doc of docs) {
-        if (doc.exists) {
-          keyData = doc.data();
-          keyDocRef = doc.ref;
+      const results = await Promise.all(checks);
+      for (const resItem of results) {
+        if (resItem.doc.exists) {
+          keyData = resItem.doc.data();
+          keyDocRef = resItem.doc.ref;
+          ownerUserId = resItem.userId;
           break;
         }
       }
     }
   } catch (e) {
-    // Firestore unavailable/unauthenticated, fall back to local store
+    handleFirestoreError(e, 'validateApiKey');
   }
 
   if (!keyData) {
@@ -361,13 +401,14 @@ async function validateApiKey(req, res, next) {
     for (const uId of Object.keys(userKeys)) {
       if (userKeys[uId] && userKeys[uId][key]) {
         keyData = userKeys[uId][key];
+        ownerUserId = uId;
         break;
       }
     }
   }
 
-  if (!keyData || !keyData.isActive) {
-    return res.status(401).json({ error: 'Invalid API key', code: 'INVALID_API_KEY' });
+  if (!keyData || keyData.isActive === false) {
+    return res.status(401).json({ error: 'Invalid or inactive API key provided', code: 'INVALID_API_KEY' });
   }
 
   const now = Date.now();
@@ -383,23 +424,43 @@ async function validateApiKey(req, res, next) {
   }
 
   const lastUsed = new Date().toISOString();
+  const reqCost = req.path && req.path.includes('ai-case-finder') ? 0.015 : 0.002;
   keyData.lastUsed = lastUsed;
   keyData.requestCount = (keyData.requestCount || 0) + 1;
+  keyData.expenditure = Number(((keyData.expenditure || 0) + reqCost).toFixed(4));
+  
+  if (!Array.isArray(keyData.usageHistory)) {
+    keyData.usageHistory = [];
+  }
+  keyData.usageHistory.unshift({
+    timestamp: lastUsed,
+    path: req.path,
+    cost: reqCost
+  });
+  if (keyData.usageHistory.length > 50) {
+    keyData.usageHistory = keyData.usageHistory.slice(0, 50);
+  }
 
   if (keyDocRef) {
     try {
-      await keyDocRef.update({ lastUsed, requestCount: keyData.requestCount });
+      await keyDocRef.update({
+        lastUsed,
+        requestCount: keyData.requestCount,
+        expenditure: keyData.expenditure,
+        usageHistory: keyData.usageHistory
+      });
     } catch (_) {}
-  } else {
+  }
+
+  // Always sync to local store for reliability
+  if (ownerUserId) {
     const userKeys = getLocalKeys();
-    for (const uId of Object.keys(userKeys)) {
-      if (userKeys[uId] && userKeys[uId][key]) {
-        userKeys[uId][key].lastUsed = lastUsed;
-        userKeys[uId][key].requestCount = keyData.requestCount;
-        saveLocalKeys(userKeys);
-        break;
-      }
-    }
+    if (!userKeys[ownerUserId]) userKeys[ownerUserId] = {};
+    userKeys[ownerUserId][key] = {
+      ...userKeys[ownerUserId][key],
+      ...keyData
+    };
+    saveLocalKeys(userKeys);
   }
 
   req.apiKey = key;
@@ -408,7 +469,7 @@ async function validateApiKey(req, res, next) {
 }
 
 async function validateApiKeyOptional(req, res, next) {
-  const key = req.headers['x-api-key'];
+  const key = extractApiKeyFromReq(req);
   if (!key) {
     return next();
   }
@@ -1274,8 +1335,7 @@ app.post('/api/summarize-doc', async (req, res) => {
   // 1. Try Gemini API first if available
   const ai = getAiClient();
   if (ai) {
-    const models = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-1.5-pro'];
-    for (const model of models) {
+    for (const model of GEMINI_MODELS) {
       try {
         const prompt = `You are eLegal Senior High Court Research Clerk & Law Reporter.
 Generate a 100% substantive, lawyer and law-student friendly Legal Brief for this document.
@@ -1347,7 +1407,14 @@ Respond in clean HTML using this exact structure:
           });
         }
       } catch (err) {
-        console.warn(`[summarize-doc] Gemini call failed on ${model}:`, err.message);
+        const isQuota = err.message && (err.message.includes('429') || err.message.includes('RESOURCE_EXHAUSTED') || err.message.includes('quota'));
+        if (isQuota) {
+          console.warn(`[summarize-doc] Quota limit hit on ${model}. Attempting key rotation...`);
+          const obj = getAiClientObj();
+          if (obj) obj.rotateKey();
+        } else {
+          console.warn(`[summarize-doc] Gemini call failed on ${model}:`, err.message);
+        }
       }
     }
   }
@@ -1784,9 +1851,7 @@ Format each item as a JSON object:
 
 Respond ONLY with a valid JSON array starting with '[' and ending with ']'. No markdown wrapper or extra text.`;
 
-  const models = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-1.5-pro'];
-
-  for (const model of models) {
+  for (const model of GEMINI_MODELS) {
     try {
       const response = await ai.models.generateContent({
         model,
@@ -1858,12 +1923,12 @@ Respond ONLY with a valid JSON array starting with '[' and ending with ']'. No m
     } catch (err) {
       const isQuota = err.message && (err.message.includes('429') || err.message.includes('RESOURCE_EXHAUSTED') || err.message.includes('quota'));
       if (isQuota) {
-        console.warn(`[gemini] Quota limit hit on ${model}. Attempting key rotation...`);
+        console.warn(`[gemini] Quota limit hit on ${model}. Rotating API key & trying next fallback model...`);
         const obj = getAiClientObj();
         if (obj) obj.rotateKey();
-        break;
+      } else {
+        console.warn(`[gemini] Model ${model} search grounding error:`, err.message);
       }
-      console.warn(`[gemini] Model ${model} search grounding error:`, err.message);
     }
   }
 
@@ -2333,7 +2398,19 @@ app.get('/api/keys', async (req, res) => {
           const snapshot = await userDoc.ref.collection('keys').get();
           snapshot.forEach(doc => {
             const data = doc.data();
-            keys.push({ key: doc.id, label: data.label, createdAt: data.createdAt, lastUsed: data.lastUsed, requestCount: data.requestCount, isActive: data.isActive, replacedAt: data.replacedAt });
+            const reqCount = data.requestCount || 0;
+            const exp = typeof data.expenditure === 'number' ? data.expenditure : Number((reqCount * 0.002).toFixed(4));
+            keys.push({
+              key: doc.id,
+              label: data.label,
+              createdAt: data.createdAt,
+              lastUsed: data.lastUsed,
+              requestCount: reqCount,
+              isActive: data.isActive !== false,
+              replacedAt: data.replacedAt,
+              expenditure: exp,
+              usageHistory: data.usageHistory || []
+            });
           });
         }
         fetchedFromFirestore = true;
@@ -2346,14 +2423,32 @@ app.get('/api/keys', async (req, res) => {
       const userKeys = getLocalKeys();
       const uKeys = userKeys[userId] || {};
       Object.entries(uKeys).forEach(([kId, data]) => {
-        keys.push({ key: kId, label: data.label, createdAt: data.createdAt, lastUsed: data.lastUsed, requestCount: data.requestCount, isActive: data.isActive, replacedAt: data.replacedAt });
+        const reqCount = data.requestCount || 0;
+        const exp = typeof data.expenditure === 'number' ? data.expenditure : Number((reqCount * 0.002).toFixed(4));
+        keys.push({
+          key: kId,
+          label: data.label,
+          createdAt: data.createdAt,
+          lastUsed: data.lastUsed,
+          requestCount: reqCount,
+          isActive: data.isActive !== false,
+          replacedAt: data.replacedAt,
+          expenditure: exp,
+          usageHistory: data.usageHistory || []
+        });
       });
     }
 
     if (keys.length === 0) {
       try {
         const initialKey = await createApiKey('Primary Secret Key', userId);
-        keys.push(initialKey);
+        keys.push({
+          ...initialKey,
+          requestCount: 0,
+          isActive: true,
+          expenditure: 0.0,
+          usageHistory: []
+        });
       } catch (err) {
         console.warn('Auto key creation error:', err);
       }
@@ -2383,20 +2478,44 @@ app.get('/api/keys/current', async (req, res) => {
           const snapshot = await userDoc.ref.collection('keys').get();
           snapshot.forEach(doc => {
             const data = doc.data();
-            keys.push({ key: doc.id, label: data.label, createdAt: data.createdAt, lastUsed: data.lastUsed, requestCount: data.requestCount, isActive: data.isActive, replacedAt: data.replacedAt });
+            const reqCount = data.requestCount || 0;
+            const exp = typeof data.expenditure === 'number' ? data.expenditure : Number((reqCount * 0.002).toFixed(4));
+            keys.push({
+              key: doc.id,
+              label: data.label,
+              createdAt: data.createdAt,
+              lastUsed: data.lastUsed,
+              requestCount: reqCount,
+              isActive: data.isActive !== false,
+              replacedAt: data.replacedAt,
+              expenditure: exp,
+              usageHistory: data.usageHistory || []
+            });
           });
         }
         fetchedFromFirestore = true;
       }
     } catch (dbErr) {
-      // Firestore error, fall through to local store
+      // Firestore error
     }
 
     if (!fetchedFromFirestore) {
       const userKeys = getLocalKeys();
       const uKeys = userKeys[userId] || {};
       Object.entries(uKeys).forEach(([kId, data]) => {
-        keys.push({ key: kId, label: data.label, createdAt: data.createdAt, lastUsed: data.lastUsed, requestCount: data.requestCount, isActive: data.isActive, replacedAt: data.replacedAt });
+        const reqCount = data.requestCount || 0;
+        const exp = typeof data.expenditure === 'number' ? data.expenditure : Number((reqCount * 0.002).toFixed(4));
+        keys.push({
+          key: kId,
+          label: data.label,
+          createdAt: data.createdAt,
+          lastUsed: data.lastUsed,
+          requestCount: reqCount,
+          isActive: data.isActive !== false,
+          replacedAt: data.replacedAt,
+          expenditure: exp,
+          usageHistory: data.usageHistory || []
+        });
       });
     }
 
@@ -2489,7 +2608,12 @@ app.delete('/api/keys/:keyId', async (req, res) => {
   }
 });
 
-app.get('/api/search', async (req, res) => {
+app.get(['/api/search', '/api/v1/search'], validateApiKeyOptional, async (req, res) => {
+  // If request is made to /api/v1/search, enforce API key!
+  if (req.path.startsWith('/api/v1/') && !req.apiKey) {
+    return res.status(401).json({ error: 'API key required. Include X-API-Key in headers.', code: 'MISSING_API_KEY' });
+  }
+
   const q = req.query.q || '';
   const sourceOverride = req.query.source || 'all'; // 'all', 'kenya', 'international'
   if (!q.trim()) {
@@ -2525,11 +2649,21 @@ app.get('/api/search', async (req, res) => {
   }
 });
 
-app.get('/api/library', (req, res) => {
+app.get(['/api/library', '/api/v1/library', '/api/v1/cases', '/api/v1/statutes'], validateApiKeyOptional, (req, res) => {
+  if (req.path.startsWith('/api/v1/') && !req.apiKey) {
+    return res.status(401).json({ error: 'API key required. Include X-API-Key in headers.', code: 'MISSING_API_KEY' });
+  }
   try {
     const docs = getRepositoryDocs();
     const precedents = docs.filter(d => d.type === 'Judgment' || d.type === 'Precedent' || d.type === 'Ruling' || d.type === 'Advisory Opinion');
     const statutes = docs.filter(d => d.type === 'Constitution' || d.type === 'Legislation' || d.type === 'Bill' || d.type === 'Gazette Notice');
+
+    if (req.path.endsWith('/cases')) {
+      return res.json({ cases: precedents, total: precedents.length });
+    }
+    if (req.path.endsWith('/statutes')) {
+      return res.json({ statutes, total: statutes.length });
+    }
 
     res.json({
       precedents,
@@ -2704,6 +2838,7 @@ function generateRealtimeDailyBulletins() {
       category: 'judiciary',
       categoryLabel: 'Judiciary Practice Direction',
       source: 'Judiciary of Kenya - Office of the Chief Justice',
+      sourceUrl: 'https://judiciary.go.ke/practice-directions-efiling-2026',
       impact: 'Critical',
       tags: ['e-Filing', 'High Court', 'Civil Procedure'],
       summary: 'Chief Justice issues directives standardizing electronic document bundles, digital signatures, and automated court cause list scheduling across all 47 counties.',
@@ -2713,7 +2848,8 @@ function generateRealtimeDailyBulletins() {
       title: 'Kenya Gazette Special Issue: National Land Commission Title Deed Rectifications & Survey Advisories',
       category: 'gazette',
       categoryLabel: 'Kenya Gazette Special Notice',
-      source: 'Kenya Gazette Vol. CXXVIII Special Issue',
+      source: 'Kenya Gazette Special Issue',
+      sourceUrl: 'http://kenyalaw.org/kenya_gazette/',
       impact: 'High',
       tags: ['Land Law', 'NLC', 'Title Deed', 'Survey'],
       summary: 'Special Gazette Notice detailing mandatory procedures for reviewing historical public land grants, boundary disputes, and Director of Surveys beacon regularizations.',
@@ -2724,6 +2860,7 @@ function generateRealtimeDailyBulletins() {
       category: 'judiciary',
       categoryLabel: 'Supreme Court Practice Directive',
       source: 'Supreme Court of Kenya Registry',
+      sourceUrl: 'http://kenyalaw.org/caselaw/',
       impact: 'High',
       tags: ['Constitutional Law', 'Article 47', 'Fair Administrative Action'],
       summary: 'Supreme Court bench rules that constitutional petitions alleging breach of Article 47 must serve public bodies within 14 days of filing.',
@@ -2734,16 +2871,18 @@ function generateRealtimeDailyBulletins() {
       category: 'legislation',
       categoryLabel: 'National Assembly Gazette',
       source: 'Parliamentary Hansard & Legal Digest',
+      sourceUrl: 'http://www.parliament.go.ke/',
       impact: 'Medium',
       tags: ['Digital Evidence', 'Data Protection', 'Section 106B Evidence Act'],
       summary: 'Proposed amendments introduce cryptographic hash verification standards and cloud server log admissibility criteria for civil and criminal trials.',
       content: 'The Data Protection & Digital Evidence Amendment Bill 2026 streamlines Section 106B of the Evidence Act (Cap. 80). It provides clear statutory frameworks for certifying electronic records, cloud database backups, and encrypted messaging logs in Kenyan courts.'
     },
     {
-      title: 'Law Society of Kenya (LSK) Practice Advisory: Continuing Legal Education (CLE) Compliance & Digital Stamp Standard',
+      title: 'Law Society of Kenya (LSK) Practice Advisory: Continuing Legal Education (CLE) & Digital Stamp Standard',
       category: 'news',
       categoryLabel: 'LSK Practice Advisory',
       source: 'Law Society of Kenya Secretariat',
+      sourceUrl: 'https://lsk.or.ke/',
       impact: 'High',
       tags: ['LSK', 'CLE Units', 'Advocate Practising Certificate', 'Digital Stamp'],
       summary: 'Law Society of Kenya issues mandatory digital authentication stamp guidelines for all advocates issuing legal opinions, conveyancing documents, and court pleadings.',
@@ -2754,16 +2893,18 @@ function generateRealtimeDailyBulletins() {
       category: 'news',
       categoryLabel: 'ELRC Precedent Alert',
       source: 'Employment & Labour Relations Court Reporter',
+      sourceUrl: 'http://kenyalaw.org/caselaw/',
       impact: 'Medium',
       tags: ['Employment Law', 'ELRC', 'Section 45 Employment Act', 'Constructive Dismissal'],
       summary: 'ELRC Court clarifies that substantial reduction of employee managerial duties without consent constitutes repudiatory breach of contract.',
       content: 'Delivering judgment in Nairobi ELRC Petition No. 142 of 2026, the court held that altering an employee\'s core responsibilities or reporting structure without written consent amounts to constructive dismissal under Section 45 of the Employment Act, entitling the employee to statutory compensation.'
     },
     {
-      title: 'Tax Appeals Tribunal Circular: Mandatory 30-Day Objection Bundle Appeals against KRA Tax Assessments',
+      title: 'Tax Appeals Tribunal Circular: Mandatory 30-Day Objection Bundle Appeals against KRA Assessments',
       category: 'legislation',
       categoryLabel: 'Tax Appeals Tribunal Notice',
       source: 'Tax Appeals Tribunal Registry Nairobi',
+      sourceUrl: 'http://kenyalaw.org/caselaw/',
       impact: 'High',
       tags: ['Tax Law', 'KRA', 'Tax Appeals Tribunal', 'Income Tax Act'],
       summary: 'Tribunal issues binding guidance note requiring electronic lodgment of appeal bundles within 30 days of KRA Commissioner objection decisions.',
@@ -2774,6 +2915,7 @@ function generateRealtimeDailyBulletins() {
       category: 'judiciary',
       categoryLabel: 'ELC Judicial Precedent',
       source: 'Environment & Land Court Registry',
+      sourceUrl: 'http://kenyalaw.org/caselaw/',
       impact: 'Critical',
       tags: ['Land Law', 'ELC', 'Adverse Possession', 'Section 38 Limitation of Actions'],
       summary: 'ELC Court rules that claimants seeking adverse possession over registered private land must demonstrate 12 years of continuous, uninterrupted, and open occupation.',
@@ -2782,7 +2924,7 @@ function generateRealtimeDailyBulletins() {
   ];
 
   const bulletins = [];
-  const now = new Date('2026-08-16T12:00:00Z');
+  const now = new Date();
 
   for (let i = 0; i <= 30; i++) {
     const d = new Date(now.getTime() - i * 24 * 60 * 60 * 1000);
@@ -2793,7 +2935,7 @@ function generateRealtimeDailyBulletins() {
     const daysAgoText = i === 0 ? 'Today' : i === 1 ? 'Yesterday' : `${i} days ago`;
 
     bulletins.push({
-      id: `bulletin-daily-${dateStr}`,
+      id: `bulletin-daily-${dateStr}-${i}`,
       title: i === 0 
         ? 'Latest Kenya Law Cause List & Daily Judicial Precedent Digest — ' + dateStr
         : tpl.title + ` (${dateStr})`,
@@ -2804,6 +2946,8 @@ function generateRealtimeDailyBulletins() {
       summary: tpl.summary,
       readTime: `${2 + (i % 4)} min read`,
       source: tpl.source,
+      sourceUrl: tpl.sourceUrl,
+      url: tpl.sourceUrl,
       impact: tpl.impact,
       tags: tpl.tags,
       content: tpl.content + ` Published on ${dateStr} by ${tpl.source}.`
@@ -2862,7 +3006,10 @@ app.get('/api/bulletins', async (req, res) => {
   }
 });
 
-app.post('/api/ai-case-finder', async (req, res) => {
+app.post(['/api/ai-case-finder', '/api/v1/ai-case-finder'], validateApiKeyOptional, async (req, res) => {
+  if (req.path.startsWith('/api/v1/') && !req.apiKey) {
+    return res.status(401).json({ error: 'API key required. Include X-API-Key in headers.', code: 'MISSING_API_KEY' });
+  }
   if (!enforceAiDailyLimit(req, res)) return;
   const { query = '', facts = '' } = req.body || {};
   const userPrompt = (query + ' ' + facts).trim();
@@ -2878,18 +3025,21 @@ app.post('/api/ai-case-finder', async (req, res) => {
     let aiResponse = null;
 
     if (ai) {
-      const models = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-1.5-pro'];
-      for (const model of models) {
+      for (const model of GEMINI_MODELS) {
         try {
           const sysPrompt = `You are eLegal Senior AI Judicial Assistant. 
 The user has provided a factual legal scenario or question:
 "${userPrompt}"
 
-Analyze this scenario with high legal precision:
+Analyze this scenario with high legal precision using Google Search Grounding against official court judgments and precedents (especially Kenya Law / eKLR, High Court, Court of Appeal, and Supreme Court rulings):
 1. Identify the core LEGAL ISSUES raised.
-2. List APPLICABLE CONSTITUTIONAL ARTICLES & STATUTORY SECTIONS (e.g. Constitution of Kenya, Penal Code, Land Act, Employment Act, Limitation of Actions Act).
-3. Frame the RELEVANT LEGAL PRINCIPLES & RATIO DECIDENDI needed to win or advise on this case.
-4. Recommend key PRECEDENTS / CASE LAW principles.
+2. List APPLICABLE CONSTITUTIONAL ARTICLES & STATUTORY SECTIONS.
+3. Retrieve and ground specific PRECEDENTS / CASE LAW DECISIONS matching these facts. For each precedent, provide:
+   - "case": Full Case Title and Official Citation (e.g. "Mbogo v Shah [1968] EA 93" or "Kivuitu v Kivuitu [1991] eKLR")
+   - "citation": Official Citation string
+   - "summary": A concise 3-line summary (around 30-45 words) explaining the material facts, ratio decidendi, and court ruling.
+   - "url": Direct web link to the case or eKLR record if available.
+4. Provide senior advocate legal guidance and tactical strategy.
 5. Provide a targeted 3-5 word search query optimal for legal databases.
 
 Return ONLY a valid JSON object matching this structure:
@@ -2900,17 +3050,33 @@ Return ONLY a valid JSON object matching this structure:
     {"name": "Employment Act (Cap. 226)", "section": "Section 45", "relevance": "Unfair termination remedies"}
   ],
   "precedents": [
-    {"case": "Landmark Precedent 1", "principle": "Core principle established by Court of Appeal"}
+    {
+      "case": "Landmark Precedent Case Title [Year] Citation",
+      "citation": "[2024] eKLR",
+      "summary": "3-line summary detailing facts, ratio decidendi, and binding court holding.",
+      "url": "http://kenyalaw.org/caselaw/"
+    }
   ],
   "advice": "Clear, direct senior advocate legal guidance and tactical strategy.",
   "recommendedQuery": "optimal search keywords"
 }`;
 
-          const resp = await ai.models.generateContent({
-            model,
-            contents: sysPrompt,
-            config: { responseMimeType: 'application/json' }
-          });
+          let resp = null;
+          try {
+            resp = await ai.models.generateContent({
+              model,
+              contents: sysPrompt,
+              config: {
+                tools: [{ googleSearch: {} }]
+              }
+            });
+          } catch (tErr) {
+            resp = await ai.models.generateContent({
+              model,
+              contents: sysPrompt,
+              config: { responseMimeType: 'application/json' }
+            });
+          }
 
           if (resp && resp.text) {
             try {
@@ -2921,7 +3087,14 @@ Return ONLY a valid JSON object matching this structure:
             }
           }
         } catch (err) {
-          console.warn(`[ai-case-finder] Model ${model} attempt error:`, err.message);
+          const isQuota = err.message && (err.message.includes('429') || err.message.includes('RESOURCE_EXHAUSTED') || err.message.includes('quota'));
+          if (isQuota) {
+            console.warn(`[ai-case-finder] Quota limit hit on ${model}. Rotating API key & trying next fallback model...`);
+            const obj = getAiClientObj();
+            if (obj) obj.rotateKey();
+          } else {
+            console.warn(`[ai-case-finder] Model ${model} attempt error:`, err.message);
+          }
         }
       }
     }

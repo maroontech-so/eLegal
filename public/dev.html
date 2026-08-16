@@ -844,10 +844,46 @@
       margin-bottom: 22px;
     }
 
-    @media (max-width: 768px) {
-      .analytics-metrics-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
+    .mobile-menu-btn {
+      display: none;
+      background: #16171B;
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 6px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s;
+    }
+
+    .mobile-menu-btn:hover {
+      background: var(--bg-hover);
+    }
+
+    .mobile-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      top: 58px;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(4px);
+      z-index: 98;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+    }
+
+    .mobile-backdrop.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .table-container {
+      width: 100%;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      margin-bottom: 16px;
     }
 
     .metric-card {
@@ -932,6 +968,135 @@
     ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: #22252B; border-radius: 3px; }
+
+    /* ── Responsive Mobile Media Queries ── */
+    @media (max-width: 992px) {
+      .top-navbar {
+        padding: 0 16px;
+      }
+      .main-content {
+        padding: 24px 28px 80px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      html, body {
+        overflow-x: hidden;
+        overflow-y: auto;
+      }
+
+      .mobile-menu-btn {
+        display: inline-flex;
+      }
+
+      .mobile-backdrop {
+        display: block;
+      }
+
+      .top-navbar {
+        padding: 0 12px;
+        height: 58px;
+      }
+
+      .brand-logo {
+        font-size: 18px;
+      }
+
+      .version-tag, .status-badge {
+        display: none;
+      }
+
+      .nav-actions {
+        gap: 6px;
+      }
+
+      .btn-secondary span, .btn-primary span {
+        font-size: 0.75rem;
+      }
+
+      .app-viewport {
+        display: block;
+        width: 100vw;
+        height: auto;
+        min-height: calc(100vh - 58px);
+        overflow: visible;
+      }
+
+      .sidebar {
+        position: fixed;
+        top: 58px;
+        left: 0;
+        bottom: 0;
+        width: 280px;
+        z-index: 99;
+        transform: translateX(-100%);
+        transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 4px 0 24px rgba(0,0,0,0.8);
+      }
+
+      .sidebar.open {
+        transform: translateX(0);
+      }
+
+      .main-content {
+        width: 100%;
+        max-width: 100vw;
+        padding: 16px 14px 60px;
+        height: auto;
+        overflow: visible;
+      }
+
+      .doc-title {
+        font-size: 1.45rem;
+        letter-spacing: -0.02em;
+      }
+
+      .doc-description {
+        font-size: 0.88rem;
+        margin-bottom: 18px;
+      }
+
+      .rich-doc-card {
+        padding: 16px;
+        margin-bottom: 20px;
+      }
+
+      .analytics-metrics-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+      }
+
+      .create-key-card div[style*="display: flex"] {
+        flex-direction: column !important;
+        align-items: stretch !important;
+      }
+
+      .playground-panel {
+        padding: 14px;
+      }
+
+      pre, .code-snippet-box, #responseBox {
+        font-size: 0.76rem;
+        word-break: break-all;
+      }
+
+      table {
+        min-width: 550px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .analytics-metrics-grid {
+        grid-template-columns: 1fr;
+      }
+      .brand-logo span {
+        font-size: 16px;
+      }
+      .btn-secondary, .btn-primary {
+        padding: 5px 8px;
+        font-size: 0.72rem;
+      }
+    }
   </style>
 </head>
 
@@ -939,13 +1104,18 @@
 
   <!-- Top Navbar with Clean Monochromatic Black & White Logo -->
   <header class="top-navbar">
-    <a href="/" class="brand-group">
-      <div class="brand-logo">
-        <i data-lucide="scale" style="width: 22px; height: 22px; color: #FFFFFF;"></i>
-        <span>eLegal<span class="dot">.</span></span>
-      </div>
-      <span class="version-tag">REST API v1.0</span>
-    </a>
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <button class="mobile-menu-btn" id="mobileMenuBtn" onclick="toggleMobileSidebar()" title="Toggle Navigation Menu">
+        <i data-lucide="menu" style="width: 18px; height: 18px;"></i>
+      </button>
+      <a href="/" class="brand-group">
+        <div class="brand-logo">
+          <i data-lucide="scale" style="width: 22px; height: 22px; color: #FFFFFF;"></i>
+          <span>eLegal<span class="dot">.</span></span>
+        </div>
+        <span class="version-tag">REST API v1.0</span>
+      </a>
+    </div>
 
     <div class="nav-actions">
       <div class="status-badge">
@@ -966,6 +1136,8 @@
       </button>
     </div>
   </header>
+
+  <div class="mobile-backdrop" id="mobileBackdrop" onclick="closeMobileSidebar()"></div>
 
   <!-- Main Viewport -->
   <div class="app-viewport">
@@ -1241,9 +1413,9 @@
             <div class="metric-sub text-muted">Quota available</div>
           </div>
           <div class="metric-card">
-            <div class="metric-label">Rate Limit Quota</div>
-            <div class="metric-value">1,000 req/min</div>
-            <div class="metric-sub text-emerald">0% throttled</div>
+            <div class="metric-label">Real Expenditure</div>
+            <div class="metric-value text-emerald" id="metricTotalExpenditurePage">$0.00</div>
+            <div class="metric-sub text-muted">Usage cost tracking</div>
           </div>
           <div class="metric-card">
             <div class="metric-label">Avg System Latency</div>
@@ -1335,6 +1507,7 @@
                   <th>Status</th>
                   <th>Created Date</th>
                   <th>Total Requests</th>
+                  <th>Expenditure ($)</th>
                   <th style="text-align: right;">Actions</th>
                 </tr>
               </thead>
@@ -1770,22 +1943,26 @@
     function renderKeysListAndAnalytics(keys) {
       const activeKeys = keys.filter(k => k.isActive !== false);
       const totalCalls = keys.reduce((sum, k) => sum + (k.requestCount || 0), 0);
+      const totalExpenditure = keys.reduce((sum, k) => sum + (typeof k.expenditure === 'number' ? k.expenditure : (k.requestCount || 0) * 0.002), 0);
 
       const callsEl = document.getElementById('metricTotalCallsPage') || document.getElementById('metricTotalCalls');
       const activeEl = document.getElementById('metricActiveKeysPage') || document.getElementById('metricActiveKeys');
+      const costEl = document.getElementById('metricTotalExpenditurePage') || document.getElementById('metricTotalExpenditure');
       if (callsEl) callsEl.textContent = totalCalls.toLocaleString();
       if (activeEl) activeEl.textContent = `${activeKeys.length} / 10`;
+      if (costEl) costEl.textContent = `$${totalExpenditure.toFixed(4)}`;
 
       // 1. Render Key Table Rows
       const tbody = document.getElementById('developerKeysTableBodyPage') || document.getElementById('developerKeysTableBody');
       if (tbody) {
         tbody.innerHTML = '';
         if (keys.length === 0) {
-          tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 18px;">No API keys generated yet. Use the form above to generate your first secret key.</td></tr>`;
+          tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--text-muted); padding: 18px;">No API keys generated yet. Use the form above to generate your first secret key.</td></tr>`;
         } else {
           keys.forEach(k => {
             const isAct = k.isActive !== false;
             const maskedKey = k.key.length > 12 ? (k.key.substring(0, 10) + '...' + k.key.substring(k.key.length - 4)) : k.key;
+            const exp = typeof k.expenditure === 'number' ? k.expenditure : (k.requestCount || 0) * 0.002;
             const tr = document.createElement('tr');
             tr.innerHTML = `
               <td style="font-weight: 600; color: #fff;">${escapeHtml(k.label || 'Default Key')}</td>
@@ -1793,6 +1970,7 @@
               <td><span class="badge-status ${isAct ? 'active' : 'paused'}">${isAct ? 'Active' : 'Paused'}</span></td>
               <td style="color: var(--text-muted); font-size: 0.78rem;">${k.createdAt || 'N/A'}</td>
               <td style="font-family: var(--font-mono); font-size: 0.8rem; font-weight: 700;">${(k.requestCount || 0).toLocaleString()}</td>
+              <td style="font-family: var(--font-mono); font-size: 0.8rem; font-weight: 700; color: #34D399;">$${exp.toFixed(4)}</td>
               <td style="text-align: right;">
                 <div style="display: flex; gap: 6px; justify-content: flex-end;">
                   <button class="btn-secondary" onclick="toggleKeyStatus('${k.key}', ${isAct})" style="padding: 3px 8px; font-size: 0.72rem;" title="${isAct ? 'Pause Key' : 'Activate Key'}">
@@ -2349,8 +2527,23 @@ curl -X GET "${baseUrl}/api/health"
       }
     }
 
+    function toggleMobileSidebar() {
+      const sidebar = document.querySelector('.sidebar');
+      const backdrop = document.getElementById('mobileBackdrop');
+      if (sidebar) sidebar.classList.toggle('open');
+      if (backdrop) backdrop.classList.toggle('show');
+    }
+
+    function closeMobileSidebar() {
+      const sidebar = document.querySelector('.sidebar');
+      const backdrop = document.getElementById('mobileBackdrop');
+      if (sidebar) sidebar.classList.remove('open');
+      if (backdrop) backdrop.classList.remove('show');
+    }
+
     // Switch Active Topic
     function switchTopic(key, el) {
+      closeMobileSidebar();
       activeTopicKey = key;
       
       // Update Tree Active Styling

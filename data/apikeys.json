@@ -21,6 +21,23 @@
         "requestCount": 0,
         "isActive": true
       }
+    },
+    "user_7b8ddcafcaaada9a": {
+      "el_30d6dfa0db88a78d3068d5466edd01f2": {
+        "label": "Primary Secret Key",
+        "createdAt": "2026-08-16T10:14:03.783Z",
+        "lastUsed": "2026-08-16T10:14:08.211Z",
+        "requestCount": 1,
+        "isActive": true,
+        "expenditure": 0.002,
+        "usageHistory": [
+          {
+            "timestamp": "2026-08-16T10:14:08.211Z",
+            "path": "/api/v1/search",
+            "cost": 0.002
+          }
+        ]
+      }
     }
   }
 }

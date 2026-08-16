@@ -961,6 +961,117 @@
             text-decoration: underline;
         }
 
+        /* ─── BULLETIN ACTION BUTTONS & CITATION STYLES ─── */
+        .bulletin-action-buttons {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid var(--border-subtle);
+            flex-wrap: wrap;
+        }
+
+        .bulletin-btn-source {
+            flex: 1;
+            min-width: 140px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 8px 12px;
+            border-radius: var(--radius-sm);
+            background: #F1F5F9;
+            color: #1E293B;
+            font-size: 0.76rem;
+            font-weight: 600;
+            text-decoration: none;
+            border: 1px solid var(--border-color);
+            transition: all 0.2s ease;
+        }
+
+        .bulletin-btn-source:hover {
+            background: #E2E8F0;
+            color: #0F172A;
+            border-color: #CBD5E1;
+        }
+
+        .bulletin-btn-precedents {
+            flex: 1;
+            min-width: 140px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 8px 12px;
+            border-radius: var(--radius-sm);
+            background: linear-gradient(135deg, var(--accent-blue) 0%, #1D4ED8 100%);
+            color: #FFFFFF;
+            font-size: 0.76rem;
+            font-weight: 600;
+            border: none;
+            box-shadow: 0 2px 6px rgba(37, 99, 235, 0.22);
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .bulletin-btn-precedents:hover {
+            background: linear-gradient(135deg, #1D4ED8 0%, #1E40AF 100%);
+            box-shadow: 0 4px 10px rgba(37, 99, 235, 0.32);
+            transform: translateY(-1px);
+        }
+
+        /* ─── AI CITATION CARDS WITH 3-LINE SUMMARY ─── */
+        .ai-citation-card {
+            background: #F8FAFC;
+            border: 1px solid #CBD5E1;
+            border-left: 4px solid var(--accent-purple);
+            border-radius: var(--radius-md);
+            padding: 14px;
+            margin-top: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .ai-citation-title {
+            font-size: 0.92rem;
+            font-weight: 700;
+            color: #0F172A;
+        }
+
+        .ai-citation-summary {
+            font-size: 0.84rem;
+            line-height: 1.45;
+            color: #334155;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .ai-citation-action {
+            align-self: flex-start;
+            margin-top: 4px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 6px 12px;
+            border-radius: 99px;
+            background: #EDE9FE;
+            color: var(--accent-purple);
+            font-size: 0.76rem;
+            font-weight: 700;
+            border: 1px solid rgba(124, 58, 237, 0.2);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .ai-citation-action:hover {
+            background: var(--accent-purple);
+            color: white;
+            transform: translateY(-1px);
+        }
+
         /* ─── PAGINATION STYLES (CONTAINERLESS) ─── */
         .pagination-bar {
             display: flex;
@@ -1955,6 +2066,23 @@
                         <p class="section-subtitle" id="workspaceSubtitle">Official Kenya court precedents, statutory acts, and Gazette report archives ready for review.</p>
                     </div>
 
+                    <!-- Dedicated E-Repository Search Bar -->
+                    <div class="search-container" style="margin-top: 16px; margin-bottom: 20px; width: 100%;">
+                        <div class="search-wrap" id="repoSearchWrap" style="position: relative;">
+                            <div class="search-input-icon">
+                                <i data-lucide="search"></i>
+                            </div>
+                            <input type="text" id="repoSearchInput"
+                                placeholder="Search repository by case title, citation, section, or legal facts..." autocomplete="off"
+                                oninput="handleRepoSearchInput(this.value)"
+                                onkeydown="if(event.key === 'Enter'){ executeRepoSearch(); }" />
+                            <button id="repoSearchBtn" onclick="executeRepoSearch()">
+                                <span>Search Repository</span>
+                            </button>
+                            <div class="search-suggestions-dropdown" id="repoSuggestionsDropdown"></div>
+                        </div>
+                    </div>
+
                     <div class="filters-wrapper">
                         <div class="filters" id="filterBar">
                             <button class="filter-chip active" data-filter="all">All</button>
@@ -2454,9 +2582,18 @@
                     <div class="bulletin-body">
                         <div class="bulletin-top-meta">
                             <span class="bulletin-date">${item.date}</span>
+                            <span class="bulletin-category-tag ${item.category || ''}">${escapeHtml(item.categoryLabel || item.category || 'News')}</span>
                         </div>
                         <h3 class="bulletin-title">${escapeHtml(item.title)}</h3>
                         <p class="bulletin-summary">${escapeHtml(item.summary)}</p>
+                        <div class="bulletin-action-buttons">
+                            <a href="${item.url || item.sourceUrl || 'http://kenyalaw.org'}" target="_blank" rel="noopener" class="bulletin-btn-source" onclick="event.stopPropagation();">
+                                <i data-lucide="external-link" style="width: 12px; height: 12px;"></i> Read Full Story
+                            </a>
+                            <button type="button" class="bulletin-btn-precedents" onclick="event.stopPropagation(); findRelatedPrecedentsForBulletin('${escapeJsString(item.title)}', '${escapeJsString((item.tags || []).join(' '))}');">
+                                <i data-lucide="search" style="width: 12px; height: 12px;"></i> Find Precedents
+                            </button>
+                        </div>
                     </div>
                     <div class="bulletin-footer">
                         <span class="bulletin-source">${escapeHtml(item.source)}</span>
@@ -2490,7 +2627,7 @@
                 });
                 if (res.ok) {
                     const data = await res.json();
-                    renderAiPanel(data);
+                    renderAiResult(data);
                 } else {
                     throw new Error('AI Service Unavailable');
                 }
@@ -2911,9 +3048,18 @@
                     <div class="bulletin-body">
                         <div class="bulletin-top-meta">
                             <span class="bulletin-date">${item.date}</span>
+                            <span class="bulletin-category-tag ${item.category || ''}">${escapeHtml(item.categoryLabel || item.category || 'News')}</span>
                         </div>
                         <h3 class="bulletin-title">${escapeHtml(item.title)}</h3>
                         <p class="bulletin-summary">${escapeHtml(item.summary)}</p>
+                        <div class="bulletin-action-buttons">
+                            <a href="${item.url || item.sourceUrl || 'http://kenyalaw.org'}" target="_blank" rel="noopener" class="bulletin-btn-source" onclick="event.stopPropagation();">
+                                <i data-lucide="external-link" style="width: 12px; height: 12px;"></i> Read Full Story
+                            </a>
+                            <button type="button" class="bulletin-btn-precedents" onclick="event.stopPropagation(); findRelatedPrecedentsForBulletin('${escapeJsString(item.title)}', '${escapeJsString((item.tags || []).join(' '))}');">
+                                <i data-lucide="search" style="width: 12px; height: 12px;"></i> Find Precedents
+                            </button>
+                        </div>
                     </div>
                     <div class="bulletin-footer">
                         <span class="bulletin-source">${escapeHtml(item.source)}</span>
@@ -2978,6 +3124,57 @@
             closeModal('bulletinModalOverlay');
         }
 
+        function syncSearchInputs(value) {
+            const homeInput = document.getElementById('searchInput');
+            const repoInput = document.getElementById('repoSearchInput');
+            if (homeInput && homeInput.value !== value) homeInput.value = value;
+            if (repoInput && repoInput.value !== value) repoInput.value = value;
+        }
+
+        function handleRepoSearchInput(value) {
+            syncSearchInputs(value);
+            if (typeof handleSearchInput === 'function') handleSearchInput(value);
+        }
+
+        async function executeRepoSearch(customQuery) {
+            const query = (customQuery !== undefined ? customQuery : (document.getElementById('repoSearchInput')?.value || document.getElementById('searchInput')?.value || '')).trim();
+            if (!query) return;
+
+            syncSearchInputs(query);
+            navigateTo('/e-repository');
+            setSearchLoading(true);
+            renderSkeleton();
+            document.getElementById('workspaceTitle').textContent = `Search Results: "${query}"`;
+            if (typeof startStatusTicker === 'function') startStatusTicker(query);
+
+            try {
+                const url = `${API_BASE}/search?q=${encodeURIComponent(query)}&source=all`;
+                const res = await fetchApi(url);
+                if (!res.ok) throw new Error(`Search failed (${res.status})`);
+                lastResult = await res.json();
+                currentFilter = 'all';
+                repoState.page = 1;
+                syncFilterButtons();
+                renderCurrent();
+            } catch (e) {
+                renderEmpty('Search Error', e.message);
+            } finally {
+                if (typeof stopStatusTicker === 'function') stopStatusTicker();
+                setSearchLoading(false);
+            }
+        }
+
+        function findRelatedPrecedentsForBulletin(title, tags) {
+            closeBulletinModal();
+            const queryText = (tags && tags.trim().length > 0) ? tags.split(' ').slice(0, 3).join(' ') : title.split(' ').slice(0, 4).join(' ');
+            executeRepoSearch(queryText);
+        }
+
+        function searchCitationInRepo(queryText) {
+            closeBulletinModal();
+            executeRepoSearch(queryText);
+        }
+
         function viewBulletinDetail(bulletinId) {
             const item = bulletinsState.items.find(b => b.id === bulletinId);
             if (!item) return;
@@ -2988,8 +3185,9 @@
                     <img src="${item.imageUrl || 'https://upload.wikimedia.org/wikipedia/commons/0/07/Nairobi_Law_Courts.jpg'}" alt="Preview" style="width: 100%; height: 100%; object-fit: cover; opacity: 0.9;" onerror="this.onerror=null; this.src='https://upload.wikimedia.org/wikipedia/commons/0/07/Nairobi_Law_Courts.jpg';" />
                 </div>
                 <div style="padding: 24px;">
-                    <div style="margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
-                        <span style="font-size: 0.78rem; color: var(--text-tertiary);">${item.date} • ${item.readTime}</span>
+                    <div style="margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between;">
+                        <span style="font-size: 0.78rem; color: var(--text-tertiary);">${item.date} • ${item.readTime || '3 min read'}</span>
+                        <span class="bulletin-category-tag ${item.category || ''}">${escapeHtml(item.categoryLabel || item.category || 'News')}</span>
                     </div>
                     <h2 style="font-size: 1.2rem; font-weight: 800; line-height: 1.35; margin-bottom: 12px; color: var(--text-primary);">${escapeHtml(item.title)}</h2>
                     <div style="font-size: 0.85rem; font-weight: 600; color: var(--accent-blue); margin-bottom: 16px;">Source: ${escapeHtml(item.source)}</div>
@@ -3002,9 +3200,14 @@
                         ${(item.tags || []).map(t => `<span style="background: rgba(0,0,0,0.04); padding: 3px 10px; border-radius: 99px; font-size: 0.75rem; font-weight: 600; color: var(--text-secondary);">${escapeHtml(t)}</span>`).join('')}
                     </div>
 
-                    <button class="ai-submit-btn" style="width: 100%; justify-content: center;" onclick="closeBulletinModal(); searchPracticeArea('${escapeHtml(item.tags ? item.tags[0] : item.title)}');">
-                        Find Related Precedents in Repository
-                    </button>
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px;">
+                        <a href="${item.url || item.sourceUrl || 'http://kenyalaw.org'}" target="_blank" rel="noopener" class="bulletin-btn-source" style="padding: 10px 16px; font-size: 0.82rem;">
+                            <i data-lucide="external-link" style="width: 14px; height: 14px;"></i> Read Full Story from Source
+                        </a>
+                        <button type="button" class="bulletin-btn-precedents" style="padding: 10px 16px; font-size: 0.82rem;" onclick="findRelatedPrecedentsForBulletin('${escapeJsString(item.title)}', '${escapeJsString((item.tags || []).join(' '))}');">
+                            <i data-lucide="search" style="width: 14px; height: 14px;"></i> Find Related Precedents
+                        </button>
+                    </div>
                 </div>
             `;
             openModal('bulletinModalOverlay');
@@ -3056,11 +3259,21 @@
                 </div>
             `).join('');
 
-            // Precedents
+            // Precedents & Grounded Citations
             const precList = document.getElementById('aiPrecedentsList');
-            precList.innerHTML = (analysis.precedents || []).map(p => `
-                <li><strong>${escapeHtml(p.case || p.title || '')}:</strong> ${escapeHtml(p.principle || '')}</li>
-            `).join('');
+            precList.innerHTML = (analysis.precedents || []).map(p => {
+                const caseTitle = p.case || p.title || p.citation || 'Kenyan Case Precedent';
+                const summaryText = p.summary || p.principle || 'Ratio decidendi matched by Google Grounded AI search.';
+                return `
+                <div class="ai-citation-card">
+                    <div class="ai-citation-title">${escapeHtml(caseTitle)}</div>
+                    <div class="ai-citation-summary">${escapeHtml(summaryText)}</div>
+                    <button type="button" class="ai-citation-action" onclick="searchCitationInRepo('${escapeJsString(caseTitle)}')">
+                        <i data-lucide="search" style="width: 12px; height: 12px;"></i> Search Citation in Repository
+                    </button>
+                </div>
+                `;
+            }).join('');
 
             // Matching Cases
             const matches = data.matchingCases || [];
@@ -3074,6 +3287,10 @@
 
         function closeAiPanel() {
             document.getElementById('aiResultPanel').classList.remove('active');
+        }
+
+        function renderAiPanel(data) {
+            renderAiResult(data);
         }
 
         /* ─── SEARCH STATUS TICKER MESSAGES (40+ VARIATIONS) ─── */

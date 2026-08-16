@@ -2021,13 +2021,17 @@ async function searchFastWeb(query, source = 'all') {
   const siteQuery = `(${sites.map(s => `site:${s}`).join(' OR ')})`;
   const scopeQuery = `${query} ${siteQuery} filetype:pdf OR case law OR judgment OR statute OR treaty OR ruling`;
 
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 3000);
   try {
     const response = await fetch(`https://html.duckduckgo.com/html/?q=${encodeURIComponent(scopeQuery)}`, {
       headers: {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
         'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
-      }
+      },
+      signal: controller.signal
     });
+    clearTimeout(timeoutId);
     if (!response.ok) return [];
     const html = await response.text();
     const results = [];

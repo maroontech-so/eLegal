@@ -2339,21 +2339,31 @@ async function searchWithRetry(query, retries = 1, source = 'all', classificatio
   const seen = new Set();
   const allResults = [...(webResults || []), ...(geminiResults || []), ...(kenyaResults || [])];
 
-  // Also check local repository docs
+  // 4. Local invert index search
+  const localIndexMatches = searchLocalIndex(normalizedQuery);
+
+  // 5. Check local repository docs exhaustively across all fields
   const repoDocs = getRepositoryDocs();
   const repoMatches = repoDocs.filter(doc => {
-    const target = `${doc.title || ''} ${doc.citation || ''} ${doc.type || ''} ${doc.source || ''} ${doc.year || ''}`.toLowerCase();
+    const target = `${doc.title || ''} ${doc.label || ''} ${doc.citation || ''} ${doc.type || ''} ${doc.source || ''} ${doc.year || ''} ${doc.abstract || ''} ${doc.ratioDecidendi || ''} ${doc.statutoryBasis || ''} ${doc.fullContent || ''} ${doc.rawText || ''}`.toLowerCase();
     if (sigTokens.length > 0) {
       return sigTokens.some(t => target.includes(t));
     }
-    return false;
-  }).map(d => ({ ...d, score: 60, source: 'local' }));
+    return true;
+  }).map(d => {
+    const target = `${d.title || ''} ${d.citation || ''} ${d.abstract || ''} ${d.ratioDecidendi || ''} ${d.fullContent || ''}`.toLowerCase();
+    let tokenHits = 0;
+    sigTokens.forEach(t => {
+      if (target.includes(t)) tokenHits++;
+    });
+    return { ...d, score: 55 + (tokenHits * 15), source: 'local' };
+  });
 
-  // Combine all results
-  const allSources = [...allResults, ...repoMatches];
+  // Combine all sources exhaustively
+  const allSources = [...allResults, ...localIndexMatches, ...repoMatches];
 
   for (const item of allSources) {
-    const key = (item.url || item.title || '').toLowerCase();
+    const key = (item.url || item.readUrl || item.title || '').toLowerCase().trim();
     if (key && !seen.has(key)) {
       seen.add(key);
       const enriched = enrichDocumentMetadata(item);
@@ -2374,7 +2384,7 @@ async function searchWithRetry(query, retries = 1, source = 'all', classificatio
     }
   }
 
-  return rankResults(combined, normalizedQuery, classification).slice(0, 30);
+  return rankResults(combined, normalizedQuery, classification).slice(0, 100);
 }
 
 async function fetchLatestKenyaLawItems() {

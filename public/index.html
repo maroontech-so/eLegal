@@ -1914,10 +1914,98 @@
             font-size: 0.82rem;
         }
 
-        /* ─── RESPONSIVE ─── */
+        /* ─── RESPONSIVE & MOBILE NAVIGATION ─── */
+        .mobile-only {
+            display: none !important;
+        }
+
+        .desktop-only {
+            display: inline-flex !important;
+        }
+
+        .mobile-nav-wrapper {
+            position: relative;
+        }
+
+        .mobile-nav-toggle {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 6px 12px;
+            background: var(--surface-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            color: var(--text-primary);
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .mobile-nav-toggle:hover, .mobile-nav-toggle:focus {
+            border-color: var(--accent-blue);
+            background: rgba(37, 99, 235, 0.06);
+        }
+
+        .mobile-nav-menu {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: calc(100% + 8px);
+            width: 220px;
+            background: var(--surface-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            box-shadow: 0 12px 36px rgba(0, 0, 0, 0.18);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            padding: 6px 0;
+            z-index: 2000;
+        }
+
+        .mobile-nav-menu.show {
+            display: block;
+        }
+
+        .mobile-nav-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 16px;
+            font-size: 0.88rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            text-decoration: none;
+            transition: background 0.15s ease, color 0.15s ease;
+        }
+
+        .mobile-nav-item:hover, .mobile-nav-item.active {
+            background: rgba(37, 99, 235, 0.08);
+            color: var(--accent-blue);
+        }
+
+        .mobile-nav-item.api-item {
+            color: var(--accent-blue);
+            font-weight: 700;
+        }
+
+        .mobile-nav-divider {
+            height: 1px;
+            background: var(--border-subtle);
+            margin: 4px 0;
+        }
+
         @media (max-width: 768px) {
+            .mobile-only {
+                display: block !important;
+            }
+
+            .desktop-only {
+                display: none !important;
+            }
+
             .top-navbar {
-                padding: 10px 16px;
+                padding: 10px 14px;
             }
 
             .nav-links {
@@ -1925,27 +2013,60 @@
             }
 
             .content-area {
-                padding: 20px 16px 0;
-                gap: 28px;
+                padding: 16px 12px 0;
+                gap: 20px;
             }
 
             #searchInput {
-                padding-right: 110px;
-                font-size: 0.88rem;
+                padding-right: 100px;
+                font-size: 0.85rem;
+                height: 50px;
             }
 
             #searchBtn {
-                padding: 0 16px;
-                font-size: 0.85rem;
+                padding: 0 14px;
+                font-size: 0.82rem;
+                height: 38px;
+                top: 6px;
+                right: 6px;
             }
 
-            .bulletins-grid {
-                grid-template-columns: 1fr;
+            #repoSearchInput {
+                padding-right: 100px !important;
+                font-size: 0.85rem !important;
+                height: 50px !important;
+            }
+
+            #repoSearchBtn {
+                padding: 0 14px !important;
+                font-size: 0.82rem !important;
+                top: 6px !important;
+                bottom: 6px !important;
+                right: 6px !important;
+            }
+
+            .results-grid, .bulletins-grid, .practice-grid {
+                grid-template-columns: 1fr !important;
+                gap: 12px !important;
             }
 
             .case-card-title {
                 white-space: normal;
                 flex: 1 1 100%;
+            }
+
+            .filter-bar {
+                overflow-x: auto;
+                white-space: nowrap;
+                padding-bottom: 6px;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .preview-modal-content, .bulletin-modal-content {
+                width: 95vw !important;
+                max-width: 95vw !important;
+                margin: 10px auto !important;
+                padding: 16px !important;
             }
         }
 
@@ -2073,7 +2194,42 @@
         </nav>
 
         <div class="nav-actions">
-            <a href="/dev" class="api-btn" id="apiBtn" title="Developer API & REST Documentation">&lt;API /&gt;</a>
+            <!-- Desktop API Button -->
+            <a href="/dev" class="api-btn desktop-only" id="apiBtn" title="Developer API & REST Documentation">&lt;API /&gt;</a>
+
+            <!-- Mobile Navigation Dropdown (Replaces API button on smaller devices) -->
+            <div class="mobile-nav-wrapper mobile-only">
+                <button class="mobile-nav-toggle" id="mobileNavToggle" onclick="toggleMobileNavMenu(event)" aria-label="Toggle Navigation Menu">
+                    <i data-lucide="menu" style="width: 15px; height: 15px;"></i>
+                    <span>Menu</span>
+                    <i data-lucide="chevron-down" style="width: 13px; height: 13px; margin-left: 2px;"></i>
+                </button>
+
+                <div class="mobile-nav-menu" id="mobileNavMenu">
+                    <a href="/home" class="mobile-nav-item" id="mobileNavHome" onclick="mobileNavigateTo('/home', event)">
+                        <i data-lucide="home" style="width: 15px; height: 15px;"></i> Home
+                    </a>
+                    <a href="/e-repository" class="mobile-nav-item" id="mobileNavRepo" onclick="mobileNavigateTo('/e-repository', event)">
+                        <i data-lucide="database" style="width: 15px; height: 15px;"></i> E-Repository
+                    </a>
+                    <a href="/ai-case-finder" class="mobile-nav-item" id="mobileNavAi" onclick="mobileNavigateTo('/ai-case-finder', event)">
+                        <i data-lucide="sparkles" style="width: 15px; height: 15px;"></i> AI Case Finder
+                    </a>
+                    <a href="/bulletins" class="mobile-nav-item" id="mobileNavBulletins" onclick="mobileNavigateTo('/bulletins', event)">
+                        <i data-lucide="newspaper" style="width: 15px; height: 15px;"></i> Bulletins & Digest
+                    </a>
+                    <a href="/practice" class="mobile-nav-item" id="mobileNavPractice" onclick="mobileNavigateTo('/practice', event)">
+                        <i data-lucide="briefcase" style="width: 15px; height: 15px;"></i> Practice Areas
+                    </a>
+                    <a href="/saved" class="mobile-nav-item" id="mobileNavSaved" onclick="mobileNavigateTo('/saved', event)">
+                        <i data-lucide="bookmark" style="width: 15px; height: 15px;"></i> Saved (<span id="mobileSavedCountBadge">0</span>)
+                    </a>
+                    <div class="mobile-nav-divider"></div>
+                    <a href="/dev" class="mobile-nav-item api-item" onclick="mobileNavigateTo('/dev', event)">
+                        <i data-lucide="code" style="width: 15px; height: 15px;"></i> Developer API & Docs
+                    </a>
+                </div>
+            </div>
         </div>
     </header>
 
@@ -3608,12 +3764,26 @@
             return nowSaved;
         }
 
+        function toggleMobileNavMenu(e) {
+            if (e) e.stopPropagation();
+            const menu = document.getElementById('mobileNavMenu');
+            if (menu) menu.classList.toggle('show');
+        }
+
+        function mobileNavigateTo(path, event) {
+            const menu = document.getElementById('mobileNavMenu');
+            if (menu) menu.classList.remove('show');
+            navigateTo(path, event);
+        }
+
         function updateSavedCountBadge() {
             const count = getSavedDocs().length;
             const b1 = document.getElementById('savedCountBadge');
             const b2 = document.getElementById('savedCountBadge2');
+            const b3 = document.getElementById('mobileSavedCountBadge');
             if (b1) b1.textContent = count;
             if (b2) b2.textContent = count;
+            if (b3) b3.textContent = count;
         }
 
         /* ─── RENDER REPOSITORY RESULTS WITH PAGINATION ─── */

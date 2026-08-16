@@ -1364,34 +1364,34 @@
             }
         }
 
-        /* RESULT ITEM (3-COLUMN GRID DOCKET CARD) - 60% HEIGHT REDUCTION */
+        /* RESULT ITEM (COMPACT SLIM DOCKET CARD - NO FOOTER) */
         .case-card {
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
+            justify-content: center;
             background: var(--surface-bg);
             border-radius: var(--radius-md);
-            padding: 6px 12px;
+            padding: 5px 10px;
             border: 1px solid var(--border-color);
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
             cursor: pointer;
             transition: all 0.2s ease;
             position: relative;
-            min-height: 48px;
+            min-height: 36px;
         }
 
         .case-card:hover {
             border-color: var(--accent-blue);
             box-shadow: var(--shadow-md);
-            transform: translateY(-2px);
+            transform: translateY(-1px);
         }
 
         .case-card-title {
-            font-size: 0.83rem;
+            font-size: 0.82rem;
             font-weight: 700;
             color: var(--text-primary);
-            line-height: 1.25;
-            margin: 2px 0 3px 0;
+            line-height: 1.22;
+            margin: 1px 0 2px 0;
             display: -webkit-box;
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
@@ -1403,12 +1403,7 @@
         }
 
         .case-card-footer {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-top: auto;
-            padding-top: 3px;
-            border-top: 1px solid var(--border-subtle);
+            display: none !important;
         }
 
         .case-read-link {
@@ -2122,46 +2117,46 @@
             box-shadow: 0 12px 36px rgba(168, 85, 247, 0.25) !important;
         }
 
-        /* E-Repository Clean Cards Layout (60% Height Reduction) */
+        /* E-Repository Clean Cards Layout (Ultra Compact Slim Docket) */
         .case-card {
             background: var(--surface-bg);
             border: 1px solid var(--border-color);
             border-radius: var(--radius-md);
-            padding: 6px 12px;
+            padding: 5px 10px;
             box-shadow: var(--shadow-sm);
             transition: all 0.25s ease;
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
-            min-height: 50px;
+            justify-content: center;
+            min-height: 36px;
         }
 
         .case-card:hover {
             border-color: var(--accent-blue);
             box-shadow: var(--shadow-md);
-            transform: translateY(-2px);
+            transform: translateY(-1px);
         }
 
         .case-card-title {
-            font-size: 0.84rem;
+            font-size: 0.82rem;
             font-weight: 700;
             color: var(--text-primary);
-            line-height: 1.25;
-            margin: 2px 0 3px 0;
+            line-height: 1.22;
+            margin: 1px 0 2px 0;
         }
 
         /* Thin & Compact Precedent Cards on Home Teaser */
         .compact-precedents-grid .case-card {
-            padding: 5px 10px;
-            min-height: 42px;
+            padding: 4px 8px;
+            min-height: 32px;
             border-radius: var(--radius-sm, 6px);
             gap: 2px;
         }
 
         .compact-precedents-grid .case-card-title {
-            font-size: 0.82rem;
-            margin: 1px 0 2px 0;
-            line-height: 1.22;
+            font-size: 0.80rem;
+            margin: 1px 0;
+            line-height: 1.20;
         }
 
         .compact-precedents-grid .case-badge {
@@ -4129,23 +4124,7 @@
             titleEl.className = 'case-card-title';
             titleEl.textContent = title;
 
-            const footerEl = document.createElement('div');
-            footerEl.className = 'case-card-footer';
-
-            const sourceEl = document.createElement('span');
-            sourceEl.style.cssText = 'font-size: 0.75rem; color: var(--text-tertiary); font-weight: 500; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; max-width: 60%;';
-            sourceEl.textContent = item.source || citation || 'Kenyan Law Reports';
-
-            const readLink = document.createElement('a');
-            readLink.className = 'case-read-link';
-            readLink.href = targetUrl.startsWith('/read') ? targetUrl :
-                `/read.html?title=${encodeURIComponent(title)}&sourceUrl=${encodeURIComponent(targetUrl)}&year=${encodeURIComponent(yearStr)}`;
-            readLink.innerHTML = `Read <i data-lucide="arrow-right" style="width: 12px; height: 12px;"></i>`;
-            readLink.addEventListener('click', (e) => e.stopPropagation());
-
-            footerEl.append(sourceEl, readLink);
-
-            card.append(topMeta, titleEl, footerEl);
+            card.append(topMeta, titleEl);
 
             card.addEventListener('click', (e) => {
                 if (e.target.closest('a') || e.target.closest('button')) return;

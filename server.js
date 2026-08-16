@@ -2313,21 +2313,21 @@ async function searchWithRetry(query, retries = 1, source = 'all', classificatio
   const stopWords = new Set(['v', 'vs', 'r', 're', 'the', 'and', 'or', 'in', 'of', 'to', 'at', 'a', 'an', 'for']);
   const sigTokens = normalizedQuery.toLowerCase().split(/\W+/).filter(t => t.length > 1 && !stopWords.has(t));
 
-  // 1. Always run web search (DuckDuckGo) – the PRIMARY engine
-  const webPromise = searchFastWeb(normalizedQuery, effectiveSource);
+  // 1. Web search
+  const webPromise = searchFastWeb(normalizedQuery, effectiveSource).catch(() => []);
 
-  // 2. Always run Gemini (AI grounded search) – covers both Kenya & international
-  const geminiPromise = searchWithGeminiGrounding(normalizedQuery, effectiveSource);
+  // 2. Gemini AI grounded search
+  const geminiPromise = searchWithGeminiGrounding(normalizedQuery, effectiveSource).catch(() => []);
 
-  // 3. Kenya Law API – only if the source suggests Kenya or we are in 'all' mode (optional extra)
+  // 3. Kenya Law API
   const kenyaPromise = (effectiveSource === 'all' || effectiveSource === 'kenya')
-    ? fetchKenyaLawDirect(normalizedQuery)
+    ? fetchKenyaLawDirect(normalizedQuery).catch(() => [])
     : Promise.resolve([]);
 
-  // Fast 3.5-second timeout for parallel search queries
-  const timeoutPromise = new Promise(resolve => setTimeout(() => resolve([]), 3500));
+  // Fast 1.5-second timeout for external search queries
+  const timeoutPromise = new Promise(resolve => setTimeout(() => resolve([]), 1500));
 
-  // Run all searches in parallel with a fast timeout
+  // Run all searches in parallel with a 1.5-second timeout
   const [webResults, geminiResults, kenyaResults] = await Promise.all([
     Promise.race([webPromise, timeoutPromise]),
     Promise.race([geminiPromise, timeoutPromise]),

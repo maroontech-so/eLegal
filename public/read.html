@@ -274,7 +274,7 @@
         .viewer-container {
             flex: 1;
             overflow-y: auto;
-            overflow-x: hidden;
+            overflow-x: auto;
             padding: 20px 12px 100px 12px;
             display: flex;
             flex-direction: column;
@@ -283,39 +283,104 @@
             -webkit-overflow-scrolling: touch;
             width: 100%;
             max-width: 100vw;
+            touch-action: manipulation;
         }
 
         /* ============================================================
-           PDF PAGE STYLING
+           PDF PAGE STYLING (Crisp High-DPI Rendering & Zoom)
            ============================================================ */
         #pagesContainer {
             width: 100%;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 16px;
-            max-width: var(--max-width-content);
+            gap: 20px;
+            max-width: 100%;
         }
 
         .page-wrapper {
             background: white;
             border-radius: var(--radius-sm);
             overflow: hidden;
-            box-shadow: var(--shadow-sm);
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.10);
             transition: box-shadow var(--transition-med);
-            width: 100%;
-            display: flex;
+            display: inline-flex;
             justify-content: center;
+            align-items: center;
+            max-width: 100%;
+        }
+        .page-wrapper.zoomed {
+            max-width: none !important;
         }
         .page-wrapper:hover {
-            box-shadow: var(--shadow-md);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
         }
         .page-wrapper canvas {
             display: block;
+            height: auto;
             max-width: 100%;
-            height: auto !important;
-            width: 100% !important;
-            object-fit: contain;
+            border-radius: var(--radius-sm);
+        }
+        .page-wrapper.zoomed canvas {
+            max-width: none !important;
+        }
+
+        /* ============================================================
+           FLOATING PDF ZOOM CONTROLS
+           ============================================================ */
+        .pdf-zoom-bar {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(15, 23, 20, 0.92);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 30px;
+            padding: 5px 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            z-index: 900;
+            box-shadow: 0 10px 32px rgba(0, 0, 0, 0.35);
+        }
+        .pdf-zoom-btn {
+            background: transparent;
+            border: none;
+            color: #FFFFFF;
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.875rem;
+            transition: all 0.15s ease;
+        }
+        .pdf-zoom-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        .pdf-zoom-btn:active {
+            transform: scale(0.92);
+        }
+        .pdf-fit-btn {
+            width: auto;
+            border-radius: 14px;
+            padding: 0 12px;
+            font-size: 0.75rem;
+            background: rgba(255, 255, 255, 0.18);
+        }
+        .pdf-zoom-label {
+            color: #FFFFFF;
+            font-size: 0.8125rem;
+            font-weight: 700;
+            min-width: 48px;
+            text-align: center;
+            user-select: none;
+            letter-spacing: -0.01em;
         }
 
         /* ============================================================
@@ -364,17 +429,34 @@
         }
 
         .reader-body p {
-            margin-bottom: 1.2em;
+            margin-bottom: 1.8em;
             text-align: justify;
             word-break: break-word;
             hyphens: auto;
-            text-indent: 2.2em;
             margin-top: 0;
             padding-top: 0;
         }
-        .reader-body p.first-after-heading,
-        .reader-body p.first-after-block {
-            text-indent: 0;
+        
+        /* Numbered paragraphs logic */
+        .reader-body {
+            counter-reset: paragraph;
+        }
+        .reader-body p.numbered-paragraph {
+            position: relative;
+            padding-left: 2.5em; /* Indent from the margin */
+            margin-bottom: 1.8em; /* Skip a line between paragraphs */
+            text-indent: 0 !important;
+            text-align: justify;
+            line-height: 1.8;
+        }
+        .reader-body p.numbered-paragraph::before {
+            counter-increment: paragraph;
+            content: counter(paragraph) ". ";
+            position: absolute;
+            left: 0;
+            top: 0;
+            font-weight: bold;
+            color: var(--text-primary);
         }
 
         .reader-body h1,
@@ -384,57 +466,197 @@
         .reader-body .doc-heading,
         .reader-body .case-heading {
             font-family: var(--font-body);
-            color: var(--accent-green);
-            margin-top: 1.8em;
-            margin-bottom: 0.6em;
-            line-height: 1.3;
-            font-weight: 700;
-            letter-spacing: 0.02em;
-            text-indent: 0;
-            text-align: center !important;
-            text-transform: uppercase !important;
-            text-decoration: underline !important;
-            text-underline-offset: 0.2em;
-            text-decoration-thickness: 2px;
-        }
-
-        .reader-body h1,
-        .reader-body .doc-heading.level-1 {
-            font-size: clamp(1.5rem, 3vw, 2rem);
-            font-family: var(--font-display);
-            text-decoration-color: var(--accent-gold);
-        }
-        .reader-body h2,
-        .reader-body .doc-heading.level-2 {
-            font-size: clamp(1.25rem, 2.2vw, 1.6rem);
-            text-decoration-color: var(--accent-green);
-        }
-        .reader-body h3,
-        .reader-body .doc-heading.level-3 {
-            font-size: clamp(1.05rem, 1.6vw, 1.25rem);
-            text-decoration-color: var(--accent-green);
-        }
-        .reader-body h4,
-        .reader-body .doc-heading.level-4 {
-            font-size: clamp(0.95rem, 1.2vw, 1.05rem);
-            font-weight: 600;
-            text-decoration-color: var(--accent-green);
-        }
-
-        .reader-body .case-heading {
-            font-family: var(--font-display);
-            font-size: clamp(1.15rem, 2vw, 1.4rem);
             color: var(--text-primary);
-            text-align: center !important;
-            text-transform: uppercase !important;
-            text-decoration: underline !important;
-            text-underline-offset: 0.2em;
-            text-decoration-thickness: 2px;
-            text-decoration-color: var(--accent-gold);
-            margin: 1.8em 0 0.6em 0;
-            letter-spacing: 0.02em;
+            margin-top: 1.5em;
+            margin-bottom: 0.8em;
+            line-height: 1.4;
             font-weight: 700;
             text-indent: 0;
+        }
+
+        /* Central aligned main heading block (Case name, Court, Date, Parties) */
+        .reader-body .heading-block {
+            text-align: center !important;
+            font-weight: bold !important;
+            margin-top: 1em;
+            margin-bottom: 3.2em; /* Skip two lines before body paragraphs */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.35em;
+        }
+        .reader-body .heading-block div {
+            text-align: center !important;
+            font-weight: bold !important;
+            margin: 0;
+            line-height: 1.4;
+            font-size: 1.05rem;
+            color: var(--text-primary);
+        }
+
+        /* Left aligned subheadings */
+        .reader-body h2,
+        .reader-body h3,
+        .reader-body h4,
+        .reader-body .doc-heading.level-2,
+        .reader-body .doc-heading.level-3,
+        .reader-body .doc-heading.level-4,
+        .reader-body .subheading {
+            text-align: left !important;
+            font-weight: bold !important;
+            text-indent: 0 !important;
+            padding-left: 0 !important;
+            font-size: 1.05rem;
+            color: var(--text-primary);
+        }
+
+        /* ============================================================
+           AKOMA NTOSO (AKN) / eKLR RENDERER STYLING
+           ============================================================ */
+        .reader-body .akn-header,
+        .reader-body .tausi-header {
+            text-align: center !important;
+            font-weight: bold !important;
+            margin-top: 1em;
+            margin-bottom: 2.5em;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.4em;
+        }
+        .reader-body .akn-header div,
+        .reader-body .tausi-header div,
+        .reader-body .akn-docTitle,
+        .reader-body .neutral-citation,
+        .reader-body .republic-head,
+        .reader-body .doc-authority,
+        .reader-body .docket-number,
+        .reader-body .judges,
+        .reader-body .doc-date,
+        .reader-body .parties-listing {
+            text-align: center !important;
+            font-weight: bold !important;
+            margin-left: auto !important;
+            margin-right: auto !important;
+        }
+        .reader-body .parties-listing {
+            margin-top: 1em;
+            margin-bottom: 1em;
+        }
+        .reader-body .party-listing {
+            display: flex;
+            justify-content: center;
+            gap: 1em;
+            font-weight: bold;
+        }
+
+        .reader-body .akn-heading,
+        .reader-body .akn-division .akn-heading {
+            display: block;
+            text-align: left !important;
+            font-weight: bold !important;
+            text-indent: 0 !important;
+            margin-top: 1.8em;
+            margin-bottom: 0.8em;
+            font-size: 1.1em;
+            color: var(--text-primary);
+        }
+
+        .reader-body .akn-paragraph {
+            display: block;
+            position: relative;
+            padding-left: 2.5em; /* Indented from margin */
+            margin-bottom: 1.8em; /* Skip a line between paragraphs */
+            text-indent: 0 !important;
+            text-align: justify;
+            line-height: 1.8;
+        }
+        .reader-body .akn-paragraph > .akn-num {
+            position: absolute;
+            left: 0;
+            top: 0;
+            font-weight: bold;
+            color: var(--text-primary);
+        }
+
+        .reader-body .akn-subparagraph {
+            display: block;
+            padding-left: 1.8em;
+            margin-top: 0.5em;
+            margin-bottom: 0.5em;
+        }
+
+        .reader-body .akn-conclusions {
+            margin-top: 2.5em;
+            padding-top: 1.5em;
+            border-top: 1px solid var(--border-color);
+            text-align: left;
+            font-weight: bold;
+            line-height: 1.8;
+        }
+        .reader-body .akn-conclusions .akn-p,
+        .reader-body .akn-conclusions span {
+            display: block;
+            margin-bottom: 0.4em;
+        }
+
+        /* Production Legal Document Renderer Styles */
+        .legal-doc {
+            font-family: var(--font-legal);
+            font-size: 1.05em;
+            line-height: 1.85;
+            text-align: justify;
+            color: var(--text-primary);
+        }
+        
+        .legal-doc h1 {
+            text-align: center !important;
+            font-size: 1.3em;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-top: 1.5em;
+            margin-bottom: 1.5em;
+            color: var(--text-primary);
+        }
+        
+        .legal-doc h2 {
+            font-size: 1.15em;
+            font-weight: bold;
+            text-decoration: underline;
+            margin-top: 1.8em;
+            margin-bottom: 0.8em;
+            color: var(--text-primary);
+        }
+        
+        .legal-doc p {
+            margin-bottom: 1.5em;
+            line-height: 1.8;
+            text-indent: 0;
+        }
+        
+        .legal-doc .numbered-para {
+            display: flex;
+            margin-bottom: 1.5em;
+            align-items: flex-start;
+        }
+        
+        .legal-doc .para-number {
+            min-width: 38px;
+            font-weight: bold;
+            color: var(--text-primary);
+            flex-shrink: 0;
+        }
+        
+        .legal-doc .para-content {
+            flex: 1;
+            line-height: 1.8;
+        }
+
+        .legal-doc .center-text {
+            text-align: center !important;
+            font-weight: bold;
+            margin: 0.35em 0;
+            display: block;
         }
 
         .citation-highlight {
@@ -1185,10 +1407,30 @@
             <span class="doc-title" id="docTitle">Loading document...</span>
         </div>
         <div class="toolbar-right">
+            <div class="header-zoom-bar" style="display: inline-flex; align-items: center; background: rgba(0, 0, 0, 0.04); border: 1px solid var(--border-color); border-radius: 6px; padding: 1px 4px; gap: 2px;">
+                <button id="btnHeaderZoomOut" class="source-btn" style="cursor: pointer; padding: 2px 7px; font-weight: bold; min-height: 26px; font-size: 15px; border: none; background: transparent; line-height: 1;" title="Zoom Out (Reduce Font/Scale)">−</button>
+                <span id="headerZoomLabel" style="font-size: 11px; font-weight: 700; min-width: 36px; text-align: center; color: var(--text-primary);">100%</span>
+                <button id="btnHeaderZoomIn" class="source-btn" style="cursor: pointer; padding: 2px 7px; font-weight: bold; min-height: 26px; font-size: 15px; border: none; background: transparent; line-height: 1;" title="Zoom In (Increase Font/Scale)">+</button>
+            </div>
             <span class="badge badge-year" id="badgeYear" style="display:none;">Year</span>
             <span class="badge badge-type" id="badgeType" style="display:none;">Type</span>
             <span class="badge" id="badgeSource" style="display:none;">Source</span>
-            <span class="badge" id="pageInfo">Loading...</span>
+            <span class="badge" id="pageInfo">Text View</span>
+            <button id="btnToggleView" class="source-btn" style="cursor: pointer; display: inline-flex; align-items: center; gap: 4px;" title="Switch view mode">
+                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                </svg>
+                <span id="btnToggleViewText">PDF View</span>
+            </button>
+            <button id="btnDownloadPdf" class="source-btn" style="cursor: pointer; display: inline-flex; align-items: center; gap: 4px; background: var(--accent-green); color: #ffffff; border-color: var(--accent-green);" title="Download PDF document directly">
+                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+                <span id="btnDownloadPdfText">Download PDF</span>
+            </button>
             <button id="btnBookmark" class="source-btn" style="cursor: pointer; display: inline-flex; align-items: center; gap: 4px;" title="Save document to bookmarks">
                 <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z" />
@@ -1214,6 +1456,18 @@
         <div id="pagesContainer" style="width: 100%; display: flex; flex-direction: column; align-items: center;"></div>
         <div id="textReaderContainer" style="width: 100%; display: none; justify-content: center;"></div>
         <div id="error" class="state-message error-msg" style="display:none;"></div>
+    </div>
+
+    <!-- FLOATING ZOOM CONTROLS FOR PDF -->
+    <div id="pdfZoomBar" class="pdf-zoom-bar" style="display: none;">
+        <button id="btnZoomOut" class="pdf-zoom-btn" title="Zoom Out (Reduce Size)">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </button>
+        <span id="pdfZoomLabel" class="pdf-zoom-label">100%</span>
+        <button id="btnZoomIn" class="pdf-zoom-btn" title="Zoom In (Increase Size)">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </button>
+        <button id="btnZoomFit" class="pdf-zoom-btn pdf-fit-btn" title="Reset Zoom">Reset</button>
     </div>
 
     <!-- FLOATING ACTION BUTTON FOR AI SUMMARY -->
@@ -1255,6 +1509,7 @@
         </div>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js"></script>
     <script src="/lib/pdf.min.js"></script>
     <script>
         pdfjsLib.GlobalWorkerOptions.workerSrc = '/lib/pdf.worker.min.js';
@@ -1477,35 +1732,338 @@
             return u.endsWith('.docx') || u.endsWith('.doc');
         }
 
-        /* ─── Helper: Render PDF from ArrayBuffer ─── */
+        /* ─── Production PDF-to-HTML Converter Engine ─── */
+        async function processPdfToHtml(arrayBuffer) {
+            try {
+                loadingEl.style.display = 'block';
+                const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+                let fullHtml = '';
+                
+                let currentParagraph = '';
+                let currentListNum = '';
+                let passedHeading = false;
+
+                function buildParagraphHtml(num, text) {
+                    if (!text || !text.trim()) return '';
+                    if (num) {
+                        return `<div class="numbered-para"><div class="para-number">${num}</div><div class="para-content">${text}</div></div>`;
+                    } else {
+                        return `<p>${text}</p>`;
+                    }
+                }
+
+                for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+                    const page = await pdf.getPage(pageNum);
+                    const textContent = await page.getTextContent();
+                    
+                    // Group items by approximate Y coordinate (lines)
+                    const lines = {};
+                    textContent.items.forEach(item => {
+                        const y = Math.round(item.transform[5]); 
+                        if (!lines[y]) lines[y] = [];
+                        lines[y].push(item);
+                    });
+
+                    // Sort lines top to bottom (PDF coordinates usually have Y=0 at bottom, so sort descending)
+                    const sortedY = Object.keys(lines).map(Number).sort((a, b) => b - a);
+                    
+                    for (let i = 0; i < sortedY.length; i++) {
+                        const y = sortedY[i];
+                        // Sort items on the line left to right
+                        const lineItems = lines[y].sort((a, b) => a.transform[4] - b.transform[4]);
+                        
+                        let lineText = lineItems.map(item => item.str).join(' ').trim();
+                        lineText = lineText.replace(/\s+/g, ' ');
+                        
+                        if (!lineText) continue;
+
+                        // Skip headers/footers based on content or position (heuristic)
+                        if (lineText.includes('kenyalaw.org') || lineText.match(/^\[Page \d+\]$/) || lineText === 'KENYA LAW' || lineText === 'THE NATIONAL COUNCIL FOR LAW REPORTING') {
+                            continue;
+                        }
+
+                        // --- Document Restructuring Heuristics ---
+                        
+                        // 1. Headings (Centered, All Caps, or specific keywords)
+                        const isSectionHeading = lineText === 'RULING' || lineText === 'JUDGMENT' || lineText === 'Analysis and Determination' || lineText.startsWith('Whether ');
+                        
+                        if (isSectionHeading) {
+                            if (currentParagraph) {
+                                fullHtml += buildParagraphHtml(currentListNum, currentParagraph);
+                                currentParagraph = '';
+                                currentListNum = '';
+                            }
+                            
+                            if (lineText === 'RULING' || lineText === 'JUDGMENT') {
+                                passedHeading = true;
+                                fullHtml += `<h1>${lineText}</h1>`;
+                            } else {
+                                fullHtml += `<h2>${lineText}</h2>`;
+                            }
+                            continue;
+                        }
+
+                        // 2. Center everything before the main body (Ruling/Judgment) 
+                        if (!passedHeading && lineText.length < 120 && !lineText.match(/^([0-9]+\.|[ivx]+\.)\s+(.*)/i)) {
+                            if (currentParagraph) {
+                                fullHtml += buildParagraphHtml(currentListNum, currentParagraph);
+                                currentParagraph = '';
+                                currentListNum = '';
+                            }
+                            fullHtml += `<div class="center-text">${lineText}</div>`;
+                            continue;
+                        }
+
+                        // 3. Numbered Paragraphs (e.g., "1.", "2.", "i.")
+                        const listMatch = lineText.match(/^([0-9]+\.|[ivx]+\.)\s+(.*)/i);
+                        
+                        if (listMatch) {
+                            passedHeading = true;
+                            if (currentParagraph) {
+                                fullHtml += buildParagraphHtml(currentListNum, currentParagraph);
+                            }
+                            currentListNum = listMatch[1];
+                            currentParagraph = listMatch[2];
+                        } else {
+                            // 4. Continuation of a paragraph
+                            const prevY = i > 0 ? sortedY[i-1] : null;
+                            const lineSpacing = prevY ? Math.abs(prevY - y) : 0;
+                            
+                            if (lineSpacing > 25 && currentParagraph) {
+                                 fullHtml += buildParagraphHtml(currentListNum, currentParagraph);
+                                 currentListNum = '';
+                                 currentParagraph = lineText;
+                            } else {
+                                if (currentParagraph) {
+                                    if (currentParagraph.endsWith('-')) {
+                                        currentParagraph = currentParagraph.slice(0, -1) + lineText;
+                                    } else {
+                                        currentParagraph += ' ' + lineText;
+                                    }
+                                } else {
+                                    currentParagraph = lineText;
+                                }
+                            }
+                        }
+                    }
+                }
+                
+                if (currentParagraph) {
+                     fullHtml += buildParagraphHtml(currentListNum, currentParagraph);
+                }
+
+                if (!fullHtml || fullHtml.trim().length < 20) {
+                    return false;
+                }
+
+                const cleanHtml = (typeof DOMPurify !== 'undefined') ? DOMPurify.sanitize(fullHtml) : fullHtml;
+                
+                renderTextReader({
+                    html: `<div class="legal-doc">${cleanHtml}</div>`,
+                    text: fullHtml.replace(/<[^>]+>/g, ' ')
+                });
+
+                return true;
+            } catch (err) {
+                console.error("Error processing PDF to HTML:", err);
+                return false;
+            }
+        }
+
+        /* ─── Helper: Render PDF from ArrayBuffer with High-DPI & Zoom Controls ─── */
+        let globalPdfDoc = null;
+        let pdfZoomLevel = 1.0;
+        let baseFitScale = 1.0;
+
         async function renderPdfFromBuffer(arrayBuffer, totalPagesOverride) {
+            cachedPdfArrayBuffer = arrayBuffer;
+            if (currentViewMode === 'text') {
+                const converted = await processPdfToHtml(arrayBuffer);
+                if (converted) return true;
+            }
+
             const pdfDoc = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+            globalPdfDoc = pdfDoc;
             const totalPages = totalPagesOverride || pdfDoc.numPages;
             pageInfoEl.textContent = `${totalPages} page${totalPages !== 1 ? 's' : ''}`;
             loadingEl.style.display = 'none';
 
+            const zoomBar = document.getElementById('pdfZoomBar');
+            if (zoomBar) zoomBar.style.display = 'flex';
+
             const firstPage = await pdfDoc.getPage(1);
             const firstViewport = firstPage.getViewport({ scale: 1 });
-            const availableWidth = Math.min(window.innerWidth - 40, 900);
-            const fitScale = Math.min(availableWidth / firstViewport.width, 1.8);
+            const screenWidth = Math.min(window.innerWidth - (window.innerWidth < 600 ? 16 : 40), 960);
+
+            // On mobile devices, ensure default font size is large and legible
+            const isMobile = window.innerWidth < 600;
+            baseFitScale = (screenWidth / firstViewport.width) * (isMobile ? 1.35 : 1.05);
+
+            await reRenderPdfPages();
+            return true;
+        }
+
+        async function reRenderPdfPages() {
+            if (!globalPdfDoc) return;
+            pagesContainer.innerHTML = '';
+
+            const totalPages = globalPdfDoc.numPages;
+            const effectiveScale = baseFitScale * pdfZoomLevel;
+
+            // Output scale accounts for High-DPI / Retina mobile screens (minimum 2.0x multiplier)
+            const outputScale = Math.max(window.devicePixelRatio || 1, 2.0);
+
+            const zoomLabel = document.getElementById('pdfZoomLabel');
+            if (zoomLabel) zoomLabel.textContent = `${Math.round(pdfZoomLevel * 100)}%`;
 
             for (let i = 1; i <= totalPages; i++) {
-                const page = await pdfDoc.getPage(i);
-                const viewport = page.getViewport({ scale: fitScale });
-
-                const canvas = document.createElement('canvas');
-                canvas.height = viewport.height;
-                canvas.width = viewport.width;
+                const page = await globalPdfDoc.getPage(i);
+                const viewport = page.getViewport({ scale: effectiveScale });
 
                 const wrapper = document.createElement('div');
                 wrapper.className = 'page-wrapper';
+                if (pdfZoomLevel > 1.0) {
+                    wrapper.classList.add('zoomed');
+                }
+
+                const canvas = document.createElement('canvas');
+                // High resolution internal canvas buffer
+                canvas.width = Math.floor(viewport.width * outputScale);
+                canvas.height = Math.floor(viewport.height * outputScale);
+
+                // CSS display dimensions match the viewport size
+                canvas.style.width = Math.floor(viewport.width) + 'px';
+                canvas.style.height = Math.floor(viewport.height) + 'px';
+
                 wrapper.appendChild(canvas);
                 pagesContainer.appendChild(wrapper);
 
-                await page.render({ canvasContext: canvas.getContext('2d'), viewport }).promise;
+                const ctx = canvas.getContext('2d');
+                const transform = [outputScale, 0, 0, outputScale, 0, 0];
+                await page.render({ canvasContext: ctx, viewport: viewport, transform: transform }).promise;
             }
-            return true;
         }
+
+        // Attach PDF Zoom listeners
+        document.getElementById('btnZoomIn')?.addEventListener('click', () => {
+            if (pdfZoomLevel < 3.5) {
+                pdfZoomLevel = Math.round((pdfZoomLevel + 0.25) * 100) / 100;
+                updateHeaderZoomUI();
+                reRenderPdfPages();
+            }
+        });
+
+        document.getElementById('btnZoomOut')?.addEventListener('click', () => {
+            if (pdfZoomLevel > 0.5) {
+                pdfZoomLevel = Math.round((pdfZoomLevel - 0.25) * 100) / 100;
+                updateHeaderZoomUI();
+                reRenderPdfPages();
+            }
+        });
+
+        document.getElementById('btnZoomFit')?.addEventListener('click', () => {
+            pdfZoomLevel = 1.0;
+            updateHeaderZoomUI();
+            reRenderPdfPages();
+        });
+
+        /* ─── Top Header Zoom & Mobile Pinch-to-Zoom Controller ─── */
+        function updateHeaderZoomUI() {
+            const headerZoomLabel = document.getElementById('headerZoomLabel');
+            const pdfZoomLabel = document.getElementById('pdfZoomLabel');
+            
+            if (currentViewMode === 'text') {
+                const percentage = Math.round((textFontSize / 1.0625) * 100);
+                if (headerZoomLabel) headerZoomLabel.textContent = `${percentage}%`;
+                const card = textReaderContainer.querySelector('.reader-card');
+                if (card) card.style.fontSize = textFontSize + 'rem';
+            } else {
+                const percentage = Math.round(pdfZoomLevel * 100);
+                if (headerZoomLabel) headerZoomLabel.textContent = `${percentage}%`;
+                if (pdfZoomLabel) pdfZoomLabel.textContent = `${percentage}%`;
+            }
+        }
+
+        function headerZoomIn() {
+            if (currentViewMode === 'text') {
+                if (textFontSize < 2.5) {
+                    textFontSize = Math.round((textFontSize + 0.1) * 100) / 100;
+                    updateHeaderZoomUI();
+                }
+            } else {
+                if (pdfZoomLevel < 3.5) {
+                    pdfZoomLevel = Math.round((pdfZoomLevel + 0.2) * 100) / 100;
+                    updateHeaderZoomUI();
+                    reRenderPdfPages();
+                }
+            }
+        }
+
+        function headerZoomOut() {
+            if (currentViewMode === 'text') {
+                if (textFontSize > 0.6) {
+                    textFontSize = Math.round((textFontSize - 0.1) * 100) / 100;
+                    updateHeaderZoomUI();
+                }
+            } else {
+                if (pdfZoomLevel > 0.5) {
+                    pdfZoomLevel = Math.round((pdfZoomLevel - 0.2) * 100) / 100;
+                    updateHeaderZoomUI();
+                    reRenderPdfPages();
+                }
+            }
+        }
+
+        document.getElementById('btnHeaderZoomIn')?.addEventListener('click', headerZoomIn);
+        document.getElementById('btnHeaderZoomOut')?.addEventListener('click', headerZoomOut);
+
+        /* ─── Mobile Touch Pinch-to-Zoom Listener ─── */
+        let initialPinchDistance = 0;
+        let initialPinchFontSize = textFontSize;
+        let initialPinchPdfZoom = pdfZoomLevel;
+
+        const viewerContainerEl = document.getElementById('viewerContainer');
+
+        viewerContainerEl?.addEventListener('touchstart', (e) => {
+            if (e.touches.length === 2) {
+                const dist = Math.hypot(
+                    e.touches[0].clientX - e.touches[1].clientX,
+                    e.touches[0].clientY - e.touches[1].clientY
+                );
+                initialPinchDistance = dist;
+                initialPinchFontSize = textFontSize;
+                initialPinchPdfZoom = pdfZoomLevel;
+            }
+        }, { passive: true });
+
+        viewerContainerEl?.addEventListener('touchmove', (e) => {
+            if (e.touches.length === 2 && initialPinchDistance > 0) {
+                const currentDist = Math.hypot(
+                    e.touches[0].clientX - e.touches[1].clientX,
+                    e.touches[0].clientY - e.touches[1].clientY
+                );
+                const scale = currentDist / initialPinchDistance;
+
+                if (currentViewMode === 'text') {
+                    const newFontSize = Math.min(Math.max(initialPinchFontSize * scale, 0.6), 2.8);
+                    textFontSize = Math.round(newFontSize * 100) / 100;
+                    updateHeaderZoomUI();
+                } else if (currentViewMode === 'pdf') {
+                    const newZoom = Math.min(Math.max(initialPinchPdfZoom * scale, 0.5), 3.5);
+                    pdfZoomLevel = Math.round(newZoom * 100) / 100;
+                    updateHeaderZoomUI();
+                }
+            }
+        }, { passive: true });
+
+        viewerContainerEl?.addEventListener('touchend', (e) => {
+            if (e.touches.length < 2 && initialPinchDistance > 0) {
+                if (currentViewMode === 'pdf' && globalPdfDoc) {
+                    reRenderPdfPages();
+                }
+                initialPinchDistance = 0;
+            }
+        }, { passive: true });
 
         /* ─── Helper: Convert DOCX to PDF using server API ─── */
         async function convertDocxToPdf(docxUrl) {
@@ -1595,31 +2153,80 @@
             let rawHtml = data.html || '';
             let rawText = data.text || '';
 
-            // For Kenya Law sources that fell back to text, we already have structured text
-            // But we also try to restructure plain text
-            let contentHtml = '';
+            // Check if rawText/rawHtml contains unparsed binary PDF streams
+            if ((rawText && rawText.startsWith('%PDF-')) || (rawHtml && rawHtml.startsWith('%PDF-'))) {
+                console.warn('[reader] Unparsed binary PDF stream detected in text reader. Switching to PDF view...');
+                if (sourceUrl) {
+                    currentViewMode = 'pdf';
+                    textReaderContainer.style.display = 'none';
+                    pagesContainer.style.display = 'flex';
+                    pageInfoEl.textContent = 'PDF View';
+                    const toggleText = document.getElementById('btnToggleViewText');
+                    if (toggleText) toggleText.textContent = 'Text View';
+                    const pdfProxyUrl = `/api/pdf-proxy?sourceUrl=${encodeURIComponent(sourceUrl)}`;
+                    fetch(pdfProxyUrl).then(r => r.arrayBuffer()).then(buf => renderPdfFromBuffer(buf)).catch(e => showError(e.message));
+                    return;
+                } else {
+                    rawText = 'Document content loaded as PDF binary.';
+                }
+            }
 
-            if (rawHtml && rawHtml.trim().length > 50) {
-                // Clean HTML and apply styling
+            // If rawText is missing but we have rawHtml, extract the text so we can restructure it
+            if (!rawText && rawHtml) {
                 const temp = document.createElement('div');
                 temp.innerHTML = rawHtml;
-                // Remove unwanted elements
-                const removeSelectors = ['header', 'footer', 'nav', 'aside', '.header', '.footer', '.navigation',
-                    '.sidebar', '[role="banner"]', '[role="navigation"]', '[role="contentinfo"]'
+                const removeSelectors = ['header', 'footer', 'nav', 'aside', '.header', '.footer', '.navigation', '.sidebar'];
+                for (const sel of removeSelectors) {
+                    const els = temp.querySelectorAll(sel);
+                    for (const el of els) el.remove();
+                }
+                rawText = temp.innerText || temp.textContent;
+            }
+
+            let contentHtml = '';
+
+            const isAknMarkup = rawHtml && (
+                rawHtml.includes('akn-judgment') ||
+                rawHtml.includes('la-akoma-ntoso') ||
+                rawHtml.includes('akn-paragraph') ||
+                rawHtml.includes('tausi-header') ||
+                rawHtml.includes('content-and-enrichments')
+            );
+
+            if (isAknMarkup) {
+                // Parse AKN HTML directly to preserve 100% native document structure
+                const temp = document.createElement('div');
+                temp.innerHTML = rawHtml;
+
+                // Remove scraping UI artifacts & non-content widgets
+                const removeSelectors = [
+                    'header', 'footer', 'nav', 'aside', '.header', '.footer', '.navigation', '.sidebar',
+                    'la-gutter', 'la-decorate-terms', 'la-decorate-internal-refs', 'la-decorate-external-refs',
+                    '.btn', '.btn-primary', '.btn-shrink-sm'
                 ];
                 for (const sel of removeSelectors) {
                     const els = temp.querySelectorAll(sel);
                     for (const el of els) el.remove();
                 }
-                // Deactivate links
+
+                // Remove scraping text artifacts like "Loading PDF...", "To the top", etc.
+                const allEls = temp.querySelectorAll('*');
+                for (const el of allEls) {
+                    const t = (el.innerText || '').trim();
+                    if (/^Loading PDF/i.test(t) || /^To the top$/i.test(t) || /^Cited documents/i.test(t) || /^Find in document text/i.test(t)) {
+                        el.remove();
+                    }
+                }
+
+                // Remove hrefs to prevent accidental navigation
                 const links = temp.querySelectorAll('a');
                 for (const link of links) {
                     link.removeAttribute('href');
                     link.style.pointerEvents = 'none';
-                    link.style.cursor = 'default';
                     link.style.textDecoration = 'none';
                     link.style.color = 'inherit';
                 }
+
                 contentHtml = temp.innerHTML;
             } else if (rawText && rawText.trim().length > 10) {
                 // Restructure plain text into legal document format
@@ -1629,6 +2236,18 @@
                 } else {
                     contentHtml = `<p>${escapeHtml(rawText)}</p>`;
                 }
+            } else if (rawHtml && rawHtml.trim().length > 50) {
+                // Fallback to basic HTML if text extraction failed completely
+                const temp = document.createElement('div');
+                temp.innerHTML = rawHtml;
+                const links = temp.querySelectorAll('a');
+                for (const link of links) {
+                    link.removeAttribute('href');
+                    link.style.pointerEvents = 'none';
+                    link.style.textDecoration = 'none';
+                    link.style.color = 'inherit';
+                }
+                contentHtml = temp.innerHTML;
             } else {
                 // Fallback
                 contentHtml = `
@@ -1666,11 +2285,11 @@
 
             // Font controls
             document.getElementById('btnFontDec')?.addEventListener('click', () => {
-                textFontSize = Math.max(0.85, textFontSize - 0.1);
+                textFontSize = Math.max(0.85, textFontSize - 0.15);
                 card.style.fontSize = textFontSize + 'rem';
             });
             document.getElementById('btnFontInc')?.addEventListener('click', () => {
-                textFontSize = Math.min(1.8, textFontSize + 0.1);
+                textFontSize = Math.min(2.5, textFontSize + 0.15);
                 card.style.fontSize = textFontSize + 'rem';
             });
             document.getElementById('btnCopyText')?.addEventListener('click', () => {
@@ -1787,27 +2406,25 @@
             return false;
         }
 
-        function removeSignatureBlock(lines) {
+        function truncateAtSignatureBlock(lines) {
             const result = [];
-            let inBlock = false;
             for (let i = 0; i < lines.length; i++) {
                 const line = lines[i];
-                const trimmed = line.trim();
-                if (!inBlock && isSignatureBlock(trimmed)) {
-                    inBlock = true;
-                    let j = i + 1;
-                    while (j < lines.length && j < i + 5) {
-                        const nt = lines[j].trim();
-                        if (isSignatureBlock(nt) || nt === '' || /^[•·\-–—]/.test(nt)) { j++; } else break;
-                    }
-                    i = j - 1;
-                    continue;
-                }
-                if (inBlock) {
-                    if (isSignatureBlock(trimmed) || trimmed === '' || /^[•·\-–—]/.test(trimmed)) continue;
-                    inBlock = false;
-                }
                 result.push(line);
+                if (isSignatureBlock(line)) {
+                    // Include the signature block itself and then end
+                    let j = i + 1;
+                    while (j < lines.length && j < i + 10) {
+                        const nt = lines[j].trim();
+                        result.push(lines[j]);
+                        if (nt === '' || /^[•·\-–—]/.test(nt) || isSignatureBlock(nt) || /^[A-Z\s\.,()]+$/.test(nt) || /\d{4}/.test(nt)) {
+                            j++;
+                        } else {
+                            break;
+                        }
+                    }
+                    break;
+                }
             }
             return result;
         }
@@ -1818,19 +2435,47 @@
             }
             let text = rawText.replace(/\r\n/g, '\n').replace(/\r/g, '\n').replace(/\t/g, ' ').replace(/[ \t]+/g, ' ');
             let lines = text.split('\n');
-            lines = removeSignatureBlock(lines);
+            
+            // Remove eKLR scraping UI artifacts
+            lines = lines.filter(line => {
+                const t = line.trim();
+                if (/^Loading PDF/i.test(t)) return false;
+                if (/^This document is.*?Do you want to load it/i.test(t)) return false;
+                if (/^Load document$/i.test(t)) return false;
+                if (/^▲ To the top$/i.test(t)) return false;
+                if (/^Cited documents\s*\d*/i.test(t)) return false;
+                if (/^Documents citing this one\s*\d*/i.test(t)) return false;
+                if (/^\d+\.\s+.*?\d+\s+citations$/i.test(t)) return false;
+                if (/^Act\s*\d*$/i.test(t)) return false;
+                return true;
+            });
+
+            lines = truncateAtSignatureBlock(lines);
 
             const blocks = [];
             let currentParagraph = [];
             let inList = false;
             let listItems = [];
+            let headerPhase = true;
 
             function flushParagraph() {
                 if (currentParagraph.length === 0) return;
                 const content = currentParagraph.join(' ');
                 if (content.trim()) {
                     const highlighted = highlightCitations(content.trim());
-                    blocks.push({ type: 'paragraph', content: highlighted });
+                    if (headerPhase) {
+                        if (/^\s*\[?\d+[\.\)]\s*/.test(content) || content.length > 150) {
+                            headerPhase = false;
+                            blocks.push({ type: 'paragraph', content: highlighted });
+                        } else {
+                            blocks.push({ type: 'main-heading', content: highlighted });
+                            if (/^(JUDGMENT|RULING|ORDER|DECISION|DETERMINATION|DECREE|SENTENCE)$/i.test(content.trim())) {
+                                headerPhase = false;
+                            }
+                        }
+                    } else {
+                        blocks.push({ type: 'paragraph', content: highlighted });
+                    }
                 }
                 currentParagraph = [];
             }
@@ -1848,6 +2493,25 @@
                 const trimmed = raw.trim();
                 if (!trimmed) { flushParagraph();
                     flushList(); continue; }
+
+                if (headerPhase) {
+                    if (/^\s*\[?\d+[\.\)]\s*/.test(trimmed)) {
+                        flushParagraph();
+                        flushList();
+                        headerPhase = false;
+                        currentParagraph.push(trimmed);
+                        continue;
+                    }
+                    if (isLegalHeading(trimmed) || isCitationLine(trimmed) || trimmed.length < 120) {
+                        flushParagraph();
+                        flushList();
+                        blocks.push({ type: 'main-heading', content: highlightCitations(trimmed) });
+                        if (/^(JUDGMENT|RULING|ORDER|DECISION|DETERMINATION|DECREE|SENTENCE)$/i.test(trimmed)) {
+                            headerPhase = false;
+                        }
+                        continue;
+                    }
+                }
 
                 if (isCitationLine(trimmed) && trimmed.length < 100) {
                     flushParagraph();
@@ -1887,27 +2551,34 @@
             flushList();
 
             let html = '';
-            let prevType = '';
+            let inHeadingBlock = false;
 
             for (let i = 0; i < blocks.length; i++) {
                 const block = blocks[i];
-                const isFirst = (i === 0);
+
+                if (block.type === 'main-heading') {
+                    if (!inHeadingBlock) {
+                        html += `<div class="heading-block">`;
+                        inHeadingBlock = true;
+                    }
+                    html += `<div>${block.content}</div>`;
+                    continue;
+                } else if (inHeadingBlock) {
+                    html += `</div>`;
+                    inHeadingBlock = false;
+                }
 
                 if (block.type === 'heading') {
                     const level = block.level || 3;
                     const cls = `doc-heading level-${level}`;
-                    const isCase = /v\.|versus/i.test(block.content) && /[A-Z]/.test(block.content);
-                    const tag = isCase ? 'div' : (level <= 2 ? 'h2' : (level === 3 ? 'h3' : 'h4'));
-                    const extraClass = isCase ? 'case-heading' : cls;
-                    html += `<${tag} class="${extraClass}">${block.content}</${tag}>`;
-                    prevType = 'heading';
+                    const tag = level <= 2 ? 'h2' : (level === 3 ? 'h3' : 'h4');
+                    html += `<${tag} class="${cls} subheading">${block.content}</${tag}>`;
                     continue;
                 }
 
                 if (block.type === 'citation') {
                     html +=
                         `<div class="citation-highlight" style="display:inline-block; padding:0.2em 0.6em; margin:0.2em 0;">${block.content}</div>`;
-                    prevType = 'citation';
                     continue;
                 }
 
@@ -1922,24 +2593,26 @@
                         html += `<li>${highlightCitations(clean)}</li>`;
                     }
                     html += `</${tag}>`;
-                    prevType = 'list';
                     continue;
                 }
 
                 if (block.type === 'paragraph') {
-                    const content = block.content;
+                    let content = block.content;
                     if (content.length < 3) continue;
+                    
                     if (content === content.toUpperCase() && content.length < 60 && !content.includes('.')) {
-                        html += `<h4 class="doc-heading level-4">${content}</h4>`;
-                        prevType = 'heading';
+                        html += `<h4 class="doc-heading level-4 subheading">${content}</h4>`;
                         continue;
                     }
-                    const isFirstAfterHeading = (prevType === 'heading' || prevType === 'citation' || isFirst);
-                    const cls = isFirstAfterHeading ? 'first-after-heading' : '';
-                    html += `<p class="${cls}">${content}</p>`;
-                    prevType = 'paragraph';
+                    
+                    content = content.replace(/^\s*\[?\d+[\.\)]\s*/, '');
+                    html += `<p class="numbered-paragraph">${content}</p>`;
                     continue;
                 }
+            }
+
+            if (inHeadingBlock) {
+                html += `</div>`;
             }
 
             return { html: html, hasContent: true };
@@ -1952,66 +2625,165 @@
             return div.innerHTML;
         }
 
+        let currentViewMode = 'text';
+        let cachedPdfArrayBuffer = null;
+
+        // View toggle handler
+        document.getElementById('btnToggleView')?.addEventListener('click', async () => {
+            const toggleText = document.getElementById('btnToggleViewText');
+            const pdfZoomBar = document.getElementById('pdfZoomBar');
+
+            if (currentViewMode === 'text') {
+                currentViewMode = 'pdf';
+                if (toggleText) toggleText.textContent = 'Text View';
+                textReaderContainer.style.display = 'none';
+                pagesContainer.style.display = 'flex';
+                pageInfoEl.textContent = 'PDF View';
+
+                if (cachedPdfArrayBuffer) {
+                    await renderPdfFromBuffer(cachedPdfArrayBuffer);
+                } else if (sourceUrl) {
+                    loadingEl.style.display = 'block';
+                    try {
+                        const pdfProxyUrl = `/api/pdf-proxy?sourceUrl=${encodeURIComponent(sourceUrl)}`;
+                        const res = await fetch(pdfProxyUrl);
+                        if (res.ok) {
+                            cachedPdfArrayBuffer = await res.arrayBuffer();
+                            await renderPdfFromBuffer(cachedPdfArrayBuffer);
+                        } else {
+                            alert('PDF file not available for this document.');
+                        }
+                    } catch (e) {
+                        alert('Could not load PDF: ' + e.message);
+                    } finally {
+                        loadingEl.style.display = 'none';
+                    }
+                }
+            } else {
+                currentViewMode = 'text';
+                if (toggleText) toggleText.textContent = 'PDF View';
+                pagesContainer.style.display = 'none';
+                if (pdfZoomBar) pdfZoomBar.style.display = 'none';
+                textReaderContainer.style.display = 'flex';
+                pageInfoEl.textContent = 'Text View';
+            }
+        });
+
+        /* ─── DIRECT PDF DOWNLOAD HANDLER ─── */
+        document.getElementById('btnDownloadPdf')?.addEventListener('click', async () => {
+            const downloadBtnText = document.getElementById('btnDownloadPdfText');
+            const originalText = downloadBtnText ? downloadBtnText.textContent : 'Download PDF';
+            if (downloadBtnText) downloadBtnText.textContent = 'Downloading...';
+
+            try {
+                let blob = null;
+                const safeName = (titleParam || displayTitle || 'eLegal_Document')
+                    .replace(/[^a-zA-Z0-9_\-\s]/g, '')
+                    .trim()
+                    .replace(/\s+/g, '_');
+                const downloadFilename = (safeName.toLowerCase().endsWith('.pdf') ? safeName : safeName + '.pdf');
+
+                if (cachedPdfArrayBuffer) {
+                    blob = new Blob([cachedPdfArrayBuffer], { type: 'application/pdf' });
+                } else if (sourceUrl) {
+                    const pdfProxyUrl = `/api/pdf-proxy?sourceUrl=${encodeURIComponent(sourceUrl)}`;
+                    const res = await fetch(pdfProxyUrl);
+                    if (res.ok) {
+                        const buffer = await res.arrayBuffer();
+                        cachedPdfArrayBuffer = buffer;
+                        blob = new Blob([buffer], { type: 'application/pdf' });
+                    } else {
+                        throw new Error('PDF file stream unavailable.');
+                    }
+                } else if (filename && filename !== 'document.pdf') {
+                    const res = await fetch(`/read/${encodeURIComponent(filename)}?raw=1`);
+                    if (res.ok) {
+                        const buffer = await res.arrayBuffer();
+                        blob = new Blob([buffer], { type: 'application/pdf' });
+                    }
+                }
+
+                if (blob) {
+                    const blobUrl = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = blobUrl;
+                    a.download = downloadFilename;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
+                } else {
+                    alert('Could not generate PDF download for this document.');
+                }
+            } catch (err) {
+                alert('Download failed: ' + err.message);
+            } finally {
+                if (downloadBtnText) downloadBtnText.textContent = originalText;
+            }
+        });
+
         /* ─── MAIN LOAD FUNCTION ─── */
         async function loadDocument() {
-            // ── Step 1: If it's a Kenya Law source, try PDF directly or convert ──
-            if (sourceUrl && isKenyaLawSource(sourceUrl)) {
-                // Attempt to get PDF from /source or convert if needed
-                const pdfOk = await renderKenyaLawPdf(sourceUrl);
-                if (pdfOk) {
-                    // Successfully rendered PDF (either native or converted)
-                    return;
-                }
-                // If PDF fetch/conversion failed, fall through to API
-                console.warn('Kenya Law PDF fetch/conversion failed, falling back to API');
-            }
+            loadingEl.style.display = 'block';
 
-            // ── Step 2: Fall back to API-based loading ──
             if (!sourceUrl && (!filename || filename === 'document.pdf')) {
                 showError('No source URL or file provided');
                 return;
             }
 
             try {
+                // Prioritize text & HTML extraction for dynamic, adjustable font size rendering
                 const fetchTarget = sourceUrl ?
                     `/api/document-content?sourceUrl=${encodeURIComponent(sourceUrl)}&title=${encodeURIComponent(displayTitle)}&year=${encodeURIComponent(reqYear)}&type=${encodeURIComponent(reqType)}&source=${encodeURIComponent(reqSource)}` :
                     `/read/${encodeURIComponent(filename)}?raw=1`;
 
                 const res = await fetch(fetchTarget);
-                if (!res.ok) {
-                    throw new Error(`Failed to load document (${res.status})`);
-                }
+                if (res.ok) {
+                    const data = await res.json();
+                    loadedDocData = data;
 
-                const data = await res.json();
-                loadedDocData = data;
-
-                // If API says it's a PDF, try to render it
-                const preferPdf = !data.fallback && (data.isPdf || data.hasPdf || !!data.pdfUrl);
-
-                if (preferPdf) {
-                    try {
-                        const pdfUrl = data.pdfUrl || `/api/pdf-proxy?sourceUrl=${encodeURIComponent(sourceUrl)}`;
-                        const pdfRes = await fetch(pdfUrl);
-                        if (pdfRes.ok) {
-                            const arrayBuffer = await pdfRes.arrayBuffer();
-                            const bytes = new Uint8Array(arrayBuffer.slice(0, 5));
-                            const pdfHeader = String.fromCharCode.apply(null, Array.from(bytes));
-                            if (pdfHeader.startsWith('%PDF')) {
-                                await renderPdfFromBuffer(arrayBuffer);
-                                return;
-                            }
-                        }
-                    } catch (pdfErr) {
-                        console.warn('PDF rendering error, switching to Text Reader:', pdfErr.message);
+                    if (data && (data.text || data.html)) {
+                        console.log('[reader] Rendered extracted text/HTML with adjustable font sizing and structured legal layout');
+                        renderTextReader(data);
+                        return;
                     }
                 }
-
-                // ── Step 3: Render as text ──
-                renderTextReader(data);
-
             } catch (e) {
-                showError(e.message);
+                console.warn('[reader] Document content extraction failed:', e.message);
             }
+
+            // Fallback to PDF proxy if text content extraction is unavailable
+            if (sourceUrl) {
+                try {
+                    console.log('[reader] Fetching PDF from proxy for sourceUrl:', sourceUrl);
+                    const pdfProxyUrl = `/api/pdf-proxy?sourceUrl=${encodeURIComponent(sourceUrl)}`;
+                    const res = await fetch(pdfProxyUrl);
+                    if (res.ok) {
+                        const arrayBuffer = await res.arrayBuffer();
+                        const bytes = new Uint8Array(arrayBuffer.slice(0, 5));
+                        const header = String.fromCharCode.apply(null, Array.from(bytes));
+                        if (header.startsWith('%PDF')) {
+                            cachedPdfArrayBuffer = arrayBuffer;
+                            const converted = await processPdfToHtml(arrayBuffer);
+                            if (converted) {
+                                currentViewMode = 'text';
+                                const toggleText = document.getElementById('btnToggleViewText');
+                                if (toggleText) toggleText.textContent = 'PDF View';
+                                return;
+                            }
+                            await renderPdfFromBuffer(arrayBuffer);
+                            currentViewMode = 'pdf';
+                            const toggleText = document.getElementById('btnToggleViewText');
+                            if (toggleText) toggleText.textContent = 'Text View';
+                            return;
+                        }
+                    }
+                } catch (e) {
+                    console.warn('[reader] Direct PDF proxy loading failed:', e.message);
+                }
+            }
+
+            showError('Could not load or format document text content.');
         }
 
         loadDocument();

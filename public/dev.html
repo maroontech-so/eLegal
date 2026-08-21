@@ -2701,7 +2701,7 @@
 
     function generateFullMarkdownForLLM() {
       const activeKey = 'YOUR_SECRET_API_KEY';
-      const baseUrl = window.location.origin || 'http://localhost:3000';
+      const baseUrl = window.location.origin || '';
 
       return `# eLegal REST API — Full Developer Documentation for LLM Context
 
@@ -3062,7 +3062,7 @@ curl -X GET "${baseUrl}/api/health"
 
     function buildFullUrl() {
       const topic = TOPICS[activeTopicKey];
-      let url = (window.location.origin || 'http://localhost:3000') + topic.path;
+      let url = (window.location.origin || '') + topic.path;
       const params = getParamValues();
       const searchParams = new URLSearchParams();
 

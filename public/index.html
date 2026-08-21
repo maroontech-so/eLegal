@@ -2502,6 +2502,9 @@
                         <button class="bulletin-chip" onclick="setBulletinCategory('gazette', this)">Gazette</button>
                         <button class="bulletin-chip" onclick="setBulletinCategory('legislation', this)">Legislation</button>
                         <button class="bulletin-chip" onclick="setBulletinCategory('news', this)">Precedent Alerts</button>
+                        <button class="bulletin-chip" style="background: var(--accent-blue); color: white; border: none; font-weight: 600;" onclick="refreshLiveBulletins(this)">
+                            <i data-lucide="refresh-cw" style="width: 13px; height: 13px; margin-right: 4px;"></i> Refresh Live News
+                        </button>
                     </div>
                 </div>
 
@@ -2890,6 +2893,23 @@
                 }
             } catch (e) {
                 console.warn('Bulletins teaser refresh notice:', e);
+            }
+        }
+
+        async function refreshLiveBulletins(btnEl) {
+            if (btnEl) btnEl.disabled = true;
+            try {
+                const res = await fetchApi(`${API_BASE}/bulletins/refresh`, { method: 'POST' });
+                if (res.ok) {
+                    setTimeout(async () => {
+                        await loadBulletins(1, bulletinsState.category);
+                        loadHomeTeaserBulletins();
+                    }, 1500);
+                }
+            } catch (e) {
+                console.warn('Refresh bulletins error:', e);
+            } finally {
+                setTimeout(() => { if (btnEl) btnEl.disabled = false; }, 2000);
             }
         }
 
@@ -3613,9 +3633,27 @@
             executeRepoSearch(queryText);
         }
 
+        function formatBulletinContentHtml(rawContent) {
+            if (!rawContent) return '';
+            let formatted = escapeHtml(rawContent)
+                .replace(/### (.*?)(&lt;|\n|$)/g, '<h4 style="font-size: 1.05rem; font-weight: 700; color: var(--accent-green); margin: 18px 0 8px 0;">$1</h4>')
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*(.*?)\*/g, '<em>$1</em>');
+            
+            const parts = formatted.split(/\n\s*\n/);
+            return parts.map(p => {
+                const trimmed = p.trim();
+                if (!trimmed) return '';
+                if (trimmed.startsWith('<h4')) return trimmed;
+                return `<p style="margin-bottom: 14px; line-height: 1.7; color: var(--text-primary); font-size: 0.96rem;">${trimmed}</p>`;
+            }).join('');
+        }
+
         function viewBulletinDetail(bulletinId) {
             const item = bulletinsState.items.find(b => b.id === bulletinId);
             if (!item) return;
+
+            const fullStoryHtml = formatBulletinContentHtml(item.content || item.summary);
 
             const panel = document.getElementById('bulletinDetailPanel');
             panel.innerHTML = `
@@ -3624,14 +3662,14 @@
                 </div>
                 <div style="padding: 24px;">
                     <div style="margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between;">
-                        <span style="font-size: 0.78rem; color: var(--text-tertiary);">${item.date} • ${item.readTime || '3 min read'}</span>
+                        <span style="font-size: 0.78rem; color: var(--text-tertiary);">${item.date} • ${item.readTime || '4 min read'}</span>
                         <span class="bulletin-category-tag ${item.category || ''}">${escapeHtml(item.categoryLabel || item.category || 'News')}</span>
                     </div>
-                    <h2 style="font-size: 1.2rem; font-weight: 800; line-height: 1.35; margin-bottom: 12px; color: var(--text-primary);">${escapeHtml(item.title)}</h2>
+                    <h2 style="font-size: 1.25rem; font-weight: 800; line-height: 1.35; margin-bottom: 12px; color: var(--text-primary);">${escapeHtml(item.title)}</h2>
                     <div style="font-size: 0.85rem; font-weight: 600; color: var(--accent-blue); margin-bottom: 16px;">Source: ${escapeHtml(item.source)}</div>
                     
-                    <div style="font-size: 0.92rem; line-height: 1.6; color: var(--text-primary); border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); padding: 16px 0; margin-bottom: 20px;">
-                        ${escapeHtml(item.content || item.summary)}
+                    <div style="font-size: 0.95rem; line-height: 1.7; color: var(--text-primary); border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); padding: 18px 0; margin-bottom: 20px;">
+                        ${fullStoryHtml}
                     </div>
 
                     <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 20px;">
@@ -3640,7 +3678,7 @@
 
                     <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px;">
                         <a href="${item.url || item.sourceUrl || 'http://kenyalaw.org'}" target="_blank" rel="noopener" class="bulletin-btn-source" style="padding: 10px 16px; font-size: 0.82rem;">
-                            <i data-lucide="external-link" style="width: 14px; height: 14px;"></i> Read Full Story from Source
+                            <i data-lucide="external-link" style="width: 14px; height: 14px;"></i> Original Source Page
                         </a>
                         <button type="button" class="bulletin-btn-precedents" style="padding: 10px 16px; font-size: 0.82rem;" onclick="findRelatedPrecedentsForBulletin('${escapeJsString(item.title)}', '${escapeJsString((item.tags || []).join(' '))}');">
                             <i data-lucide="search" style="width: 14px; height: 14px;"></i> Find Related Precedents

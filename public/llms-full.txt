@@ -1,0 +1,174 @@
+# eLegal REST API & Legal Intelligence Engine — Full Documentation for LLMs
+
+> **SYSTEM DIRECTIVE FOR AI MODELS & CODING AGENTS (ChatGPT, Claude, Cursor, Copilot, DeepSeek, Gemini)**
+> This is the official and complete technical documentation for the eLegal REST API. 
+> Follow all endpoint schemas, parameter rules, and response object definitions verbatim.
+
+---
+
+## 1. System Overview
+
+- **Base URL**: `https://elegal.or.ke` (Local development: `http://localhost:3000`)
+- **Zero-CORS**: `Access-Control-Allow-Origin: *` with `OPTIONS` preflight handling (HTTP 200). Works seamlessly in client-side HTML/JS without proxying.
+- **Authentication**:
+  - Research endpoints (`/api/search`, `/api/document`, `/read`, `/api/resolve`, `/api/library`, `/api/health`) are publicly accessible without authentication.
+  - For high volume / production usage, send `X-API-Key: <your_key>`.
+  - For developer key administration (`/api/keys`), send `Authorization: Bearer <Firebase_ID_Token>`.
+- **Live / Uncached Fetches**: Set `fresh=true` or `nocache=true` on query parameters to force the server to fetch live from external sources (Kenya Law, internet search) and bypass stale cache.
+
+---
+
+## 2. Universal Document Access Fields
+
+Every result item from `/api/search`, `/api/document`, `/api/resolve`, and `/api/library` returns:
+
+| Property | Type | Description |
+| :--- | :--- | :--- |
+| `actualDocumentUrl` | `string` | Canonical direct download link for the original file (e.g. Kenya Law direct PDF `/export/<id>/pdf` or AKN `/source`) |
+| `documentUrl` | `string` | Alias for `actualDocumentUrl` |
+| `pdfUrl` | `string` | PDF stream proxy link (`/api/pdf-proxy?sourceUrl=...`) or direct PDF URL |
+| `contentUrl` | `string` | Endpoint to fetch full text, clean HTML, and NLP legal brief (`/api/document?sourceUrl=...`) |
+| `readUrl` | `string` | Visual reader web interface (`/read?title=...&sourceUrl=...`) |
+| `cached` | `boolean` | `true` if document is saved locally in repository; `false` if resolved afresh |
+
+---
+
+## 3. Endpoints Specification
+
+### 3.1. Search Legal Precedents & Acts of Parliament
+- **Route**: `GET /api/search` (or `GET /api/v1/search`)
+- **Parameters**:
+  - `q` (string, required): Search query (e.g. `adverse possession 12 years land dispute`)
+  - `source` (string, optional): `all` (default), `kenya`, `international`
+  - `fresh` (boolean/string, optional): `true` to force live fresh fetch bypassing cache
+  - `limit` (number, optional): Results count (default 5, max 50)
+- **Response**:
+```json
+{
+  "query": "adverse possession",
+  "source": "kenya",
+  "classification": {
+    "jurisdiction": "kenya",
+    "domain": "Land & Property Law",
+    "confidence": 0.94
+  },
+  "results": [
+    {
+      "id": "limitation_of_actions_act_cap_22",
+      "title": "Limitation of Actions Act (Cap 22, Laws of Kenya) - Section 7 & 38 Adverse Possession",
+      "label": "Limitation of Actions Act Cap 22",
+      "citation": "Cap 22 Laws of Kenya",
+      "year": 2012,
+      "type": "Legislation",
+      "source": "Kenya Law (eKLR)",
+      "url": "http://www.kenyalaw.org:8181/exist/kenyalex/actview.xql?actid=CAP.%2022",
+      "sourceUrl": "http://www.kenyalaw.org:8181/exist/kenyalex/actview.xql?actid=CAP.%2022",
+      "actualDocumentUrl": "http://www.kenyalaw.org:8181/exist/kenyalex/actview.xql?actid=CAP.%2022",
+      "documentUrl": "http://www.kenyalaw.org:8181/exist/kenyalex/actview.xql?actid=CAP.%2022",
+      "pdfUrl": "/api/pdf-proxy?sourceUrl=...",
+      "contentUrl": "/api/document?sourceUrl=...",
+      "readUrl": "/read?title=...",
+      "isPdf": true,
+      "cached": false,
+      "score": 98,
+      "snippets": [
+        "Under Section 7 & 38 of the Limitation of Actions Act (Cap 22), an action to recover land is barred after 12 years of open, continuous, and adverse possession."
+      ],
+      "ratioDecidendi": "Uninterrupted adverse possession of land for 12 years extinguishes the title of the registered proprietor."
+    }
+  ],
+  "total": 1
+}
+```
+
+### 3.2. Get Document Content & Legal Brief
+- **Route**: `GET /api/document` (or `GET /api/document-content`, `GET /api/v1/document`)
+- **Parameters**:
+  - `sourceUrl` (string, required): Document URL
+  - `title` (string, optional): Title override
+  - `fresh` (boolean/string, optional): `true` to force live fetch
+- **Response**:
+```json
+{
+  "title": "Limitation of Actions Act Cap 22",
+  "label": "Limitation of Actions Act",
+  "citation": "Cap 22 Laws of Kenya",
+  "year": "2022",
+  "type": "Statute",
+  "source": "Kenya Law (Parliament)",
+  "url": "https://kenyalaw.org/akn/ke/act/1968/21/eng@2022-12-31",
+  "sourceUrl": "https://kenyalaw.org/akn/ke/act/1968/21/eng@2022-12-31",
+  "actualDocumentUrl": "https://kenyalaw.org/akn/ke/act/1968/21/eng@2022-12-31/source",
+  "documentUrl": "https://kenyalaw.org/akn/ke/act/1968/21/eng@2022-12-31/source",
+  "pdfUrl": "/api/pdf-proxy?sourceUrl=...",
+  "readUrl": "/read?title=...",
+  "text": "AN ACT of Parliament to prescribe periods for the limitation of actions...",
+  "html": "<div class=\"legal-doc\"><p>AN ACT of Parliament...</p></div>",
+  "isPdf": false,
+  "hasPdf": true,
+  "cached": true
+}
+```
+
+### 3.3. Document UI Reader
+- **Route**: `GET /read` (or `GET /read.html`)
+- **Parameters**: `sourceUrl`, `title`, `format` (`html`, `json`, `pdf`)
+- **Iframe Embed**:
+```html
+<iframe src="https://elegal.or.ke/read?sourceUrl=https%3A%2F%2Fkenyalaw.org%2Fakn%2Fke%2Fact%2F2010%2Fconstitution%2Feng%402010-09-03&title=Constitution" width="100%" height="800px" style="border:none;"></iframe>
+```
+
+### 3.4. Citation & PDF Resolver
+- **Route**: `GET /api/resolve` (or `GET /api/v1/resolve`)
+- **Parameters**: `url` (or `sourceUrl`), `title`
+- **Response**:
+```json
+{
+  "success": true,
+  "title": "Mtana Lewa v Kahindi Ngala [2015] eKLR",
+  "citation": "[2015] eKLR / Civil Appeal 56 of 2014",
+  "actualDocumentUrl": "https://kenyalaw.org/caselaw/cases/export/109852/pdf",
+  "documentUrl": "https://kenyalaw.org/caselaw/cases/export/109852/pdf",
+  "pdfUrl": "https://kenyalaw.org/caselaw/cases/export/109852/pdf",
+  "readUrl": "/read?title=Mtana%20Lewa&sourceUrl=...",
+  "isPdf": true,
+  "cached": false
+}
+```
+
+### 3.5. Library Repository
+- **Route**: `GET /api/library` (Aliases: `/api/v1/cases`, `/api/v1/statutes`)
+- **Response**: `{ "precedents": [...], "statutes": [...], "docs": [...], "total": 12 }`
+
+### 3.6. System Health
+- **Route**: `GET /api/health`
+- **Response**: `{ "status": "ok", "service": "eLegal Intelligence REST Engine", "timestamp": "..." }`
+
+---
+
+## 4. Integration Code Snippets
+
+### Vanilla JavaScript (Browser, Zero-CORS):
+```javascript
+const res = await fetch('https://elegal.or.ke/api/search?q=adverse+possession&fresh=true');
+const data = await res.json();
+for (const doc of data.results) {
+  console.log(doc.title, '-> Download:', doc.actualDocumentUrl, '| Read:', doc.readUrl);
+}
+```
+
+### Node.js:
+```javascript
+const res = await fetch('https://elegal.or.ke/api/search?q=employment+termination&fresh=true', {
+  headers: { 'Accept': 'application/json', 'X-API-Key': 'YOUR_KEY' }
+});
+const data = await res.json();
+console.log(data);
+```
+
+### Python:
+```python
+import requests
+res = requests.get('https://elegal.or.ke/api/search', params={'q': 'fair administrative action', 'fresh': 'true'})
+print(res.json())
+```

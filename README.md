@@ -143,9 +143,11 @@ X-API-Key: el_demo_key_12345
 
 | Endpoint | Method | Description |
 | :--- | :--- | :--- |
-| `/api/search` | `GET` | Executes targeted legal search with ML classification |
-| `/api/library` | `GET` | Fetches featured repository precedents and statutes |
-| `/api/resolve` | `GET` | Converts Kenya Law URLs to viewable PDF export links |
+| `/api/search` | `GET` | Executes live/cached targeted legal search with ML classification & document URLs |
+| `/api/document` | `GET` | Extracts full text, clean HTML body, and structured NLP legal brief for any document URL |
+| `/read` | `GET` | Renders the interactive eLegal document reader UI (embeddable via iframe) |
+| `/api/resolve` | `GET` | Resolves Kenya Law URLs into direct PDF export links & metadata |
+| `/api/library` | `GET` | Fetches featured repository precedents and statutes with document links |
 | `/api/keys` | `POST` | Generates a new developer API key |
 | `/api/keys` | `GET` | Lists API keys for an authenticated user |
 | `/api/keys/:keyId` | `DELETE`| Deactivates an existing API key |
@@ -153,11 +155,50 @@ X-API-Key: el_demo_key_12345
 
 ---
 
+### Zero-CORS HTML / JavaScript Quick Start
+
+Developers can call the eLegal API directly from any browser client or `.html` file with zero CORS friction:
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <title>eLegal API Demo</title>
+</head>
+<body>
+  <h2>Legal Search Results</h2>
+  <ul id="results"></ul>
+
+  <script>
+    async function searchPrecedents() {
+      // Live search without CORS blocking
+      const res = await fetch('https://elegal-hteg.onrender.com/api/search?q=adverse+possession&fresh=true');
+      const data = await res.json();
+      
+      const list = document.getElementById('results');
+      data.results.forEach(doc => {
+        const li = document.createElement('li');
+        li.innerHTML = `
+          <strong>${doc.title}</strong> (${doc.year})<br>
+          <a href="${doc.actualDocumentUrl}" target="_blank">Download Document / PDF</a> | 
+          <a href="${doc.readUrl}" target="_blank">Open in Reader</a>
+        `;
+        list.appendChild(li);
+      });
+    }
+    searchPrecedents();
+  </script>
+</body>
+</html>
+```
+
+---
+
 ### Sample Request & Response: `/api/search`
 
 #### Request:
 ```bash
-curl -X GET "https://elegal-hteg.onrender.com/api/search?q=adverse%20possession&source=kenya" \
+curl -X GET "https://elegal-hteg.onrender.com/api/search?q=adverse%20possession&source=kenya&fresh=true" \
      -H "X-API-Key: el_demo_key_12345"
 ```
 
@@ -175,13 +216,20 @@ curl -X GET "https://elegal-hteg.onrender.com/api/search?q=adverse%20possession&
     {
       "id": "sisto_wambugu_1983",
       "title": "Sisto Wambugu v Kamau Njuguna [1983] KECA 69 (KLR)",
+      "label": "Sisto Wambugu v Kamau Njuguna",
       "citation": "Sisto Wambugu v Kamau Njuguna [1983] KECA 69 (KLR)",
       "year": "1983",
       "type": "Judgment",
-      "source": "Kenya Law (eKLR)",
-      "url": "https://kenyalaw.org/caselaw/cases/view/12345",
-      "readUrl": "/read.html?title=Sisto%20Wambugu...&sourceUrl=...",
-      "fileType": "PDF",
+      "source": "Kenya Law (Court of Appeal)",
+      "url": "https://kenyalaw.org/akn/ke/judgment/keca/1983/69/eng@1983-11-14",
+      "sourceUrl": "https://kenyalaw.org/akn/ke/judgment/keca/1983/69/eng@1983-11-14",
+      "documentUrl": "https://kenyalaw.org/akn/ke/judgment/keca/1983/69/eng@1983-11-14/source",
+      "actualDocumentUrl": "https://kenyalaw.org/akn/ke/judgment/keca/1983/69/eng@1983-11-14/source",
+      "pdfUrl": "/api/pdf-proxy?sourceUrl=https%3A%2F%2Fkenyalaw.org...",
+      "contentUrl": "/api/document?sourceUrl=https%3A%2F%2Fkenyalaw.org...",
+      "readUrl": "/read?title=Sisto%20Wambugu...&sourceUrl=...",
+      "isPdf": true,
+      "cached": false,
       "score": 98
     }
   ],

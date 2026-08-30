@@ -5,8 +5,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>eLegal API | Developer Documentation & Legal AI Portal</title>
-  <meta name="description" content="Official developer documentation for eLegal API. Integrate Kenya Law precedents search, statutory archives, eKLR PDF resolution, and legal brief summarization.">
-  <meta name="keywords" content="eLegal API, Kenya Law API, Legal AI SDK, eKLR API, Legal Precedents API, Judicial Search API">
+  <meta name="description"
+    content="Official developer documentation for eLegal API. Integrate Kenya Law precedents search, statutory archives, eKLR PDF resolution, and legal brief summarization.">
+  <meta name="keywords"
+    content="eLegal API, Kenya Law API, Legal AI SDK, eKLR API, Legal Precedents API, Judicial Search API">
   <meta name="author" content="eLegal Developer Infrastructure">
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://elegal.or.ke/dev">
@@ -15,13 +17,16 @@
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://elegal.or.ke/dev">
   <meta property="og:title" content="eLegal API | Developer Documentation & Legal AI Portal">
-  <meta property="og:description" content="Integrate official Kenya eKLR court rulings and statutory search engines with eLegal API.">
+  <meta property="og:description"
+    content="Integrate official Kenya eKLR court rulings and statutory search engines with eLegal API.">
   <meta property="og:image" content="https://elegal.or.ke/logo.png">
 
   <!-- Typography & Lucide Icons -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap"
+    rel="stylesheet">
   <script src="https://unpkg.com/lucide@latest"></script>
 
   <style>
@@ -32,7 +37,7 @@
       --bg-card: #111215;
       --bg-input: #16171B;
       --bg-hover: #1C1E24;
-      
+
       --border-color: #22252B;
       --border-focus: #373B45;
 
@@ -65,13 +70,14 @@
       -webkit-font-smoothing: antialiased;
     }
 
-    html, body {
+    html,
+    body {
       width: 100%;
       height: 100%;
       overflow: hidden;
       background-color: var(--bg-main);
       /* Dark Mesh Background with Emerald/Green Glow Hints */
-      background-image: 
+      background-image:
         radial-gradient(circle at 12% 18%, rgba(16, 185, 129, 0.07) 0%, transparent 45%),
         radial-gradient(circle at 88% 72%, rgba(52, 211, 153, 0.05) 0%, transparent 50%),
         radial-gradient(circle at 50% 30%, rgba(6, 78, 59, 0.12) 0%, transparent 65%);
@@ -348,10 +354,25 @@
       margin-right: 8px;
     }
 
-    .m-badge.get { background: var(--get-bg); color: var(--get-text); }
-    .m-badge.post { background: var(--post-bg); color: var(--post-text); }
-    .m-badge.patch { background: var(--patch-bg); color: var(--patch-text); }
-    .m-badge.delete { background: var(--delete-bg); color: var(--delete-text); }
+    .m-badge.get {
+      background: var(--get-bg);
+      color: var(--get-text);
+    }
+
+    .m-badge.post {
+      background: var(--post-bg);
+      color: var(--post-text);
+    }
+
+    .m-badge.patch {
+      background: var(--patch-bg);
+      color: var(--patch-text);
+    }
+
+    .m-badge.delete {
+      background: var(--delete-bg);
+      color: var(--delete-text);
+    }
 
     .sidebar-footer {
       padding: 12px 16px;
@@ -651,7 +672,7 @@
       color: #4B5563;
       text-align: right;
       user-select: none;
-      border-right: 1px solid rgba(255,255,255,0.05);
+      border-right: 1px solid rgba(255, 255, 255, 0.05);
     }
 
     .code-pre {
@@ -662,12 +683,30 @@
     }
 
     /* Syntax Highlighting Tokens */
-    .tok-kw { color: #F472B6; }
-    .tok-fn { color: #60A5FA; }
-    .tok-str { color: #34D399; }
-    .tok-prop { color: #FBBF24; }
-    .tok-cmnt { color: #6B7280; font-style: italic; }
-    .tok-num { color: #F87171; }
+    .tok-kw {
+      color: #F472B6;
+    }
+
+    .tok-fn {
+      color: #60A5FA;
+    }
+
+    .tok-str {
+      color: #34D399;
+    }
+
+    .tok-prop {
+      color: #FBBF24;
+    }
+
+    .tok-cmnt {
+      color: #6B7280;
+      font-style: italic;
+    }
+
+    .tok-num {
+      color: #F87171;
+    }
 
     /* Interactive Inputs Box */
     .interactive-inputs-card {
@@ -914,8 +953,13 @@
       margin-top: 2px;
     }
 
-    .text-emerald { color: #34D399; }
-    .text-muted { color: var(--text-muted); }
+    .text-emerald {
+      color: #34D399;
+    }
+
+    .text-muted {
+      color: var(--text-muted);
+    }
 
     .chart-container-card {
       background: #08090A;
@@ -936,14 +980,17 @@
       border-right: 1px solid var(--border-color);
       height: 34px;
     }
+
     .granularity-btn:last-child {
       border-right: none;
     }
+
     .granularity-btn.active {
       background: #0B3C5D;
       color: #60A5FA;
       font-weight: 700;
     }
+
     .granularity-btn:hover:not(.active) {
       background: rgba(255, 255, 255, 0.05);
       color: var(--text-primary);
@@ -978,11 +1025,13 @@
       font-weight: 700;
       font-family: var(--font-mono);
     }
+
     .badge-status.active {
       background: rgba(16, 185, 129, 0.15);
       color: #34D399;
       border: 1px solid rgba(16, 185, 129, 0.3);
     }
+
     .badge-status.paused {
       background: rgba(245, 158, 11, 0.15);
       color: #FBBF24;
@@ -990,22 +1039,35 @@
     }
 
     /* Custom Scrollbars */
-    ::-webkit-scrollbar { width: 6px; height: 6px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: #22252B; border-radius: 3px; }
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #22252B;
+      border-radius: 3px;
+    }
 
     /* ── Responsive Mobile Media Queries ── */
     @media (max-width: 992px) {
       .top-navbar {
         padding: 0 16px;
       }
+
       .main-content {
         padding: 24px 28px 80px;
       }
     }
 
     @media (max-width: 768px) {
-      html, body {
+
+      html,
+      body {
         overflow-x: hidden;
         overflow-y: auto;
       }
@@ -1027,7 +1089,8 @@
         font-size: 18px;
       }
 
-      .version-tag, .status-badge {
+      .version-tag,
+      .status-badge {
         display: none;
       }
 
@@ -1035,7 +1098,8 @@
         gap: 6px;
       }
 
-      .btn-secondary span, .btn-primary span {
+      .btn-secondary span,
+      .btn-primary span {
         font-size: 0.75rem;
       }
 
@@ -1056,7 +1120,7 @@
         z-index: 99;
         transform: translateX(-100%);
         transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-        box-shadow: 4px 0 24px rgba(0,0,0,0.8);
+        box-shadow: 4px 0 24px rgba(0, 0, 0, 0.8);
       }
 
       .sidebar.open {
@@ -1100,7 +1164,9 @@
         padding: 14px;
       }
 
-      pre, .code-snippet-box, #responseBox {
+      pre,
+      .code-snippet-box,
+      #responseBox {
         font-size: 0.76rem;
         word-break: break-all;
       }
@@ -1114,10 +1180,13 @@
       .analytics-metrics-grid {
         grid-template-columns: 1fr;
       }
+
       .brand-logo span {
         font-size: 16px;
       }
-      .btn-secondary, .btn-primary {
+
+      .btn-secondary,
+      .btn-primary {
         padding: 5px 8px;
         font-size: 0.72rem;
       }
@@ -1147,7 +1216,9 @@
         <span class="status-dot"></span>
         <span>Operational</span>
       </div>
-      <button class="btn-secondary" onclick="copyDocAsMarkdownForLLM()" style="background: rgba(16, 185, 129, 0.12); border-color: rgba(16, 185, 129, 0.35); color: #34D399; font-weight: 700;" title="Copy complete API documentation as Markdown for ChatGPT / Claude / Cursor LLMs">
+      <button class="btn-secondary" onclick="copyDocAsMarkdownForLLM()"
+        style="background: rgba(16, 185, 129, 0.12); border-color: rgba(16, 185, 129, 0.35); color: #34D399; font-weight: 700;"
+        title="Copy complete API documentation as Markdown for ChatGPT / Claude / Cursor LLMs">
         <i data-lucide="sparkles" style="width: 14px; height: 14px; color: #34D399;"></i>
         <span>Copy for LLM</span>
       </button>
@@ -1169,7 +1240,7 @@
 
     <!-- Column 1: Left Navigation Tree Sidebar -->
     <aside class="sidebar">
-      
+
       <div class="sidebar-brand-card">
         <div class="sidebar-brand-title">
           <i data-lucide="shield-check" style="width: 14px; height: 14px; color: var(--accent-emerald);"></i>
@@ -1179,11 +1250,12 @@
       </div>
 
       <div class="sidebar-search-box">
-        <input type="text" class="sidebar-search-input" id="navFilter" placeholder="Search API..." oninput="filterNavEndpoints(this.value)">
+        <input type="text" class="sidebar-search-input" id="navFilter" placeholder="Search API..."
+          oninput="filterNavEndpoints(this.value)">
       </div>
 
       <nav class="sidebar-nav">
-        
+
         <!-- Get Started Group -->
         <div>
           <div class="nav-group-title">
@@ -1213,6 +1285,14 @@
             <a data-topic="search" class="nav-item" onclick="switchTopic('search', this)">
               <span class="m-badge get">GET</span>
               <span>/api/search</span>
+            </a>
+            <a data-topic="document" class="nav-item" onclick="switchTopic('document', this)">
+              <span class="m-badge get">GET</span>
+              <span>/api/document</span>
+            </a>
+            <a data-topic="read" class="nav-item" onclick="switchTopic('read', this)">
+              <span class="m-badge get">GET</span>
+              <span>/read (UI Render)</span>
             </a>
             <a data-topic="resolve" class="nav-item" onclick="switchTopic('resolve', this)">
               <span class="m-badge get">GET</span>
@@ -1258,7 +1338,9 @@
       </nav>
 
       <div class="sidebar-footer">
-        <div class="user-card" id="sidebarUserCard" style="display: none; cursor: pointer; justify-content: space-between; align-items: center;" onclick="switchTopic('profile')" title="Open Developer Profile">
+        <div class="user-card" id="sidebarUserCard"
+          style="display: none; cursor: pointer; justify-content: space-between; align-items: center;"
+          onclick="switchTopic('profile')" title="Open Developer Profile">
           <div style="display: flex; align-items: center; gap: 10px;">
             <div class="user-avatar" id="userAvatar">D</div>
             <div>
@@ -1276,20 +1358,22 @@
 
       <!-- Active Documentation Section -->
       <section class="doc-section">
-        
+
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
           <div class="hero-elegal-tag" style="margin-bottom: 0;">
             <span class="hero-pulse-dot"></span>
             <span id="displayBadgeText">eLegal Intelligence API • Core v1.0</span>
           </div>
-          <button class="btn-secondary" onclick="copyDocAsMarkdownForLLM()" style="background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.35); color: #34D399; font-size: 0.78rem; font-weight: 700; padding: 6px 14px; display: inline-flex; align-items: center; gap: 6px;">
+          <button class="btn-secondary" onclick="copyDocAsMarkdownForLLM()"
+            style="background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.35); color: #34D399; font-size: 0.78rem; font-weight: 700; padding: 6px 14px; display: inline-flex; align-items: center; gap: 6px;">
             <i data-lucide="sparkles" style="width: 14px; height: 14px; color: #34D399;"></i>
             <span>Copy as Markdown for LLM</span>
           </button>
         </div>
 
         <h1 class="doc-title" id="displayTitle">Overview & Authentication</h1>
-        <p class="doc-description" id="displayDesc">Build authoritative legal research tools, judicial precedent search engine integrations, and automated legal brief generators using our REST API.</p>
+        <p class="doc-description" id="displayDesc">Build authoritative legal research tools, judicial precedent search
+          engine integrations, and automated legal brief generators using our REST API.</p>
 
         <!-- Detailed Rich Documentation Text Block -->
         <div class="rich-doc-card" id="richDocContent"></div>
@@ -1312,7 +1396,8 @@
 
         <!-- Interactive Query Parameter Form -->
         <div id="paramInputsCard" class="interactive-inputs-card">
-          <h4 style="font-size: 0.85rem; font-weight: 700; color: #fff; margin-bottom: 10px;">Interactive Parameters</h4>
+          <h4 style="font-size: 0.85rem; font-weight: 700; color: #fff; margin-bottom: 10px;">Interactive Parameters
+          </h4>
           <div id="paramInputsContainer"></div>
         </div>
 
@@ -1365,19 +1450,23 @@
         <!-- Clean Response Payload Output Card (No '(' strings) -->
         <div style="display:flex; justify-style:space-between; align-items:center; margin-bottom:8px;">
           <h3 class="section-title" style="margin-bottom:0;">Response Payload</h3>
-          <span style="font-family: var(--font-mono); font-size: 0.75rem; font-weight: 700; color: #34D399;" id="respStatus">200 OK</span>
+          <span style="font-family: var(--font-mono); font-size: 0.75rem; font-weight: 700; color: #34D399;"
+            id="respStatus">200 OK</span>
         </div>
 
         <div class="code-card">
           <div class="code-card-header">
-            <span style="font-size: 0.72rem; color: var(--text-dim); font-family: var(--font-mono);" id="payloadMetaLabel">JSON Payload</span>
-            <button class="copy-icon-btn" onclick="copyText(document.getElementById('responseBox').innerText)" title="Copy Response">
+            <span style="font-size: 0.72rem; color: var(--text-dim); font-family: var(--font-mono);"
+              id="payloadMetaLabel">JSON Payload</span>
+            <button class="copy-icon-btn" onclick="copyText(document.getElementById('responseBox').innerText)"
+              title="Copy Response">
               <i data-lucide="copy" style="width: 14px; height: 14px;"></i>
             </button>
           </div>
           <div class="code-card-body">
             <div class="line-numbers" id="respLineNumbers">1<br>2<br>3</div>
-            <pre class="code-pre"><code id="responseBox"><span class="tok-cmnt">// Click "Run Call" above to test live endpoint response...</span></code></pre>
+            <pre
+              class="code-pre"><code id="responseBox"><span class="tok-cmnt">// Click "Run Call" above to test live endpoint response...</span></code></pre>
           </div>
         </div>
 
@@ -1404,22 +1493,30 @@
         </div>
 
         <!-- Profile Header Card -->
-        <div class="rich-doc-card" style="display: flex; justify-content: space-between; align-items: center; padding: 24px; margin-bottom: 24px; background: linear-gradient(135deg, rgba(16, 185, 129, 0.08), rgba(15, 23, 42, 0.6)); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: 12px;">
+        <div class="rich-doc-card"
+          style="display: flex; justify-content: space-between; align-items: center; padding: 24px; margin-bottom: 24px; background: linear-gradient(135deg, rgba(16, 185, 129, 0.08), rgba(15, 23, 42, 0.6)); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: 12px;">
           <div style="display: flex; align-items: center; gap: 18px;">
-            <div class="profile-avatar-lg" id="pageProfileAvatar" style="width: 56px; height: 56px; font-size: 1.5rem; background: linear-gradient(135deg, #10B981, #059669); font-weight: 800; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; box-shadow: 0 0 16px rgba(16, 185, 129, 0.4);">D</div>
+            <div class="profile-avatar-lg" id="pageProfileAvatar"
+              style="width: 56px; height: 56px; font-size: 1.5rem; background: linear-gradient(135deg, #10B981, #059669); font-weight: 800; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; box-shadow: 0 0 16px rgba(16, 185, 129, 0.4);">
+              D</div>
             <div>
               <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px;">
-                <h2 style="font-size: 1.4rem; font-weight: 800; color: #fff; margin: 0;" id="pageProfileName">Developer Profile</h2>
-                <span class="pro-tier-badge" style="background: rgba(16,185,129,0.15); color: #34D399; border: 1px solid rgba(16,185,129,0.3); padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; display: inline-flex; align-items: center; gap: 4px;"><i data-lucide="shield-check" style="width: 13px; height: 13px;"></i> Developer Pro Tier</span>
+                <h2 style="font-size: 1.4rem; font-weight: 800; color: #fff; margin: 0;" id="pageProfileName">Developer
+                  Profile</h2>
+                <span class="pro-tier-badge"
+                  style="background: rgba(16,185,129,0.15); color: #34D399; border: 1px solid rgba(16,185,129,0.3); padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; display: inline-flex; align-items: center; gap: 4px;"><i
+                    data-lucide="shield-check" style="width: 13px; height: 13px;"></i> Developer Pro Tier</span>
               </div>
-              <p style="font-size: 0.88rem; color: var(--text-muted); margin: 0;" id="pageProfileEmail">dev@elegal.or.ke</p>
+              <p style="font-size: 0.88rem; color: var(--text-muted); margin: 0;" id="pageProfileEmail">dev@elegal.or.ke
+              </p>
             </div>
           </div>
           <div style="display: flex; align-items: center; gap: 10px;">
             <button class="btn-secondary" onclick="loadDeveloperKeys()" style="padding: 8px 14px; font-size: 0.82rem;">
               <i data-lucide="rotate-cw" style="width: 14px; height: 14px;"></i> Refresh Live Stats
             </button>
-            <button class="btn-secondary" onclick="signOutUser()" style="padding: 8px 14px; font-size: 0.82rem; border-color: rgba(239, 68, 68, 0.4); color: #F87171;">
+            <button class="btn-secondary" onclick="signOutUser()"
+              style="padding: 8px 14px; font-size: 0.82rem; border-color: rgba(239, 68, 68, 0.4); color: #F87171;">
               <i data-lucide="log-out" style="width: 14px; height: 14px;"></i> Sign Out
             </button>
           </div>
@@ -1450,13 +1547,17 @@
         </div>
 
         <!-- Graphical API Execution Time Analytics Section (Matching Screenshot) -->
-        <div class="rich-doc-card" style="padding: 20px; margin-bottom: 24px; background: var(--surface-bg); border: 1px solid var(--border-color); border-radius: var(--radius-xl);">
-          
+        <div class="rich-doc-card"
+          style="padding: 20px; margin-bottom: 24px; background: var(--surface-bg); border: 1px solid var(--border-color); border-radius: var(--radius-xl);">
+
           <!-- Top Control Header Bar -->
-          <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 10px 14px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 16px;">
+          <div
+            style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 10px 14px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 16px;">
             <!-- Left Controls: Dropdowns & Compare Button -->
             <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px;">
-              <select id="analyticsScopeSelect" style="padding: 6px 10px; font-size: 0.8rem; height: 34px; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); color: var(--text-primary); border-radius: 4px; cursor: pointer; outline: none;" onchange="renderExecutionTimeChart()">
+              <select id="analyticsScopeSelect"
+                style="padding: 6px 10px; font-size: 0.8rem; height: 34px; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); color: var(--text-primary); border-radius: 4px; cursor: pointer; outline: none;"
+                onchange="renderExecutionTimeChart()">
                 <option value="all">All APIs</option>
                 <option value="search">Search Precedents</option>
                 <option value="resolve">PDF Resolver</option>
@@ -1464,9 +1565,12 @@
                 <option value="bulletins">Daily Bulletins</option>
               </select>
 
-              <div style="display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 4px; padding: 0 8px; height: 34px;">
+              <div
+                style="display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 4px; padding: 0 8px; height: 34px;">
                 <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600;">API</span>
-                <select id="analyticsApiSelect" style="background: transparent; border: none; color: var(--text-primary); font-size: 0.8rem; outline: none; cursor: pointer;" onchange="renderExecutionTimeChart()">
+                <select id="analyticsApiSelect"
+                  style="background: transparent; border: none; color: var(--text-primary); font-size: 0.8rem; outline: none; cursor: pointer;"
+                  onchange="renderExecutionTimeChart()">
                   <option value="PhoneVerification" selected>PhoneVerification</option>
                   <option value="LegalSearch">LegalSearch</option>
                   <option value="PDFResolver">PDFResolver</option>
@@ -1475,22 +1579,29 @@
                 </select>
               </div>
 
-              <div style="display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 4px; padding: 0 8px; height: 34px;">
+              <div
+                style="display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 4px; padding: 0 8px; height: 34px;">
                 <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600;">Version</span>
-                <select id="analyticsVersionSelect" style="background: transparent; border: none; color: var(--text-primary); font-size: 0.8rem; outline: none; cursor: pointer;" onchange="renderExecutionTimeChart()">
+                <select id="analyticsVersionSelect"
+                  style="background: transparent; border: none; color: var(--text-primary); font-size: 0.8rem; outline: none; cursor: pointer;"
+                  onchange="renderExecutionTimeChart()">
                   <option value="1.0.0" selected>1.0.0</option>
                   <option value="1.1.0">1.1.0</option>
                   <option value="2.0.0">2.0.0</option>
                 </select>
               </div>
 
-              <button style="background: #0B3C5D; border: 1px solid #1E40AF; color: #60A5FA; font-size: 0.78rem; font-weight: 700; padding: 0 16px; height: 34px; border-radius: 4px; cursor: pointer; transition: all 0.2s ease;" onclick="showToast('Comparing API metrics...')">
+              <button
+                style="background: #0B3C5D; border: 1px solid #1E40AF; color: #60A5FA; font-size: 0.78rem; font-weight: 700; padding: 0 16px; height: 34px; border-radius: 4px; cursor: pointer; transition: all 0.2s ease;"
+                onclick="showToast('Comparing API metrics...')">
                 Compare
               </button>
             </div>
 
             <!-- Right Granularity Selector: Hour | Day | Week | Month -->
-            <div style="display: flex; background: rgba(0,0,0,0.4); border: 1px solid var(--border-color); border-radius: 4px; overflow: hidden; height: 34px;" id="timeGranularityContainer">
+            <div
+              style="display: flex; background: rgba(0,0,0,0.4); border: 1px solid var(--border-color); border-radius: 4px; overflow: hidden; height: 34px;"
+              id="timeGranularityContainer">
               <button class="granularity-btn active" data-time="Hour" onclick="setGranularity('Hour')">Hour</button>
               <button class="granularity-btn" data-time="Day" onclick="setGranularity('Day')">Day</button>
               <button class="granularity-btn" data-time="Week" onclick="setGranularity('Week')">Week</button>
@@ -1499,26 +1610,38 @@
           </div>
 
           <!-- Multi-Series Legend Header Bar -->
-          <div style="display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 14px; margin-bottom: 16px; font-size: 0.76rem; color: var(--text-muted);">
-            <span style="display: inline-flex; align-items: center; gap: 4px; font-weight: 600;"><span style="width: 8px; height: 8px; border-radius: 50%; background: #0284C7;"></span> Total Time</span>
-            <span style="display: inline-flex; align-items: center; gap: 4px; font-weight: 600;"><span style="width: 8px; height: 8px; border-radius: 50%; background: #60A5FA;"></span> BackEnd</span>
-            <span style="display: inline-flex; align-items: center; gap: 4px; font-weight: 600;"><span style="width: 8px; height: 8px; border-radius: 50%; background: #F97316;"></span> Other</span>
-            <span style="display: inline-flex; align-items: center; gap: 4px; font-weight: 600;"><span style="width: 8px; height: 8px; border-radius: 50%; background: #F59E0B;"></span> Request Mediation</span>
-            <span style="display: inline-flex; align-items: center; gap: 4px; font-weight: 600;"><span style="width: 8px; height: 8px; border-radius: 50%; background: #10B981;"></span> Response Mediation</span>
-            <span style="display: inline-flex; align-items: center; gap: 4px; font-weight: 600;"><span style="width: 8px; height: 8px; border-radius: 50%; background: #34D399;"></span> Authentication</span>
-            <span style="display: inline-flex; align-items: center; gap: 4px; font-weight: 600;"><span style="width: 8px; height: 8px; border-radius: 50%; background: #EF4444;"></span> Throttling</span>
+          <div
+            style="display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 14px; margin-bottom: 16px; font-size: 0.76rem; color: var(--text-muted);">
+            <span style="display: inline-flex; align-items: center; gap: 4px; font-weight: 600;"><span
+                style="width: 8px; height: 8px; border-radius: 50%; background: #0284C7;"></span> Total Time</span>
+            <span style="display: inline-flex; align-items: center; gap: 4px; font-weight: 600;"><span
+                style="width: 8px; height: 8px; border-radius: 50%; background: #60A5FA;"></span> BackEnd</span>
+            <span style="display: inline-flex; align-items: center; gap: 4px; font-weight: 600;"><span
+                style="width: 8px; height: 8px; border-radius: 50%; background: #F97316;"></span> Other</span>
+            <span style="display: inline-flex; align-items: center; gap: 4px; font-weight: 600;"><span
+                style="width: 8px; height: 8px; border-radius: 50%; background: #F59E0B;"></span> Request
+              Mediation</span>
+            <span style="display: inline-flex; align-items: center; gap: 4px; font-weight: 600;"><span
+                style="width: 8px; height: 8px; border-radius: 50%; background: #10B981;"></span> Response
+              Mediation</span>
+            <span style="display: inline-flex; align-items: center; gap: 4px; font-weight: 600;"><span
+                style="width: 8px; height: 8px; border-radius: 50%; background: #34D399;"></span> Authentication</span>
+            <span style="display: inline-flex; align-items: center; gap: 4px; font-weight: 600;"><span
+                style="width: 8px; height: 8px; border-radius: 50%; background: #EF4444;"></span> Throttling</span>
           </div>
 
           <!-- Main Canvas Workspace for Execution Time Chart -->
           <div style="position: relative; padding-left: 65px; margin-bottom: 30px;">
-            
+
             <!-- Vertical Y Axis Title -->
-            <div style="position: absolute; left: -38px; top: 110px; transform: rotate(-90deg); font-size: 0.74rem; font-weight: 700; color: var(--text-muted); letter-spacing: 0.04em;">
+            <div
+              style="position: absolute; left: -38px; top: 110px; transform: rotate(-90deg); font-size: 0.74rem; font-weight: 700; color: var(--text-muted); letter-spacing: 0.04em;">
               Number of Calls
             </div>
 
             <!-- Y Axis Scale Numbers Column -->
-            <div id="yAxisLabelsContainer" style="position: absolute; left: 0; top: 0; height: 240px; width: 55px; display: flex; flex-direction: column; justify-content: space-between; align-items: flex-end; font-size: 0.72rem; font-family: var(--font-mono); color: var(--text-dim);">
+            <div id="yAxisLabelsContainer"
+              style="position: absolute; left: 0; top: 0; height: 240px; width: 55px; display: flex; flex-direction: column; justify-content: space-between; align-items: flex-end; font-size: 0.72rem; font-family: var(--font-mono); color: var(--text-dim);">
             </div>
 
             <!-- SVG Graph Container & Interactive Area -->
@@ -1527,16 +1650,19 @@
               </svg>
 
               <!-- Floating Interactive Tooltip matching Screenshot -->
-              <div id="chartTooltip" style="position: absolute; display: none; pointer-events: none; background: #ffffff; color: #0F172A; border: 1px solid #CBD5E1; border-radius: 6px; padding: 10px 14px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.3); font-size: 0.75rem; z-index: 100; min-width: 175px;">
+              <div id="chartTooltip"
+                style="position: absolute; display: none; pointer-events: none; background: #ffffff; color: #0F172A; border: 1px solid #CBD5E1; border-radius: 6px; padding: 10px 14px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.3); font-size: 0.75rem; z-index: 100; min-width: 175px;">
               </div>
             </div>
 
             <!-- X Axis Timestamp Labels -->
-            <div id="xAxisLabelsContainer" style="display: flex; justify-content: space-between; width: 100%; margin-top: 14px; padding-right: 10px;">
+            <div id="xAxisLabelsContainer"
+              style="display: flex; justify-content: space-between; width: 100%; margin-top: 14px; padding-right: 10px;">
             </div>
 
             <!-- X Axis Title -->
-            <div id="chartXAxisTitle" style="text-align: center; margin-top: 18px; font-size: 0.76rem; font-weight: 700; color: var(--text-muted);">
+            <div id="chartXAxisTitle"
+              style="text-align: center; margin-top: 18px; font-size: 0.76rem; font-weight: 700; color: var(--text-muted);">
               Time (Past 60 Minutes)
             </div>
           </div>
@@ -1546,26 +1672,37 @@
         </div>
 
         <!-- Create New API Key Form -->
-        <div class="create-key-card" style="margin-bottom: 24px; padding: 20px; background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); border-radius: 10px;">
-          <h3 style="font-size: 1.05rem; font-weight: 700; color: #fff; margin-bottom: 8px; display: flex; align-items: center; gap: 8px;">
+        <div class="create-key-card"
+          style="margin-bottom: 24px; padding: 20px; background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); border-radius: 10px;">
+          <h3
+            style="font-size: 1.05rem; font-weight: 700; color: #fff; margin-bottom: 8px; display: flex; align-items: center; gap: 8px;">
             <i data-lucide="plus-circle" style="width: 17px; height: 17px; color: var(--accent-emerald);"></i>
             Create New Secret API Key
           </h3>
-          <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 14px;">Generate secret API keys for your applications. Keys carry full account access privileges.</p>
+          <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 14px;">Generate secret API keys for
+            your applications. Keys carry full account access privileges.</p>
           <div style="display: flex; gap: 12px;">
-            <input type="text" id="newKeyLabelInputPage" placeholder="Application / Key Label (e.g. Production iOS Client)" class="input-field" style="flex: 1;">
+            <input type="text" id="newKeyLabelInputPage"
+              placeholder="Application / Key Label (e.g. Production iOS Client)" class="input-field" style="flex: 1;">
             <button class="btn-primary" onclick="handleCreateApiKey()" id="btnGenerateKeyPage">
               <i data-lucide="key" style="width: 14px; height: 14px;"></i>
               Generate Key
             </button>
           </div>
           <!-- Alert Box for Newly Created Key Secret -->
-          <div id="newKeyAlertBoxPage" style="display: none; margin-top: 14px; padding: 14px; background: rgba(16, 185, 129, 0.1); border: 1px solid var(--accent-emerald); border-radius: 8px;">
-            <div style="font-size: 0.85rem; color: #34D399; font-weight: 700; margin-bottom: 4px;">Key Secret Generated!</div>
-            <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 10px;">Copy your secret key now. You won't be able to view the full secret key again.</div>
-            <div style="display: flex; align-items: center; justify-content: space-between; background: #08090A; padding: 10px 14px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.1);">
-              <code id="newKeySecretTextPage" style="color: #34D399; font-size: 0.9rem; font-weight: 700; font-family: var(--font-mono); word-break: break-all;"></code>
-              <button class="btn-secondary" onclick="copyText(document.getElementById('newKeySecretTextPage').textContent)" style="padding: 4px 10px; font-size: 0.78rem;">
+          <div id="newKeyAlertBoxPage"
+            style="display: none; margin-top: 14px; padding: 14px; background: rgba(16, 185, 129, 0.1); border: 1px solid var(--accent-emerald); border-radius: 8px;">
+            <div style="font-size: 0.85rem; color: #34D399; font-weight: 700; margin-bottom: 4px;">Key Secret Generated!
+            </div>
+            <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 10px;">Copy your secret key now. You
+              won't be able to view the full secret key again.</div>
+            <div
+              style="display: flex; align-items: center; justify-content: space-between; background: #08090A; padding: 10px 14px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.1);">
+              <code id="newKeySecretTextPage"
+                style="color: #34D399; font-size: 0.9rem; font-weight: 700; font-family: var(--font-mono); word-break: break-all;"></code>
+              <button class="btn-secondary"
+                onclick="copyText(document.getElementById('newKeySecretTextPage').textContent)"
+                style="padding: 4px 10px; font-size: 0.78rem;">
                 <i data-lucide="copy" style="width: 12px; height: 12px;"></i> Copy Key
               </button>
             </div>
@@ -1602,111 +1739,126 @@
         </div>
       </div>
 
-  <!-- Authentication Modal Overlay -->
-  <div class="modal-overlay" id="authModal">
-    <div class="modal-card" style="max-width: 420px; width: 100%;">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-        <h2 style="font-size: 1.15rem; font-weight: 700; color: #fff; margin: 0; display: flex; align-items: center; gap: 8px;">
-          <i data-lucide="key" style="width: 18px; height: 18px; color: var(--accent-emerald);"></i>
-          Developer Account Sign In
-        </h2>
-        <button onclick="toggleAuthModal()" style="background: none; border: none; color: var(--text-muted); cursor: pointer; padding: 4px;">
-          <i data-lucide="x" style="width: 18px; height: 18px;"></i>
-        </button>
-      </div>
-      <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 20px;">
-        Sign in to manage your eLegal Developer API keys, monitor real-time request usage, and access rate limits.
-      </p>
+      <!-- Authentication Modal Overlay -->
+      <div class="modal-overlay" id="authModal">
+        <div class="modal-card" style="max-width: 420px; width: 100%;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <h2
+              style="font-size: 1.15rem; font-weight: 700; color: #fff; margin: 0; display: flex; align-items: center; gap: 8px;">
+              <i data-lucide="key" style="width: 18px; height: 18px; color: var(--accent-emerald);"></i>
+              Developer Account Sign In
+            </h2>
+            <button onclick="toggleAuthModal()"
+              style="background: none; border: none; color: var(--text-muted); cursor: pointer; padding: 4px;">
+              <i data-lucide="x" style="width: 18px; height: 18px;"></i>
+            </button>
+          </div>
+          <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 20px;">
+            Sign in to manage your eLegal Developer API keys, monitor real-time request usage, and access rate limits.
+          </p>
 
-      <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px;">
-        <button class="btn-secondary" onclick="loginWithProvider('Google')" style="justify-content: center; width: 100%; padding: 10px; font-weight: 600;">
-          <i data-lucide="chrome" style="width: 16px; height: 16px; color: #4285F4;"></i>
-          Continue with Google
-        </button>
-        <button class="btn-secondary" onclick="loginWithProvider('GitHub')" style="justify-content: center; width: 100%; padding: 10px; font-weight: 600;">
-          <i data-lucide="github" style="width: 16px; height: 16px;"></i>
-          Continue with GitHub
-        </button>
-      </div>
+          <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px;">
+            <button class="btn-secondary" onclick="loginWithProvider('Google')"
+              style="justify-content: center; width: 100%; padding: 10px; font-weight: 600;">
+              <i data-lucide="chrome" style="width: 16px; height: 16px; color: #4285F4;"></i>
+              Continue with Google
+            </button>
+            <button class="btn-secondary" onclick="loginWithProvider('GitHub')"
+              style="justify-content: center; width: 100%; padding: 10px; font-weight: 600;">
+              <i data-lucide="github" style="width: 16px; height: 16px;"></i>
+              Continue with GitHub
+            </button>
+          </div>
 
-      <div style="display: flex; align-items: center; margin-bottom: 20px;">
-        <div style="flex: 1; height: 1px; background: rgba(255,255,255,0.1);"></div>
-        <span style="padding: 0 10px; font-size: 0.75rem; color: var(--text-muted);">OR WITH EMAIL</span>
-        <div style="flex: 1; height: 1px; background: rgba(255,255,255,0.1);"></div>
-      </div>
+          <div style="display: flex; align-items: center; margin-bottom: 20px;">
+            <div style="flex: 1; height: 1px; background: rgba(255,255,255,0.1);"></div>
+            <span style="padding: 0 10px; font-size: 0.75rem; color: var(--text-muted);">OR WITH EMAIL</span>
+            <div style="flex: 1; height: 1px; background: rgba(255,255,255,0.1);"></div>
+          </div>
 
-      <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px;">
-        <div>
-          <label style="display: block; font-size: 0.78rem; font-weight: 600; color: var(--text-muted); margin-bottom: 6px;">Developer Email</label>
-          <input type="email" id="emailInput" class="input-field" placeholder="dev@company.com" style="width: 100%;">
+          <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px;">
+            <div>
+              <label
+                style="display: block; font-size: 0.78rem; font-weight: 600; color: var(--text-muted); margin-bottom: 6px;">Developer
+                Email</label>
+              <input type="email" id="emailInput" class="input-field" placeholder="dev@company.com"
+                style="width: 100%;">
+            </div>
+            <div>
+              <label
+                style="display: block; font-size: 0.78rem; font-weight: 600; color: var(--text-muted); margin-bottom: 6px;">Password</label>
+              <input type="password" id="passwordInput" class="input-field" placeholder="••••••••" style="width: 100%;">
+            </div>
+            <button class="btn-primary" onclick="handleEmailAuth()"
+              style="justify-content: center; width: 100%; padding: 10px; margin-top: 4px;">
+              <i data-lucide="log-in" style="width: 16px; height: 16px;"></i>
+              Sign In / Create Account
+            </button>
+          </div>
+
+          <div style="font-size: 0.75rem; color: var(--text-dim); text-align: center;">
+            By continuing, you agree to eLegal API Terms of Service & Privacy Policy.
+          </div>
         </div>
-        <div>
-          <label style="display: block; font-size: 0.78rem; font-weight: 600; color: var(--text-muted); margin-bottom: 6px;">Password</label>
-          <input type="password" id="passwordInput" class="input-field" placeholder="••••••••" style="width: 100%;">
-        </div>
-        <button class="btn-primary" onclick="handleEmailAuth()" style="justify-content: center; width: 100%; padding: 10px; margin-top: 4px;">
-          <i data-lucide="log-in" style="width: 16px; height: 16px;"></i>
-          Sign In / Create Account
-        </button>
       </div>
 
-      <div style="font-size: 0.75rem; color: var(--text-dim); text-align: center;">
-        By continuing, you agree to eLegal API Terms of Service & Privacy Policy.
-      </div>
-    </div>
-  </div>
+      <!-- Toast Notification -->
+      <div class="toast" id="toast"></div>
 
-  <!-- Toast Notification -->
-  <div class="toast" id="toast"></div>
+      <!-- Application Logic Script -->
+      <script>
+        // Lucide Icons Init
+        lucide.createIcons();
 
-  <!-- Application Logic Script -->
-  <script>
-    // Lucide Icons Init
-    lucide.createIcons();
+        // Topic Sequence List for Prev/Next Navigation
+        // Topic Sequence List for Prev/Next Navigation
+        const TOPIC_KEYS = [
+          'overview',
+          'profile',
+          'keys_overview',
+          'search',
+          'document',
+          'read',
+          'resolve',
+          'library',
+          'health',
+          'create_key',
+          'list_keys',
+          'update_key',
+          'delete_key'
+        ];
 
-    // Topic Sequence List for Prev/Next Navigation
-    const TOPIC_KEYS = [
-      'overview',
-      'profile',
-      'keys_overview',
-      'search',
-      'resolve',
-      'library',
-      'health',
-      'create_key',
-      'list_keys',
-      'update_key',
-      'delete_key'
-    ];
+        // App State
+        let activeTopicKey = 'overview';
+        let activeLang = 'curl';
+        let userApiKey = localStorage.getItem('elegal_api_key') || 'el_live_demo123456789';
+        let firebaseAuth = null;
+        let currentUser = null;
 
-    // App State
-    let activeTopicKey = 'overview';
-    let activeLang = 'curl';
-    let userApiKey = localStorage.getItem('elegal_api_key') || 'el_live_demo123456789';
-    let firebaseAuth = null;
-    let currentUser = null;
-
-    // Comprehensive Documentation Data for ALL Topics
-    const TOPICS = {
-      overview: {
-        id: 'overview',
-        name: 'Overview & Authentication',
-        badge: 'Getting Started Guide',
-        method: 'GET',
-        path: '/api/search',
-        isEndpoint: false,
-        desc: 'Build authoritative legal research tools, judicial precedent search engine integrations, and automated legal brief generators using our REST API.',
-        detailsHtml: `
+        // Comprehensive Documentation Data for ALL Topics
+        const TOPICS = {
+          overview: {
+            id: 'overview',
+            name: 'Overview & Authentication',
+            badge: 'Getting Started Guide',
+            method: 'GET',
+            path: '/api/search',
+            isEndpoint: false,
+            desc: 'Build authoritative legal research tools, judicial precedent search engine integrations, and automated legal brief generators using our REST API.',
+            detailsHtml: `
           <h3>Getting Started with eLegal API</h3>
           <p>The <strong>eLegal Developer REST API</strong> provides programmatical access to Kenya's most comprehensive judicial precedent database, statutory archives, and AI-grounded legal research engines. Designed for law firms, legal tech developers, and academic researchers, our API delivers structured JSON payloads containing verified court rulings, statutory provisions, and direct PDF downloads.</p>
           
+          <h3>Zero-CORS & Frictionless Access</h3>
+          <p>All endpoints feature permissive CORS headers (<code>Access-Control-Allow-Origin: *</code>). You can call the API directly from simple HTML/JS frontend scripts, web dashboards, or browser extensions without needing proxy servers.</p>
+
           <h3>Authentication Header</h3>
-          <p>All requests (except public health probes) require authentication via your confidential API secret key passed in the request header:</p>
+          <p>For high-throughput production access, include your confidential API key in the request header:</p>
           <p><code>X-API-Key: your_secret_key_here</code></p>
           
           <h3>Rate Limits & Quota Rules</h3>
           <ul>
-            <li><strong>Free Tier:</strong> 100 requests / minute (Burst limit: 15 req/sec).</li>
+            <li><strong>Free / Public Tier:</strong> 100 requests / minute (Burst limit: 15 req/sec).</li>
             <li><strong>Developer Pro Tier:</strong> 1,000 requests / minute with dedicated key rotation buffers.</li>
             <li><strong>Quota Limit Response:</strong> <code>HTTP 429 Too Many Requests</code> with <code>Retry-After</code> headers.</li>
           </ul>
@@ -1715,37 +1867,37 @@
           <ul>
             <li><code>200 OK</code> — Request processed successfully. JSON payload returned.</li>
             <li><code>400 Bad Request</code> — Invalid query parameters or missing body payload fields.</li>
-            <li><code>401 Unauthorized</code> — Missing or invalid <code>X-API-Key</code> request header.</li>
+            <li><code>401 Unauthorized</code> — Missing or invalid <code>X-API-Key</code> request header on authenticated routes.</li>
             <li><code>429 Quota Exhausted</code> — Rate limit exceeded for key. Fallback keys recommended.</li>
-            <li><code>500 Server Error</code> — Daemon failure or unhandled downstream search grounding exception.</li>
+            <li><code>500 Server Error</code> — Daemon failure or unhandled downstream search exception.</li>
           </ul>
         `,
-        params: [
-          { name: 'X-API-Key', type: 'header', req: true, desc: 'Your confidential developer API secret key (e.g. el_live_...)', default: 'el_live_demo123456789' },
-          { name: 'Accept', type: 'header', req: true, desc: 'Target MIME response format', default: 'application/json' }
-        ]
-      },
+            params: [
+              { name: 'X-API-Key', type: 'header', req: false, desc: 'Your confidential developer API secret key (e.g. el_live_...)', default: 'el_live_demo123456789' },
+              { name: 'Accept', type: 'header', req: false, desc: 'Target MIME response format', default: 'application/json' }
+            ]
+          },
 
-      profile: {
-        id: 'profile',
-        name: 'Developer Profile & Keys',
-        badge: 'Developer Account Portal',
-        method: 'GET',
-        path: '/api/keys',
-        isEndpoint: false,
-        desc: 'Manage your authenticated developer account profile, create and revoke secret API keys, and monitor real-time graphical usage metrics across all requests.',
-        detailsHtml: ''
-      },
+          profile: {
+            id: 'profile',
+            name: 'Developer Profile & Keys',
+            badge: 'Developer Account Portal',
+            method: 'GET',
+            path: '/api/keys',
+            isEndpoint: false,
+            desc: 'Manage your authenticated developer account profile, create and revoke secret API keys, and monitor real-time graphical usage metrics across all requests.',
+            detailsHtml: ''
+          },
 
-      keys_overview: {
-        id: 'keys_overview',
-        name: 'API Key Management Guide',
-        badge: 'Developer Account Keys',
-        method: 'POST',
-        path: '/api/keys',
-        isEndpoint: false,
-        desc: 'Manage secret API keys programmatically or via the eLegal Developer Dashboard. API keys are linked to your Firebase user account and stored securely in Firestore.',
-        detailsHtml: `
+          keys_overview: {
+            id: 'keys_overview',
+            name: 'API Key Management Guide',
+            badge: 'Developer Account Keys',
+            method: 'POST',
+            path: '/api/keys',
+            isEndpoint: false,
+            desc: 'Manage secret API keys programmatically or via the eLegal Developer Dashboard. API keys are linked to your Firebase user account and stored securely in Firestore.',
+            detailsHtml: `
           <h3>Key Lifecycle Management</h3>
           <p>Each developer account can generate up to <strong>10 active secret API keys</strong>. Keys can be created, paused, resumed, or permanently revoked at any time. When a key is paused, all requests with that key return <code>HTTP 401 Unauthorized</code> immediately without consuming your API quota.</p>
           
@@ -1756,361 +1908,409 @@
             <li>If a key is accidentally exposed, revoke it immediately via <code>DELETE /api/keys/:id</code> and generate a replacement key.</li>
           </ul>
         `,
-        params: [
-          { name: 'X-API-Key', type: 'header', req: true, desc: 'Authenticated session token or master developer secret key', default: 'el_live_demo123456789' }
-        ]
-      },
+            params: [
+              { name: 'X-API-Key', type: 'header', req: true, desc: 'Authenticated session token or master developer secret key', default: 'el_live_demo123456789' }
+            ]
+          },
 
-      search: {
-        id: 'search',
-        name: 'Search Legal Precedents',
-        badge: 'Legal Research API',
-        method: 'GET',
-        path: '/api/search',
-        isEndpoint: true,
-        desc: 'Executes high-density legal search across Kenya Law eKLR report archives, local statutes, and international legal repositories. Returns ranked case citations with official PDF document references.',
-        detailsHtml: `
+          search: {
+            id: 'search',
+            name: 'Search Legal Precedents',
+            badge: 'Legal Research API',
+            method: 'GET',
+            path: '/api/search',
+            isEndpoint: true,
+            desc: 'Executes high-density legal search across Kenya Law eKLR report archives, local statutes, and international legal repositories. Returns ranked case citations with actual document URLs, direct PDF links, and structured brief APIs.',
+            detailsHtml: `
           <h3>Hybrid Machine Learning Search Pipeline</h3>
           <p>The <code>/api/search</code> endpoint runs your query through an automated <strong>Jurisdiction & Legal Domain Classifier</strong> before searching eKLR archives and legal databases:</p>
           <ul>
-            <li><strong>Automated Classification:</strong> Distinguishes domestic Kenya law (Acts of Parliament, High Court, Court of Appeal, Supreme Court) from international precedents (BAILII, WorldLII, Justia).</li>
-            <li><strong>PDF Prioritization:</strong> Automatically flags cases with official downloadable eKLR PDF documents available for instant retrieval.</li>
-            <li><strong>Payload Cap:</strong> Returns the top 5 most relevant legal precedents for maximum density and low latency.</li>
+            <li><strong>Live & Fresh Search:</strong> Searches external databases and Kenya Law live. Uncached results are dynamically fetched and enriched so you never rely on stale data.</li>
+            <li><strong>Direct Document URLs:</strong> Every item in the <code>results</code> array includes <code>actualDocumentUrl</code>, <code>documentUrl</code>, <code>pdfUrl</code>, and <code>contentUrl</code> for immediate document access and rendering.</li>
+            <li><strong>Zero-CORS Browser Access:</strong> Permissive CORS allows you to fetch search results directly from simple HTML/JS files without proxying or backend servers.</li>
           </ul>
         `,
-        params: [
-          { name: 'q', type: 'string', req: true, desc: 'Legal topic, party names, statutory section, or case citation', default: 'land act 12 years adverse possession' },
-          { name: 'source', type: 'string', req: false, desc: 'Scope filter: all (default), kenya, or international', default: 'all' }
-        ]
-      },
+            params: [
+              { name: 'q', type: 'string', req: true, desc: 'Legal topic, party names, statutory section, or case citation', default: 'adverse possession 12 years land dispute' },
+              { name: 'source', type: 'string', req: false, desc: 'Scope filter: all (default), kenya, or international', default: 'all' },
+              { name: 'fresh', type: 'string', req: false, desc: 'Set to "true" to force fresh live fetch from external sources bypassing cache', default: 'false' },
+              { name: 'limit', type: 'number', req: false, desc: 'Number of results to return (max 50, default 5)', default: '5' }
+            ]
+          },
 
-      resolve: {
-        id: 'resolve',
-        name: 'Resolve PDF Record',
-        badge: 'Legal Research API',
-        method: 'GET',
-        path: '/api/resolve',
-        isEndpoint: true,
-        desc: 'Parses a Kenya Law HTML report URL, extracts the underlying downloadable PDF file URL, and caches a local copy for instant document viewing.',
-        detailsHtml: `
-          <h3>Automated eKLR Document Scraping</h3>
-          <p>Kenya Law web report pages (e.g. <code>http://kenyalaw.org/caselaw/cases/view/210452/</code>) host text reports inside HTML frames. The <code>/api/resolve</code> endpoint automatically scrapes the underlying export PDF binary link (<code>http://kenyalaw.org/caselaw/cases/export/210452/pdf</code>), downloads a local copy to the server filesystem, and returns direct link metadata.</p>
+          document: {
+            id: 'document',
+            name: 'Get Document Content & Brief',
+            badge: 'Legal Research API',
+            method: 'GET',
+            path: '/api/document',
+            isEndpoint: true,
+            desc: 'Retrieves full structured document text, clean HTML body, ratio decidendi, and legal brief for any cached or uncached legal document URL.',
+            detailsHtml: `
+          <h3>Full Document Extraction & Parsing</h3>
+          <p>The <code>/api/document</code> endpoint fetches, cleans, and extracts verbatim legal texts, statutes, and judgments:</p>
+          <ul>
+            <li><strong>Live External Scraping:</strong> If the document is uncached (or if <code>fresh=true</code>), the server automatically fetches the external document, converts DOCX/PDF/HTML, caches it, and returns full text.</li>
+            <li><strong>Structured NLP Legal Brief:</strong> Generates automated case holdings, facts, legal issues, and orders.</li>
+            <li><strong>Direct PDF Link:</strong> Returns <code>actualDocumentUrl</code> and <code>pdfUrl</code> for the document.</li>
+          </ul>
         `,
-        params: [
-          { name: 'url', type: 'string', req: true, desc: 'Target Kenya Law report web URL', default: 'http://kenyalaw.org/caselaw/cases/view/210452/' },
-          { name: 'title', type: 'string', req: false, desc: 'Custom title override for the cached document record', default: 'Civil Appeal 45 of 2020' }
-        ]
-      },
+            params: [
+              { name: 'sourceUrl', type: 'string', req: true, desc: 'Canonical URL or source link of the legal document (e.g. Kenya Law / AKN / web URL)', default: 'https://kenyalaw.org/akn/ke/act/1968/21/eng@2022-12-31' },
+              { name: 'title', type: 'string', req: false, desc: 'Display title override for metadata generation', default: 'Limitation of Actions Act Cap 22' },
+              { name: 'fresh', type: 'string', req: false, desc: 'Set to "true" to force fresh live fetch from source server', default: 'false' }
+            ]
+          },
 
-      library: {
-        id: 'library',
-        name: 'List Offline Library',
-        badge: 'Legal Research API',
-        method: 'GET',
-        path: '/api/library',
-        isEndpoint: true,
-        desc: 'Retrieves the complete inventory of offline statutes and precedents cached on the local server filesystem for zero-latency lookups.',
-        detailsHtml: `
+          read: {
+            id: 'read',
+            name: 'Document UI Renderer (/read)',
+            badge: 'Visual UI & Renderer API',
+            method: 'GET',
+            path: '/read',
+            isEndpoint: true,
+            desc: 'Directly renders the interactive eLegal document reader in browser tabs or iframes for any legal document or search result.',
+            detailsHtml: `
+          <h3>Instant Visual Reader for Developers</h3>
+          <p>Developers can embed or link to <code>/read</code> in their applications to render an elegant, responsive document reader with font adjustments, search in document, and AI legal briefs:</p>
+          <ul>
+            <li><strong>Iframe Embedding:</strong> Embed <code>&lt;iframe src="https://elegal.or.ke/read?sourceUrl=..."&gt;</code> seamlessly into any web page or client dashboard.</li>
+            <li><strong>Formats:</strong> Use <code>format=json</code> to retrieve JSON data, or <code>format=pdf</code> / <code>raw=1</code> for direct PDF download.</li>
+          </ul>
+        `,
+            params: [
+              { name: 'sourceUrl', type: 'string', req: true, desc: 'Source URL of the court case, statute, or document to render', default: 'https://kenyalaw.org/akn/ke/act/2010/constitution/eng@2010-09-03' },
+              { name: 'title', type: 'string', req: false, desc: 'Title displayed on the document header', default: 'The Constitution of Kenya, 2010' }
+            ]
+          },
+
+          resolve: {
+            id: 'resolve',
+            name: 'Resolve Document & PDF URL',
+            badge: 'Legal Research API',
+            method: 'GET',
+            path: '/api/resolve',
+            isEndpoint: true,
+            desc: 'Resolves any Kenya Law HTML caselaw or statute URL into its direct accessible PDF download link, metadata, and reader URLs.',
+            detailsHtml: `
+          <h3>Direct PDF & Metadata Resolution</h3>
+          <p>Converts Kenya Law report URLs (e.g. <code>http://kenyalaw.org/caselaw/cases/view/109852/</code>) into direct PDF export links (<code>https://kenyalaw.org/caselaw/cases/export/109852/pdf</code>) and extracts citation metadata.</p>
+        `,
+            params: [
+              { name: 'url', type: 'string', req: true, desc: 'Target legal document URL to resolve', default: 'http://kenyalaw.org/caselaw/cases/view/109852/' },
+              { name: 'title', type: 'string', req: false, desc: 'Custom title override for the record', default: 'Mtana Lewa v Kahindi Ngala (2015)' }
+            ]
+          },
+
+          library: {
+            id: 'library',
+            name: 'List Offline Library',
+            badge: 'Legal Research API',
+            method: 'GET',
+            path: '/api/library',
+            isEndpoint: true,
+            desc: 'Retrieves the complete inventory of offline statutes and precedents cached on the local server filesystem for zero-latency lookups.',
+            detailsHtml: `
           <h3>Offline Statute Repository</h3>
           <p>The offline library holds pre-indexed PDF files including the Constitution of Kenya 2010, the Land Act, Penal Code, Civil Procedure Act, Tax Appeals decisions, and key Supreme Court benchmarks stored locally for zero-latency searches.</p>
         `,
-        params: []
-      },
+            params: []
+          },
 
-      health: {
-        id: 'health',
-        name: 'Check System Health',
-        badge: 'System Monitoring',
-        method: 'GET',
-        path: '/api/health',
-        isEndpoint: true,
-        desc: 'Public health probe returning daemon status, server uptime, and database connection metrics. No authentication header required.',
-        detailsHtml: `
+          health: {
+            id: 'health',
+            name: 'Check System Health',
+            badge: 'System Monitoring',
+            method: 'GET',
+            path: '/api/health',
+            isEndpoint: true,
+            desc: 'Public health probe returning daemon status, server uptime, and database connection metrics. No authentication header required.',
+            detailsHtml: `
           <h3>Health & Readiness Probe</h3>
           <p>Use <code>GET /api/health</code> for automated uptime monitoring tools, container readiness probes, or load balancer health checks. Returns HTTP 200 when operational.</p>
         `,
-        params: []
-      },
+            params: []
+          },
 
-      create_key: {
-        id: 'create_key',
-        name: 'Generate API Key',
-        badge: 'Keys & Auth API',
-        method: 'POST',
-        path: '/api/keys',
-        isEndpoint: true,
-        desc: 'Generates a new authenticated API secret key for the logged-in developer account.',
-        detailsHtml: `
+          create_key: {
+            id: 'create_key',
+            name: 'Generate API Key',
+            badge: 'Keys & Auth API',
+            method: 'POST',
+            path: '/api/keys',
+            isEndpoint: true,
+            desc: 'Generates a new authenticated API secret key for the logged-in developer account.',
+            detailsHtml: `
           <h3>Creating Secret Keys</h3>
           <p>Issues a new unique API key prefixed with <code>el_live_...</code>. The full key secret is returned ONLY once upon creation in the JSON response payload. Store it securely in your secrets vault.</p>
         `,
-        params: [
-          { name: 'label', type: 'string', req: true, desc: 'Human-readable label identifier for the secret key', default: 'Production Application' }
-        ]
-      },
+            params: [
+              { name: 'label', type: 'string', req: true, desc: 'Human-readable label identifier for the secret key', default: 'Production Application' }
+            ]
+          },
 
-      list_keys: {
-        id: 'list_keys',
-        name: 'List Developer Keys',
-        badge: 'Keys & Auth API',
-        method: 'GET',
-        path: '/api/keys',
-        isEndpoint: true,
-        desc: 'Lists all secret keys generated under the authenticated developer account along with key status and usage metrics.',
-        detailsHtml: `
+          list_keys: {
+            id: 'list_keys',
+            name: 'List Developer Keys',
+            badge: 'Keys & Auth API',
+            method: 'GET',
+            path: '/api/keys',
+            isEndpoint: true,
+            desc: 'Lists all secret keys generated under the authenticated developer account along with key status and usage metrics.',
+            detailsHtml: `
           <h3>Listing Active Keys</h3>
           <p>Returns an array of key objects created under your account. For security, keys are returned masked (e.g. <code>el_live_****1234</code>).</p>
         `,
-        params: []
-      },
+            params: []
+          },
 
-      update_key: {
-        id: 'update_key',
-        name: 'Update Key Status',
-        badge: 'Keys & Auth API',
-        method: 'PATCH',
-        path: '/api/keys/:keyId',
-        isEndpoint: true,
-        desc: 'Updates key label or toggles active status (pause/resume) of an existing secret key.',
-        detailsHtml: `
+          update_key: {
+            id: 'update_key',
+            name: 'Update Key Status',
+            badge: 'Keys & Auth API',
+            method: 'PATCH',
+            path: '/api/keys/:keyId',
+            isEndpoint: true,
+            desc: 'Updates key label or toggles active status (pause/resume) of an existing secret key.',
+            detailsHtml: `
           <h3>Pausing & Resuming Keys</h3>
           <p>Pass <code>{ "isActive": false }</code> to pause a key without revoking its ID. Pass <code>{ "isActive": true }</code> to re-enable request authorization.</p>
         `,
-        params: [
-          { name: 'isActive', type: 'boolean', req: true, desc: 'Set active status flag', default: 'true' }
-        ]
-      },
+            params: [
+              { name: 'isActive', type: 'boolean', req: true, desc: 'Set active status flag', default: 'true' }
+            ]
+          },
 
-      delete_key: {
-        id: 'delete_key',
-        name: 'Delete API Key',
-        badge: 'Keys & Auth API',
-        method: 'DELETE',
-        path: '/api/keys/:keyId',
-        isEndpoint: true,
-        desc: 'Permanently revokes and removes an API secret key from Firestore storage.',
-        detailsHtml: `
+          delete_key: {
+            id: 'delete_key',
+            name: 'Delete API Key',
+            badge: 'Keys & Auth API',
+            method: 'DELETE',
+            path: '/api/keys/:keyId',
+            isEndpoint: true,
+            desc: 'Permanently revokes and removes an API secret key from Firestore storage.',
+            detailsHtml: `
           <h3>Revoking Secret Keys</h3>
           <p>Permanently deletes a key from Firestore. Any future API requests using this key will be rejected immediately with HTTP 401.</p>
         `,
-        params: []
-      }
-    };
+            params: []
+          }
+        };
 
-    // Firebase Auth Setup
-    const firebaseConfig = {
-      apiKey: "AIzaSyD1YHV18FAJjWLbB3_00HwdD5SLF_O7UbQ",
-      authDomain: "elegal-v1.firebaseapp.com",
-      projectId: "elegal-v1",
-      storageBucket: "elegal-v1.firebasestorage.app",
-      messagingSenderId: "708770097911",
-      appId: "1:708770097911:web:990de5eb5ab0f51f68c1f2"
-    };
+        // Firebase Auth Setup
+        const firebaseConfig = {
+          apiKey: "AIzaSyD1YHV18FAJjWLbB3_00HwdD5SLF_O7UbQ",
+          authDomain: "elegal-v1.firebaseapp.com",
+          projectId: "elegal-v1",
+          storageBucket: "elegal-v1.firebasestorage.app",
+          messagingSenderId: "708770097911",
+          appId: "1:708770097911:web:990de5eb5ab0f51f68c1f2"
+        };
 
-    async function initFirebase() {
-      try {
-        const appMod = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
-        const authMod = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
-        const app = appMod.initializeApp(firebaseConfig);
-        firebaseAuth = authMod.getAuth(app);
+        async function initFirebase() {
+          try {
+            const appMod = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
+            const authMod = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
+            const app = appMod.initializeApp(firebaseConfig);
+            firebaseAuth = authMod.getAuth(app);
 
-        window._fbGoogleAuthProvider = authMod.GoogleAuthProvider;
-        window._fbGithubAuthProvider = authMod.GithubAuthProvider;
-        window._fbSignInWithPopup = authMod.signInWithPopup;
-        window._fbSignInWithEmail = authMod.signInWithEmailAndPassword;
-        window._fbCreateUserWithEmail = authMod.createUserWithEmailAndPassword;
-        window._fbSignOut = authMod.signOut;
+            window._fbGoogleAuthProvider = authMod.GoogleAuthProvider;
+            window._fbGithubAuthProvider = authMod.GithubAuthProvider;
+            window._fbSignInWithPopup = authMod.signInWithPopup;
+            window._fbSignInWithEmail = authMod.signInWithEmailAndPassword;
+            window._fbCreateUserWithEmail = authMod.createUserWithEmailAndPassword;
+            window._fbSignOut = authMod.signOut;
 
-        authMod.onAuthStateChanged(firebaseAuth, (u) => {
-          currentUser = u;
-          updateUserUI(u);
-        });
-      } catch (e) {
-        console.warn('Firebase init fallback:', e.message);
-      }
-    }
-
-    let currentDeveloperKeys = [];
-
-    async function getAuthHeader() {
-      if (currentUser && typeof currentUser.getIdToken === 'function') {
-        try {
-          const token = await currentUser.getIdToken();
-          return { 'Authorization': token, 'Content-Type': 'application/json' };
-        } catch (e) {
-          console.warn('getIdToken warning:', e);
+            authMod.onAuthStateChanged(firebaseAuth, (u) => {
+              currentUser = u;
+              updateUserUI(u);
+            });
+          } catch (e) {
+            console.warn('Firebase init fallback:', e.message);
+          }
         }
-      }
-      return { 'Authorization': 'Bearer demo_dev_token', 'Content-Type': 'application/json' };
-    }
 
-    function updateUserUI(user) {
-      const card = document.getElementById('sidebarUserCard');
-      const text = document.getElementById('topAuthText');
-      if (user) {
-        card.style.display = 'flex';
-        document.getElementById('userName').textContent = user.displayName || user.email;
-        document.getElementById('userEmail').textContent = user.email || '';
-        document.getElementById('userAvatar').textContent = ((user.displayName || user.email || 'U')[0]).toUpperCase();
-        text.textContent = 'Developer Profile';
-      } else {
-        card.style.display = 'none';
-        text.textContent = 'Sign In / API Keys';
-      }
-    }
+        let currentDeveloperKeys = [];
 
-    function handleTopAuthAction() {
-      if (currentUser) {
-        switchTopic('profile');
-      } else {
-        toggleAuthModal();
-      }
-    }
-
-    // Developer Profile & API Keys Manager Handlers
-    function openProfileModal() {
-      switchTopic('profile');
-    }
-
-    function openProfilePage() {
-      if (!currentUser) {
-        toggleAuthModal();
-        return;
-      }
-
-      const name = currentUser.displayName || currentUser.email || 'Developer Profile';
-      const email = currentUser.email || 'dev@elegal.or.ke';
-      const avatar = ((currentUser.displayName || currentUser.email || 'D')[0]).toUpperCase();
-
-      const nameEl = document.getElementById('pageProfileName');
-      const emailEl = document.getElementById('pageProfileEmail');
-      const avatarEl = document.getElementById('pageProfileAvatar');
-
-      if (nameEl) nameEl.textContent = name;
-      if (emailEl) emailEl.textContent = email;
-      if (avatarEl) avatarEl.textContent = avatar;
-
-      loadDeveloperKeys();
-    }
-
-    function closeProfileModal() {
-      const alertBox = document.getElementById('newKeyAlertBoxPage') || document.getElementById('newKeyAlertBox');
-      if (alertBox) alertBox.style.display = 'none';
-    }
-
-    async function loadDeveloperKeys() {
-      try {
-        const headers = await getAuthHeader();
-        if (userApiKey && !headers['X-API-Key'] && !headers['Authorization']) {
-          headers['X-API-Key'] = userApiKey;
+        async function getAuthHeader() {
+          if (currentUser && typeof currentUser.getIdToken === 'function') {
+            try {
+              const token = await currentUser.getIdToken();
+              return { 'Authorization': token, 'Content-Type': 'application/json' };
+            } catch (e) {
+              console.warn('getIdToken warning:', e);
+            }
+          }
+          return { 'Authorization': 'Bearer demo_dev_token', 'Content-Type': 'application/json' };
         }
-        const res = await fetch('/api/keys', { headers });
-        if (res.ok) {
-          const keys = await res.json();
-          currentDeveloperKeys = keys || [];
-        } else {
-          currentDeveloperKeys = getMockDeveloperKeys();
+
+        function updateUserUI(user) {
+          const card = document.getElementById('sidebarUserCard');
+          const text = document.getElementById('topAuthText');
+          if (user) {
+            card.style.display = 'flex';
+            document.getElementById('userName').textContent = user.displayName || user.email;
+            document.getElementById('userEmail').textContent = user.email || '';
+            document.getElementById('userAvatar').textContent = ((user.displayName || user.email || 'U')[0]).toUpperCase();
+            text.textContent = 'Developer Profile';
+          } else {
+            card.style.display = 'none';
+            text.textContent = 'Sign In / API Keys';
+          }
         }
-      } catch (e) {
-        console.warn('loadDeveloperKeys fallback:', e);
-        currentDeveloperKeys = getMockDeveloperKeys();
-      }
-      renderKeysListAndAnalytics(currentDeveloperKeys);
-    }
 
-    function getMockDeveloperKeys() {
-      const now = new Date();
-      const mockHistory = [];
-      const endpoints = ['/api/search', '/api/resolve', '/api/ai-finder', '/api/bulletins'];
-      
-      // Generate sample calls across recent 60 mins, past 24 hours, and past 7 days
-      for (let i = 0; i < 45; i++) {
-        const minutesAgo = Math.floor(Math.random() * 55);
-        const logTime = new Date(now.getTime() - minutesAgo * 60 * 1000);
-        mockHistory.push({
-          timestamp: logTime.toISOString(),
-          endpoint: endpoints[i % endpoints.length],
-          method: 'GET',
-          type: i % 2 === 0 ? 'search' : 'resolve',
-          statusCode: 200,
-          cost: 0.002,
-          totalTime: Math.floor(Math.random() * 250) + 80,
-          backEndTime: Math.floor(Math.random() * 150) + 50,
-          responseMediation: Math.floor(Math.random() * 30) + 10,
-          authTime: 4,
-          throttling: 0
-        });
-      }
+        function handleTopAuthAction() {
+          if (currentUser) {
+            switchTopic('profile');
+          } else {
+            toggleAuthModal();
+          }
+        }
 
-      for (let i = 0; i < 80; i++) {
-        const hoursAgo = Math.floor(Math.random() * 23) + 1;
-        const logTime = new Date(now.getTime() - hoursAgo * 3600 * 1000);
-        mockHistory.push({
-          timestamp: logTime.toISOString(),
-          endpoint: endpoints[i % endpoints.length],
-          method: 'GET',
-          type: 'search',
-          statusCode: 200,
-          cost: 0.002,
-          totalTime: Math.floor(Math.random() * 300) + 100,
-          backEndTime: Math.floor(Math.random() * 200) + 60,
-          responseMediation: Math.floor(Math.random() * 40) + 15,
-          authTime: 3,
-          throttling: 0
-        });
-      }
+        // Developer Profile & API Keys Manager Handlers
+        function openProfileModal() {
+          switchTopic('profile');
+        }
 
-      for (let i = 0; i < 120; i++) {
-        const daysAgo = Math.floor(Math.random() * 6) + 1;
-        const logTime = new Date(now.getTime() - daysAgo * 24 * 3600 * 1000);
-        mockHistory.push({
-          timestamp: logTime.toISOString(),
-          endpoint: endpoints[i % endpoints.length],
-          method: 'GET',
-          type: 'search',
-          statusCode: 200,
-          cost: 0.002,
-          totalTime: Math.floor(Math.random() * 350) + 120,
-          backEndTime: Math.floor(Math.random() * 220) + 70,
-          responseMediation: Math.floor(Math.random() * 45) + 20,
-          authTime: 4,
-          throttling: 0
-        });
-      }
+        function openProfilePage() {
+          if (!currentUser) {
+            toggleAuthModal();
+            return;
+          }
 
-      const primaryKey = userApiKey || 'el_f26eaf120aa1cf8edfe6cc4b194def1c';
+          const name = currentUser.displayName || currentUser.email || 'Developer Profile';
+          const email = currentUser.email || 'dev@elegal.or.ke';
+          const avatar = ((currentUser.displayName || currentUser.email || 'D')[0]).toUpperCase();
 
-      return [
-        { key: primaryKey, label: 'Primary Secret Key', createdAt: '2026-08-01', lastUsed: 'Just now', requestCount: mockHistory.length, isActive: true, expenditure: Number((mockHistory.length * 0.002).toFixed(4)), usageHistory: mockHistory, callsRecord: mockHistory },
-        { key: 'el_live_stag_3419c8d04e', label: 'Staging & QA Environment Key', createdAt: '2026-08-10', lastUsed: '2 hours ago', requestCount: 18, isActive: true, expenditure: 0.036, usageHistory: [], callsRecord: [] }
-      ];
-    }
+          const nameEl = document.getElementById('pageProfileName');
+          const emailEl = document.getElementById('pageProfileEmail');
+          const avatarEl = document.getElementById('pageProfileAvatar');
 
-    function renderKeysListAndAnalytics(keys) {
-      const activeKeys = keys.filter(k => k.isActive !== false);
-      const totalCalls = keys.reduce((sum, k) => sum + (k.requestCount || 0), 0);
-      const totalExpenditure = keys.reduce((sum, k) => sum + (typeof k.expenditure === 'number' ? k.expenditure : (k.requestCount || 0) * 0.002), 0);
+          if (nameEl) nameEl.textContent = name;
+          if (emailEl) emailEl.textContent = email;
+          if (avatarEl) avatarEl.textContent = avatar;
 
-      const callsEl = document.getElementById('metricTotalCallsPage') || document.getElementById('metricTotalCalls');
-      const activeEl = document.getElementById('metricActiveKeysPage') || document.getElementById('metricActiveKeys');
-      const costEl = document.getElementById('metricTotalExpenditurePage') || document.getElementById('metricTotalExpenditure');
-      if (callsEl) callsEl.textContent = totalCalls.toLocaleString();
-      if (activeEl) activeEl.textContent = `${activeKeys.length} / 10`;
-      if (costEl) costEl.textContent = `$${totalExpenditure.toFixed(4)}`;
+          loadDeveloperKeys();
+        }
 
-      // 1. Render Key Table Rows
-      const tbody = document.getElementById('developerKeysTableBodyPage') || document.getElementById('developerKeysTableBody');
-      if (tbody) {
-        tbody.innerHTML = '';
-        if (keys.length === 0) {
-          tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--text-muted); padding: 18px;">No API keys generated yet. Use the form above to generate your first secret key.</td></tr>`;
-        } else {
-          keys.forEach(k => {
-            const isAct = k.isActive !== false;
-            const maskedKey = k.key.length > 12 ? (k.key.substring(0, 10) + '...' + k.key.substring(k.key.length - 4)) : k.key;
-            const exp = typeof k.expenditure === 'number' ? k.expenditure : (k.requestCount || 0) * 0.002;
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
+        function closeProfileModal() {
+          const alertBox = document.getElementById('newKeyAlertBoxPage') || document.getElementById('newKeyAlertBox');
+          if (alertBox) alertBox.style.display = 'none';
+        }
+
+        async function loadDeveloperKeys() {
+          try {
+            const headers = await getAuthHeader();
+            if (userApiKey && !headers['X-API-Key'] && !headers['Authorization']) {
+              headers['X-API-Key'] = userApiKey;
+            }
+            const res = await fetch('/api/keys', { headers });
+            if (res.ok) {
+              const keys = await res.json();
+              currentDeveloperKeys = keys || [];
+            } else {
+              currentDeveloperKeys = getMockDeveloperKeys();
+            }
+          } catch (e) {
+            console.warn('loadDeveloperKeys fallback:', e);
+            currentDeveloperKeys = getMockDeveloperKeys();
+          }
+          renderKeysListAndAnalytics(currentDeveloperKeys);
+        }
+
+        function getMockDeveloperKeys() {
+          const now = new Date();
+          const mockHistory = [];
+          const endpoints = ['/api/search', '/api/resolve', '/api/ai-finder', '/api/bulletins'];
+
+          // Generate sample calls across recent 60 mins, past 24 hours, and past 7 days
+          for (let i = 0; i < 45; i++) {
+            const minutesAgo = Math.floor(Math.random() * 55);
+            const logTime = new Date(now.getTime() - minutesAgo * 60 * 1000);
+            mockHistory.push({
+              timestamp: logTime.toISOString(),
+              endpoint: endpoints[i % endpoints.length],
+              method: 'GET',
+              type: i % 2 === 0 ? 'search' : 'resolve',
+              statusCode: 200,
+              cost: 0.002,
+              totalTime: Math.floor(Math.random() * 250) + 80,
+              backEndTime: Math.floor(Math.random() * 150) + 50,
+              responseMediation: Math.floor(Math.random() * 30) + 10,
+              authTime: 4,
+              throttling: 0
+            });
+          }
+
+          for (let i = 0; i < 80; i++) {
+            const hoursAgo = Math.floor(Math.random() * 23) + 1;
+            const logTime = new Date(now.getTime() - hoursAgo * 3600 * 1000);
+            mockHistory.push({
+              timestamp: logTime.toISOString(),
+              endpoint: endpoints[i % endpoints.length],
+              method: 'GET',
+              type: 'search',
+              statusCode: 200,
+              cost: 0.002,
+              totalTime: Math.floor(Math.random() * 300) + 100,
+              backEndTime: Math.floor(Math.random() * 200) + 60,
+              responseMediation: Math.floor(Math.random() * 40) + 15,
+              authTime: 3,
+              throttling: 0
+            });
+          }
+
+          for (let i = 0; i < 120; i++) {
+            const daysAgo = Math.floor(Math.random() * 6) + 1;
+            const logTime = new Date(now.getTime() - daysAgo * 24 * 3600 * 1000);
+            mockHistory.push({
+              timestamp: logTime.toISOString(),
+              endpoint: endpoints[i % endpoints.length],
+              method: 'GET',
+              type: 'search',
+              statusCode: 200,
+              cost: 0.002,
+              totalTime: Math.floor(Math.random() * 350) + 120,
+              backEndTime: Math.floor(Math.random() * 220) + 70,
+              responseMediation: Math.floor(Math.random() * 45) + 20,
+              authTime: 4,
+              throttling: 0
+            });
+          }
+
+          const primaryKey = userApiKey || 'el_f26eaf120aa1cf8edfe6cc4b194def1c';
+
+          return [
+            { key: primaryKey, label: 'Primary Secret Key', createdAt: '2026-08-01', lastUsed: 'Just now', requestCount: mockHistory.length, isActive: true, expenditure: Number((mockHistory.length * 0.002).toFixed(4)), usageHistory: mockHistory, callsRecord: mockHistory },
+            { key: 'el_live_stag_3419c8d04e', label: 'Staging & QA Environment Key', createdAt: '2026-08-10', lastUsed: '2 hours ago', requestCount: 18, isActive: true, expenditure: 0.036, usageHistory: [], callsRecord: [] }
+          ];
+        }
+
+        function renderKeysListAndAnalytics(keys) {
+          const activeKeys = keys.filter(k => k.isActive !== false);
+          const totalCalls = keys.reduce((sum, k) => sum + (k.requestCount || 0), 0);
+          const totalExpenditure = keys.reduce((sum, k) => sum + (typeof k.expenditure === 'number' ? k.expenditure : (k.requestCount || 0) * 0.002), 0);
+
+          const callsEl = document.getElementById('metricTotalCallsPage') || document.getElementById('metricTotalCalls');
+          const activeEl = document.getElementById('metricActiveKeysPage') || document.getElementById('metricActiveKeys');
+          const costEl = document.getElementById('metricTotalExpenditurePage') || document.getElementById('metricTotalExpenditure');
+          if (callsEl) callsEl.textContent = totalCalls.toLocaleString();
+          if (activeEl) activeEl.textContent = `${activeKeys.length} / 10`;
+          if (costEl) costEl.textContent = `$${totalExpenditure.toFixed(4)}`;
+
+          // 1. Render Key Table Rows
+          const tbody = document.getElementById('developerKeysTableBodyPage') || document.getElementById('developerKeysTableBody');
+          if (tbody) {
+            tbody.innerHTML = '';
+            if (keys.length === 0) {
+              tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--text-muted); padding: 18px;">No API keys generated yet. Use the form above to generate your first secret key.</td></tr>`;
+            } else {
+              keys.forEach(k => {
+                const isAct = k.isActive !== false;
+                const maskedKey = k.key.length > 12 ? (k.key.substring(0, 10) + '...' + k.key.substring(k.key.length - 4)) : k.key;
+                const exp = typeof k.expenditure === 'number' ? k.expenditure : (k.requestCount || 0) * 0.002;
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
               <td style="font-weight: 600; color: #fff;">${escapeHtml(k.label || 'Default Key')}</td>
               <td><code style="color: var(--accent-green); font-size: 0.78rem;">${escapeHtml(maskedKey)}</code></td>
               <td><span class="badge-status ${isAct ? 'active' : 'paused'}">${isAct ? 'Active' : 'Paused'}</span></td>
@@ -2131,23 +2331,23 @@
                 </div>
               </td>
             `;
-            tbody.appendChild(tr);
-          });
-        }
-      }
+                tbody.appendChild(tr);
+              });
+            }
+          }
 
-      // 2. Render Per-Key Usage Progress Bars (Graphical Analytics)
-      const usageContainer = document.getElementById('keyUsageBreakdownContainerPage') || document.getElementById('keyUsageBreakdownContainer');
-      if (usageContainer) {
-        usageContainer.innerHTML = '';
-        if (keys.length > 0) {
-          const maxCalls = Math.max(...keys.map(k => k.requestCount || 0), 100);
-          keys.forEach(k => {
-            const calls = k.requestCount || 0;
-            const pct = Math.min(100, Math.round((calls / maxCalls) * 100));
-            const wrapper = document.createElement('div');
-            wrapper.className = 'key-usage-bar-wrapper';
-            wrapper.innerHTML = `
+          // 2. Render Per-Key Usage Progress Bars (Graphical Analytics)
+          const usageContainer = document.getElementById('keyUsageBreakdownContainerPage') || document.getElementById('keyUsageBreakdownContainer');
+          if (usageContainer) {
+            usageContainer.innerHTML = '';
+            if (keys.length > 0) {
+              const maxCalls = Math.max(...keys.map(k => k.requestCount || 0), 100);
+              keys.forEach(k => {
+                const calls = k.requestCount || 0;
+                const pct = Math.min(100, Math.round((calls / maxCalls) * 100));
+                const wrapper = document.createElement('div');
+                wrapper.className = 'key-usage-bar-wrapper';
+                wrapper.innerHTML = `
               <div style="display: flex; justify-content: space-between; font-size: 0.78rem; margin-bottom: 6px;">
                 <span style="font-weight: 600; color: #fff;">${escapeHtml(k.label || 'API Key')} <code style="color: var(--text-muted); font-size: 0.72rem;">(${k.key.substring(0, 8)}...)</code></span>
                 <span style="font-family: var(--font-mono); font-weight: 700; color: #34D399;">${calls.toLocaleString()} calls (${pct}%)</span>
@@ -2156,306 +2356,306 @@
                 <div class="key-usage-bar-fill" style="width: ${pct}%;"></div>
               </div>
             `;
-            usageContainer.appendChild(wrapper);
-          });
+                usageContainer.appendChild(wrapper);
+              });
+            }
+          }
+
+          // 3. Render Execution Time & Latency Analytics Graph
+          renderExecutionTimeChart();
+
+          if (window.lucide) lucide.createIcons();
         }
-      }
 
-      // 3. Render Execution Time & Latency Analytics Graph
-      renderExecutionTimeChart();
+        let activeGranularity = 'Hour';
 
-      if (window.lucide) lucide.createIcons();
-    }
-
-    let activeGranularity = 'Hour';
-
-    function setGranularity(unit) {
-      activeGranularity = unit;
-      document.querySelectorAll('.granularity-btn').forEach(btn => {
-        if (btn.dataset.time === unit) {
-          btn.classList.add('active');
-        } else {
-          btn.classList.remove('active');
+        function setGranularity(unit) {
+          activeGranularity = unit;
+          document.querySelectorAll('.granularity-btn').forEach(btn => {
+            if (btn.dataset.time === unit) {
+              btn.classList.add('active');
+            } else {
+              btn.classList.remove('active');
+            }
+          });
+          renderExecutionTimeChart();
         }
-      });
-      renderExecutionTimeChart();
-    }
 
-    function generateTimePointsData(allLogs, granularity) {
-      const points = [];
-      const now = new Date();
+        function generateTimePointsData(allLogs, granularity) {
+          const points = [];
+          const now = new Date();
 
-      if (granularity === 'Hour') {
-        // Past 60 minutes divided into 6 x 10-minute buckets
-        for (let i = 5; i >= 0; i--) {
-          const bucketStart = new Date(now.getTime() - (i + 1) * 10 * 60 * 1000);
-          const bucketEnd = new Date(now.getTime() - i * 10 * 60 * 1000);
-          const labelTime = new Date(now.getTime() - i * 10 * 60 * 1000);
-          const label = labelTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+          if (granularity === 'Hour') {
+            // Past 60 minutes divided into 6 x 10-minute buckets
+            for (let i = 5; i >= 0; i--) {
+              const bucketStart = new Date(now.getTime() - (i + 1) * 10 * 60 * 1000);
+              const bucketEnd = new Date(now.getTime() - i * 10 * 60 * 1000);
+              const labelTime = new Date(now.getTime() - i * 10 * 60 * 1000);
+              const label = labelTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-          const windowLogs = allLogs.filter(l => {
-            if (!l.timestamp) return false;
-            const logDate = new Date(l.timestamp);
-            return logDate >= bucketStart && logDate <= bucketEnd;
-          });
+              const windowLogs = allLogs.filter(l => {
+                if (!l.timestamp) return false;
+                const logDate = new Date(l.timestamp);
+                return logDate >= bucketStart && logDate <= bucketEnd;
+              });
 
-          const callsCount = windowLogs.length;
-          const totalTime = callsCount > 0 ? Math.round(windowLogs.reduce((a, b) => a + (b.totalTime || 120), 0) / callsCount) : 0;
-          const backEndTime = callsCount > 0 ? Math.round(windowLogs.reduce((a, b) => a + (b.backEndTime || 85), 0) / callsCount) : 0;
-          const responseMediation = callsCount > 0 ? Math.round(windowLogs.reduce((a, b) => a + (b.responseMediation || 25), 0) / callsCount) : 0;
+              const callsCount = windowLogs.length;
+              const totalTime = callsCount > 0 ? Math.round(windowLogs.reduce((a, b) => a + (b.totalTime || 120), 0) / callsCount) : 0;
+              const backEndTime = callsCount > 0 ? Math.round(windowLogs.reduce((a, b) => a + (b.backEndTime || 85), 0) / callsCount) : 0;
+              const responseMediation = callsCount > 0 ? Math.round(windowLogs.reduce((a, b) => a + (b.responseMediation || 25), 0) / callsCount) : 0;
 
-          points.push({
-            label,
-            calls: callsCount,
-            totalTime,
-            backEndTime,
-            otherTime: 0,
-            requestMediation: 0,
-            responseMediation,
-            authTime: callsCount > 0 ? 3 : 0,
-            throttling: 0
-          });
+              points.push({
+                label,
+                calls: callsCount,
+                totalTime,
+                backEndTime,
+                otherTime: 0,
+                requestMediation: 0,
+                responseMediation,
+                authTime: callsCount > 0 ? 3 : 0,
+                throttling: 0
+              });
+            }
+          } else if (granularity === 'Day') {
+            // Past 24 hours divided into 8 x 3-hour buckets
+            for (let i = 7; i >= 0; i--) {
+              const bucketStart = new Date(now.getTime() - (i + 1) * 3 * 3600 * 1000);
+              const bucketEnd = new Date(now.getTime() - i * 3 * 3600 * 1000);
+              const labelTime = new Date(now.getTime() - i * 3 * 3600 * 1000);
+              const label = labelTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+              const windowLogs = allLogs.filter(l => {
+                if (!l.timestamp) return false;
+                const logDate = new Date(l.timestamp);
+                return logDate >= bucketStart && logDate <= bucketEnd;
+              });
+
+              const callsCount = windowLogs.length;
+              const totalTime = callsCount > 0 ? Math.round(windowLogs.reduce((a, b) => a + (b.totalTime || 140), 0) / callsCount) : 0;
+              const backEndTime = callsCount > 0 ? Math.round(windowLogs.reduce((a, b) => a + (b.backEndTime || 100), 0) / callsCount) : 0;
+              const responseMediation = callsCount > 0 ? Math.round(windowLogs.reduce((a, b) => a + (b.responseMediation || 30), 0) / callsCount) : 0;
+
+              points.push({
+                label,
+                calls: callsCount,
+                totalTime,
+                backEndTime,
+                otherTime: 0,
+                requestMediation: 0,
+                responseMediation,
+                authTime: callsCount > 0 ? 4 : 0,
+                throttling: 0
+              });
+            }
+          } else if (granularity === 'Week') {
+            // Past 7 days
+            for (let i = 6; i >= 0; i--) {
+              const d = new Date(now);
+              d.setDate(d.getDate() - i);
+              const dayStr = String(d.getDate()).padStart(2, '0');
+              const monthStr = String(d.getMonth() + 1).padStart(2, '0');
+              const dayName = d.toLocaleDateString([], { weekday: 'short' });
+              const label = `${dayName} ${dayStr}/${monthStr}`;
+
+              const windowLogs = allLogs.filter(l => {
+                if (!l.timestamp) return false;
+                const logDate = new Date(l.timestamp);
+                return logDate.toDateString() === d.toDateString();
+              });
+
+              const callsCount = windowLogs.length;
+              const totalTime = callsCount > 0 ? Math.round(windowLogs.reduce((a, b) => a + (b.totalTime || 130), 0) / callsCount) : 0;
+              const backEndTime = callsCount > 0 ? Math.round(windowLogs.reduce((a, b) => a + (b.backEndTime || 90), 0) / callsCount) : 0;
+              const responseMediation = callsCount > 0 ? Math.round(windowLogs.reduce((a, b) => a + (b.responseMediation || 28), 0) / callsCount) : 0;
+
+              points.push({
+                label,
+                calls: callsCount,
+                totalTime,
+                backEndTime,
+                otherTime: 0,
+                requestMediation: 0,
+                responseMediation,
+                authTime: callsCount > 0 ? 3 : 0,
+                throttling: 0
+              });
+            }
+          } else {
+            // Month days (past 30 days in 10 interval buckets)
+            for (let i = 9; i >= 0; i--) {
+              const d = new Date(now);
+              d.setDate(d.getDate() - (i * 3));
+              const dayStr = String(d.getDate()).padStart(2, '0');
+              const monthShort = d.toLocaleString('en-US', { month: 'short' });
+              const label = `${dayStr} ${monthShort}`;
+
+              const windowLogs = allLogs.filter(l => {
+                if (!l.timestamp) return false;
+                const logDate = new Date(l.timestamp);
+                return Math.abs(logDate - d) < 3 * 24 * 3600 * 1000;
+              });
+
+              const callsCount = windowLogs.length;
+              const totalTime = callsCount > 0 ? Math.round(windowLogs.reduce((a, b) => a + (b.totalTime || 150), 0) / callsCount) : 0;
+              const backEndTime = callsCount > 0 ? Math.round(windowLogs.reduce((a, b) => a + (b.backEndTime || 110), 0) / callsCount) : 0;
+              const responseMediation = callsCount > 0 ? Math.round(windowLogs.reduce((a, b) => a + (b.responseMediation || 30), 0) / callsCount) : 0;
+
+              points.push({
+                label,
+                calls: callsCount,
+                totalTime,
+                backEndTime,
+                otherTime: 0,
+                requestMediation: 0,
+                responseMediation,
+                authTime: callsCount > 0 ? 4 : 0,
+                throttling: 0
+              });
+            }
+          }
+
+          return points;
         }
-      } else if (granularity === 'Day') {
-        // Past 24 hours divided into 8 x 3-hour buckets
-        for (let i = 7; i >= 0; i--) {
-          const bucketStart = new Date(now.getTime() - (i + 1) * 3 * 3600 * 1000);
-          const bucketEnd = new Date(now.getTime() - i * 3 * 3600 * 1000);
-          const labelTime = new Date(now.getTime() - i * 3 * 3600 * 1000);
-          const label = labelTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-          const windowLogs = allLogs.filter(l => {
-            if (!l.timestamp) return false;
-            const logDate = new Date(l.timestamp);
-            return logDate >= bucketStart && logDate <= bucketEnd;
+        function renderExecutionTimeChart() {
+          const svg = document.getElementById('executionTimeChartSvg');
+          const yLabels = document.getElementById('yAxisLabelsContainer');
+          const xLabels = document.getElementById('xAxisLabelsContainer');
+          const xAxisTitle = document.getElementById('chartXAxisTitle');
+          const tooltip = document.getElementById('chartTooltip');
+          if (!svg || !yLabels || !xLabels) return;
+
+          if (xAxisTitle) {
+            if (activeGranularity === 'Hour') xAxisTitle.textContent = 'Time (Past 60 Minutes)';
+            else if (activeGranularity === 'Day') xAxisTitle.textContent = 'Time (Past 24 Hours)';
+            else if (activeGranularity === 'Week') xAxisTitle.textContent = 'Time (Past 7 Days)';
+            else if (activeGranularity === 'Month') xAxisTitle.textContent = 'Time (Month Days)';
+          }
+
+          const scope = (document.getElementById('analyticsScopeSelect')?.value || 'all');
+
+          let allLogs = [];
+          if (Array.isArray(currentDeveloperKeys)) {
+            currentDeveloperKeys.forEach(k => {
+              const logs = k.usageHistory || k.callsRecord || [];
+              allLogs = allLogs.concat(logs);
+            });
+          }
+
+          if (scope !== 'all') {
+            allLogs = allLogs.filter(l => (l.type === scope || (l.endpoint && l.endpoint.includes(scope))));
+          }
+
+          const timePoints = generateTimePointsData(allLogs, activeGranularity);
+
+          // Dynamic vertical scale: default ceiling at 100, expanding up to 200 as calls increase
+          let maxCalls = Math.max(...timePoints.map(p => p.calls), 0);
+          let yMax = 100;
+          if (maxCalls > 100) {
+            yMax = Math.min(200, Math.ceil(maxCalls / 20) * 20);
+          }
+
+          // Populate Y Axis Ticks (e.g. 100, 80, 60, 40, 20, 0 or up to 200)
+          const yTicks = [];
+          const tickStep = yMax / 5;
+          for (let i = 5; i >= 0; i--) {
+            yTicks.push(Math.round(tickStep * i));
+          }
+          yLabels.innerHTML = yTicks.map(val => `<span>${val}</span>`).join('');
+
+          const svgWidth = svg.clientWidth || 700;
+          const svgHeight = 240;
+          const paddingX = 20;
+          const paddingY = 15;
+          const graphW = svgWidth - paddingX * 2;
+          const graphH = svgHeight - paddingY * 2;
+
+          // Grid lines & Limit line at 200
+          let gridHtml = '';
+          yTicks.forEach(val => {
+            const yPos = paddingY + graphH - ((val / yMax) * graphH);
+            const isLimit = val === 200;
+            const isDefaultCeil = val === 100 && yMax === 100;
+            const strokeColor = isLimit ? 'rgba(239, 68, 68, 0.6)' : (isDefaultCeil ? 'rgba(96, 165, 250, 0.3)' : 'rgba(255,255,255,0.06)');
+            const dash = (isLimit || isDefaultCeil) ? '4,4' : '2,2';
+            gridHtml += `<line x1="${paddingX}" y1="${yPos}" x2="${svgWidth - paddingX}" y2="${yPos}" stroke="${strokeColor}" stroke-dasharray="${dash}" stroke-width="${(isLimit || isDefaultCeil) ? '1.5' : '1'}"/>`;
+            if (isLimit) {
+              gridHtml += `<text x="${svgWidth - paddingX - 100}" y="${yPos - 4}" fill="#EF4444" font-size="10" font-family="monospace" font-weight="700">200 (Daily Limit)</text>`;
+            }
           });
 
-          const callsCount = windowLogs.length;
-          const totalTime = callsCount > 0 ? Math.round(windowLogs.reduce((a, b) => a + (b.totalTime || 140), 0) / callsCount) : 0;
-          const backEndTime = callsCount > 0 ? Math.round(windowLogs.reduce((a, b) => a + (b.backEndTime || 100), 0) / callsCount) : 0;
-          const responseMediation = callsCount > 0 ? Math.round(windowLogs.reduce((a, b) => a + (b.responseMediation || 30), 0) / callsCount) : 0;
+          const n = timePoints.length;
+          const mappedPoints = timePoints.map((pt, idx) => {
+            const x = paddingX + (n > 1 ? (graphW / (n - 1)) * idx : graphW / 2);
+            const getY = (val) => paddingY + graphH - ((val / yMax) * graphH);
 
-          points.push({
-            label,
-            calls: callsCount,
-            totalTime,
-            backEndTime,
-            otherTime: 0,
-            requestMediation: 0,
-            responseMediation,
-            authTime: callsCount > 0 ? 4 : 0,
-            throttling: 0
-          });
-        }
-      } else if (granularity === 'Week') {
-        // Past 7 days
-        for (let i = 6; i >= 0; i--) {
-          const d = new Date(now);
-          d.setDate(d.getDate() - i);
-          const dayStr = String(d.getDate()).padStart(2, '0');
-          const monthStr = String(d.getMonth() + 1).padStart(2, '0');
-          const dayName = d.toLocaleDateString([], { weekday: 'short' });
-          const label = `${dayName} ${dayStr}/${monthStr}`;
-
-          const windowLogs = allLogs.filter(l => {
-            if (!l.timestamp) return false;
-            const logDate = new Date(l.timestamp);
-            return logDate.toDateString() === d.toDateString();
+            return {
+              x,
+              label: pt.label,
+              calls: pt.calls,
+              totalTime: pt.totalTime,
+              backEndTime: pt.backEndTime,
+              otherTime: pt.otherTime,
+              requestMediation: pt.requestMediation,
+              responseMediation: pt.responseMediation,
+              authTime: pt.authTime,
+              throttling: pt.throttling,
+              yCalls: getY(pt.calls)
+            };
           });
 
-          const callsCount = windowLogs.length;
-          const totalTime = callsCount > 0 ? Math.round(windowLogs.reduce((a, b) => a + (b.totalTime || 130), 0) / callsCount) : 0;
-          const backEndTime = callsCount > 0 ? Math.round(windowLogs.reduce((a, b) => a + (b.backEndTime || 90), 0) / callsCount) : 0;
-          const responseMediation = callsCount > 0 ? Math.round(windowLogs.reduce((a, b) => a + (b.responseMediation || 28), 0) / callsCount) : 0;
+          function buildPath(keyY) {
+            if (mappedPoints.length === 0) return '';
+            return mappedPoints.reduce((acc, p, idx) => {
+              return idx === 0 ? `M ${p.x} ${p[keyY]}` : `${acc} L ${p.x} ${p[keyY]}`;
+            }, '');
+          }
 
-          points.push({
-            label,
-            calls: callsCount,
-            totalTime,
-            backEndTime,
-            otherTime: 0,
-            requestMediation: 0,
-            responseMediation,
-            authTime: callsCount > 0 ? 3 : 0,
-            throttling: 0
-          });
-        }
-      } else {
-        // Month days (past 30 days in 10 interval buckets)
-        for (let i = 9; i >= 0; i--) {
-          const d = new Date(now);
-          d.setDate(d.getDate() - (i * 3));
-          const dayStr = String(d.getDate()).padStart(2, '0');
-          const monthShort = d.toLocaleString('en-US', { month: 'short' });
-          const label = `${dayStr} ${monthShort}`;
+          const pathCalls = buildPath('yCalls');
 
-          const windowLogs = allLogs.filter(l => {
-            if (!l.timestamp) return false;
-            const logDate = new Date(l.timestamp);
-            return Math.abs(logDate - d) < 3 * 24 * 3600 * 1000;
-          });
-
-          const callsCount = windowLogs.length;
-          const totalTime = callsCount > 0 ? Math.round(windowLogs.reduce((a, b) => a + (b.totalTime || 150), 0) / callsCount) : 0;
-          const backEndTime = callsCount > 0 ? Math.round(windowLogs.reduce((a, b) => a + (b.backEndTime || 110), 0) / callsCount) : 0;
-          const responseMediation = callsCount > 0 ? Math.round(windowLogs.reduce((a, b) => a + (b.responseMediation || 30), 0) / callsCount) : 0;
-
-          points.push({
-            label,
-            calls: callsCount,
-            totalTime,
-            backEndTime,
-            otherTime: 0,
-            requestMediation: 0,
-            responseMediation,
-            authTime: callsCount > 0 ? 4 : 0,
-            throttling: 0
-          });
-        }
-      }
-
-      return points;
-    }
-
-    function renderExecutionTimeChart() {
-      const svg = document.getElementById('executionTimeChartSvg');
-      const yLabels = document.getElementById('yAxisLabelsContainer');
-      const xLabels = document.getElementById('xAxisLabelsContainer');
-      const xAxisTitle = document.getElementById('chartXAxisTitle');
-      const tooltip = document.getElementById('chartTooltip');
-      if (!svg || !yLabels || !xLabels) return;
-
-      if (xAxisTitle) {
-        if (activeGranularity === 'Hour') xAxisTitle.textContent = 'Time (Past 60 Minutes)';
-        else if (activeGranularity === 'Day') xAxisTitle.textContent = 'Time (Past 24 Hours)';
-        else if (activeGranularity === 'Week') xAxisTitle.textContent = 'Time (Past 7 Days)';
-        else if (activeGranularity === 'Month') xAxisTitle.textContent = 'Time (Month Days)';
-      }
-
-      const scope = (document.getElementById('analyticsScopeSelect')?.value || 'all');
-      
-      let allLogs = [];
-      if (Array.isArray(currentDeveloperKeys)) {
-        currentDeveloperKeys.forEach(k => {
-          const logs = k.usageHistory || k.callsRecord || [];
-          allLogs = allLogs.concat(logs);
-        });
-      }
-
-      if (scope !== 'all') {
-        allLogs = allLogs.filter(l => (l.type === scope || (l.endpoint && l.endpoint.includes(scope))));
-      }
-
-      const timePoints = generateTimePointsData(allLogs, activeGranularity);
-
-      // Dynamic vertical scale: default ceiling at 100, expanding up to 200 as calls increase
-      let maxCalls = Math.max(...timePoints.map(p => p.calls), 0);
-      let yMax = 100;
-      if (maxCalls > 100) {
-        yMax = Math.min(200, Math.ceil(maxCalls / 20) * 20);
-      }
-
-      // Populate Y Axis Ticks (e.g. 100, 80, 60, 40, 20, 0 or up to 200)
-      const yTicks = [];
-      const tickStep = yMax / 5;
-      for (let i = 5; i >= 0; i--) {
-        yTicks.push(Math.round(tickStep * i));
-      }
-      yLabels.innerHTML = yTicks.map(val => `<span>${val}</span>`).join('');
-
-      const svgWidth = svg.clientWidth || 700;
-      const svgHeight = 240;
-      const paddingX = 20;
-      const paddingY = 15;
-      const graphW = svgWidth - paddingX * 2;
-      const graphH = svgHeight - paddingY * 2;
-
-      // Grid lines & Limit line at 200
-      let gridHtml = '';
-      yTicks.forEach(val => {
-        const yPos = paddingY + graphH - ((val / yMax) * graphH);
-        const isLimit = val === 200;
-        const isDefaultCeil = val === 100 && yMax === 100;
-        const strokeColor = isLimit ? 'rgba(239, 68, 68, 0.6)' : (isDefaultCeil ? 'rgba(96, 165, 250, 0.3)' : 'rgba(255,255,255,0.06)');
-        const dash = (isLimit || isDefaultCeil) ? '4,4' : '2,2';
-        gridHtml += `<line x1="${paddingX}" y1="${yPos}" x2="${svgWidth - paddingX}" y2="${yPos}" stroke="${strokeColor}" stroke-dasharray="${dash}" stroke-width="${(isLimit || isDefaultCeil) ? '1.5' : '1'}"/>`;
-        if (isLimit) {
-          gridHtml += `<text x="${svgWidth - paddingX - 100}" y="${yPos - 4}" fill="#EF4444" font-size="10" font-family="monospace" font-weight="700">200 (Daily Limit)</text>`;
-        }
-      });
-
-      const n = timePoints.length;
-      const mappedPoints = timePoints.map((pt, idx) => {
-        const x = paddingX + (n > 1 ? (graphW / (n - 1)) * idx : graphW / 2);
-        const getY = (val) => paddingY + graphH - ((val / yMax) * graphH);
-
-        return {
-          x,
-          label: pt.label,
-          calls: pt.calls,
-          totalTime: pt.totalTime,
-          backEndTime: pt.backEndTime,
-          otherTime: pt.otherTime,
-          requestMediation: pt.requestMediation,
-          responseMediation: pt.responseMediation,
-          authTime: pt.authTime,
-          throttling: pt.throttling,
-          yCalls: getY(pt.calls)
-        };
-      });
-
-      function buildPath(keyY) {
-        if (mappedPoints.length === 0) return '';
-        return mappedPoints.reduce((acc, p, idx) => {
-          return idx === 0 ? `M ${p.x} ${p[keyY]}` : `${acc} L ${p.x} ${p[keyY]}`;
-        }, '');
-      }
-
-      const pathCalls = buildPath('yCalls');
-
-      let circlesHtml = '';
-      mappedPoints.forEach((p, idx) => {
-        circlesHtml += `
+          let circlesHtml = '';
+          mappedPoints.forEach((p, idx) => {
+            circlesHtml += `
           <g class="chart-hover-group" data-idx="${idx}">
             <line class="crosshair-line" x1="${p.x}" y1="${paddingY}" x2="${p.x}" y2="${svgHeight - paddingY}" stroke="rgba(96, 165, 250, 0.4)" stroke-dasharray="3" style="display: none;" />
             <circle cx="${p.x}" cy="${p.yCalls}" r="5" fill="#0284C7" stroke="#ffffff" stroke-width="2" />
             <rect x="${p.x - 18}" y="0" width="36" height="${svgHeight}" fill="transparent" style="cursor: pointer;" />
           </g>
         `;
-      });
+          });
 
-      svg.innerHTML = `
+          svg.innerHTML = `
         ${gridHtml}
         <path d="${pathCalls}" fill="none" stroke="#0284C7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
         ${circlesHtml}
       `;
 
-      xLabels.innerHTML = mappedPoints.map(p => `
+          xLabels.innerHTML = mappedPoints.map(p => `
         <span style="font-size: 0.72rem; color: var(--text-dim); font-family: var(--font-mono); transform: rotate(-25deg); transform-origin: top left; display: inline-block; white-space: nowrap;">${p.label}</span>
       `).join('');
 
-      svg.querySelectorAll('.chart-hover-group').forEach(group => {
-        const idx = parseInt(group.dataset.idx, 10);
-        const p = mappedPoints[idx];
-        const crosshair = group.querySelector('.crosshair-line');
+          svg.querySelectorAll('.chart-hover-group').forEach(group => {
+            const idx = parseInt(group.dataset.idx, 10);
+            const p = mappedPoints[idx];
+            const crosshair = group.querySelector('.crosshair-line');
 
-        group.addEventListener('mouseenter', (e) => {
-          if (crosshair) crosshair.style.display = 'block';
-          
-          const containerRect = document.getElementById('executionChartCanvasContainer').getBoundingClientRect();
-          const tooltipW = 195;
-          let leftPos = p.x - (tooltipW / 2);
-          if (leftPos < 0) leftPos = 5;
-          if (leftPos + tooltipW > containerRect.width) leftPos = containerRect.width - tooltipW - 5;
+            group.addEventListener('mouseenter', (e) => {
+              if (crosshair) crosshair.style.display = 'block';
 
-          let topPos = p.yCalls - 150;
-          if (topPos < 5) topPos = p.yCalls + 15;
+              const containerRect = document.getElementById('executionChartCanvasContainer').getBoundingClientRect();
+              const tooltipW = 195;
+              let leftPos = p.x - (tooltipW / 2);
+              if (leftPos < 0) leftPos = 5;
+              if (leftPos + tooltipW > containerRect.width) leftPos = containerRect.width - tooltipW - 5;
 
-          tooltip.style.display = 'block';
-          tooltip.style.left = leftPos + 'px';
-          tooltip.style.top = topPos + 'px';
+              let topPos = p.yCalls - 150;
+              if (topPos < 5) topPos = p.yCalls + 15;
 
-          tooltip.innerHTML = `
+              tooltip.style.display = 'block';
+              tooltip.style.left = leftPos + 'px';
+              tooltip.style.top = topPos + 'px';
+
+              tooltip.innerHTML = `
             <div style="font-weight: 700; font-family: var(--font-mono); border-bottom: 1px solid #CBD5E1; padding-bottom: 4px; margin-bottom: 6px; color: #0F172A; display: flex; justify-content: space-between;">
               <span>${p.label}</span>
               <span style="color: #0284C7;">${p.calls} calls</span>
@@ -2477,635 +2677,766 @@
               <div style="text-align: right; color: #64748B;">${p.throttling} ms</div>
             </div>
           `;
-        });
+            });
 
-        group.addEventListener('mouseleave', () => {
-          if (crosshair) crosshair.style.display = 'none';
-          tooltip.style.display = 'none';
-        });
-      });
-    }
+            group.addEventListener('mouseleave', () => {
+              if (crosshair) crosshair.style.display = 'none';
+              tooltip.style.display = 'none';
+            });
+          });
+        }
 
-    function escapeHtml(str) {
-      return (str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-    }
+        function escapeHtml(str) {
+          return (str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
 
-    async function handleCreateApiKey() {
-      const labelInput = document.getElementById('newKeyLabelInputPage') || document.getElementById('newKeyLabelInput');
-      const label = (labelInput?.value || '').trim() || 'New Secret Key';
-      const btn = document.getElementById('btnGenerateKeyPage') || document.getElementById('btnGenerateKey');
+        async function handleCreateApiKey() {
+          const labelInput = document.getElementById('newKeyLabelInputPage') || document.getElementById('newKeyLabelInput');
+          const label = (labelInput?.value || '').trim() || 'New Secret Key';
+          const btn = document.getElementById('btnGenerateKeyPage') || document.getElementById('btnGenerateKey');
 
-      if (btn) {
-        btn.disabled = true;
-        btn.textContent = 'Generating...';
-      }
+          if (btn) {
+            btn.disabled = true;
+            btn.textContent = 'Generating...';
+          }
 
-      try {
-        const headers = await getAuthHeader();
-        const res = await fetch('/api/keys', {
-          method: 'POST',
-          headers,
-          body: JSON.stringify({ label })
-        });
+          try {
+            const headers = await getAuthHeader();
+            const res = await fetch('/api/keys', {
+              method: 'POST',
+              headers,
+              body: JSON.stringify({ label })
+            });
 
-        let newKeyObj;
-        if (res.ok) {
-          newKeyObj = await res.json();
-          if (!currentDeveloperKeys.some(k => k.key === newKeyObj.key)) {
+            let newKeyObj;
+            if (res.ok) {
+              newKeyObj = await res.json();
+              if (!currentDeveloperKeys.some(k => k.key === newKeyObj.key)) {
+                currentDeveloperKeys.unshift(newKeyObj);
+              }
+            } else {
+              const rawKey = 'el_live_' + Math.random().toString(36).substring(2, 12) + Math.random().toString(36).substring(2, 10);
+              newKeyObj = { key: rawKey, label, createdAt: new Date().toISOString().split('T')[0], lastUsed: 'Never', requestCount: 0, isActive: true };
+              currentDeveloperKeys.unshift(newKeyObj);
+            }
+
+            const secretEl = document.getElementById('newKeySecretTextPage') || document.getElementById('newKeySecretText');
+            const alertBox = document.getElementById('newKeyAlertBoxPage') || document.getElementById('newKeyAlertBox');
+            if (secretEl) secretEl.textContent = newKeyObj.key;
+            if (alertBox) alertBox.style.display = 'block';
+            if (labelInput) labelInput.value = '';
+
+            userApiKey = newKeyObj.key;
+            localStorage.setItem('elegal_api_key', userApiKey);
+
+            showToast('New API key generated successfully!');
+            renderKeysListAndAnalytics(currentDeveloperKeys);
+          } catch (e) {
+            console.error('Create key error:', e);
+            showToast('Key generation fallback activated');
+            const rawKey = 'el_live_' + Math.random().toString(36).substring(2, 12);
+            const newKeyObj = { key: rawKey, label, createdAt: new Date().toISOString().split('T')[0], lastUsed: 'Never', requestCount: 0, isActive: true };
             currentDeveloperKeys.unshift(newKeyObj);
-          }
-        } else {
-          const rawKey = 'el_live_' + Math.random().toString(36).substring(2, 12) + Math.random().toString(36).substring(2, 10);
-          newKeyObj = { key: rawKey, label, createdAt: new Date().toISOString().split('T')[0], lastUsed: 'Never', requestCount: 0, isActive: true };
-          currentDeveloperKeys.unshift(newKeyObj);
-        }
-
-        const secretEl = document.getElementById('newKeySecretTextPage') || document.getElementById('newKeySecretText');
-        const alertBox = document.getElementById('newKeyAlertBoxPage') || document.getElementById('newKeyAlertBox');
-        if (secretEl) secretEl.textContent = newKeyObj.key;
-        if (alertBox) alertBox.style.display = 'block';
-        if (labelInput) labelInput.value = '';
-
-        userApiKey = newKeyObj.key;
-        localStorage.setItem('elegal_api_key', userApiKey);
-
-        showToast('New API key generated successfully!');
-        renderKeysListAndAnalytics(currentDeveloperKeys);
-      } catch (e) {
-        console.error('Create key error:', e);
-        showToast('Key generation fallback activated');
-        const rawKey = 'el_live_' + Math.random().toString(36).substring(2, 12);
-        const newKeyObj = { key: rawKey, label, createdAt: new Date().toISOString().split('T')[0], lastUsed: 'Never', requestCount: 0, isActive: true };
-        currentDeveloperKeys.unshift(newKeyObj);
-        const secretEl = document.getElementById('newKeySecretTextPage') || document.getElementById('newKeySecretText');
-        const alertBox = document.getElementById('newKeyAlertBoxPage') || document.getElementById('newKeyAlertBox');
-        if (secretEl) secretEl.textContent = rawKey;
-        if (alertBox) alertBox.style.display = 'block';
-        if (labelInput) labelInput.value = '';
-        renderKeysListAndAnalytics(currentDeveloperKeys);
-      } finally {
-        if (btn) {
-          btn.disabled = false;
-          btn.innerHTML = `<i data-lucide="key" style="width: 14px; height: 14px;"></i> Generate Key`;
-        }
-        if (window.lucide) lucide.createIcons();
-      }
-    }
-
-    function recordApiKeyUsage(usedKey) {
-      const keyToMatch = usedKey || userApiKey;
-      if (!currentDeveloperKeys || currentDeveloperKeys.length === 0) {
-        currentDeveloperKeys = getMockDeveloperKeys();
-      }
-      let foundKey = currentDeveloperKeys.find(k => k.key === keyToMatch);
-      if (!foundKey && currentDeveloperKeys.length > 0) {
-        foundKey = currentDeveloperKeys[0];
-      }
-      if (foundKey) {
-        foundKey.requestCount = (foundKey.requestCount || 0) + 1;
-        foundKey.lastUsed = 'Just now';
-      }
-      renderKeysListAndAnalytics(currentDeveloperKeys);
-    }
-
-    async function toggleKeyStatus(keyId, currentActiveState) {
-      const newState = !currentActiveState;
-      try {
-        const headers = await getAuthHeader();
-        const res = await fetch(`/api/keys/${keyId}`, {
-          method: 'PATCH',
-          headers,
-          body: JSON.stringify({ isActive: newState })
-        });
-        if (!res.ok) {
-          const found = currentDeveloperKeys.find(k => k.key === keyId);
-          if (found) found.isActive = newState;
-        }
-      } catch (e) {
-        const found = currentDeveloperKeys.find(k => k.key === keyId);
-        if (found) found.isActive = newState;
-      }
-      showToast(`Key ${newState ? 'activated' : 'paused'}`);
-      loadDeveloperKeys();
-    }
-
-    async function deleteApiKey(keyId) {
-      if (!confirm('Are you sure you want to permanently revoke this API key? Applications using this key will immediately stop working.')) return;
-      try {
-        const headers = await getAuthHeader();
-        const res = await fetch(`/api/keys/${keyId}`, {
-          method: 'DELETE',
-          headers
-        });
-        if (!res.ok) {
-          currentDeveloperKeys = currentDeveloperKeys.filter(k => k.key !== keyId);
-        }
-      } catch (e) {
-        currentDeveloperKeys = currentDeveloperKeys.filter(k => k.key !== keyId);
-      }
-      showToast('Key revoked successfully');
-      loadDeveloperKeys();
-    }
-
-    // Auth Modal Handlers
-    async function loginWithProvider(providerName) {
-      if (!firebaseAuth || !window._fbSignInWithPopup) {
-        showToast('Firebase authentication is not initialized.');
-        return;
-      }
-      try {
-        let provider;
-        if (providerName === 'Google') {
-          provider = new window._fbGoogleAuthProvider();
-        } else if (providerName === 'GitHub') {
-          provider = new window._fbGithubAuthProvider();
-        } else {
-          showToast('Unsupported auth provider');
-          return;
-        }
-        const res = await window._fbSignInWithPopup(firebaseAuth, provider);
-        showToast(`Signed in as ${res.user.displayName || res.user.email}`);
-        document.getElementById('authModal')?.classList.remove('show');
-        openProfileModal();
-      } catch (e) {
-        console.error('Provider login error:', e);
-        showToast(e.message || 'Login failed');
-      }
-    }
-
-    async function handleEmailAuth() {
-      if (!firebaseAuth) {
-        showToast('Firebase authentication is not initialized.');
-        return;
-      }
-      const email = (document.getElementById('emailInput')?.value || '').trim();
-      const password = (document.getElementById('passwordInput')?.value || '').trim();
-
-      if (!email || !password) {
-        showToast('Please enter both email and password.');
-        return;
-      }
-
-      try {
-        let res;
-        try {
-          res = await window._fbSignInWithEmail(firebaseAuth, email, password);
-        } catch (signInErr) {
-          if (signInErr.code === 'auth/user-not-found' || signInErr.code === 'auth/invalid-credential' || signInErr.code === 'auth/invalid-login-credentials') {
-            res = await window._fbCreateUserWithEmail(firebaseAuth, email, password);
-          } else {
-            throw signInErr;
+            const secretEl = document.getElementById('newKeySecretTextPage') || document.getElementById('newKeySecretText');
+            const alertBox = document.getElementById('newKeyAlertBoxPage') || document.getElementById('newKeyAlertBox');
+            if (secretEl) secretEl.textContent = rawKey;
+            if (alertBox) alertBox.style.display = 'block';
+            if (labelInput) labelInput.value = '';
+            renderKeysListAndAnalytics(currentDeveloperKeys);
+          } finally {
+            if (btn) {
+              btn.disabled = false;
+              btn.innerHTML = `<i data-lucide="key" style="width: 14px; height: 14px;"></i> Generate Key`;
+            }
+            if (window.lucide) lucide.createIcons();
           }
         }
-        showToast(`Signed in as ${res.user.email}`);
-        document.getElementById('authModal')?.classList.remove('show');
-        openProfileModal();
-      } catch (e) {
-        console.error('Email auth error:', e);
-        showToast(e.message || 'Authentication failed');
-      }
-    }
 
-    async function signOutUser() {
-      if (firebaseAuth && window._fbSignOut) {
-        try {
-          await window._fbSignOut(firebaseAuth);
-          showToast('Signed out successfully');
-          if (activeTopicKey === 'profile') {
-            switchTopic('overview');
+        function recordApiKeyUsage(usedKey) {
+          const keyToMatch = usedKey || userApiKey;
+          if (!currentDeveloperKeys || currentDeveloperKeys.length === 0) {
+            currentDeveloperKeys = getMockDeveloperKeys();
           }
-        } catch (e) {
-          showToast(e.message || 'Sign out failed');
+          let foundKey = currentDeveloperKeys.find(k => k.key === keyToMatch);
+          if (!foundKey && currentDeveloperKeys.length > 0) {
+            foundKey = currentDeveloperKeys[0];
+          }
+          if (foundKey) {
+            foundKey.requestCount = (foundKey.requestCount || 0) + 1;
+            foundKey.lastUsed = 'Just now';
+          }
+          renderKeysListAndAnalytics(currentDeveloperKeys);
         }
-      }
-    }
 
-    function toggleAuthModal() {
-      const modal = document.getElementById('authModal');
-      if (modal) {
-        modal.classList.toggle('show');
-      }
-    }
+        async function toggleKeyStatus(keyId, currentActiveState) {
+          const newState = !currentActiveState;
+          try {
+            const headers = await getAuthHeader();
+            const res = await fetch(`/api/keys/${keyId}`, {
+              method: 'PATCH',
+              headers,
+              body: JSON.stringify({ isActive: newState })
+            });
+            if (!res.ok) {
+              const found = currentDeveloperKeys.find(k => k.key === keyId);
+              if (found) found.isActive = newState;
+            }
+          } catch (e) {
+            const found = currentDeveloperKeys.find(k => k.key === keyId);
+            if (found) found.isActive = newState;
+          }
+          showToast(`Key ${newState ? 'activated' : 'paused'}`);
+          loadDeveloperKeys();
+        }
 
-    function showToast(msg) {
-      const t = document.getElementById('toast');
-      t.textContent = msg;
-      t.classList.add('show');
-      setTimeout(() => t.classList.remove('show'), 2500);
-    }
+        async function deleteApiKey(keyId) {
+          if (!confirm('Are you sure you want to permanently revoke this API key? Applications using this key will immediately stop working.')) return;
+          try {
+            const headers = await getAuthHeader();
+            const res = await fetch(`/api/keys/${keyId}`, {
+              method: 'DELETE',
+              headers
+            });
+            if (!res.ok) {
+              currentDeveloperKeys = currentDeveloperKeys.filter(k => k.key !== keyId);
+            }
+          } catch (e) {
+            currentDeveloperKeys = currentDeveloperKeys.filter(k => k.key !== keyId);
+          }
+          showToast('Key revoked successfully');
+          loadDeveloperKeys();
+        }
 
-    function copyText(txt) {
-      navigator.clipboard.writeText(txt);
-      showToast('Copied to clipboard!');
-    }
+        // Auth Modal Handlers
+        async function loginWithProvider(providerName) {
+          if (!firebaseAuth || !window._fbSignInWithPopup) {
+            showToast('Firebase authentication is not initialized.');
+            return;
+          }
+          try {
+            let provider;
+            if (providerName === 'Google') {
+              provider = new window._fbGoogleAuthProvider();
+            } else if (providerName === 'GitHub') {
+              provider = new window._fbGithubAuthProvider();
+            } else {
+              showToast('Unsupported auth provider');
+              return;
+            }
+            const res = await window._fbSignInWithPopup(firebaseAuth, provider);
+            showToast(`Signed in as ${res.user.displayName || res.user.email}`);
+            document.getElementById('authModal')?.classList.remove('show');
+            openProfileModal();
+          } catch (e) {
+            console.error('Provider login error:', e);
+            showToast(e.message || 'Login failed');
+          }
+        }
 
-    function generateFullMarkdownForLLM() {
-      const activeKey = 'YOUR_SECRET_API_KEY';
-      const baseUrl = window.location.origin || '';
+        async function handleEmailAuth() {
+          if (!firebaseAuth) {
+            showToast('Firebase authentication is not initialized.');
+            return;
+          }
+          const email = (document.getElementById('emailInput')?.value || '').trim();
+          const password = (document.getElementById('passwordInput')?.value || '').trim();
 
-      return `# eLegal REST API — Full Developer Documentation for LLM Context
+          if (!email || !password) {
+            showToast('Please enter both email and password.');
+            return;
+          }
 
-> **System Prompt / Context Notice for AI Assistants (ChatGPT, Claude, Cursor, Copilot)**
-> This document contains the complete REST API specifications for the eLegal Kenya Judicial Precedent & Legal Intelligence Platform. Use these schemas, endpoints, and authentication rules to generate integration code, HTTP requests, client SDKs, or legal tech applications.
+          try {
+            let res;
+            try {
+              res = await window._fbSignInWithEmail(firebaseAuth, email, password);
+            } catch (signInErr) {
+              if (signInErr.code === 'auth/user-not-found' || signInErr.code === 'auth/invalid-credential' || signInErr.code === 'auth/invalid-login-credentials') {
+                res = await window._fbCreateUserWithEmail(firebaseAuth, email, password);
+              } else {
+                throw signInErr;
+              }
+            }
+            showToast(`Signed in as ${res.user.email}`);
+            document.getElementById('authModal')?.classList.remove('show');
+            openProfileModal();
+          } catch (e) {
+            console.error('Email auth error:', e);
+            showToast(e.message || 'Authentication failed');
+          }
+        }
+
+        async function signOutUser() {
+          if (firebaseAuth && window._fbSignOut) {
+            try {
+              await window._fbSignOut(firebaseAuth);
+              showToast('Signed out successfully');
+              if (activeTopicKey === 'profile') {
+                switchTopic('overview');
+              }
+            } catch (e) {
+              showToast(e.message || 'Sign out failed');
+            }
+          }
+        }
+
+        function toggleAuthModal() {
+          const modal = document.getElementById('authModal');
+          if (modal) {
+            modal.classList.toggle('show');
+          }
+        }
+
+        function showToast(msg) {
+          const t = document.getElementById('toast');
+          t.textContent = msg;
+          t.classList.add('show');
+          setTimeout(() => t.classList.remove('show'), 2500);
+        }
+
+        function copyText(txt) {
+          navigator.clipboard.writeText(txt);
+          showToast('Copied to clipboard!');
+        }
+
+        function generateFullMarkdownForLLM() {
+          const activeKey = (typeof userApiKey !== 'undefined' && userApiKey) ? userApiKey : 'YOUR_SECRET_API_KEY';
+          const baseUrl = window.location.origin || 'http://localhost:3000';
+
+          return `# eLegal REST API & Legal Engine — Comprehensive Reference for LLMs & AI Agents
+
+> **SYSTEM PROMPT DIRECTIVE FOR AI ASSISTANTS (ChatGPT, Claude, Cursor, Copilot, DeepSeek)**
+> You are an expert legal tech integration engineer. Use this document as the authoritative ground truth for the **eLegal Platform API**. 
+> - All endpoints support **Zero-CORS** (\`Access-Control-Allow-Origin: *\`).
+> - Client-side browser code (HTML/JS) can call endpoints directly without backend proxies or CORS errors.
+> - Search and document retrieval endpoints do NOT strictly require API keys for prototyping, though \`X-API-Key\` can be provided for rate limit elevation.
+> - Always use the provided canonical properties (\`actualDocumentUrl\`, \`documentUrl\`, \`pdfUrl\`, \`contentUrl\`, \`readUrl\`) instead of hallucinating file paths.
 
 ---
 
-## 1. System Overview & Authentication
+## 1. System Overview & Core Capabilities
 
-- **Base URL:** \`${baseUrl}\`
-- **Format:** JSON (\`Content-Type: application/json\`, \`Accept: application/json\`)
-- **Authentication Method:** Custom Request Header
-- **Authentication Header:** \`X-API-Key: ${activeKey}\`
-
-### Rate Limits & Quotas
-- **Free Tier:** 100 requests / minute
-- **Developer Pro Tier:** 1,000 requests / minute
-- **HTTP 429:** Returned when rate limit is exceeded. Check \`Retry-After\` header.
+| Feature | Specification |
+| :--- | :--- |
+| **Base URL** | \`${baseUrl}\` |
+| **Response Format** | JSON (\`application/json\`) or HTML UI (for \`/read\`) |
+| **CORS Policy** | Permissive \`*\` on all routes with automated \`OPTIONS\` preflight (200 OK) |
+| **Auth Header (Optional/Prod)** | \`X-API-Key: ${activeKey}\` |
+| **User Token Auth (Admin Keys)** | \`Authorization: Bearer <FIREBASE_ID_TOKEN>\` (only for \`/api/keys\`) |
+| **Default Rate Limits** | Public Tier: 100 req/min (Burst: 15 req/sec) · Pro Tier: 1,000 req/min |
+| **Live / Fresh Data Mode** | Append \`fresh=true\` or \`nocache=true\` to force fresh external fetches bypassing server cache |
 
 ---
 
-## 2. API Endpoints Reference
+## 2. Document Access URLs Schema Explanation
 
-### 2.1. Search Legal Precedents
-- **Endpoint:** \`GET /api/search\`
-- **Description:** Search Kenya court rulings, Supreme Court decisions, Court of Appeal precedents, High Court judgments, and Employment & Land Court cases.
-- **Headers Required:**
-  - \`X-API-Key\`: Confidential developer API secret key.
-  - \`Accept\`: \`application/json\`
+Every search result item and document record returned by eLegal contains rich, verified document links:
+
+1. \`actualDocumentUrl\` *(string)*: Direct download URL for the original document (e.g. direct Kenya Law export PDF \`https://kenyalaw.org/caselaw/cases/export/109852/pdf\` or AKN source \`.../source\`).
+2. \`documentUrl\` *(string)*: Alias for \`actualDocumentUrl\`.
+3. \`pdfUrl\` *(string)*: Accessible PDF streaming link (either direct export URL or local proxy \`/api/pdf-proxy?sourceUrl=...\`).
+4. \`contentUrl\` *(string)*: REST API endpoint to retrieve verbatim text, clean HTML, and NLP legal brief (\`/api/document?sourceUrl=...\`).
+5. \`readUrl\` *(string)*: Visual document reader interface link (\`/read?title=...&sourceUrl=...\`).
+6. \`cached\` *(boolean)*: Indicates if full text is saved in local disk repository (\`true\`) or fetched afresh (\`false\`).
+
+---
+
+## 3. Complete REST Endpoints Reference
+
+### 3.1. Search Legal Precedents & Legislation
+- **Endpoint:** \`GET /api/search\` (or alias \`GET /api/v1/search\`)
+- **Description:** Executes high-density legal search across Kenya Law eKLR report archives, statutory Acts of Parliament, and global legal repositories with automatic Machine Learning jurisdiction classification.
+- **Headers (Optional):**
+  - \`X-API-Key: ${activeKey}\`
+  - \`Accept: application/json\`
 - **Query Parameters:**
-  - \`q\` (string, required): Keywords, case names, legal principles, or judge names (e.g. \`Constitutional Rights Amendment\`).
-  - \`category\` (string, optional): Court division filter (e.g. \`Civil\`, \`Criminal\`, \`Constitutional\`, \`Land\`).
-  - \`limit\` (number, optional): Max number of results to return (default: 10, max: 50).
-- **Example cURL Request:**
+  - \`q\` *(string, required)*: Legal query, party names, statutory section, or citation (e.g. \`adverse possession 12 years land dispute\`).
+  - \`source\` *(string, optional)*: Jurisdiction filter: \`all\` (default), \`kenya\`, or \`international\`.
+  - \`fresh\` *(boolean/string, optional)*: Set to \`true\` or \`1\` to bypass local cache and fetch live uncached results from source registries.
+  - \`limit\` *(number, optional)*: Number of results (default: \`5\`, maximum: \`50\`).
+
+#### Example Request:
 \`\`\`bash
-curl -X GET "${baseUrl}/api/search?q=Constitutional+Rights&category=Civil&limit=5" \\
+curl -X GET "${baseUrl}/api/search?q=adverse%20possession&source=kenya&fresh=true&limit=2" \\
   -H "Accept: application/json" \\
   -H "X-API-Key: ${activeKey}"
 \`\`\`
-- **Response Payload Schema (200 OK):**
+
+#### Response JSON Schema (200 OK):
 \`\`\`json
 {
-  "query": "Constitutional Rights",
-  "total": 5,
-  "category": "Civil",
+  "query": "adverse possession",
+  "source": "kenya",
+  "classification": {
+    "jurisdiction": "kenya",
+    "domain": "Land & Property Law",
+    "confidence": 0.94
+  },
   "results": [
     {
-      "id": "eLegal-2026-SC-001",
-      "title": "Republic v. Attorney General & 2 Others Ex-Parte Okiya Omtatah",
-      "citation": "[2026] eKLR 104",
-      "court": "Supreme Court of Kenya",
-      "date": "2026-02-14",
-      "summary": "Landmark Supreme Court ruling establishing public participation standards under Article 118 of the Constitution of Kenya.",
-      "score": 0.98,
-      "pdfUrl": "/pdf/eLegal-2026-SC-001.pdf"
+      "id": "limitation_of_actions_act_cap_22",
+      "title": "Limitation of Actions Act (Cap 22, Laws of Kenya) - Section 7 & 38 Adverse Possession",
+      "label": "Limitation of Actions Act Cap 22",
+      "citation": "Cap 22 Laws of Kenya",
+      "year": 2012,
+      "type": "Legislation",
+      "source": "Kenya Law (eKLR)",
+      "url": "http://www.kenyalaw.org:8181/exist/kenyalex/actview.xql?actid=CAP.%2022",
+      "sourceUrl": "http://www.kenyalaw.org:8181/exist/kenyalex/actview.xql?actid=CAP.%2022",
+      "actualDocumentUrl": "http://www.kenyalaw.org:8181/exist/kenyalex/actview.xql?actid=CAP.%2022",
+      "documentUrl": "http://www.kenyalaw.org:8181/exist/kenyalex/actview.xql?actid=CAP.%2022",
+      "pdfUrl": "/api/pdf-proxy?sourceUrl=http%3A%2F%2Fwww.kenyalaw.org...",
+      "contentUrl": "/api/document?sourceUrl=http%3A%2F%2Fwww.kenyalaw.org...&title=Limitation...",
+      "readUrl": "/read?title=Limitation%20of%20Actions%20Act...&sourceUrl=http...",
+      "isPdf": true,
+      "cached": false,
+      "score": 98,
+      "snippets": [
+        "Under Section 7 & 38 of the Limitation of Actions Act (Cap 22), an action to recover land is barred after 12 years of open, continuous, and adverse possession."
+      ],
+      "ratioDecidendi": "Uninterrupted adverse possession of land for 12 years extinguishes the title of the registered proprietor."
     }
-  ]
+  ],
+  "total": 1
 }
 \`\`\`
 
 ---
 
-### 2.2. Citation & Case Reference Resolver
-- **Endpoint:** \`GET /api/resolve\`
-- **Description:** Resolve citation strings (e.g. \`[2024] eKLR 452\` or \`Civil Appeal 12 of 2022\`) to canonical case metadata and PDF links.
-- **Headers Required:**
-  - \`X-API-Key\`: Confidential developer API secret key.
+### 3.2. Get Full Document Content & Legal Brief
+- **Endpoint:** \`GET /api/document\` (or alias \`GET /api/document-content\`, \`GET /api/v1/document\`)
+- **Description:** Fetches full verbatim text, structured HTML body, ratio decidendi, and NLP case briefs for any cached or uncached legal document URL.
 - **Query Parameters:**
-  - \`citation\` (string, required): eKLR or law report citation string.
-- **Example cURL Request:**
+  - \`sourceUrl\` *(string, required)*: Canonical URL of the legal document (e.g. Kenya Law / AKN / web URL).
+  - \`title\` *(string, optional)*: Document title override.
+  - \`fresh\` *(boolean/string, optional)*: Set to \`true\` to force a live fetch from the remote server.
+
+#### Example Request:
 \`\`\`bash
-curl -X GET "${baseUrl}/api/resolve?citation=%5B2024%5D+eKLR+452" \\
-  -H "Accept: application/json" \\
-  -H "X-API-Key: ${activeKey}"
+curl -X GET "${baseUrl}/api/document?sourceUrl=https%3A%2F%2Fkenyalaw.org%2Fakn%2Fke%2Fact%2F1968%2F21%2Feng%402022-12-31&title=Limitation+Act" \\
+  -H "Accept: application/json"
 \`\`\`
-- **Response Payload Schema (200 OK):**
+
+#### Response JSON Schema (200 OK):
 \`\`\`json
 {
-  "citation": "[2024] eKLR 452",
-  "status": "resolved",
-  "case": {
-    "title": "Gitobu Imanyara v. Attorney General",
-    "court": "Court of Appeal at Nairobi",
-    "decisionDate": "2024-05-18",
-    "neutralCitation": "[2024] KECA 452 (KLR)",
-    "pdfDownloadUrl": "${baseUrl}/pdf/resolved-452.pdf"
-  }
+  "title": "Limitation of Actions Act Cap 22",
+  "label": "Limitation of Actions Act",
+  "citation": "Cap 22 Laws of Kenya",
+  "year": "2022",
+  "type": "Statute",
+  "source": "Kenya Law (Parliament)",
+  "url": "https://kenyalaw.org/akn/ke/act/1968/21/eng@2022-12-31",
+  "sourceUrl": "https://kenyalaw.org/akn/ke/act/1968/21/eng@2022-12-31",
+  "actualDocumentUrl": "https://kenyalaw.org/akn/ke/act/1968/21/eng@2022-12-31/source",
+  "documentUrl": "https://kenyalaw.org/akn/ke/act/1968/21/eng@2022-12-31/source",
+  "pdfUrl": "/api/pdf-proxy?sourceUrl=https%3A%2F%2Fkenyalaw.org...",
+  "readUrl": "/read?title=Limitation%20Act&sourceUrl=https...",
+  "text": "AN ACT of Parliament to prescribe periods for the limitation of actions...",
+  "html": "<div class=\\"legal-doc\\"><p>AN ACT of Parliament...</p></div>",
+  "isPdf": false,
+  "hasPdf": true,
+  "cached": true
 }
 \`\`\`
 
 ---
 
-### 2.3. Statutory Archive & Acts of Parliament Library
-- **Endpoint:** \`GET /api/library\`
-- **Description:** Retrieve statutory legislation, Kenya Gazette notices, and constitutional provisions.
-- **Headers Required:**
-  - \`X-API-Key\`: Confidential developer API secret key.
+### 3.3. Document UI Reader & Iframe Renderer
+- **Endpoint:** \`GET /read\` (or \`GET /read.html\`, \`GET /read/:filename\`)
+- **Description:** Renders the interactive eLegal document reader UI with adjustable font sizing, search in document, and AI summary drawer. Suitable for direct browser links or \`<iframe>\` embedding.
 - **Query Parameters:**
-  - \`act\` (string, optional): Act title or Cap number (e.g. \`Penal Code Cap 63\`).
-  - \`year\` (number, optional): Enactment year.
-- **Example cURL Request:**
-\`\`\`bash
-curl -X GET "${baseUrl}/api/library?act=Penal+Code+Cap+63" \\
-  -H "Accept: application/json" \\
-  -H "X-API-Key: ${activeKey}"
+  - \`sourceUrl\` *(string, required)*: Document source link.
+  - \`title\` *(string, optional)*: Title displayed on the header.
+  - \`format\` *(string, optional)*:
+    - \`html\` (default): Serves interactive reader UI.
+    - \`json\`: Redirects to \`/api/document\` structured JSON.
+    - \`pdf\` or \`raw=1\`: Redirects to direct PDF binary stream.
+
+#### Example Iframe HTML Embedding:
+\`\`\`html
+<iframe
+  src="${baseUrl}/read?sourceUrl=https%3A%2F%2Fkenyalaw.org%2Fakn%2Fke%2Fact%2F2010%2Fconstitution%2Feng%402010-09-03&title=Constitution+of+Kenya"
+  width="100%"
+  height="800px"
+  style="border: none; border-radius: 8px;"
+  allow="clipboard-write">
+</iframe>
 \`\`\`
-- **Response Payload Schema (200 OK):**
+
+---
+
+### 3.4. Resolve Case & Export PDF URL
+- **Endpoint:** \`GET /api/resolve\` (or alias \`GET /api/v1/resolve\`)
+- **Description:** Resolves Kenya Law HTML caselaw view URLs into direct PDF download links (\`/export/<id>/pdf\`) and scrapes metadata.
+- **Query Parameters:**
+  - \`url\` *(string, required)*: Kenya Law caselaw URL (e.g. \`http://kenyalaw.org/caselaw/cases/view/109852/\`).
+  - \`title\` *(string, optional)*: Custom case title override.
+
+#### Example Request:
+\`\`\`bash
+curl -X GET "${baseUrl}/api/resolve?url=http%3A%2F%2Fkenyalaw.org%2Fcaselaw%2Fcases%2Fview%2F109852%2F"
+\`\`\`
+
+#### Response JSON Schema (200 OK):
 \`\`\`json
 {
-  "act": "Penal Code Cap 63",
-  "status": "available",
-  "provisions": [
+  "success": true,
+  "title": "Mtana Lewa v Kahindi Ngala [2015] eKLR",
+  "label": "Mtana Lewa v Kahindi Ngala",
+  "citation": "[2015] eKLR / Civil Appeal 56 of 2014",
+  "actualDocumentUrl": "https://kenyalaw.org/caselaw/cases/export/109852/pdf",
+  "documentUrl": "https://kenyalaw.org/caselaw/cases/export/109852/pdf",
+  "pdfUrl": "https://kenyalaw.org/caselaw/cases/export/109852/pdf",
+  "readUrl": "/read?title=Mtana%20Lewa&sourceUrl=http...",
+  "source": "Kenya Law (Court of Appeal)",
+  "isPdf": true,
+  "cached": false
+}
+\`\`\`
+
+---
+
+### 3.5. List Offline Library Precedents & Statutes
+- **Endpoint:** \`GET /api/library\` (or aliases \`GET /api/v1/cases\`, \`GET /api/v1/statutes\`)
+- **Description:** Retrieves all offline statutes and precedents cached on the local server repository.
+- **Response JSON Schema (200 OK):**
+\`\`\`json
+{
+  "precedents": [
     {
-      "section": "Section 24",
-      "heading": "General Punishment for Felonies",
-      "text": "Where any person is convicted of a felony under this Code..."
+      "id": "sisto_wambugu_1983",
+      "title": "Sisto Wambugu v Kamau Njuguna [1983] KECA 69",
+      "citation": "[1983] KECA 69 (KLR)",
+      "type": "Judgment",
+      "actualDocumentUrl": "https://kenyalaw.org/akn/ke/judgment/keca/1983/69/eng@1983-11-14/source",
+      "pdfUrl": "/api/pdf-proxy?sourceUrl=...",
+      "readUrl": "/read?title=Sisto...",
+      "cached": true
     }
-  ]
+  ],
+  "statutes": [],
+  "docs": [],
+  "total": 12
 }
 \`\`\`
 
 ---
 
-### 2.4. Public Health & System Latency Probe
+### 3.6. System Health Probe
 - **Endpoint:** \`GET /api/health\`
-- **Description:** Check cluster daemon status, database responsiveness, and service uptime. Does not consume quota.
-- **Headers Required:** None
-- **Example cURL Request:**
-\`\`\`bash
-curl -X GET "${baseUrl}/api/health"
-\`\`\`
-- **Response Payload Schema (200 OK):**
-\`\`\`json
-{
-  "status": "ok",
-  "timestamp": "2026-08-16T12:00:00Z",
-  "latencyMs": 14,
-  "service": "eLegal Intelligence REST Engine"
-}
-\`\`\`
+- **Description:** Public health probe for uptime checkers and load balancers.
+- **Response (200 OK):** \`{ "status": "ok", "service": "eLegal Intelligence REST Engine", "timestamp": "..." }\`
 
 ---
 
-## 3. Developer API Keys Management Endpoints
+## 4. Code Integration Examples
 
-### 3.1. Generate Secret API Key
-- **Endpoint:** \`POST /api/keys\`
-- **Headers Required:** \`Authorization: <Firebase_ID_Token>\`
-- **Body Payload:**
-\`\`\`json
-{
-  "label": "Production Mobile App Key"
-}
-\`\`\`
+### 4.1. Client-Side Browser HTML / JavaScript (Zero-CORS)
+\`\`\`html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>eLegal Search Demo</title>
+</head>
+<body>
+  <h2>Kenya Legal Precedent Search</h2>
+  <input type="text" id="queryInput" value="adverse possession land" style="width: 300px;">
+  <button onclick="performSearch()">Search</button>
+  <div id="resultsContainer" style="margin-top: 20px;"></div>
 
-### 3.2. List Account API Keys & Metrics
-- **Endpoint:** \`GET /api/keys\`
-- **Headers Required:** \`Authorization: <Firebase_ID_Token>\`
-
-### 3.3. Pause / Resume API Key
-- **Endpoint:** \`PATCH /api/keys/:keyId\`
-- **Headers Required:** \`Authorization: <Firebase_ID_Token>\`
-- **Body Payload:**
-\`\`\`json
-{
-  "isActive": false
-}
-\`\`\`
-
-### 3.4. Revoke / Delete API Key
-- **Endpoint:** \`DELETE /api/keys/:keyId\`
-- **Headers Required:** \`Authorization: <Firebase_ID_Token>\`
-
----
-
-## 4. Integration Guidelines for AI Applications
-
-1. **Header Placement:** Always send \`X-API-Key\` in the HTTP request header, not as a URL query parameter, to prevent secret leakages in server access logs.
-2. **Error Handling Rules:**
-   - \`401 Unauthorized\`: Invalid or paused key.
-   - \`429 Too Many Requests\`: Pause request dispatch and retry after the duration specified in the \`Retry-After\` header.
-3. **Payload Grounding:** Use the \`summary\`, \`citation\`, and \`pdfUrl\` fields from \`GET /api/search\` responses to ground AI response citations accurately.
-`;
-    }
-
-    async function copyDocAsMarkdownForLLM() {
-      const md = generateFullMarkdownForLLM();
-      try {
-        await navigator.clipboard.writeText(md);
-        showToast('Copied complete API documentation as Markdown for LLMs!');
-      } catch (e) {
-        const ta = document.createElement('textarea');
-        ta.value = md;
-        document.body.appendChild(ta);
-        ta.select();
-        document.execCommand('copy');
-        document.body.removeChild(ta);
-        showToast('Copied complete API documentation as Markdown for LLMs!');
-      }
-    }
-
-    function toggleMobileSidebar() {
-      const sidebar = document.querySelector('.sidebar');
-      const backdrop = document.getElementById('mobileBackdrop');
-      if (sidebar) sidebar.classList.toggle('open');
-      if (backdrop) backdrop.classList.toggle('show');
-    }
-
-    function closeMobileSidebar() {
-      const sidebar = document.querySelector('.sidebar');
-      const backdrop = document.getElementById('mobileBackdrop');
-      if (sidebar) sidebar.classList.remove('open');
-      if (backdrop) backdrop.classList.remove('show');
-    }
-
-    // Switch Active Topic
-    function switchTopic(key, el) {
-      closeMobileSidebar();
-      activeTopicKey = key;
+  <script>
+    async function performSearch() {
+      const q = document.getElementById('queryInput').value;
+      const res = await fetch(\`${baseUrl}/api/search?q=\${encodeURIComponent(q)}&fresh=true\`);
+      const data = await res.json();
       
-      // Update Tree Active Styling
-      document.querySelectorAll('.nav-item').forEach(l => l.classList.remove('active'));
-      const activeEl = el || document.querySelector(`.nav-item[data-topic="${key}"]`);
-      if (activeEl) activeEl.classList.add('active');
-
-      renderTopicView();
+      const container = document.getElementById('resultsContainer');
+      container.innerHTML = data.results.map(doc => \`
+        <div style="border: 1px solid #ccc; padding: 12px; margin-bottom: 10px; border-radius: 6px;">
+          <h3>\${doc.title} (\${doc.year})</h3>
+          <p><em>\${doc.citation}</em></p>
+          <p>\${doc.snippets ? doc.snippets[0] : ''}</p>
+          <a href="\${doc.actualDocumentUrl}" target="_blank" style="margin-right: 12px;">📥 Download PDF / Source</a>
+          <a href="\${doc.readUrl}" target="_blank">📖 Open in Reader</a>
+        </div>
+      \`).join('');
     }
+  </script>
+</body>
+</html>
+\`\`\`
 
-    // Navigate to Previous or Next Topic
-    function navigateTopic(dir) {
-      const currentIndex = TOPIC_KEYS.indexOf(activeTopicKey);
-      const newIndex = currentIndex + dir;
-      if (newIndex >= 0 && newIndex < TOPIC_KEYS.length) {
-        switchTopic(TOPIC_KEYS[newIndex]);
-        document.querySelector('.main-content').scrollTop = 0;
-      }
-    }
+### 4.2. Node.js (Fetch with async/await)
+\`\`\`javascript
+const res = await fetch('${baseUrl}/api/search?q=unfair+termination+employment&fresh=true', {
+  headers: {
+    'Accept': 'application/json',
+    'X-API-Key': '${activeKey}'
+  }
+});
+const { results } = await res.json();
+for (const doc of results) {
+  console.log('Case Title:', doc.title);
+  console.log('Direct Document URL:', doc.actualDocumentUrl);
+  console.log('Reader URL:', doc.readUrl);
+}
+\`\`\`
 
-    function renderTopicView() {
-      const docSection = document.querySelector('.doc-section');
-      const profileView = document.getElementById('profilePageView');
+### 4.3. Python (Requests)
+\`\`\`python
+import requests
 
-      if (activeTopicKey === 'profile') {
-        if (docSection) docSection.style.display = 'none';
-        if (profileView) profileView.style.display = 'block';
-        openProfilePage();
-        return;
-      } else {
-        if (docSection) docSection.style.display = 'block';
-        if (profileView) profileView.style.display = 'none';
-      }
+url = "${baseUrl}/api/search"
+params = {
+    "q": "Constitution Article 47 fair administrative action",
+    "fresh": "true",
+    "limit": 5
+}
+headers = {
+    "X-API-Key": "${activeKey}",
+    "Accept": "application/json"
+}
 
-      const topic = TOPICS[activeTopicKey];
-      if (!topic) return;
-      document.getElementById('displayTitle').textContent = topic.name;
-      document.getElementById('displayDesc').textContent = topic.desc;
-      document.getElementById('displayBadgeText').textContent = topic.badge;
-      document.getElementById('richDocContent').innerHTML = topic.detailsHtml || '';
+response = requests.get(url, params=params, headers=headers)
+data = response.json()
 
-      // Endpoint Pill Container Visibility
-      const epContainer = document.getElementById('endpointBarContainer');
-      if (topic.isEndpoint) {
-        epContainer.style.display = 'block';
-        const pMethod = document.getElementById('pillMethod');
-        pMethod.textContent = topic.method;
-        pMethod.className = `endpoint-pill-method m-badge ${topic.method.toLowerCase()}`;
-        document.getElementById('pillPath').textContent = topic.path;
-      } else {
-        epContainer.style.display = 'none';
-      }
+for case in data.get("results", []):
+    print(f"[{case['year']}] {case['title']}")
+    print(f"  PDF URL: {case['actualDocumentUrl']}")
+    print(f"  Reader:  {case['readUrl']}")
+\`\`\`
 
-      // Render Parameters Inputs
-      const inputsContainer = document.getElementById('paramInputsContainer');
-      const inputsCard = document.getElementById('paramInputsCard');
-      inputsContainer.innerHTML = '';
+---
 
-      if (!topic.params || topic.params.length === 0) {
-        inputsCard.style.display = 'none';
-      } else {
-        inputsCard.style.display = 'block';
-        topic.params.forEach(p => {
-          const row = document.createElement('div');
-          row.className = 'input-row';
-          row.innerHTML = `
+## 5. Golden Rules for AI Coding Assistants (LLM Guardrails)
+
+1. **NEVER Hallucinate Document Paths:** Always use the \`actualDocumentUrl\`, \`pdfUrl\`, or \`readUrl\` properties returned in API payloads. Do not craft hypothetical \`/pdf/case_xyz.pdf\` paths.
+2. **Zero-CORS Confirmation:** When writing frontend web applications, do NOT add proxy servers or backend wrappers solely for CORS — eLegal allows direct browser fetches from any origin.
+3. **Use \`fresh=true\` For Live Legal Checks:** When real-time accuracy against newly delivered court judgments or external registries is required, always specify \`fresh=true\`.
+4. **Iframe Integration:** When asked to render or display court judgments inside a web UI, recommend embedding \`${baseUrl}/read?sourceUrl=...\` in an iframe.
+`;
+        }
+
+        async function copyDocAsMarkdownForLLM() {
+          const md = generateFullMarkdownForLLM();
+          try {
+            await navigator.clipboard.writeText(md);
+            showToast('Copied complete API documentation as Markdown for LLMs!');
+          } catch (e) {
+            const ta = document.createElement('textarea');
+            ta.value = md;
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand('copy');
+            document.body.removeChild(ta);
+            showToast('Copied complete API documentation as Markdown for LLMs!');
+          }
+        }
+
+        function toggleMobileSidebar() {
+          const sidebar = document.querySelector('.sidebar');
+          const backdrop = document.getElementById('mobileBackdrop');
+          if (sidebar) sidebar.classList.toggle('open');
+          if (backdrop) backdrop.classList.toggle('show');
+        }
+
+        function closeMobileSidebar() {
+          const sidebar = document.querySelector('.sidebar');
+          const backdrop = document.getElementById('mobileBackdrop');
+          if (sidebar) sidebar.classList.remove('open');
+          if (backdrop) backdrop.classList.remove('show');
+        }
+
+        // Switch Active Topic
+        function switchTopic(key, el) {
+          closeMobileSidebar();
+          activeTopicKey = key;
+
+          // Update Tree Active Styling
+          document.querySelectorAll('.nav-item').forEach(l => l.classList.remove('active'));
+          const activeEl = el || document.querySelector(`.nav-item[data-topic="${key}"]`);
+          if (activeEl) activeEl.classList.add('active');
+
+          renderTopicView();
+        }
+
+        // Navigate to Previous or Next Topic
+        function navigateTopic(dir) {
+          const currentIndex = TOPIC_KEYS.indexOf(activeTopicKey);
+          const newIndex = currentIndex + dir;
+          if (newIndex >= 0 && newIndex < TOPIC_KEYS.length) {
+            switchTopic(TOPIC_KEYS[newIndex]);
+            document.querySelector('.main-content').scrollTop = 0;
+          }
+        }
+
+        function renderTopicView() {
+          const docSection = document.querySelector('.doc-section');
+          const profileView = document.getElementById('profilePageView');
+
+          if (activeTopicKey === 'profile') {
+            if (docSection) docSection.style.display = 'none';
+            if (profileView) profileView.style.display = 'block';
+            openProfilePage();
+            return;
+          } else {
+            if (docSection) docSection.style.display = 'block';
+            if (profileView) profileView.style.display = 'none';
+          }
+
+          const topic = TOPICS[activeTopicKey];
+          if (!topic) return;
+          document.getElementById('displayTitle').textContent = topic.name;
+          document.getElementById('displayDesc').textContent = topic.desc;
+          document.getElementById('displayBadgeText').textContent = topic.badge;
+          document.getElementById('richDocContent').innerHTML = topic.detailsHtml || '';
+
+          // Endpoint Pill Container Visibility
+          const epContainer = document.getElementById('endpointBarContainer');
+          if (topic.isEndpoint) {
+            epContainer.style.display = 'block';
+            const pMethod = document.getElementById('pillMethod');
+            pMethod.textContent = topic.method;
+            pMethod.className = `endpoint-pill-method m-badge ${topic.method.toLowerCase()}`;
+            document.getElementById('pillPath').textContent = topic.path;
+          } else {
+            epContainer.style.display = 'none';
+          }
+
+          // Render Parameters Inputs
+          const inputsContainer = document.getElementById('paramInputsContainer');
+          const inputsCard = document.getElementById('paramInputsCard');
+          inputsContainer.innerHTML = '';
+
+          if (!topic.params || topic.params.length === 0) {
+            inputsCard.style.display = 'none';
+          } else {
+            inputsCard.style.display = 'block';
+            topic.params.forEach(p => {
+              const row = document.createElement('div');
+              row.className = 'input-row';
+              row.innerHTML = `
             <span class="input-label">${p.name}</span>
             <input type="text" class="input-field" data-param="${p.name}" value="${p.default || ''}" oninput="updateCodeSnippet()">
           `;
-          inputsContainer.appendChild(row);
-        });
-      }
+              inputsContainer.appendChild(row);
+            });
+          }
 
-      // Render Parameters Table
-      const tableBody = document.getElementById('paramsTableBody');
-      const tableContainer = document.getElementById('paramsTableContainer');
-      tableBody.innerHTML = '';
+          // Render Parameters Table
+          const tableBody = document.getElementById('paramsTableBody');
+          const tableContainer = document.getElementById('paramsTableContainer');
+          tableBody.innerHTML = '';
 
-      if (!topic.params || topic.params.length === 0) {
-        tableContainer.style.display = 'none';
-      } else {
-        tableContainer.style.display = 'block';
-        topic.params.forEach(p => {
-          const tr = document.createElement('tr');
-          tr.innerHTML = `
+          if (!topic.params || topic.params.length === 0) {
+            tableContainer.style.display = 'none';
+          } else {
+            tableContainer.style.display = 'block';
+            topic.params.forEach(p => {
+              const tr = document.createElement('tr');
+              tr.innerHTML = `
             <td><span class="param-name">${p.name}</span>${p.req ? '<span class="param-req">REQUIRED</span>' : ''}</td>
             <td><span class="param-type">${p.type}</span></td>
             <td>${p.req ? 'Yes' : 'No'}</td>
             <td style="color: var(--text-muted);">${p.desc}</td>
           `;
-          tableBody.appendChild(tr);
-        });
-      }
-
-      // Render Prev / Next Nav Buttons
-      const currIdx = TOPIC_KEYS.indexOf(activeTopicKey);
-      const prevBtn = document.getElementById('prevTopicBtn');
-      const nextBtn = document.getElementById('nextTopicBtn');
-
-      if (currIdx > 0) {
-        prevBtn.classList.remove('disabled');
-        document.getElementById('prevTopicLabel').textContent = TOPICS[TOPIC_KEYS[currIdx - 1]].name;
-      } else {
-        prevBtn.classList.add('disabled');
-        document.getElementById('prevTopicLabel').textContent = 'Previous';
-      }
-
-      if (currIdx < TOPIC_KEYS.length - 1) {
-        nextBtn.classList.remove('disabled');
-        document.getElementById('nextTopicLabel').textContent = TOPICS[TOPIC_KEYS[currIdx + 1]].name;
-      } else {
-        nextBtn.classList.add('disabled');
-        document.getElementById('nextTopicLabel').textContent = 'Next';
-      }
-
-      updateCodeSnippet();
-    }
-
-    function setLanguage(lang) {
-      activeLang = lang;
-      document.querySelectorAll('.lang-tab').forEach(t => t.classList.remove('active'));
-      const activeBtn = document.querySelector(`.lang-tab[data-lang="${lang}"]`);
-      if (activeBtn) activeBtn.classList.add('active');
-      updateCodeSnippet();
-    }
-
-    function getParamValues() {
-      const values = {};
-      const container = document.getElementById('paramInputsContainer');
-      if (container) {
-        container.querySelectorAll('.input-field').forEach(input => {
-          if (input.dataset.param && input.dataset.param !== 'undefined') {
-            values[input.dataset.param] = input.value.trim();
+              tableBody.appendChild(tr);
+            });
           }
-        });
-      }
-      return values;
-    }
 
-    function buildFullUrl() {
-      const topic = TOPICS[activeTopicKey];
-      let url = (window.location.origin || '') + topic.path;
-      const params = getParamValues();
-      const searchParams = new URLSearchParams();
+          // Render Prev / Next Nav Buttons
+          const currIdx = TOPIC_KEYS.indexOf(activeTopicKey);
+          const prevBtn = document.getElementById('prevTopicBtn');
+          const nextBtn = document.getElementById('nextTopicBtn');
 
-      for (const [k, v] of Object.entries(params)) {
-        if (v && pTypeIsQuery(topic, k)) searchParams.append(k, v);
-      }
-      const queryString = searchParams.toString();
-      if (queryString && topic.method === 'GET') url += '?' + queryString;
-      return url;
-    }
+          if (currIdx > 0) {
+            prevBtn.classList.remove('disabled');
+            document.getElementById('prevTopicLabel').textContent = TOPICS[TOPIC_KEYS[currIdx - 1]].name;
+          } else {
+            prevBtn.classList.add('disabled');
+            document.getElementById('prevTopicLabel').textContent = 'Previous';
+          }
 
-    function pTypeIsQuery(topic, name) {
-      if (!name || name === 'undefined') return false;
-      if (!topic.params) return false;
-      const found = topic.params.find(p => p.name === name);
-      return found ? (found.type !== 'header' && found.type !== 'body') : false;
-    }
+          if (currIdx < TOPIC_KEYS.length - 1) {
+            nextBtn.classList.remove('disabled');
+            document.getElementById('nextTopicLabel').textContent = TOPICS[TOPIC_KEYS[currIdx + 1]].name;
+          } else {
+            nextBtn.classList.add('disabled');
+            document.getElementById('nextTopicLabel').textContent = 'Next';
+          }
 
-    // Code Snippet Generator across 7 languages
-    function updateCodeSnippet() {
-      const topic = TOPICS[activeTopicKey];
-      const url = buildFullUrl();
-      const method = topic.method;
-      const key = (typeof userApiKey !== 'undefined' && userApiKey) ? userApiKey : (localStorage.getItem('elegal_api_key') || 'YOUR_SECRET_API_KEY');
-      let snippet = '';
+          updateCodeSnippet();
+        }
 
-      if (activeLang === 'curl') {
-        if (topic.path === '/api/keys' && !topic.params.some(p => p.name === 'X-API-Key')) {
-          snippet = `<span class="tok-cmnt"># Terminal cURL Request (Developer Account Admin)</span>
+        function setLanguage(lang) {
+          activeLang = lang;
+          document.querySelectorAll('.lang-tab').forEach(t => t.classList.remove('active'));
+          const activeBtn = document.querySelector(`.lang-tab[data-lang="${lang}"]`);
+          if (activeBtn) activeBtn.classList.add('active');
+          updateCodeSnippet();
+        }
+
+        function getParamValues() {
+          const values = {};
+          const container = document.getElementById('paramInputsContainer');
+          if (container) {
+            container.querySelectorAll('.input-field').forEach(input => {
+              if (input.dataset.param && input.dataset.param !== 'undefined') {
+                values[input.dataset.param] = input.value.trim();
+              }
+            });
+          }
+          return values;
+        }
+
+        function buildFullUrl() {
+          const topic = TOPICS[activeTopicKey];
+          let url = (window.location.origin || '') + topic.path;
+          const params = getParamValues();
+          const searchParams = new URLSearchParams();
+
+          for (const [k, v] of Object.entries(params)) {
+            if (v && pTypeIsQuery(topic, k)) searchParams.append(k, v);
+          }
+          const queryString = searchParams.toString();
+          if (queryString && topic.method === 'GET') url += '?' + queryString;
+          return url;
+        }
+
+        function pTypeIsQuery(topic, name) {
+          if (!name || name === 'undefined') return false;
+          if (!topic.params) return false;
+          const found = topic.params.find(p => p.name === name);
+          return found ? (found.type !== 'header' && found.type !== 'body') : false;
+        }
+
+        // Code Snippet Generator across 7 languages
+        function updateCodeSnippet() {
+          const topic = TOPICS[activeTopicKey];
+          const url = buildFullUrl();
+          const method = topic.method;
+          const key = (typeof userApiKey !== 'undefined' && userApiKey) ? userApiKey : (localStorage.getItem('elegal_api_key') || 'YOUR_SECRET_API_KEY');
+          let snippet = '';
+
+          if (activeLang === 'curl') {
+            if (topic.path === '/api/keys' && !topic.params.some(p => p.name === 'X-API-Key')) {
+              snippet = `<span class="tok-cmnt"># Terminal cURL Request (Developer Account Admin)</span>
 <span class="tok-fn">curl</span> -X ${method} \\
   <span class="tok-str">"${url}"</span> \\
   -H <span class="tok-str">"Accept: application/json"</span> \\
   -H <span class="tok-str">"Authorization: Bearer &lt;FIREBASE_ID_TOKEN&gt;"</span>`;
-        } else {
-          snippet = `<span class="tok-cmnt"># Terminal cURL Request</span>
+            } else {
+              snippet = `<span class="tok-cmnt"># Terminal cURL Request</span>
 <span class="tok-fn">curl</span> -X ${method} \\
   <span class="tok-str">"${url}"</span> \\
   -H <span class="tok-str">"Accept: application/json"</span> \\
   -H <span class="tok-str">"X-API-Key: ${key}"</span>`;
-        }
-      } 
-      else if (activeLang === 'node-fetch') {
-        snippet = `<span class="tok-cmnt">// Node.js Native Fetch</span>
+            }
+          }
+          else if (activeLang === 'node-fetch') {
+            snippet = `<span class="tok-cmnt">// Node.js Native Fetch</span>
 <span class="tok-kw">const</span> res = <span class="tok-kw">await</span> <span class="tok-fn">fetch</span>(<span class="tok-str">'${url}'</span>, {
   method: <span class="tok-str">'${method}'</span>,
   headers: {
@@ -3115,9 +3446,9 @@ curl -X GET "${baseUrl}/api/health"
 });
 <span class="tok-kw">const</span> data = <span class="tok-kw">await</span> res.<span class="tok-fn">json</span>();
 console.<span class="tok-fn">log</span>(data);`;
-      }
-      else if (activeLang === 'node-axios') {
-        snippet = `<span class="tok-cmnt">// Node.js / Browser Axios</span>
+          }
+          else if (activeLang === 'node-axios') {
+            snippet = `<span class="tok-cmnt">// Node.js / Browser Axios</span>
 <span class="tok-kw">const</span> axios = <span class="tok-fn">require</span>(<span class="tok-str">'axios'</span>);
 
 <span class="tok-kw">const</span> response = <span class="tok-kw">await</span> axios({
@@ -3126,9 +3457,9 @@ console.<span class="tok-fn">log</span>(data);`;
   headers: { <span class="tok-prop">'X-API-Key'</span>: <span class="tok-str">'${key}'</span> }
 });
 console.<span class="tok-fn">log</span>(response.data);`;
-      }
-      else if (activeLang === 'python-req') {
-        snippet = `<span class="tok-cmnt"># Python Requests</span>
+          }
+          else if (activeLang === 'python-req') {
+            snippet = `<span class="tok-cmnt"># Python Requests</span>
 <span class="tok-kw">import</span> requests
 
 url = <span class="tok-str">"${url}"</span>
@@ -3136,9 +3467,9 @@ headers = { <span class="tok-str">"X-API-Key"</span>: <span class="tok-str">"${k
 
 response = requests.<span class="tok-fn">${method.toLowerCase()}</span>(url, headers=headers)
 print(response.json())`;
-      }
-      else if (activeLang === 'go') {
-        snippet = `<span class="tok-cmnt">// Go Native net/http</span>
+          }
+          else if (activeLang === 'go') {
+            snippet = `<span class="tok-cmnt">// Go Native net/http</span>
 <span class="tok-kw">package</span> main
 
 <span class="tok-kw">import</span> (
@@ -3156,9 +3487,9 @@ print(response.json())`;
 	body, _ := io.<span class="tok-fn">ReadAll</span>(res.Body)
 	fmt.<span class="tok-fn">Println</span>(string(body))
 }`;
-      }
-      else if (activeLang === 'php') {
-        snippet = `<span class="tok-cmnt">&lt;?php // PHP cURL</span>
+          }
+          else if (activeLang === 'php') {
+            snippet = `<span class="tok-cmnt">&lt;?php // PHP cURL</span>
 $ch = curl_init();
 curl_setopt($ch, CURLOPT_URL, <span class="tok-str">"${url}"</span>);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -3168,9 +3499,9 @@ curl_setopt($ch, CURLOPT_HTTPHEADER, [
 $response = curl_exec($ch);
 curl_close($ch);
 echo $response;`;
-      }
-      else if (activeLang === 'ruby') {
-        snippet = `<span class="tok-cmnt"># Ruby Net::HTTP</span>
+          }
+          else if (activeLang === 'ruby') {
+            snippet = `<span class="tok-cmnt"># Ruby Net::HTTP</span>
 require <span class="tok-str">'net/http'</span>
 require <span class="tok-str">'uri'</span>
 
@@ -3180,127 +3511,127 @@ request[<span class="tok-str">"X-API-Key"</span>] = <span class="tok-str">"${key
 
 response = Net::HTTP.<span class="tok-fn">start</span>(uri.hostname, uri.port) { |http| http.<span class="tok-fn">request</span>(request) }
 puts response.body`;
-      }
+          }
 
-      document.getElementById('codeSnippetBox').innerHTML = snippet;
-      updateLineNumbers('codeSnippetBox', 'codeLineNumbers');
-    }
-
-    function updateLineNumbers(codeId, numId) {
-      const text = document.getElementById(codeId).innerText;
-      const lines = text.split('\n').length || 1;
-      let numbersHtml = '';
-      for (let i = 1; i <= lines; i++) {
-        numbersHtml += i + '<br>';
-      }
-      document.getElementById(numId).innerHTML = numbersHtml;
-    }
-
-    // Live Request Execution
-    async function executePlaygroundRequest() {
-      const topic = TOPICS[activeTopicKey];
-      const url = buildFullUrl();
-      const relativeUrl = url.replace('http://localhost:3000', '');
-      const respBox = document.getElementById('responseBox');
-      const statusEl = document.getElementById('respStatus');
-
-      respBox.innerHTML = '<span class="tok-cmnt">// Executing eLegal API request...</span>';
-      recordApiKeyUsage(userApiKey);
-
-      try {
-        const headers = { 'Content-Type': 'application/json' };
-        if (userApiKey) headers['X-API-Key'] = userApiKey;
-
-        const res = await fetch(relativeUrl, { method: topic.method, headers });
-        let data = await res.json();
-
-        // Enforce 5 results limit if present
-        if (data && Array.isArray(data.results)) {
-          data.results = data.results.slice(0, 5);
-          data.total = data.results.length;
-        } else if (Array.isArray(data)) {
-          data = data.slice(0, 5);
+          document.getElementById('codeSnippetBox').innerHTML = snippet;
+          updateLineNumbers('codeSnippetBox', 'codeLineNumbers');
         }
 
-        statusEl.textContent = `${res.status} ${res.statusText || 'OK'}`;
-        statusEl.style.color = res.ok ? '#34D399' : '#F87171';
-        respBox.innerHTML = syntaxHighlightJson(JSON.stringify(data, null, 2));
-      } catch (e) {
-        statusEl.textContent = '200 OK';
-        statusEl.style.color = '#34D399';
-
-        // Custom Payload Response for each topic
-        let mockPayload = {};
-        if (activeTopicKey === 'overview') {
-          mockPayload = {
-            status: "success",
-            platform: "eLegal Kenya Law AI Engine",
-            authStatus: "authenticated",
-            apiKey: userApiKey,
-            version: "v1.0"
-          };
-        } else if (activeTopicKey === 'keys_overview' || activeTopicKey === 'list_keys') {
-          mockPayload = {
-            status: "success",
-            activeKeys: [
-              { id: "key_01", label: "Production Backend", prefix: "el_live_prod...", createdAt: "2026-08-01", isActive: true },
-              { id: "key_02", label: "Staging Test App", prefix: "el_live_stag...", createdAt: "2026-08-10", isActive: true }
-            ]
-          };
-        } else {
-          mockPayload = {
-            status: "success",
-            platform: "eLegal Kenya Law AI Engine",
-            endpoint: topic.path,
-            resultsCount: 5,
-            results: [
-              { id: "eklr_2022_1045", title: "Republic v National Land Commission [2022] eKLR", citation: "[2022] eKLR 1045", court: "High Court of Kenya", isPdf: true, pdfUrl: "http://kenyalaw.org/caselaw/cases/export/210452/pdf" },
-              { id: "eklr_2021_409", title: "In re Estate of Peter Kamau Njuguna (Deceased) [2021] eKLR", citation: "[2021] eKLR 409", court: "Court of Appeal at Kisumu", isPdf: true, pdfUrl: "http://kenyalaw.org/caselaw/cases/export/209112/pdf" },
-              { id: "eklr_2020_881", title: "Munyao v Kenya Revenue Authority [2020] eKLR", citation: "[2020] eKLR 881", court: "Tax Appeals Tribunal", isPdf: false, pdfUrl: null },
-              { id: "eklr_2022_9012", title: "Okiya Omtatah Okoiti v Attorney General & 3 others [2022] eKLR", citation: "[2022] eKLR 9012", court: "Supreme Court of Kenya", isPdf: true, pdfUrl: "http://kenyalaw.org/caselaw/cases/export/224091/pdf" },
-              { id: "eklr_2019_124", title: "Wambui & 2 others v Mwangi [2019] eKLR", citation: "[2019] eKLR 124", court: "Environment & Land Court", isPdf: true, pdfUrl: "http://kenyalaw.org/caselaw/cases/export/189201/pdf" }
-            ]
-          };
+        function updateLineNumbers(codeId, numId) {
+          const text = document.getElementById(codeId).innerText;
+          const lines = text.split('\n').length || 1;
+          let numbersHtml = '';
+          for (let i = 1; i <= lines; i++) {
+            numbersHtml += i + '<br>';
+          }
+          document.getElementById(numId).innerHTML = numbersHtml;
         }
 
-        respBox.innerHTML = syntaxHighlightJson(JSON.stringify(mockPayload, null, 2));
-      }
-      updateLineNumbers('responseBox', 'respLineNumbers');
-    }
+        // Live Request Execution
+        async function executePlaygroundRequest() {
+          const topic = TOPICS[activeTopicKey];
+          const url = buildFullUrl();
+          const relativeUrl = url.replace('http://localhost:3000', '');
+          const respBox = document.getElementById('responseBox');
+          const statusEl = document.getElementById('respStatus');
 
-    function syntaxHighlightJson(json) {
-      json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-      return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
-        let cls = 'tok-str';
-        if (/^"/.test(match)) {
-          if (/:$/.test(match)) cls = 'tok-prop';
-        } else if (/true|false|null/.test(match)) {
-          cls = 'tok-kw';
-        } else {
-          cls = 'tok-num';
+          respBox.innerHTML = '<span class="tok-cmnt">// Executing eLegal API request...</span>';
+          recordApiKeyUsage(userApiKey);
+
+          try {
+            const headers = { 'Content-Type': 'application/json' };
+            if (userApiKey) headers['X-API-Key'] = userApiKey;
+
+            const res = await fetch(relativeUrl, { method: topic.method, headers });
+            let data = await res.json();
+
+            // Enforce 5 results limit if present
+            if (data && Array.isArray(data.results)) {
+              data.results = data.results.slice(0, 5);
+              data.total = data.results.length;
+            } else if (Array.isArray(data)) {
+              data = data.slice(0, 5);
+            }
+
+            statusEl.textContent = `${res.status} ${res.statusText || 'OK'}`;
+            statusEl.style.color = res.ok ? '#34D399' : '#F87171';
+            respBox.innerHTML = syntaxHighlightJson(JSON.stringify(data, null, 2));
+          } catch (e) {
+            statusEl.textContent = '200 OK';
+            statusEl.style.color = '#34D399';
+
+            // Custom Payload Response for each topic
+            let mockPayload = {};
+            if (activeTopicKey === 'overview') {
+              mockPayload = {
+                status: "success",
+                platform: "eLegal Kenya Law AI Engine",
+                authStatus: "authenticated",
+                apiKey: userApiKey,
+                version: "v1.0"
+              };
+            } else if (activeTopicKey === 'keys_overview' || activeTopicKey === 'list_keys') {
+              mockPayload = {
+                status: "success",
+                activeKeys: [
+                  { id: "key_01", label: "Production Backend", prefix: "el_live_prod...", createdAt: "2026-08-01", isActive: true },
+                  { id: "key_02", label: "Staging Test App", prefix: "el_live_stag...", createdAt: "2026-08-10", isActive: true }
+                ]
+              };
+            } else {
+              mockPayload = {
+                status: "success",
+                platform: "eLegal Kenya Law AI Engine",
+                endpoint: topic.path,
+                resultsCount: 5,
+                results: [
+                  { id: "eklr_2022_1045", title: "Republic v National Land Commission [2022] eKLR", citation: "[2022] eKLR 1045", court: "High Court of Kenya", isPdf: true, pdfUrl: "http://kenyalaw.org/caselaw/cases/export/210452/pdf" },
+                  { id: "eklr_2021_409", title: "In re Estate of Peter Kamau Njuguna (Deceased) [2021] eKLR", citation: "[2021] eKLR 409", court: "Court of Appeal at Kisumu", isPdf: true, pdfUrl: "http://kenyalaw.org/caselaw/cases/export/209112/pdf" },
+                  { id: "eklr_2020_881", title: "Munyao v Kenya Revenue Authority [2020] eKLR", citation: "[2020] eKLR 881", court: "Tax Appeals Tribunal", isPdf: false, pdfUrl: null },
+                  { id: "eklr_2022_9012", title: "Okiya Omtatah Okoiti v Attorney General & 3 others [2022] eKLR", citation: "[2022] eKLR 9012", court: "Supreme Court of Kenya", isPdf: true, pdfUrl: "http://kenyalaw.org/caselaw/cases/export/224091/pdf" },
+                  { id: "eklr_2019_124", title: "Wambui & 2 others v Mwangi [2019] eKLR", citation: "[2019] eKLR 124", court: "Environment & Land Court", isPdf: true, pdfUrl: "http://kenyalaw.org/caselaw/cases/export/189201/pdf" }
+                ]
+              };
+            }
+
+            respBox.innerHTML = syntaxHighlightJson(JSON.stringify(mockPayload, null, 2));
+          }
+          updateLineNumbers('responseBox', 'respLineNumbers');
         }
-        return '<span class="' + cls + '">' + match + '</span>';
-      });
-    }
 
-    function copyCodeSnippet() {
-      const text = document.getElementById('codeSnippetBox').innerText;
-      navigator.clipboard.writeText(text);
-      showToast('Code snippet copied!');
-    }
+        function syntaxHighlightJson(json) {
+          json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+          return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
+            let cls = 'tok-str';
+            if (/^"/.test(match)) {
+              if (/:$/.test(match)) cls = 'tok-prop';
+            } else if (/true|false|null/.test(match)) {
+              cls = 'tok-kw';
+            } else {
+              cls = 'tok-num';
+            }
+            return '<span class="' + cls + '">' + match + '</span>';
+          });
+        }
 
-    function filterNavEndpoints(val) {
-      const text = val.toLowerCase();
-      document.querySelectorAll('.nav-item').forEach(link => {
-        const matches = link.innerText.toLowerCase().includes(text);
-        link.style.display = matches ? 'flex' : 'none';
-      });
-    }
+        function copyCodeSnippet() {
+          const text = document.getElementById('codeSnippetBox').innerText;
+          navigator.clipboard.writeText(text);
+          showToast('Code snippet copied!');
+        }
 
-    // Boot Init
-    initFirebase();
-    renderTopicView();
-  </script>
+        function filterNavEndpoints(val) {
+          const text = val.toLowerCase();
+          document.querySelectorAll('.nav-item').forEach(link => {
+            const matches = link.innerText.toLowerCase().includes(text);
+            link.style.display = matches ? 'flex' : 'none';
+          });
+        }
+
+        // Boot Init
+        initFirebase();
+        renderTopicView();
+      </script>
 </body>
 
 </html>

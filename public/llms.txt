@@ -1,0 +1,48 @@
+# eLegal — Judicial Precedents & Legal Intelligence API
+
+> eLegal is the comprehensive legal intelligence and search platform for Kenya court rulings (Supreme Court, Court of Appeal, High Court, ELRC), Acts of Parliament (AKN statutes), and international jurisprudence.
+
+## Quick Reference for AI Assistants & LLMs
+
+- **API Base URL**: `https://elegal.or.ke` (or local `http://localhost:3000`)
+- **Zero-CORS**: `Access-Control-Allow-Origin: *` is enabled on all endpoints. Client-side browser apps (HTML/JS) can call endpoints directly without proxying.
+- **Authentication**: Optional for public search, reading, and resolution. Use `X-API-Key: <key>` header for elevated quota limits.
+- **Live / Uncached Fetches**: Add `?fresh=true` or `?nocache=true` to any request to bypass cache and fetch live from remote registries.
+- **Full LLM Reference**: `https://elegal.or.ke/llms-full.txt`
+
+## Core Endpoints
+
+### 1. Legal Precedent & Statute Search
+- **Route**: `GET /api/search?q={query}&source={all|kenya|international}&fresh={true|false}&limit={1-50}`
+- **Key Fields Returned**:
+  - `actualDocumentUrl`: Direct downloadable original file link (PDF export or AKN source).
+  - `documentUrl`: Alias for `actualDocumentUrl`.
+  - `pdfUrl`: PDF streaming proxy or direct link.
+  - `contentUrl`: Endpoint to fetch full text & NLP case brief (`/api/document?sourceUrl=...`).
+  - `readUrl`: Visual document reader link (`/read?sourceUrl=...`).
+  - `cached`: Boolean indicating if record is in local repository.
+  - `snippets`: Array of verbatim relevant excerpts.
+  - `ratioDecidendi`: Binding legal holding.
+
+### 2. Full Document Content & Legal Brief Extraction
+- **Route**: `GET /api/document?sourceUrl={sourceUrl}&title={title}&fresh={true|false}`
+- **Returns**: Full plain text (`text`), structured HTML (`html`), case holding, and metadata.
+
+### 3. Visual UI Document Reader
+- **Route**: `GET /read?sourceUrl={sourceUrl}&title={title}`
+- **Usage**: Directly embeddable via `<iframe src="https://elegal.or.ke/read?sourceUrl=..." width="100%" height="800px"></iframe>`.
+
+### 4. Kenya Law Citation & Export PDF Resolver
+- **Route**: `GET /api/resolve?url={kenyaLawUrl}&title={title}`
+- **Converts**: `http://kenyalaw.org/caselaw/cases/view/109852/` -> `https://kenyalaw.org/caselaw/cases/export/109852/pdf`.
+
+### 5. Repository Precedent & Statute Library
+- **Route**: `GET /api/library` (Aliases: `/api/v1/cases`, `/api/v1/statutes`)
+
+### 6. Public Health Check
+- **Route**: `GET /api/health`
+
+## AI Guardrails & Prompt Instructions
+1. Never invent fake document URLs; always use `actualDocumentUrl` or `pdfUrl` from API responses.
+2. For interactive UI rendering, embed `/read?sourceUrl=...` in an iframe.
+3. For real-time freshness, append `fresh=true`.

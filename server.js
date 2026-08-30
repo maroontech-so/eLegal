@@ -34,6 +34,7 @@ try {
 const cors = require('cors');
 const { v2: cloudinary } = require('cloudinary');
 const pdfParse = require('pdf-parse');
+const mammoth = require('mammoth');
 const { classifyQueryOpenSourceML } = require('./src/ml-classifier');
 
 // Initialize Cloudinary safely
@@ -1235,12 +1236,19 @@ app.get('/api/pdf-proxy', async (req, res) => {
 
 async function extractTextFromPdf(pdfBuffer) {
   try {
-    const data = await pdfParse(pdfBuffer);
-    const text = data.text || '';
-    if (!text.trim()) return { plainText: '', bodyHtml: '' };
+    let rawText = '';
+    if (typeof pdfParse === 'function') {
+      const data = await pdfParse(pdfBuffer);
+      rawText = data.text || '';
+    } else if (pdfParse && pdfParse.PDFParse) {
+      const parser = new pdfParse.PDFParse({ data: pdfBuffer });
+      const data = await parser.getText();
+      rawText = typeof data === 'string' ? data : (data?.text || '');
+    }
+    if (!rawText.trim()) return { plainText: '', bodyHtml: '' };
 
     // Break into clean paragraphs
-    const paragraphs = text
+    const paragraphs = rawText
       .split(/\n\s*\n/)
       .map(p => p.trim())
       .filter(p => p.length > 0);
@@ -1259,7 +1267,7 @@ async function extractTextFromPdf(pdfBuffer) {
     });
 
     return {
-      plainText: text,
+      plainText: rawText,
       bodyHtml: htmlParts.join('\n')
     };
   } catch (e) {
@@ -1271,6 +1279,48 @@ async function extractTextFromPdf(pdfBuffer) {
 function cleanLegalDocumentContent(rawHtml = '') {
   if (!rawHtml) return { bodyHtml: '', plainText: '' };
 
+  // Check if it's the Kenya Law PDF viewer wrapper placeholder without actual text
+  if (rawHtml.includes('Loading PDF...') && rawHtml.includes('Do you want to load it?')) {
+    return { bodyHtml: '', plainText: '' };
+  }
+
+  // 1. Specialized Akoma Ntoso (AKN) / Kenya Law parser
+  const isAkn = rawHtml.includes('la-akoma-ntoso') ||
+                rawHtml.includes('akn-judgment') ||
+                rawHtml.includes('akn-act') ||
+                rawHtml.includes('content-and-enrichments') ||
+                rawHtml.includes('frbr-doctype-judgment');
+
+  if (isAkn) {
+    let clean = rawHtml
+      .replace(/<script[\s\S]*?<\/script>/gi, '')
+      .replace(/<style[\s\S]*?<\/style>/gi, '')
+      .replace(/<nav[\s\S]*?<\/nav>/gi, '')
+      .replace(/<footer[\s\S]*?<\/footer>/gi, '')
+      .replace(/<header class=["'](?:site-header|header)["'][\s\S]*?<\/header>/gi, '');
+
+    const containerMatch = clean.match(/<div[^>]*class=["'][^"']*(?:content-and-enrichments|la-akoma-ntoso|akn-judgment|akn-act)[^"']*["'][^>]*>([\s\S]*?)<\/div>\s*<\/main>/i) ||
+                           clean.match(/<div[^>]*class=["']la-akoma-ntoso[\"'][^>]*>([\s\S]*?)<\/div>/i) ||
+                           clean.match(/<main[^>]*>([\s\S]*?)<\/main>/i);
+
+    let aknBody = containerMatch ? containerMatch[1] : clean;
+
+    // Convert AKN headers and centered items
+    aknBody = aknBody.replace(/<div[^>]*class=["'][^"']*(?:republic-head|doc-authority|akn-docTitle|tausi-header|akn-header)["'][^>]*>([\s\S]*?)<\/div>/gi, '<p class="ql-align-center"><strong>$1</strong></p>');
+    aknBody = aknBody.replace(/<div[^>]*class=["'][^"']*(?:parties-listing|party-listing|docket-number|judges|doc-date)["'][^>]*>([\s\S]*?)<\/div>/gi, '<p class="ql-align-center">$1</p>');
+    
+    // Convert headings
+    aknBody = aknBody.replace(/<div[^>]*class=["'][^"']*(?:akn-heading|doc-heading)["'][^>]*>([\s\S]*?)<\/div>/gi, '<h2>$1</h2>');
+    
+    // Convert paragraphs with numbering
+    aknBody = aknBody.replace(/<div[^>]*class=["'][^"']*akn-paragraph[^"']*["'][^>]*>([\s\S]*?)<\/div>/gi, '<p>$1</p>');
+    aknBody = aknBody.replace(/<span[^>]*class=["'][^"']*akn-num[^"']*["'][^>]*>([\s\S]*?)<\/span>/gi, '<strong>$1</strong> ');
+
+    const plainText = aknBody.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+    return { bodyHtml: aknBody, plainText };
+  }
+
+  // 2. Standard Web & Legal HTML parser
   let html = rawHtml
     .replace(/<script[\s\S]*?<\/script>/gi, '')
     .replace(/<style[\s\S]*?<\/style>/gi, '')
@@ -1283,19 +1333,16 @@ function cleanLegalDocumentContent(rawHtml = '') {
     .replace(/<nav[\s\S]*?<\/nav>/gi, '')
     .replace(/<aside[\s\S]*?<\/aside>/gi, '');
 
-  // Strip non-content UI containers, header/footer/nav/sidebar wrappers
   html = html
-    .replace(/<div[^>]*class=["'][^"']*(?:site-header|site-footer|header|footer|nav|navigation|menu|sidebar|cookie|banner|toolbar|post-header|breadcrumb|search-form|actions-bar|social-share|share-buttons|comments|ad-container|advertisement|related-posts|popup|modal|top-bar|bottom-bar)[^"']*["'][^>]*>[\s\S]*?<\/div>/gi, '')
+    .replace(/<div[^>]*class=["'](?!(?:akn|tausi))[^"']*(?:site-header|site-footer|footer|navigation|menu|sidebar|cookie|banner|toolbar|post-header|breadcrumb|search-form|actions-bar|social-share|share-buttons|comments|ad-container|advertisement|related-posts|popup|modal)[^"']*["'][^>]*>[\s\S]*?<\/div>/gi, '')
     .replace(/<section[^>]*class=["'][^"']*(?:header|footer|nav|navigation|menu|sidebar|cookie|banner|toolbar|breadcrumb|comments|ads|related)[^"']*["'][^>]*>[\s\S]*?<\/section>/gi, '');
 
-  // Find "Skip to document content" anchor or text
   const skipMatch = html.match(/(?:Skip to document content|Skip to main content|Skip to content)/i);
   if (skipMatch) {
     const idx = html.indexOf(skipMatch[0]);
     html = html.substring(idx + skipMatch[0].length);
   }
 
-  // Locate the start of main document content container
   const containerMatch = html.match(/<(?:article|main|div)[^>]*(?:class|id|role)=["'][^"']*(?:post-content|judgment|akn-judgment|akn-act|statute-content|document-content|entry-content|article-body|content-body|body-text|case-details|doc-details|main-content|main)[^"']*["'][^>]*>/i);
 
   let bodyHtml = html;
@@ -1309,7 +1356,6 @@ function cleanLegalDocumentContent(rawHtml = '') {
     }
   }
 
-  // Convert to plain text & clean residual web boilerplate
   let plainText = bodyHtml.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
 
   plainText = plainText
@@ -1329,6 +1375,124 @@ function cleanLegalDocumentContent(rawHtml = '') {
   }
 
   return { bodyHtml, plainText };
+}
+
+async function fetchRealLegalDocument(url, reqTitle = '', reqYear = '', reqType = '', reqSource = '') {
+  const normSource = normalizeFetchUrl(url);
+  let candidateUrls = [];
+
+  if (normSource.includes('/akn/')) {
+    if (!normSource.endsWith('/source')) {
+      candidateUrls.push(normSource + '/source');
+      candidateUrls.push(normSource.replace('kenyalaw.org', 'new.kenyalaw.org') + '/source');
+    }
+    candidateUrls.push(normSource);
+    candidateUrls.push(normSource.replace('kenyalaw.org', 'new.kenyalaw.org'));
+  } else if (normSource.includes('/caselaw/cases/view/')) {
+    candidateUrls.push(normSource.replace('/caselaw/cases/view/', '/caselaw/cases/export/').replace(/\/+$/, '') + '/pdf');
+    candidateUrls.push(normSource.replace('kenyalaw.org', 'new.kenyalaw.org'));
+    candidateUrls.push(normSource);
+  } else {
+    candidateUrls.push(normSource);
+  }
+
+  for (const targetUrl of candidateUrls) {
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 12000);
+
+      const res = await fetch(targetUrl, {
+        headers: getBrowserHeaders(targetUrl),
+        redirect: 'follow',
+        signal: controller.signal
+      });
+      clearTimeout(timeoutId);
+
+      if (!res.ok) continue;
+
+      const contentType = res.headers.get('content-type') || '';
+      const arrayBuffer = await res.arrayBuffer();
+      const buf = Buffer.from(arrayBuffer);
+
+      // 1. DOCX check (Word binary from Kenya Law /source or .docx)
+      const isZip = buf.toString('hex', 0, 4) === '504b0304';
+      if (isZip && buf.length > 500) {
+        try {
+          const { value: html } = await mammoth.convertToHtml({ buffer: buf });
+          const { value: text } = await mammoth.extractRawText({ buffer: buf });
+          if (text && text.trim().length > 100) {
+            return {
+              success: true,
+              format: 'docx',
+              isPdf: false,
+              hasPdf: true,
+              pdfUrl: `/api/pdf-proxy?sourceUrl=${encodeURIComponent(normSource)}`,
+              actualDocumentUrl: targetUrl,
+              url: normSource,
+              sourceUrl: normSource,
+              text: text.trim(),
+              html: html,
+              buffer: buf
+            };
+          }
+        } catch (_) { }
+      }
+
+      // 2. PDF check
+      const isPdf = buf.toString('utf8', 0, 5) === '%PDF-' || contentType.includes('application/pdf') || targetUrl.endsWith('.pdf');
+      if (isPdf && buf.length > 500) {
+        const { plainText, bodyHtml } = await extractTextFromPdf(buf);
+        if (plainText && plainText.trim().length > 100) {
+          return {
+            success: true,
+            format: 'pdf',
+            isPdf: true,
+            hasPdf: true,
+            pdfUrl: `/api/pdf-proxy?sourceUrl=${encodeURIComponent(normSource)}`,
+            actualDocumentUrl: targetUrl,
+            url: normSource,
+            sourceUrl: normSource,
+            text: plainText.trim(),
+            html: bodyHtml,
+            buffer: buf
+          };
+        }
+      }
+
+      // 3. HTML check
+      const rawHtml = buf.toString('utf8');
+      if (rawHtml.includes('Loading PDF...') && rawHtml.includes('Do you want to load it?')) {
+        continue;
+      }
+
+      const { bodyHtml, plainText } = cleanLegalDocumentContent(rawHtml);
+      if (plainText && plainText.length > 120 && !plainText.includes('Loading PDF...')) {
+        const info = extractKenyaLawDocumentInfo(rawHtml, normSource);
+        const title = info.title || reqTitle;
+        const citation = info.citation || title;
+        const scrapedPdfUrl = extractPdfUrlFromHtml(rawHtml, normSource);
+
+        return {
+          success: true,
+          format: 'html',
+          isPdf: !!scrapedPdfUrl,
+          hasPdf: true,
+          pdfUrl: scrapedPdfUrl ? `/api/pdf-proxy?sourceUrl=${encodeURIComponent(scrapedPdfUrl)}` : `/api/pdf-proxy?sourceUrl=${encodeURIComponent(normSource)}`,
+          actualDocumentUrl: normSource,
+          url: normSource,
+          sourceUrl: normSource,
+          title,
+          citation,
+          text: plainText,
+          html: bodyHtml
+        };
+      }
+    } catch (err) {
+      console.warn('[fetchRealLegalDocument] Error trying candidate:', targetUrl, err.message);
+    }
+  }
+
+  return null;
 }
 
 app.get(['/read', '/read/', '/read.html', '/read/:filename', '/api/read'], async (req, res) => {
@@ -1357,141 +1521,6 @@ app.get(['/read', '/read/', '/read.html', '/read/:filename', '/api/read'], async
   res.sendFile(path.join(__dirname, 'public', 'read.html'));
 });
 
-function generateRichLegalDocumentRecord({ title = 'Official Legal Document', citation = '', year = '', type = '', source = '', sourceUrl = '' }) {
-  const cleanTitle = (title || 'Official Kenya Law Judgment').trim();
-  const cleanYear = year || extractYearFromText(cleanTitle) || '2025';
-  const cleanCitation = citation || `[${cleanYear}] eKLR`;
-  const cleanType = type || (cleanTitle.toLowerCase().includes('act') || cleanTitle.toLowerCase().includes('bill') ? 'Statute' : 'Judgment');
-  const isStatute = cleanType.toLowerCase() === 'statute' || cleanTitle.toLowerCase().includes('act') || cleanTitle.toLowerCase().includes('constitution');
-
-  let courtName = 'IN THE HIGH COURT OF KENYA AT NAIROBI';
-  if (/supreme court/i.test(cleanTitle) || /supreme court/i.test(cleanCitation)) {
-    courtName = 'IN THE SUPREME COURT OF KENYA AT NAIROBI';
-  } else if (/court of appeal/i.test(cleanTitle) || /court of appeal/i.test(cleanCitation)) {
-    courtName = 'IN THE COURT OF APPEAL OF KENYA AT NAIROBI';
-  } else if (/environment|land|elc/i.test(cleanTitle) || /elc/i.test(cleanCitation)) {
-    courtName = 'IN THE ENVIRONMENT AND LAND COURT OF KENYA';
-  } else if (/employment|labour|elrc/i.test(cleanTitle) || /elrc/i.test(cleanCitation)) {
-    courtName = 'IN THE EMPLOYMENT AND LABOUR RELATIONS COURT OF KENYA';
-  }
-
-  let html = '';
-  if (isStatute) {
-    html = `
-      <div class="legal-doc" style="font-family: 'Georgia', 'Times New Roman', serif; color: #1a1a1a; line-height: 1.8;">
-        <div style="text-align: center; border-bottom: 2px solid #0D5C3A; padding-bottom: 15px; margin-bottom: 25px;">
-          <h2 style="font-size: 20px; font-weight: bold; text-transform: uppercase; margin: 0; color: #0D5C3A;">LAWS OF KENYA</h2>
-          <h1 style="font-size: 24px; font-weight: bold; margin: 10px 0; color: #1a1a1a;">${cleanTitle}</h1>
-          <p style="font-size: 14px; font-weight: 600; color: #4b5563; margin: 5px 0;">Official Statutory Record | ${cleanCitation}</p>
-        </div>
-
-        <div style="margin-bottom: 25px; padding: 15px; background: #f8fafc; border-left: 4px solid #0D5C3A; border-radius: 4px;">
-          <h3 style="font-size: 16px; font-weight: bold; margin-top: 0; color: #0D5C3A;">PREAMBLE & ENACTMENT</h3>
-          <p>An Act of Parliament to provide for the statutory framework, regulatory principles, administrative enforcement, and judicial remedies relating to <strong>${cleanTitle}</strong> under the Constitution of Kenya.</p>
-        </div>
-
-        <div style="margin-bottom: 20px;">
-          <h3 style="font-size: 18px; font-weight: bold; border-bottom: 1px solid #cbd5e1; padding-bottom: 5px; color: #0f172a;">PART I — PRELIMINARY PROVISIONS</h3>
-          <p><strong>Section 1 — Short Title & Commencement:</strong> This Act may be cited as the <em>${cleanTitle}</em> and shall come into operation on the date of publication in the Kenya Gazette.</p>
-          <p><strong>Section 2 — Interpretation:</strong> In this Act, unless the context otherwise requires—</p>
-          <ul style="list-style-type: square; padding-left: 25px;">
-            <li><em>"Authority"</em> means the designated statutory regulatory enforcement agency;</li>
-            <li><em>"Court"</em> means the High Court of Kenya or specialized courts of equal status established under Article 162 of the Constitution;</li>
-            <li><em>"Person"</em> includes a natural person, body corporate, partnership, or legal entity;</li>
-            <li><em>"Prescribed"</em> means prescribed by regulations made under this Act.</li>
-          </ul>
-        </div>
-
-        <div style="margin-bottom: 20px;">
-          <h3 style="font-size: 18px; font-weight: bold; border-bottom: 1px solid #cbd5e1; padding-bottom: 5px; color: #0f172a;">PART II — STATUTORY RIGHTS, OBLIGATIONS & JURISDICTION</h3>
-          <p><strong>Section 3 — Overriding Constitutional Objective:</strong> Every provision of this Act shall be construed in conformity with Article 10 (National Values and Principles of Governance) and Article 47 (Fair Administrative Action) of the Constitution of Kenya 2010.</p>
-          <p><strong>Section 4 — Statutory Duty of Compliance:</strong> Any decision, directive, or administrative action taken pursuant to this Act must observe procedural fairness, natural justice, and statutory reasonableness.</p>
-        </div>
-
-        <div style="margin-bottom: 20px;">
-          <h3 style="font-size: 18px; font-weight: bold; border-bottom: 1px solid #cbd5e1; padding-bottom: 5px; color: #0f172a;">PART III — OFFENCES, PENALTIES & REMEDIES</h3>
-          <p><strong>Section 5 — Enforcement & Civil Remedies:</strong> Any aggrieved party alleging breach of statutory duty under this Act may institute judicial review or civil proceedings before a court of competent jurisdiction to seek injunctions, declarations, or monetary damages.</p>
-        </div>
-      </div>
-    `;
-  } else {
-    html = `
-      <div class="legal-doc" style="font-family: 'Georgia', 'Times New Roman', serif; color: #1a1a1a; line-height: 1.8;">
-        <div style="text-align: center; border-bottom: 2px solid #0D5C3A; padding-bottom: 15px; margin-bottom: 25px;">
-          <h3 style="font-size: 15px; font-weight: bold; letter-spacing: 1px; margin: 0; color: #4b5563;">REPUBLIC OF KENYA</h3>
-          <h2 style="font-size: 19px; font-weight: bold; margin: 8px 0; color: #0D5C3A;">${courtName}</h2>
-          <p style="font-size: 14px; font-weight: bold; color: #1f2937; margin: 4px 0;">CITATION: ${cleanCitation}</p>
-          <h1 style="font-size: 21px; font-weight: bold; margin: 15px 0; color: #0f172a;">${cleanTitle}</h1>
-        </div>
-
-        <div style="margin-bottom: 25px; padding: 15px; background: #fdfbf7; border: 1px solid #e2e8f0; border-radius: 6px;">
-          <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
-            <tr><td style="font-weight: bold; width: 140px; padding: 4px 0;">JURISDICTION:</td><td>Kenya Law Official Judicial Registry (${cleanYear})</td></tr>
-            <tr><td style="font-weight: bold; padding: 4px 0;">CLASSIFICATION:</td><td>${cleanType} / Binding Judicial Precedent</td></tr>
-            <tr><td style="font-weight: bold; padding: 4px 0;">SOURCE:</td><td>${source || 'Kenya Law Reports (eKLR)'}</td></tr>
-          </table>
-        </div>
-
-        <div style="margin-bottom: 25px;">
-          <h3 style="font-size: 17px; font-weight: bold; border-bottom: 1px solid #cbd5e1; padding-bottom: 4px; color: #0D5C3A;">I. MATERIAL FACTS & PROCEDURAL HISTORY</h3>
-          <p>1. This proceeding concerns <strong>${cleanTitle}</strong> as recorded in the official judicial archives of Kenya Law.</p>
-          <p>2. The dispute arose out of conflicting legal obligations, procedural determinations, and statutory interpretations instituted before the Court for judicial resolution.</p>
-          <p>3. The parties presented extensive affidavit evidence, statutory authorities, and binding precedent arguments regarding the constitutional and legal frameworks applicable.</p>
-        </div>
-
-        <div style="margin-bottom: 25px;">
-          <h3 style="font-size: 17px; font-weight: bold; border-bottom: 1px solid #cbd5e1; padding-bottom: 4px; color: #0D5C3A;">II. ISSUES FOR DETERMINATION</h3>
-          <p>4. Having evaluated the pleadings and submissions of legal counsel, the Court formulated the following primary issues for determination:</p>
-          <ul style="padding-left: 25px; margin-top: 5px;">
-            <li>(a) Whether the applicant established a prima facie case with a probability of success under the relevant statutory provisions;</li>
-            <li>(b) Whether the administrative or judicial action complied with Article 47 of the Constitution of Kenya (Fair Administrative Action);</li>
-            <li>(c) What appropriate orders and costs should be awarded.</li>
-          </ul>
-        </div>
-
-        <div style="margin-bottom: 25px;">
-          <h3 style="font-size: 17px; font-weight: bold; border-bottom: 1px solid #cbd5e1; padding-bottom: 4px; color: #0D5C3A;">III. RATIO DECIDENDI & LEGAL ANALYSIS</h3>
-          <p>5. In addressing the core legal questions, the Court affirmed the established principle that procedural rules must facilitate the overriding objective of justice as enshrined in Sections 1A and 1B of the Civil Procedure Act.</p>
-          <p>6. The Court emphasized that statutory discretion must be exercised reasonably, objectively, and in full compliance with constitutional guarantees of due process and equality before the law.</p>
-          <p>7. Relying on settled precedents of the Court of Appeal and Supreme Court of Kenya, the Court held that failure to observe statutory safeguards vitiates administrative decisions ab initio.</p>
-        </div>
-
-        <div style="margin-bottom: 25px; padding: 15px; background: #f8fafc; border-left: 4px solid #0D5C3A; border-radius: 4px;">
-          <h3 style="font-size: 17px; font-weight: bold; margin-top: 0; color: #0D5C3A;">IV. FINAL RULING & DECREE</h3>
-          <p>8. CONSEQUENTLY, upon considering all material facts and applicable law, the Court ORDERS as follows:</p>
-          <ol style="padding-left: 25px; margin-top: 8px; font-weight: 500;">
-            <li>The Application/Petition is hereby allowed in terms of the statutory prayers sought.</li>
-            <li>All relevant administrative bodies and court registries shall comply forthwith with the judicial directions issued herein.</li>
-            <li>Costs of the proceedings are awarded to the successful party.</li>
-          </ol>
-        </div>
-
-        <div style="margin-top: 35px; text-align: right; font-style: italic; color: #4b5563; font-size: 14px;">
-          <p>DATED, SIGNED and DELIVERED at NAIROBI this ${cleanYear}.</p>
-          <p style="font-weight: bold; margin-top: 5px;">JUDGE / BENCH OF THE COURT OF KENYA</p>
-        </div>
-      </div>
-    `;
-  }
-
-  const plainText = html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
-
-  return {
-    title: cleanTitle,
-    label: cleanTitle,
-    citation: cleanCitation,
-    year: cleanYear,
-    type: cleanType,
-    source: source || 'Kenya Law (eKLR)',
-    url: sourceUrl,
-    sourceUrl: sourceUrl,
-    html,
-    text: plainText,
-    isPdf: false,
-    hasPdf: true
-  };
-}
-
 app.get(['/api/document-content', '/api/document', '/api/v1/document', '/api/v1/document-content'], validateApiKeyOptional, async (req, res) => {
   const sourceUrl = req.query.sourceUrl || req.query.url;
   const reqTitle = req.query.title || 'Official Kenya Law Document';
@@ -1501,19 +1530,11 @@ app.get(['/api/document-content', '/api/document', '/api/v1/document', '/api/v1/
   const forceFresh = req.query.fresh === 'true' || req.query.nocache === 'true' || req.query.refresh === 'true';
 
   if (!sourceUrl) {
-    const fallbackDoc = generateRichLegalDocumentRecord({
-      title: reqTitle,
-      citation: reqTitle,
-      year: reqYear,
-      type: reqType,
-      source: reqSource,
-      sourceUrl: 'http://kenyalaw.org'
+    return res.status(400).json({
+      success: false,
+      error: 'No source URL provided to fetch document content.',
+      title: reqTitle
     });
-    const enriched = enrichDocumentMetadata({
-      ...fallbackDoc,
-      cached: false
-    });
-    return res.json(enriched);
   }
 
   const normSource = normalizeFetchUrl(sourceUrl);
@@ -1535,7 +1556,7 @@ app.get(['/api/document-content', '/api/document', '/api/v1/document', '/api/v1/
         try {
           const fileContent = fs.readFileSync(filePath, 'utf8');
           const { bodyHtml, plainText } = cleanLegalDocumentContent(fileContent);
-          if (plainText && plainText.length > 50) {
+          if (plainText && plainText.length > 50 && !plainText.includes('Loading PDF...') && !plainText.includes('Official Statutory Record') && !plainText.includes('I. MATERIAL FACTS & PROCEDURAL HISTORY')) {
             const enriched = enrichDocumentMetadata({
               ...cachedMeta,
               cached: true,
@@ -1551,126 +1572,81 @@ app.get(['/api/document-content', '/api/document', '/api/v1/document', '/api/v1/
     }
   }
 
-  // 2. Fetch live document from external source with browser headers & 6s timeout
-  try {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 6000);
+  // 2. Fetch REAL document using multi-candidate extraction engine (DOCX, PDF, AKN HTML)
+  const realDoc = await fetchRealLegalDocument(normSource, reqTitle, reqYear, reqType, reqSource);
 
-    const response = await fetch(normSource, {
-      headers: getBrowserHeaders(normSource),
-      redirect: 'follow',
-      signal: controller.signal
+  if (realDoc && realDoc.text && realDoc.text.length > 50) {
+    const docMeta = enrichDocumentMetadata({
+      title: realDoc.title || reqTitle,
+      citation: realDoc.citation || reqTitle,
+      url: normSource,
+      sourceUrl: normSource,
+      pdfUrl: realDoc.pdfUrl || null,
+      actualDocumentUrl: realDoc.actualDocumentUrl || normSource,
+      year: reqYear || extractYearFromText(realDoc.text) || extractYearFromText(reqTitle),
+      type: reqType || classifyDocumentType(reqTitle, reqTitle, normSource, realDoc.text),
+      source: reqSource || parseSourceLabel(normSource, 'kenyalaw'),
+      snippets: [realDoc.text.substring(0, 300)],
+      cached: false
     });
-    clearTimeout(timeoutId);
 
-    if (response.ok) {
-      const contentType = response.headers.get('content-type') || '';
-      if (contentType.includes('pdf') || normSource.endsWith('.pdf')) {
-        const buffer = Buffer.from(await response.arrayBuffer());
-        const { plainText, bodyHtml } = await extractTextFromPdf(buffer);
-        if (plainText && plainText.length > 30) {
-          const docMeta = enrichDocumentMetadata({
-            title: reqTitle,
-            url: normSource,
-            sourceUrl: normSource,
-            year: reqYear,
-            type: reqType,
-            source: reqSource,
-            isPdf: true,
-            cached: false
-          });
-          saveDocToRepository(docMeta, buffer, 'pdf');
-          return res.json({
-            isPdf: true,
-            hasPdf: true,
-            pdfUrl: `/api/pdf-proxy?sourceUrl=${encodeURIComponent(normSource)}`,
-            ...docMeta,
-            text: plainText,
-            html: bodyHtml
-          });
-        }
-      }
+    if (realDoc.buffer) {
+      saveDocToRepository(docMeta, realDoc.buffer, realDoc.format === 'docx' ? 'docx' : realDoc.format === 'pdf' ? 'pdf' : 'html');
+    } else {
+      saveDocToRepository(docMeta, realDoc.text, 'txt');
+    }
 
-      const rawHtml = await response.text();
-      if (rawHtml.startsWith('%PDF-')) {
-        const buffer = Buffer.from(rawHtml, 'utf8');
-        const { plainText, bodyHtml } = await extractTextFromPdf(buffer);
-        if (plainText && plainText.length > 30) {
-          const docMeta = enrichDocumentMetadata({
-            title: reqTitle,
-            url: normSource,
-            sourceUrl: normSource,
-            year: reqYear,
-            type: reqType,
-            source: reqSource,
-            isPdf: true,
-            cached: false
-          });
-          saveDocToRepository(docMeta, buffer, 'pdf');
-          return res.json({
-            isPdf: true,
-            hasPdf: true,
-            pdfUrl: `/api/pdf-proxy?sourceUrl=${encodeURIComponent(normSource)}`,
-            ...docMeta,
-            text: plainText,
-            html: bodyHtml
-          });
-        }
-      }
+    return res.json({
+      success: true,
+      isPdf: realDoc.isPdf,
+      hasPdf: true,
+      pdfUrl: realDoc.pdfUrl,
+      actualDocumentUrl: realDoc.actualDocumentUrl,
+      ...docMeta,
+      text: realDoc.text,
+      html: realDoc.html
+    });
+  }
 
-      const { bodyHtml, plainText } = cleanLegalDocumentContent(rawHtml);
-      if (plainText && plainText.length > 80) {
-        const info = extractKenyaLawDocumentInfo(rawHtml, normSource);
-        const title = info.title || reqTitle;
-        const citation = info.citation || title;
-        const scrapedPdfUrl = extractPdfUrlFromHtml(rawHtml, normSource);
-
+  // 3. Fallback: Search Grounding to fetch the REAL case holdings and judicial text
+  try {
+    const query = `${reqTitle} ${reqYear} Kenya Law judgment statute full text`;
+    const groundedResults = await searchWithGeminiGrounding(query, 'kenya');
+    if (groundedResults && groundedResults.length > 0) {
+      const top = groundedResults[0];
+      if (top.text || (top.snippets && top.snippets.length > 0)) {
+        const fullContent = top.text || top.snippets.join('\n\n');
         const docMeta = enrichDocumentMetadata({
-          title,
-          citation,
+          title: top.title || reqTitle,
+          citation: top.citation || reqTitle,
           url: normSource,
           sourceUrl: normSource,
-          pdfUrl: scrapedPdfUrl || null,
-          year: reqYear || extractYearFromText(plainText) || extractYearFromText(title),
-          type: reqType || classifyDocumentType(title, citation, normSource, plainText),
-          source: reqSource || parseSourceLabel(normSource, 'kenyalaw'),
-          snippets: [plainText.substring(0, 300)],
+          year: top.year || reqYear,
+          type: top.type || reqType,
+          source: top.source || 'Kenya Law Official Records',
+          text: fullContent,
+          html: `<div class="legal-doc">${fullContent.split('\n\n').map(p => `<p>${p}</p>`).join('')}</div>`,
           cached: false
         });
-
-        saveDocToRepository(docMeta, plainText, 'txt');
-
         return res.json({
-          isPdf: !!scrapedPdfUrl,
-          hasPdf: true,
-          pdfUrl: scrapedPdfUrl ? `/api/pdf-proxy?sourceUrl=${encodeURIComponent(scrapedPdfUrl)}` : null,
-          ...docMeta,
-          text: plainText,
-          html: bodyHtml
+          success: true,
+          ...docMeta
         });
       }
     }
   } catch (e) {
-    console.warn('[document-content] External fetch exception:', e.message);
+    console.warn('[document-content] Grounding fallback error:', e.message);
   }
 
-  // 3. Guaranteed Rich Legal Document Fallback (NEVER returns error or empty text!)
-  const fallbackDoc = generateRichLegalDocumentRecord({
+  // 4. Return clear error if document cannot be retrieved from source (NEVER return pseudo fake text)
+  return res.status(404).json({
+    success: false,
+    error: 'The requested document could not be retrieved from the remote source URL.',
     title: reqTitle,
-    citation: reqTitle,
-    year: reqYear,
-    type: reqType,
-    source: reqSource,
-    sourceUrl: normSource
+    url: normSource,
+    sourceUrl: normSource,
+    readUrl: `/read?title=${encodeURIComponent(reqTitle)}&sourceUrl=${encodeURIComponent(normSource)}`
   });
-
-  const enrichedFallback = enrichDocumentMetadata({
-    ...fallbackDoc,
-    fallback: true,
-    cached: false
-  });
-
-  return res.json(enrichedFallback);
 });
 
 function generateNativeLegalBrief({ title = 'Legal Document', citation = '', year = '', type = '', sourceUrl = '', text = '' }) {
@@ -4081,5 +4057,7 @@ module.exports = {
   titleFromFilename,
   validateApiKey,
   createApiKey,
-  generateApiKey
+  generateApiKey,
+  fetchRealLegalDocument,
+  cleanLegalDocumentContent
 };

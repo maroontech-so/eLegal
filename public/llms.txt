@@ -46,3 +46,4 @@
 1. Never invent fake document URLs; always use `actualDocumentUrl` or `pdfUrl` from API responses.
 2. For interactive UI rendering, embed `/read?sourceUrl=...` in an iframe.
 3. For real-time freshness, append `fresh=true`.
+

@@ -1807,42 +1807,35 @@
 
       <!-- Application Logic Script -->
       <script>
-        // Lucide Icons Init
-        lucide.createIcons();
+        // Lucide        ns Init
+        lucide.        teIcons();
 
-        // Topic Sequence List for Prev/Next Navigation
-        // Topic Sequence List for Prev/Next Navigation
-        const TOPIC_KEYS = [
-          'overview',
-          'profile',
-          'keys_overview',
-          'search',
-          'document',
-          'read',
-          'resolve',
-          'library',
-          'health',
-          'create_key',
-          'list_keys',
+        // Topic Sequence List for P        Next Navigation
+               Topic Sequen          t for Prev/          avigation
+                  TOPIC_KEY                    '          ew',
+                rofile',
+              'keys_overv                    'se          
+          'do          ',
+                  d',
+              'resolv                  'library',
+          'h        h',
+          'create_key                 'list_keys',
           'update_key',
           'delete_key'
         ];
 
-        // App State
-        let activeTopicKey = 'overview';
-        let activeLang = 'curl';
-        let userApiKey = localStorage.getItem('elegal_api_key') || 'el_live_demo123456789';
-        let firebaseAuth = null;
-        let currentUser = null;
+            // App State
+        let        iveTopicKey = 'overview';             let activeLang = 'curl';
+        let userApiKe        localStorage.getI          legal_api_ke            el_live_demo1234                    let firebaseAuth = null;
+              t currentUser = null;
 
-        // Comprehensive Documentation Data for ALL Topics
-        const TOPICS = {
-          overview: {
+        /            hensive Documen            ata for ALL Topics
+              nst TOPICS = {
+                erview: {
             id: 'overview',
             name: 'Overview & Authentication',
             badge: 'Getting Started Guide',
-            method: 'GET',
-            path: '/api/search',
+            method: 'GET',                 path: '/api/search',
             isEndpoint: false,
             desc: 'Build authoritative legal research tools, judicial precedent search engine integrations, and automated legal brief generators using our REST API.',
             detailsHtml: `
@@ -1865,27 +1858,26 @@
 
           <h3>Global HTTP Status Codes</h3>
           <ul>
-            <li><code>200 OK</code> — Request processed successfully. JSON payload returned.</li>
-            <li><code>400 Bad Request</code> — Invalid query parameters or missing body payload fields.</li>
-            <li><code>401 Unauthorized</code> — Missing or invalid <code>X-API-Key</code> request header on authenticated routes.</li>
-            <li><code>429 Quota Exhausted</code> — Rate limit exceeded for key. Fallback keys recommended.</li>
-            <li><code>500 Server Error</code> — Daemon failure or unhandled downstream search exception.</li>
-          </ul>
+            <li><code>200 OK</code> — Request processed successfully.             load retur                          <li><code>400 Bad Request</code> — Invalid query parameters or missing body payload fields.</li>
+            <li><code>401 Unauthorized</code>               or invalid <code>X-API-Key</code> request header on authenticated routes.</li>
+            <li><code>429 Quota E            </          — Ra          it exceeded            . Fallback keys            nded.</li>
+            <li><code>5            r Error</code> — Daemon failure or             d downstream se            eption.</li>
+                  >
         `,
-            params: [
-              { name: 'X-API-Key', type: 'header', req: false, desc: 'Your confidential developer API secret key (e.g. el_live_...)', default: 'el_live_demo123456789' },
-              { name: 'Accept', type: 'header', req: false, desc: 'Target MIME response format', default: 'application/json' }
+                  rams: [
+              { name: 'X-API-Key', type: 'header', req: false, desc: 'Your confidential developer API secret key (e.g. el_live_...)', default: 'el_live_demo            9' },
+                    name          ept', type: 'head            : false, desc: 'Targe            esponse format', default: 'applica            n' }
             ]
           },
 
-          profile: {
-            id: 'profile',
-            name: 'Developer Profile & Keys',
+              profile: {
+                id: 'profile',
+                name: 'Developer P             Keys',
             badge: 'Developer Account Portal',
             method: 'GET',
             path: '/api/keys',
             isEndpoint: false,
-            desc: 'Manage your authenticated developer account profile, create and revoke secret API keys, and monitor real-time graphical usage metrics across all requests.',
+            desc: 'Manage yo            nticated developer account profile, create and revoke secret API keys, and monitor real-time graphical usage metrics across all requests.',
             detailsHtml: ''
           },
 
@@ -1899,15 +1891,13 @@
             desc: 'Manage secret API keys programmatically or via the eLegal Developer Dashboard. API keys are linked to your Firebase user account and stored securely in Firestore.',
             detailsHtml: `
           <h3>Key Lifecycle Management</h3>
-          <p>Each developer account can generate up to <strong>10 active secret API keys</strong>. Keys can be created, paused, resumed, or permanently revoked at any time. When a key is paused, all requests with that key return <code>HTTP 401 Unauthorized</code> immediately without consuming your API quota.</p>
+          <p>Each developer account can generate up to <strong>10 active secret API keys</strong>. Keys can be created, paused, resumed, or permanently revoked a            me. When a              used, all requests with that key return <code>HTTP 401 Unauthorized</code> immediately without consuming your API quota.</p>
           
-          <h3>Security & Key Hygiene</h3>
-          <ul>
-            <li>Never expose your secret API keys in client-side frontends or public source code repositories.</li>
-            <li>Always proxy eLegal API calls through your own secure backend server or edge function.</li>
+          <h3>S            &           gien          
+                               <li>            pose your secret API keys in clie            frontends or public source co            itories.</li>
+                <li>Always proxy e            I calls through yo            ecure backend server or edge function.</li>
             <li>If a key is accidentally exposed, revoke it immediately via <code>DELETE /api/keys/:id</code> and generate a replacement key.</li>
-          </ul>
-        `,
+          </ul>             `,
             params: [
               { name: 'X-API-Key', type: 'header', req: true, desc: 'Authenticated session token or master developer secret key', default: 'el_live_demo123456789' }
             ]
@@ -1923,42 +1913,37 @@
             desc: 'Executes high-density legal search across Kenya Law eKLR report archives, local statutes, and international legal repositories. Returns ranked case citations with actual document URLs, direct PDF links, and structured brief APIs.',
             detailsHtml: `
           <h3>Hybrid Machine Learning Search Pipeline</h3>
-          <p>The <code>/api/search</code> endpoint runs your query through an automated <strong>Jurisdiction & Legal Domain Classifier</strong> before searching eKLR archives and legal databases:</p>
+          <p>The <code>/api/search</code> endpoint runs yo             through a              d <strong>Jurisdiction & Legal Domain Classifier</strong> before searching eKLR archives and legal databases:</p>
           <ul>
-            <li><strong>Live & Fresh Search:</strong> Searches external databases and Kenya Law live. Uncached results are dynamically fetched and enriched so you never rely on stale data.</li>
-            <li><strong>Direct Document URLs:</strong> Every item in the <code>results</code> array includes <code>actualDocumentUrl</code>, <code>documentUrl</code>, <code>pdfUrl</code>, and <code>contentUrl</code> for immediate document access and rendering.</li>
-            <li><strong>Zero-CORS Browser Access:</strong> Permissive CORS allows you to fetch search results directly from simple HTML/JS files without proxying or backend servers.</li>
+            <li><strong>Live & Fr              :</strong> Searches external databases and Kenya Law live. Uncached results are dynamically fetched and enriched so you never             s          ata.                                 rong>Direct Doc            Ls:</strong> Every item in t            >results</code> array include            actualDocumentU            >, <code>documentUrl</            code>pdfUrl</code>            ode>contentUrl</code> for immediate document access and rendering.</li>
+            <li><strong>Zero-CORS Browser Access:</strong> Permissive CORS all            to fetch search results directly from simple HTML/JS files without proxying or backend servers.</li>
           </ul>
         `,
             params: [
               { name: 'q', type: 'string', req: true, desc: 'Legal topic, party names, statutory section, or case citation', default: 'adverse possession 12 years land dispute' },
               { name: 'source', type: 'string', req: false, desc: 'Scope filter: all (default), kenya, or international', default: 'all' },
-              { name: 'fresh', type: 'string', req: false, desc: 'Set to "true" to force fresh live fetch from external sources bypassing cache', default: 'false' },
-              { name: 'limit', type: 'number', req: false, desc: 'Number of results to return (max 50, default 5)', default: '5' }
+                    name: 'fr              : 'string', req: false, desc: 'Set to "true" to force fresh live fetch from external sources bypassing cache', default: 'false' },
+                           limit', type: 'number', req: false, desc: 'Number of results to return (max 50, default 5)', default: '5' }
             ]
           },
 
-          document: {
-            id: 'document',
-            name: 'Get Document Content & Brief',
-            badge: 'Legal Research API',
-            method: 'GET',
-            path: '/api/document',
-            isEndpoint: true,
-            desc: 'Retrieves full structured document text, clean HTML body, ratio decidendi, and legal brief for any cached or uncached legal document URL.',
+                    nt                        id: 'docume                     name:             ument Content & Brief',
+                  dge: 'Legal Research API',
+                method: 'GET'                  path: '/api/docu                       isEndpo            e,
+            desc: 'Retrieves full structured document text, clean HTML body, ratio decidendi, and legal brief for any cached or uncached l            ument URL.',
             detailsHtml: `
           <h3>Full Document Extraction & Parsing</h3>
           <p>The <code>/api/document</code> endpoint fetches, cleans, and extracts verbatim legal texts, statutes, and judgments:</p>
           <ul>
-            <li><strong>Live External Scraping:</strong> If the document is uncached (or if <code>fresh=true</code>), the server automatically fetches the external document, converts DOCX/PDF/HTML, caches it, and returns full text.</li>
-            <li><strong>Structured NLP Legal Brief:</strong> Generates automated case holdings, facts, legal issues, and orders.</li>
-            <li><strong>Direct PDF Link:</strong> Returns <code>actualDocumentUrl</code> and <code>pdfUrl</code> for the document.</li>
+            <li><strong>Live External Scraping:</strong> If the document is uncac            if <code>fr          ue</          , the serv            atically fetch            xternal document, converts DO            TML, caches it, and returns             t.</li>
+                   ><strong>Structured N             Brief:</strong> G             automated case holdings, facts, legal issues, and orders.</li>
+            <li><strong>Direct PDF Link:</strong> Returns <code>actualDoc            </code> and <code>pdfUrl</code> for the document.</li>
           </ul>
         `,
             params: [
-              { name: 'sourceUrl', type: 'string', req: true, desc: 'Canonical URL or source link of the legal document (e.g. Kenya Law / AKN / web URL)', default: 'https://kenyalaw.org/akn/ke/act/1968/21/eng@2022-12-31' },
-              { name: 'title', type: 'string', req: false, desc: 'Display title override for metadata generation', default: 'Limitation of Actions Act Cap 22' },
-              { name: 'fresh', type: 'string', req: false, desc: 'Set to "true" to force fresh live fetch from source server', default: 'false' }
+              { name: 'sourceUrl', type: 'string', req: true, desc: 'Canonical URL or source link of the legal document (e.g. Kenya Law / AKN / web UR            ault: 'http          nyal          /akn/ke/act/19            g@2022-12-31' },
+                  { name: 'title', type            g', req: false, desc: 'Dis            le override for              generation', defau            itation of Actions             22' },
+              { name: 'fresh', type: 'string', req: false, desc: 'Set to "true" to             esh live fetch from source server', default: 'false' }
             ]
           },
 
@@ -1968,190 +1953,158 @@
             badge: 'Visual UI & Renderer API',
             method: 'GET',
             path: '/read',
-            isEndpoint: true,
-            desc: 'Directly renders the interactive eLegal document reader in browser tabs or iframes for any legal document or search result.',
-            detailsHtml: `
-          <h3>Instant Visual Reader for Developers</h3>
-          <p>Developers can embed or link to <code>/read</code> in their applications to render an elegant, responsive document reader with font adjustments, search in document, and AI legal briefs:</p>
+                isEndpoi                          desc: 'Directly renders the interactive eLegal document reader in browser tabs or iframes for any legal document or search resul                         det          ml: `
+                   nstant Visual Rea            Developers</h3>
+          <p>            rs can embed or link to <c            d</code> in the            cations to render a            t, responsive docu            der with font adjustments, search in document, and AI legal briefs:</p>
           <ul>
-            <li><strong>Iframe Embedding:</strong> Embed <code>&lt;iframe src="https://elegal.or.ke/read?sourceUrl=..."&gt;</code> seamlessly into any web page or client dashboard.</li>
-            <li><strong>Formats:</strong> Use <code>format=json</code> to retrieve JSON data, or <code>format=pdf</code> / <code>raw=1</code> for direct PDF download.</li>
+            <li><strong>Iframe Embedd            rong> Embed <code>&lt;iframe src="https://elegal.or.ke/read?sourceUrl=..."&gt;</code> seamlessly into any web page or client dashboard.</li>
+            <li><strong>Formats:</strong> Use <code>format=json</code> to retr            N data, or           form          </code> / <cod            /code> for direct             load.</li>
           </ul>
-        `,
+            `,
             params: [
-              { name: 'sourceUrl', type: 'string', req: true, desc: 'Source URL of the court case, statute, or document to render', default: 'https://kenyalaw.org/akn/ke/act/2010/constitution/eng@2010-09-03' },
+                  { name: 'sou             type: 'string', req: true            'Source URL of the            ase, statute, or document to render', default: 'https://kenyalaw.org/akn/ke/act/2010/constitut            2010-09-03' },
               { name: 'title', type: 'string', req: false, desc: 'Title displayed on the document header', default: 'The Constitution of Kenya, 2010' }
             ]
           },
 
           resolve: {
-            id: 'resolve',
-            name: 'Resolve Document & PDF URL',
+            id: 'resolve'                  name               Document & PDF URL',
             badge: 'Legal Research API',
             method: 'GET',
-            path: '/api/resolve',
-            isEndpoint: true,
-            desc: 'Resolves any Kenya Law HTML caselaw or statute URL into its direct accessible PDF download link, metadata, and reader URLs.',
-            detailsHtml: `
+                    :           reso                      is            : true,
+                      'Resolves any Kenya Law             elaw or statute URL into i            t accessible PDF d            link, metadata, and reader            
+            detai            `
           <h3>Direct PDF & Metadata Resolution</h3>
-          <p>Converts Kenya Law report URLs (e.g. <code>http://kenyalaw.org/caselaw/cases/view/109852/</code>) into direct PDF export links (<code>https://kenyalaw.org/caselaw/cases/export/109852/pdf</code>) and extracts citation metadata.</p>
-        `,
-            params: [
-              { name: 'url', type: 'string', req: true, desc: 'Target legal document URL to resolve', default: 'http://kenyalaw.org/caselaw/cases/view/109852/' },
-              { name: 'title', type: 'string', req: false, desc: 'Custom title override for the record', default: 'Mtana Lewa v Kahindi Ngala (2015)' }
+          <p>Converts Kenya L            t URLs (e.g. <code>http://kenyalaw.org/caselaw/cases/view/109852/</code>) into direct PDF export links (<code>https://kenyalaw.org/caselaw/cases/export/109852/pdf</code>) and extracts citation metadata.</p>
+             ,
+                   am        
+                  { name: 'url', t         'string', req: true, des          rget legal document URL to resolve', default: 'http          yalaw.org/caselaw/cases/view/109852/' },
+                  { name: 'title',           'string', req: false, desc: 'Custom title overr          r the record', default: 'Mtana Lewa          indi Ngala (2015)' }
             ]
           },
 
-          library: {
-            id: 'library',
-            name: 'List Offline Library',
+                      ary: {
+            id: 'library'                            'List Offline Library',
             badge: 'Legal Research API',
-            method: 'GET',
-            path: '/api/library',
+            method: 'GET',                 path: '/api/library',
             isEndpoint: true,
-            desc: 'Retrieves the complete inventory of offline statutes and precedents cached on the local server filesystem for zero-latency lookups.',
+            desc: 'Retrieves the com            ventory of offline statutes and precedents cached             ocal server filesystem for zero-latenc            s.',
             detailsHtml: `
-          <h3>Offline Statute Repository</h3>
-          <p>The offline library holds pre-indexed PDF files including the Constitution of Kenya 2010, the Land Act, Penal Code, Civil Procedure Act, Tax Appeals decisions, and key Supreme Court benchmarks stored locally for zero-latency searches.</p>
-        `,
-            params: []
+          <h3>Offline Statu            itory</h3>
+          <p>The offline library holds pre-index            iles including the Constitution of Kenya 2010, the La            Penal Code, Civil Procedure Act, Tax Appeals decisions, and key             Court benchmarks stored locally for zero-latency searches.</p>
+        `                  params: []
           },
 
-          health: {
+                   h: {
             id: 'health',
-            name: 'Check System Health',
-            badge: 'System Monitoring',
-            method: 'GET',
-            path: '/api/health',
-            isEndpoint: true,
-            desc: 'Public health probe returning daemon status, server uptime, and database connection metrics. No authentication header required.',
-            detailsHtml: `
-          <h3>Health & Readiness Probe</h3>
-          <p>Use <code>GET /api/health</code> for automated uptime monitoring tools, container readiness probes, or load balancer health checks. Returns HTTP 200 when operational.</p>
+            name: '              em Health',
+                   ge: 'System Monit                            method: 'GET                   path: '/api/health',
+            isEndpoint:                                esc: 'Public health probe return        daemon status, server uptime, and          ase connection metrics. No authentication header required.',
+                  tailsH                     <h3>Health & Readiness Probe</h3>
+                   e <code>GET /api/health</code> for automated uptime monitoring tools, c             readiness pro              ad balancer health checks. Returns HTTP              o          on          >
         `,
             params: []
           },
 
           create_key: {
-            id: 'create_key',
-            name: 'Generate API Key',
+            id:        eat        y',
+            name: 'Generat          Key',
             badge: 'Keys & Auth API',
-            method: 'POST',
+            m           'POST',
             path: '/api/keys',
-            isEndpoint: true,
-            desc: 'Generates a new authenticated API secret key for the logged-in developer account.',
-            detailsHtml: `
-          <h3>Creating Secret Keys</h3>
-          <p>Issues a new unique API key prefixed with <code>el_live_...</code>. The full key secret is returned ONLY once upon creation in the JSON response payload. Store it securely in your secrets vault.</p>
-        `,
-            params: [
-              { name: 'label', type: 'string', req: true, desc: 'Human-readable label identifier for the secret key', default: 'Production Application' }
+            i          int: true,
+                desc: 'Generates a new aut            ed API secret key for the logged-in developer account.',
+            detailsHtml:                 <h3>Creating Secret Keys</h3>
+          <p>Issues a new unique AP            efixed with <code>el_live_...</code>. The full key secret is returned ONLY once upon creation in the JSON respon            ad. Store it securely in your secrets va          p>
+                           params: [
+                      me: 'label', type: 'string', req: true, d          Hu        rea        e label identifier for the secret           default: 'Producti            cation' }
             ]
-          },
+              },
 
-          list_keys: {
-            id: 'list_keys',
+              list_keys: {
+                i        lis        ys',
             name: 'List Developer Keys',
-            badge: 'Keys & Auth API',
-            method: 'GET',
-            path: '/api/keys',
-            isEndpoint: true,
-            desc: 'Lists all secret keys generated under the authenticated developer account along with key status and usage metrics.',
-            detailsHtml: `
+                badge: 'Keys & Auth API',                 method: 'GET',
+                     ath: '/api/keys',
+                     point: true,
+                   c: 'Lists all secre            enerated           th          enticated developer account along with key status and usage metrics.',
+                     lsHtml: `
           <h3>Listing Active Keys</h3>
-          <p>Returns an array of key objects created under your account. For security, keys are returned masked (e.g. <code>el_live_****1234</code>).</p>
+                >Returns an array of key objects created under your account. For security, keys are return          ked (e.g. <code>el_live_****1234</code>).</p>
         `,
-            params: []
+                params: []
           },
 
           update_key: {
-            id: 'update_key',
+                  : 'update_key',
             name: 'Update Key Status',
-            badge: 'Keys & Auth API',
-            method: 'PATCH',
-            path: '/api/keys/:keyId',
-            isEndpoint: true,
-            desc: 'Updates key label or toggles active status (pause/resume) of an existing secret key.',
+                   ge: 'Keys & Auth API',
+            meth          ATCH',
+            path: '/api/keys/:keyId                   isEndpoint: true,
+            desc: '          s key label or toggle        tiv        atus (pause/resume) of an exist          cret key.',
             detailsHtml: `
           <h3>Pausing & Resuming Keys</h3>
-          <p>Pass <code>{ "isActive": false }</code> to pause a key without revoking its ID. Pass <code>{ "isActive": true }</code> to re-enable request authorization.</p>
+          <p>Pass <code>{ "          ve": false }</code> to pause a key without revo         it        . Pass <code>{ "isActive": true }</co           re-en            uest authorization.</p>
         `,
-            params: [
-              { name: 'isActive', type: 'boolean', req: true, desc: 'Set active status flag', default: 'true' }
-            ]
+                params: [
+              { name: 'isActive', type: 'boolean', req: true,                active status flag', default: 'tru                          
           },
 
           delete_key: {
-            id: 'delete_key',
-            name: 'Delete API Key',
-            badge: 'Keys & Auth API',
-            method: 'DELETE',
-            path: '/api/keys/:keyId',
-            isEndpoint: true,
-            desc: 'Permanently revokes and removes an API secret key from Firestore storage.',
+                        ete_key',
+                  me: 'Delete API Key',
+                       'Keys & Auth API',
+            meth            ETE',
+                 ath: '/api/keys/:keyId',
+            isEndpoint                            desc: 'Per             revokes and removes an API secret key from Fire            orage.',
             detailsHtml: `
-          <h3>Revoking Secret Keys</h3>
-          <p>Permanently deletes a key from Firestore. Any future API requests using this key will be rejected immediately with HTTP 401.</p>
-        `,
+          <          ok          cret Keys</h3>
+          <p>Permanently deletes a         fro        restore. Any future API requests u          his key will be rejected          iately with HTTP 401.</p              `,
             params: []
           }
         };
 
         // Firebase Auth Setup
-        const firebaseConfig = {
+  c          irebaseConfig = {
           apiKey: "AIzaSyD1YHV18FAJjWLbB3_00HwdD5SLF_O7UbQ",
-          authDomain: "elegal-v1.firebaseapp.com",
+              authDomain: "elegal-v1.fire            com",
           projectId: "elegal-v1",
-          storageBucket: "elegal-v1.firebasestorage.app",
-          messagingSenderId: "708770097911",
-          appId: "1:708770097911:web:990de5eb5ab0f51f68c1f2"
-        };
+          s            cket: "elegal-v1.firebasestorage.app",
+          messagingSenderId            0097911",
+                       :708770097911:web:990de5eb5ab0f51f                    };
 
-        async function initFirebase() {
-          try {
-            const appMod = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
-            const authMod = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
-            const app = appMod.initializeApp(firebaseConfig);
-            firebaseAuth = authMod.getAuth(app);
-
-            window._fbGoogleAuthProvider = authMod.GoogleAuthProvider;
-            window._fbGithubAuthProvider = authMod.GithubAuthProvider;
-            window._fbSignInWithPopup = authMod.signInWithPopup;
-            window._fbSignInWithEmail = authMod.signInWithEmailAndPassword;
-            window._fbCreateUserWithEmail = authMod.createUserWithEmailAndPassword;
-            window._fbSignOut = authMod.signOut;
-
-            authMod.onAuthStateChanged(firebaseAuth, (u) => {
-              currentUser = u;
+        async function initFireba                     try {
+                const appMod = await import('https://www.g              /firebasejs/10.12              e-app.js');
+                const authMod = await import('https://www.gstati              basejs/10.12.0/firebase-auth.js');
+            cons              pMod.initializeApp(firebaseConfig);
+            firebase              hMod.getAuth(                       windo            gleA          vid          uthMod.GoogleAuthProvider;
+                window._fbGithubAuthProvider = authMod.GithubAuthProv                      window._fbSignInWithPopup = authMod.signInWithPopup;
+                window._fbSignInWi              authMod.signInWithEmailAndPassword                  window._fbCreateUserWithEmail = authMod              rWithEmailAndPa                        window              t = authMod.signO                     authMo              ateChanged(firebaseAuth, (u) => {
+              cu              = u;
               updateUserUI(u);
-            });
-          } catch (e) {
-            console.warn('Firebase init fallback:', e.message);
-          }
+            });               } catch (e) {
+            console.warn('Firebase init f               e.message);
+              }
         }
 
-        let currentDeveloperKeys = [];
+             et c          Dev          Keys = [];
 
-        async function getAuthHeader() {
-          if (currentUser && typeof currentUser.getIdToken === 'function') {
+        async functi            thHeader() {
+          if (currentUser && typeof cu            r.getIdToken === 'function') {
             try {
-              const token = await currentUser.getIdToken();
-              return { 'Authorization': token, 'Content-Type': 'application/json' };
-            } catch (e) {
-              console.warn('getIdToken warning:', e);
-            }
-          }
-          return { 'Authorization': 'Bearer demo_dev_token', 'Content-Type': 'application/json' };
+              const t            wait currentUser.ge              ;
+              return { 'Authoriz              ken, 'Content-Type': 'application/json' };
+                } catch (e) {                   console.war              ken warning:', e)                  }
+                          return { 'Authorization': 'Bearer demo_dev_to              tent-Type': 'application/json' };
         }
 
-        function updateUserUI(user) {
-          const card = document.getElementById('sidebarUserCard');
-          const text = document.getElementById('topAuthText');
+                     updateUserUI(user) {
+          const card = document.ge              Id('sidebarUs                        cons             doc          get          tById('topAuthText');
           if (user) {
-            card.style.display = 'flex';
-            document.getElementById('userName').textContent = user.displayName || user.email;
+            card.style.displa          lex';
+                document.getElementById('userName').textContent = user.displayName || user.email;
             document.getElementById('userEmail').textContent = user.email || '';
-            document.getElementById('userAvatar').textContent = ((user.displayName || user.email || 'U')[0]).toUpperCase();
+            document.getElementById('userAvatar').textContent = ((user.displayName || user.email |            ]).toUpperCase();
             text.textContent = 'Developer Profile';
           } else {
             card.style.display = 'none';
@@ -2159,56 +2112,51 @@
           }
         }
 
-        function handleTopAuthAction() {
+                 ion        dle        uthAction() {
           if (currentUser) {
-            switchTopic('profile');
+                switchTopic('profile');
           } else {
-            toggleAuthModal();
+                     eAuthModal();
           }
         }
 
-        // Developer Profile & API Keys Manager Handlers
+        // Developer Profile & API Keys          er Handlers
         function openProfileModal() {
           switchTopic('profile');
         }
 
         function openProfilePage() {
-          if (!currentUser) {
+          if           entUser) {
             toggleAuthModal();
             return;
           }
 
-          const name = currentUser.displayName || currentUser.email || 'Developer Profile';
-          const email = currentUser.email || 'dev@elegal.or.ke';
-          const avatar = ((currentUser.displayName || currentUser.email || 'D')[0]).toUpperCase();
+          const name = currentUser.di          ame || currentUser.email || 'Developer Profile';
+          const email = currentUser.email || 'dev@elegal.or.ke';               const avatar = ((currentUser.displayName || currentUser.email || 'D')[0]).toUpperCase();
 
-          const nameEl = document.getElementById('pageProfileName');
-          const emailEl = document.getElementById('pageProfileEmail');
-          const avatarEl = document.getElementById('pageProfileAvatar');
+          const nameEl = doc          getElementById('pageProfileName');
+          const emailEl = doc          getElementById('pageProfileEmail');
+          const avatarEl = doc          getElementById('pageProfileAvatar');
 
-          if (nameEl) nameEl.textContent = name;
-          if (emailEl) emailEl.textContent = email;
+          if (nameEl) nameEl.te          ent = name;
+          if (em           emailEl.textContent = email;
           if (avatarEl) avatarEl.textContent = avatar;
 
           loadDeveloperKeys();
-        }
-
-        function closeProfileModal() {
-          const alertBox = document.getElementById('newKeyAlertBoxPage') || document.getElementById('newKeyAlertBox');
+                       funct            eProfileModal() {
+                nst alertBox = document.g              yId('newKeyAlertBoxPage') || document.getElementById('newKeyAlertBox');
           if (alertBox) alertBox.style.display = 'none';
         }
 
         async function loadDeveloperKeys() {
           try {
-            const headers = await getAuthHeader();
-            if (userApiKey && !headers['X-API-Key'] && !headers['Authorization']) {
+                const               await getAuthHeader                    if (userApiKey && !headers['X-AP                headers['Authorization']) {
               headers['X-API-Key'] = userApiKey;
             }
-            const res = await fetch('/api/keys', { headers });
+            const res = a                /api/keys', { headers });
             if (res.ok) {
-              const keys = await res.json();
-              currentDeveloperKeys = keys || [];
-            } else {
+              const keys = await res.json()                    currentDeveloperKeys = keys || [];
+                  else {
               currentDeveloperKeys = getMockDeveloperKeys();
             }
           } catch (e) {
@@ -2252,26 +2200,22 @@
               type: 'search',
               statusCode: 200,
               cost: 0.002,
-              totalTime: Math.floor(Math.random() * 300) + 100,
-              backEndTime: Math.floor(Math.random() * 200) + 60,
-              responseMediation: Math.floor(Math.random() * 40) + 15,
+              totalTime: Math.floor(Math.random() * 300                           backEndTime:              r(Ma            m(          0)                         responseMediation: Math.floor(Math.random() * 40)          
               authTime: 3,
               throttling: 0
             });
           }
 
           for (let i = 0; i < 120; i++) {
-            const daysAgo = Math.floor(Math.random() * 6) + 1;
-            const logTime = new Date(now.getTime() - daysAgo * 24 * 3600 * 1000);
+                      daysAgo = Math.floor(M            om() * 6) + 1;
+            cons            e = new Date(now.getTim              Ago * 24 * 3600 * 1000);
             mockHistory.push({
-              timestamp: logTime.toISOString(),
-              endpoint: endpoints[i % endpoints.length],
+              t              logTime.toISOString(                     endpoint: endpoints[i % endpoi                
               method: 'GET',
               type: 'search',
-              statusCode: 200,
+                     tusCode: 200,
               cost: 0.002,
-              totalTime: Math.floor(Math.random() * 350) + 120,
-              backEndTime: Math.floor(Math.random() * 220) + 70,
+                      lTime: Math.floor(Math.random() * 350) + 120,                   backEndTime: Math.floor(Math.random() * 220) + 70,
               responseMediation: Math.floor(Math.random() * 45) + 20,
               authTime: 4,
               throttling: 0
@@ -2282,197 +2226,169 @@
 
           return [
             { key: primaryKey, label: 'Primary Secret Key', createdAt: '2026-08-01', lastUsed: 'Just now', requestCount: mockHistory.length, isActive: true, expenditure: Number((mockHistory.length * 0.002).toFixed(4)), usageHistory: mockHistory, callsRecord: mockHistory },
-            { key: 'el_live_stag_3419c8d04e', label: 'Staging & QA Environment Key', createdAt: '2026-08-10', lastUsed: '2 hours ago', requestCount: 18, isActive: true, expenditure: 0.036, usageHistory: [], callsRecord: [] }
-          ];
+            { key: 'el_live_stag_3419c8d04e', label: 'Staging & QA Environment Key', createdAt: '2026-08-10', lastUsed: '2 hours ago', requestCount:                 : true, expenditure: 0.036, usageHist              alls            []                       
         }
 
-        function renderKeysListAndAnalytics(keys) {
-          const activeKeys = keys.filter(k => k.isActive !== false);
-          const totalCalls = keys.reduce((sum, k) => sum + (k.requestCount || 0), 0);
-          const totalExpenditure = keys.reduce((sum, k) => sum + (typeof k.expenditure === 'number' ? k.expenditure : (k.requestCount || 0) * 0.002), 0);
+        function renderKeysListAndAnalytic          ) {
+          const activeKey          ys.filter(k => k.isActive !== false);
+                      t totalCalls = keys.reduce((sum,         > sum + (k.requestCount || 0), 0                 const totalExpendit          keys.reduce((sum, k) => sum + (typeof k.expenditure === 'number            penditure : (k.requestCount || 0)               0);
 
-          const callsEl = document.getElementById('metricTotalCallsPage') || document.getElementById('metricTotalCalls');
-          const activeEl = document.getElementById('metricActiveKeysPage') || document.getElementById('metricActiveKeys');
-          const costEl = document.getElementById('metricTotalExpenditurePage') || document.getElementById('metricTotalExpenditure');
-          if (callsEl) callsEl.textContent = totalCalls.toLocaleString();
-          if (activeEl) activeEl.textContent = `${activeKeys.length} / 10`;
-          if (costEl) costEl.textContent = `$${totalExpenditure.toFixed(4)}`;
+          const callsEl            ent.getEl              'metricTotalCallsPage') || docum            le          Id('          TotalCalls');
+          cons        tiv        = document.getElementById('metricActiveKeysPage') || doc          getElementById('met          iveKeys');
+          cons          El = document.getElementById('            talExpenditurePage') || document.getElementById('metri            penditure');
+          if (call              El.textContent = totalCalls.toLocaleString();
+          if (activeEl) ac              tContent = `${activeKeys.length} / 10`;
+          if (costEl) co              ontent = `$${totalExpenditure.toFixed(4)}`;
 
-          // 1. Render Key Table Rows
-          const tbody = document.getElementById('developerKeysTableBodyPage') || document.getElementById('developerKeysTableBody');
-          if (tbody) {
-            tbody.innerHTML = '';
+          // 1. Ren              ble Rows
+          const tbody = document.getElementById('developerKeysTableBodyPage') ||              getElementById('developerKeysTableBody');                f (tbody) {
+            tbody.in                ;
             if (keys.length === 0) {
-              tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--text-muted); padding: 18px;">No API keys generated yet. Use the form above to generate your first secret key.</td></tr>`;
+                  tbody.innerHTML = `<tr><td colspan="7" style="text-al              r; co              -text-muted); padding: 18px;">No API k              ted yet. Use the form above to generate your first secret key.</td></tr>`;
             } else {
-              keys.forEach(k => {
-                const isAct = k.isActive !== false;
-                const maskedKey = k.key.length > 12 ? (k.key.substring(0, 10) + '...' + k.key.substring(k.key.length - 4)) : k.key;
-                const exp = typeof k.expenditure === 'number' ? k.expenditure : (k.requestCount || 0) * 0.002;
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-              <td style="font-weight: 600; color: #fff;">${escapeHtml(k.label || 'Default Key')}</td>
-              <td><code style="color: var(--accent-green); font-size: 0.78rem;">${escapeHtml(maskedKey)}</code></td>
-              <td><span class="badge-status ${isAct ? 'active' : 'paused'}">${isAct ? 'Active' : 'Paused'}</span></td>
-              <td style="color: var(--text-muted); font-size: 0.78rem;">${k.createdAt || 'N/A'}</td>
-              <td style="font-family: var(--font-mono); font-size: 0.8rem; font-weight: 700;">${(k.requestCount || 0).toLocaleString()}</td>
-              <td style="font-family: var(--font-mono); font-size: 0.8rem; font-weight: 700; color: #34D399;">$${exp.toFixed(4)}</td>
-              <td style="text-align: right;">
-                <div style="display: flex; gap: 6px; justify-content: flex-end;">
-                  <button class="btn-secondary" onclick="toggleKeyStatus('${k.key}', ${isAct})" style="padding: 3px 8px; font-size: 0.72rem;" title="${isAct ? 'Pause Key' : 'Activate Key'}">
-                    <i data-lucide="${isAct ? 'pause' : 'play'}" style="width: 11px; height: 11px;"></i> ${isAct ? 'Pause' : 'Resume'}
+              keys.forEach                            const isAct = k.isActive !== false;
+                const maskedKey = k.key.length > 12 ? (k.key.substring(0, 1               + k.key.substring(k.key.length - 4)) : k.key;
+                const exp = typeof k.expenditure === 'number' ? k.expenditure : (k.requestC               * 0.002;
+                    const t                .createElement('tr'                       tr.i                
+                            "font-weight:                 #fff;">${escapeHtml(k                efault Key')}</td>
+                  <td><code style="color: var(--ac                 font-size: 0.              esca            as          )}</code></td>
+              <td><sp            ="badge-status ${isAct ? 'active' : 'paused'}">${            'Active' : 'Paused'}</span></td                    <td style="color: var(--text-muted); font-size: 0.78rem;">${k.creat              /A'}</td>
+              <td style="font-family: var(--font-mono);              : 0.8rem; font-weight: 700;">${(k.requestCount || 0).toLocaleStri              
+              <td style="font-family: var(--font-mono); font-size: 0.8rem; font-weight:               : #34D399;">$${exp.toFixed(4)}</td>
+                      style="text-align: right;">
+                    <div style="display: flex; gap: 6px; j                nt: flex-end;">
+                  <button class="btn-se              nclic              eyStatus('${k.key}', ${isAct})" style=              3px 8px; font-size: 0.72rem;" title="${isAct ? 'Pause Key' : 'Activate Key'}">
+                    <i data-lucide="${isAct               : 'play'}" style="width: 11px; height: 11px;"></i> ${isAct ? 'Pause' : 'Resume'}
                   </button>
-                  <button class="btn-secondary" onclick="copyText('${k.key}')" style="padding: 3px 8px; font-size: 0.72rem;" title="Copy Key">
-                    <i data-lucide="copy" style="width: 11px; height: 11px;"></i>
-                  </button>
-                  <button class="btn-secondary" onclick="deleteApiKey('${k.key}')" style="padding: 3px 8px; font-size: 0.72rem; border-color: rgba(239, 68, 68, 0.4); color: #F87171;" title="Revoke Key">
-                    <i data-lucide="trash-2" style="width: 11px; height: 11px;"></i>
-                  </button>
-                </div>
+                              class="btn-secondary" onclick="copyText('${k.key}')" style="padding: 3px 8px; font-size: 0.72rem;" title="Copy Key">
+                    <              ide="copy" sty                1px; he                ></i>
+                             n>
+                        utton class="                y" onclick="de                ${k.key}')" style="pa                px; font-size: 0.72                color: rgba(239, 68, 68, 0.4); col                " title="Revok                                           data-lucide="trash-2" style="width:             ight: 11px;"></                         </button>
+                      div>
               </td>
-            `;
-                tbody.appendChild(tr);
+                `;
+                tbody.a              (tr);
               });
             }
           }
 
-          // 2. Render Per-Key Usage Progress Bars (Graphical Analytics)
-          const usageContainer = document.getElementById('keyUsageBreakdownContainerPage') || document.getElementById('keyUsageBreakdownContainer');
+                 2. Render Per-Key Usage Progress Bars (Graphical Analytics)               const usageContainer = document.getElementById('keyUsageBreakdo              rPage') || document.getElementById('keyUsageBreakdo              r');
           if (usageContainer) {
-            usageContainer.innerHTML = '';
-            if (keys.length > 0) {
-              const maxCalls = Math.max(...keys.map(k => k.requestCount || 0), 100);
-              keys.forEach(k => {
-                const calls = k.requestCount || 0;
+                    eContainer.innerHTML = '';
+                     eys.length > 0) {
+              const m                th.max(...keys.map(k => k.requestCount || 0), 100);
+                  k              h(k => {
+                const calls =              Count || 0;
                 const pct = Math.min(100, Math.round((calls / maxCalls) * 100));
-                const wrapper = document.createElement('div');
+                const wrapper              t.createElement('div');
                 wrapper.className = 'key-usage-bar-wrapper';
                 wrapper.innerHTML = `
-              <div style="display: flex; justify-content: space-between; font-size: 0.78rem; margin-bottom: 6px;">
-                <span style="font-weight: 600; color: #fff;">${escapeHtml(k.label || 'API Key')} <code style="color: var(--text-muted); font-size: 0.72rem;">(${k.key.substring(0, 8)}...)</code></span>
-                <span style="font-family: var(--font-mono); font-weight: 700; color: #34D399;">${calls.toLocaleString()} calls (${pct}%)</span>
-              </div>
-              <div style="background: rgba(255,255,255,0.06); height: 6px; border-radius: 3px; overflow: hidden;">
-                <div class="key-usage-bar-fill" style="width: ${pct}%;"></div>
+                  <div style="display: flex; justify-content: space-between; font-size: 0.78rem; margin-bottom: 6px;">
+                <span style="font-w              ; color: #fff;                ml(k.la                Key')} <code style=                --text-mute                e: 0.72rem;">                string(0, 8)}.                span>
+                               ="font-family: var(                ; font-weight: 700; color: #34D399                oLocaleString(              ${pc            an                                             <div style="background: rgba(255,255,2            ; height: 6px; border-radius: 3              ow: hidden;">
+                         class="key-usage-bar-fill" style="              ct}%;"></div>
               </div>
             `;
-                usageContainer.appendChild(wrapper);
+                    usageContainer.appendChild(wrapper);
               });
-            }
-          }
+                            }
 
-          // 3. Render Execution Time & Latency Analytics Graph
-          renderExecutionTimeChart();
+          // 3. Render Execution               ency Analytics Graph
+          renderExec                rt();
 
-          if (window.lucide) lucide.createIcons();
+          if (window.luci                reateIcons();
         }
 
-        let activeGranularity = 'Hour';
+        let ac                ity = 'Hour';
 
-        function setGranularity(unit) {
-          activeGranularity = unit;
-          document.querySelectorAll('.granularity-btn').forEach(btn => {
+        function setGranularity(unit)                 act              rity = unit;
+          document.queryS              ('.granularity-btn').forEach(btn => {
             if (btn.dataset.time === unit) {
-              btn.classList.add('active');
-            } else {
+              btn.classList.add('active                    } else {
               btn.classList.remove('active');
             }
           });
-          renderExecutionTimeChart();
-        }
+          renderExecutionTimeChart();              
 
         function generateTimePointsData(allLogs, granularity) {
           const points = [];
           const now = new Date();
 
-          if (granularity === 'Hour') {
-            // Past 60 minutes divided into 6 x 10-minute buckets
-            for (let i = 5; i >= 0; i--) {
-              const bucketStart = new Date(now.getTime() - (i + 1) * 10 * 60 * 1000);
-              const bucketEnd = new Date(now.getTime() - i * 10 * 60 * 1000);
-              const labelTime = new Date(now.getTime() - i * 10 * 60 * 1000);
-              const label = labelTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                      ularity === 'H                                       minutes divided int                ute buckets                 for (let i =                i--) {
+                        bucketStart = new Da                me() - (i + 1) * 10                );
+              const bucketEnd =                w.getTime() -               0 *                                      t labelTime = n        ate        .getTime() - i * 10 * 60 * 1000);
+                  const label = labelTime.toLocaleTimeString([], { hour: '2-          , minute: '2-digit' });
 
-              const windowLogs = allLogs.filter(l => {
+              const windowLogs = allLogs          r(l => {
                 if (!l.timestamp) return false;
-                const logDate = new Date(l.timestamp);
-                return logDate >= bucketStart && logDate <= bucketEnd;
-              });
-
-              const callsCount = windowLogs.length;
-              const totalTime = callsCount > 0 ? Math.round(windowLogs.reduce((a, b) => a + (b.totalTime || 120), 0) / callsCount) : 0;
-              const backEndTime = callsCount > 0 ? Math.round(windowLogs.reduce((a, b) => a + (b.backEndTime || 85), 0) / callsCount) : 0;
-              const responseMediation = callsCount > 0 ? Math.round(windowLogs.reduce((a, b) => a + (b.responseMediation || 25), 0) / callsCount) : 0;
+                    const logDate = new Date(l.timestamp);
+                return          te >= bucketStart && logDate <= bucketEnd;
+                                     const callsCount = windowLogs.          ;
+              co            lTime = callsCount > 0 ? Math.round(windowLogs.reduce((a, b) => a + (b.totalTime || 1            / callsCount) : 0;
+              const backEndTime = callsCount > 0 ? Math.round(window            uce((a, b) => a + (b.backEndTime || 85), 0) / callsCount) : 0;
+              const res            iation = callsCount > 0 ? Math.round(windowLogs.reduce((a, b) => a + (b.responseMediat           25          / callsCount) : 0;
 
               points.push({
                 label,
-                calls: callsCount,
-                totalTime,
-                backEndTime,
-                otherTime: 0,
-                requestMediation: 0,
+          c          callsCount,
+                    totalTime,
+                backEndTime,                     otherTime: 0,
+                           Mediation: 0,
                 responseMediation,
-                authTime: callsCount > 0 ? 3 : 0,
-                throttling: 0
-              });
-            }
+                    authTime: callsCount > 0 ? 3                                        ling: 0
+              }                   }
           } else if (granularity === 'Day') {
-            // Past 24 hours divided into 8 x 3-hour buckets
+            // Past 24 hours divided into           hou          ets
             for (let i = 7; i >= 0; i--) {
-              const bucketStart = new Date(now.getTime() - (i + 1) * 3 * 3600 * 1000);
-              const bucketEnd = new Date(now.getTime() - i * 3 * 3600 * 1000);
-              const labelTime = new Date(now.getTime() - i * 3 * 3600 * 1000);
-              const label = labelTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+              const bucke           = new Date(now.getTime() - (i + 1) * 3 * 3600 * 1000);
+              const bucketEnd = n          e(now.getTime() - i * 3 * 3600 * 1000);
+              const l          me = new Date(no          ime() - i * 3 * 3600 *                          const label = labelTime.toLocaleTimeStr          , {           '2-digit', minute: '2-digit' });
 
-              const windowLogs = allLogs.filter(l => {
-                if (!l.timestamp) return false;
-                const logDate = new Date(l.timestamp);
-                return logDate >= bucketStart && logDate <= bucketEnd;
+              const windowLogs =           s.filter(l => {
+                    if (!l.timestamp) re          alse;
+                const log            ew Date(l.timestamp);
+                r          lo          >= bucketStart && logDate <= bucketEnd;
               });
 
-              const callsCount = windowLogs.length;
-              const totalTime = callsCount > 0 ? Math.round(windowLogs.reduce((a, b) => a + (b.totalTime || 140), 0) / callsCount) : 0;
-              const backEndTime = callsCount > 0 ? Math.round(windowLogs.reduce((a, b) => a + (b.backEndTime || 100), 0) / callsCount) : 0;
-              const responseMediation = callsCount > 0 ? Math.round(windowLogs.reduce((a, b) => a + (b.responseMediation || 30), 0) / callsCount) : 0;
+                        callsCount = windowLogs.length;
+                  const totalTime = calls          > 0 ? Math.round(wind          .reduce((a, b) => a +          talTime || 140), 0) / callsCount) : 0;
+                  const backEndTime = callsCount > 0           .round(windowLogs.reduce((a, b) =>          b.backEndTime || 10           / callsCount) : 0;
+                  const responseMediation = callsCount > 0 ? Math.round(wi            .reduce((a, b) => a + (b.resp            ation || 30), 0) / callsCount) : 0;
 
-              points.push({
+                          ush({
                 label,
                 calls: callsCount,
                 totalTime,
                 backEndTime,
-                otherTime: 0,
+                     therTime: 0,
                 requestMediation: 0,
-                responseMediation,
+                    responseMediation,
                 authTime: callsCount > 0 ? 4 : 0,
                 throttling: 0
               });
             }
           } else if (granularity === 'Week') {
-            // Past 7 days
-            for (let i = 6; i >= 0; i--) {
+            // Past 7 day                  for (let               = 0; i--) {
               const d = new Date(now);
               d.setDate(d.getDate() - i);
               const dayStr = String(d.getDate()).padStart(2, '0');
-              const monthStr = String(d.getMonth() + 1).padStart(2, '0');
-              const dayName = d.toLocaleDateString([], { weekday: 'short' });
-              const label = `${dayName} ${dayStr}/${monthStr}`;
+                   on          thStr          ing(d.getMonth() + 1).padStar          0');
+              const dayName = d.toLocaleDateSt             { weekday: 'short' });
+              const label = `${dayName} ${dayS            nthStr}`;
 
               const windowLogs = allLogs.filter(l => {
-                if (!l.timestamp) return false;
-                const logDate = new Date(l.timestamp);
-                return logDate.toDateString() === d.toDateString();
+                    if               amp              alse;
+                          logDate = new Da              tamp);
+                re              te.toDateString() === d.toDat              
               });
 
-              const callsCount = windowLogs.length;
-              const totalTime = callsCount > 0 ? Math.round(windowLogs.reduce((a, b) => a + (b.totalTime || 130), 0) / callsCount) : 0;
-              const backEndTime = callsCount > 0 ? Math.round(windowLogs.reduce((a, b) => a + (b.backEndTime || 90), 0) / callsCount) : 0;
-              const responseMediation = callsCount > 0 ? Math.round(windowLogs.reduce((a, b) => a + (b.responseMediation || 28), 0) / callsCount) : 0;
-
-              points.push({
-                label,
-                calls: callsCount,
-                totalTime,
-                backEndTime,
+                   onst callsCount = windowLogs.length;
+                  const totalTime = callsCount > 0 ? Math              dowLogs.reduce((a, b) =              otalTime || 130), 0) / call              0;
+              const             ime          lsCou           ? Math.round(windowLogs.re             b) => a + (b.backEndTime || 90), 0) / cal             : 0;
+              const responseMediation =                > 0 ? Math.round(windowLogs.reduce((a, b) => a + (b.responseMediation ||             / calls           :                       points.push({
+                        l,
+                cal          llsCount,
+                totalTime                      backEndTime,
                 otherTime: 0,
                 requestMediation: 0,
                 responseMediation,
@@ -2486,40 +2402,34 @@
               const d = new Date(now);
               d.setDate(d.getDate() - (i * 3));
               const dayStr = String(d.getDate()).padStart(2, '0');
-              const monthShort = d.toLocaleString('en-US', { month: 'short' });
+                            monthShort = d.toLocaleString('en-US', { month: 'short' });
               const label = `${dayStr} ${monthShort}`;
 
               const windowLogs = allLogs.filter(l => {
-                if (!l.timestamp) return false;
+                if (!l.times          return false;
                 const logDate = new Date(l.timestamp);
                 return Math.abs(logDate - d) < 3 * 24 * 3600 * 1000;
               });
 
               const callsCount = windowLogs.length;
-              const totalTime = callsCount > 0 ? Math.round(windowLogs.reduce((a, b) => a + (b.totalTime || 150), 0) / callsCount) : 0;
-              const backEndTime = callsCount > 0 ? Math.round(windowLogs.reduce((a, b) => a + (b.backEndTime || 110), 0) / callsCount) : 0;
-              const responseMediation = callsCount > 0 ? Math.round(windowLogs.reduce((a, b) => a + (b.responseMediation || 30), 0) / callsCount) : 0;
-
-              points.push({
+              const totalTime = callsCount > 0 ? Math.round(windowLog          ce((a, b) => a + (b.totalTime || 150), 0) / callsCount) : 0;
+                  const backEndTime = callsCount > 0 ? Mat            windowLogs.reduce((a, b) => a            ckEndTime || 110), 0) / callsCount) : 0;
+              cons            seMediation = callsCount > 0 ? Math.round(wind              uce((a, b) => a + (b.responseMediation || 30), 0) n                           points.push({
                 label,
                 calls: callsCount,
-                totalTime,
-                backEndTime,
-                otherTime: 0,
-                requestMediation: 0,
-                responseMediation,
+                tot                            backEndT                         otherTime: 0,
+                         stMediation: 0,
+                            Mediation,
                 authTime: callsCount > 0 ? 4 : 0,
                 throttling: 0
-              });
+                  });
             }
-          }
-
-          return points;
+                           return points;
         }
 
-        function renderExecutionTimeChart() {
-          const svg = document.getElementById('executionTimeChartSvg');
-          const yLabels = document.getElementById('yAxisLabelsContainer');
+        fun              erExecutionTimeChart() {
+                      g = document.getElementById('executio              Svg');
+          const yLabels = doc              lementById('yAxisLabelsContainer');
           const xLabels = document.getElementById('xAxisLabelsContainer');
           const xAxisTitle = document.getElementById('chartXAxisTitle');
           const tooltip = document.getElementById('chartTooltip');
@@ -2561,172 +2471,150 @@
           for (let i = 5; i >= 0; i--) {
             yTicks.push(Math.round(tickStep * i));
           }
-          yLabels.innerHTML = yTicks.map(val => `<span>${val}</span>`).join('');
+          yLabels.innerHTML = yTicks.map(val             n>${v            n>`).join('');
 
-          const svgWidth = svg.clientWidth || 700;
+          const svgWidth = sv              dth || 700;
           const svgHeight = 240;
-          const paddingX = 20;
-          const paddingY = 15;
-          const graphW = svgWidth - paddingX * 2;
-          const graphH = svgHeight - paddingY * 2;
+                  t paddingX = 20;
+          const            Y =                       con        raphW = svgWidth - paddingX                    const graphH = svgHeight - paddingY * 2;
 
           // Grid lines & Limit line at 200
-          let gridHtml = '';
+          let g        tml        ';
           yTicks.forEach(val => {
-            const yPos = paddingY + graphH - ((val / yMax) * graphH);
+                const yPos = paddingY + graphH - ((val / yMax) * graphH);
             const isLimit = val === 200;
-            const isDefaultCeil = val === 100 && yMax === 100;
-            const strokeColor = isLimit ? 'rgba(239, 68, 68, 0.6)' : (isDefaultCeil ? 'rgba(96, 165, 250, 0.3)' : 'rgba(255,255,255,0.06)');
-            const dash = (isLimit || isDefaultCeil) ? '4,4' : '2,2';
-            gridHtml += `<line x1="${paddingX}" y1="${yPos}" x2="${svgWidth - paddingX}" y2="${yPos}" stroke="${strokeColor}" stroke-dasharray="${dash}" stroke-width="${(isLimit || isDefaultCeil) ? '1.5' : '1'}"/>`;
-            if (isLimit) {
-              gridHtml += `<text x="${svgWidth - paddingX - 100}" y="${yPos - 4}" fill="#EF4444" font-size="10" font-family="monospace" font-weight="700">200 (Daily Limit)</text>`;
+                      isDefaultCeil = val === 100 && yMax === 100;
+            const stro          r = isLimit ? 'rgba(239, 68, 68, 0.6)' : (isDefaultCeil ? 'rgba(96, 165, 250, 0.3)' : 'rgba(255,255,255,0          ;
+                      dash = (isLimit || i            Ceil) ? '4,4' : '2,2';
+                      ml           ine x1            ingX}" y1="${yPos}" x2="${svgWidth - pa             y2="${yPos}" stroke="${strokeColor}" s              array="${dash}"               th="${(is              sDefaultCeil) ? '1.5' : '1'}"/>`                             imit) {
+                   ridHtml += `<t              vgWidth - paddingX - 100}" y="              }" fill="#EF4444" font-size="10" font-family="monospace" font-we                00 (Daily Limit)</text>`;
             }
-          });
-
-          const n = timePoints.length;
+               );                const              oints.length;
           const mappedPoints = timePoints.map((pt, idx) => {
-            const x = paddingX + (n > 1 ? (graphW / (n - 1)) * idx : graphW / 2);
+            const x = paddingX + (n > 1 ? (g               - 1)) * idx : graphW / 2);
             const getY = (val) => paddingY + graphH - ((val / yMax) * graphH);
 
             return {
-              x,
-              label: pt.label,
-              calls: pt.calls,
-              totalTime: pt.totalTime,
+                                   label: pt.label,
+                         pt.                         totalTime: pt.totalTime,
               backEndTime: pt.backEndTime,
-              otherTime: pt.otherTime,
-              requestMediation: pt.requestMediation,
+              otherTime: pt.othe                         requestMediation: pt.requestMediation,
               responseMediation: pt.responseMediation,
-              authTime: pt.authTime,
-              throttling: pt.throttling,
+                  authTime: pt.authTime,
+              throttling:            ttling,
               yCalls: getY(pt.calls)
-            };
+                };
           });
 
-          function buildPath(keyY) {
-            if (mappedPoints.length === 0) return '';
-            return mappedPoints.reduce((acc, p, idx) => {
-              return idx === 0 ? `M ${p.x} ${p[keyY]}` : `${acc} L ${p.x} ${p[keyY]}`;
-            }, '');
-          }
+          function bu            keyY) {
+            if (mapp            .length === 0) return '';
+            return mappedPo            uce((acc, p, idx) => {
+              return idx ==             ${p.x} ${p[keyY]}` : `${acc} L ${p.x} ${p[keyY]}`                  }, '')                }
 
-          const pathCalls = buildPath('yCalls');
+          const pathCalls = buil            Calls');
 
           let circlesHtml = '';
-          mappedPoints.forEach((p, idx) => {
+                  edPoints.forEach((p, idx) => {
             circlesHtml += `
-          <g class="chart-hover-group" data-idx="${idx}">
-            <line class="crosshair-line" x1="${p.x}" y1="${paddingY}" x2="${p.x}" y2="${svgHeight - paddingY}" stroke="rgba(96, 165, 250, 0.4)" stroke-dasharray="3" style="display: none;" />
-            <circle cx="${p.x}" cy="${p.yCalls}" r="5" fill="#0284C7" stroke="#ffffff" stroke-width="2" />
-            <rect x="${p.x - 18}" y="0" width="36" height="${svgHeight}" fill="transparent" style="cursor: pointer;" />
+          <g             hart-hover-group" data-idx="${idx}">
+            <line class="crosshair-line" x1="${p.x}" y1="${paddingY}" x2="${p.x}" y2="${svgHeight - paddingY            e="rgba(96, 165, 250, 0.4)" stroke-dashar            style="display: none;" />
+            <circle cx="${p.x}" cy="${p.yCalls}" r="5" fill="#0284C7" stroke="#ffffff"             idth="2" />
+            <rect x="${p.x - 18}" y="0" width="36" height="${svgHeight}" fill="transparent" style            : pointer;" />
           </g>
         `;
-          });
+                ;
 
           svg.innerHTML = `
-        ${gridHtml}
-        <path d="${pathCalls}" fill="none" stroke="#0284C7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
-        ${circlesHtml}
+        ${gridHtm               <path d="${pathCalls}" fill="none" s            0284C7" stroke-width="2.5" stroke-linecap="round"           -linejoin="r            
+        ${              l}
       `;
 
-          xLabels.innerHTML = mappedPoints.map(p => `
-        <span style="font-size: 0.72rem; color: var(--text-dim); font-family: var(--font-mono); transform: rotate(-25deg); transform-origin: top left; display: inline-block; white-space: nowrap;">${p.label}</span>
-      `).join('');
+                       nnerHTML = mappedPoints.map(p => `
+        <span style="font-size: 0.72rem; color: var(--text            on            : var(--font-mono); transform: rotate(-25          tr        orm        gin: top left; display: inline-block;           space: nowrap;">${p.label}</span>
+      `)          '');
 
-          svg.querySelectorAll('.chart-hover-group').forEach(group => {
-            const idx = parseInt(group.dataset.idx, 10);
-            const p = mappedPoints[idx];
-            const crosshair = group.querySelector('.crosshair-line');
+          svg.querySelectorAll('.chart-hover-group').forEach            > {
+            const idx = parseInt(group.data          x,                      const p = mappedPoints[idx];
+            const crosshair           p.querySelector('.crosshair-line');
 
-            group.addEventListener('mouseenter', (e) => {
-              if (crosshair) crosshair.style.display = 'block';
+            gro            entListener('mouseenter', (e) => {
+                       f (crosshair) cr            style.display = 'block';
 
-              const containerRect = document.getElementById('executionChartCanvasContainer').getBoundingClientRect();
-              const tooltipW = 195;
+              const containerRec            ment.getElementById('executionCh          va          iner').getBoundingClientRect();
+              cons        olt        = 195;
               let leftPos = p.x - (tooltipW / 2);
-              if (leftPos < 0) leftPos = 5;
-              if (leftPos + tooltipW > containerRect.width) leftPos = containerRect.width - tooltipW - 5;
+                  if (leftPos < 0) leftPos = 5;
+                  i            os + tooltipW > containerRect.width) le            containerRect.width - tooltipW - 5;
 
-              let topPos = p.yCalls - 150;
-              if (topPos < 5) topPos = p.yCalls + 15;
+                         Pos = p.yCalls -                                       < 5) topPos = p.yCalls + 15;
 
-              tooltip.style.display = 'block';
-              tooltip.style.left = leftPos + 'px';
-              tooltip.style.top = topPos + 'px';
+                          styl            y = 'block';
+                  tooltip.style.left = leftPos + 'px';
+              tooltip.st              topPos + 'px';
 
-              tooltip.innerHTML = `
-            <div style="font-weight: 700; font-family: var(--font-mono); border-bottom: 1px solid #CBD5E1; padding-bottom: 4px; margin-bottom: 6px; color: #0F172A; display: flex; justify-content: space-between;">
-              <span>${p.label}</span>
-              <span style="color: #0284C7;">${p.calls} calls</span>
+              tooltip.            L                     <div            font-weight: 700; font-family: var(--font-mono); border-bottom:            id #CBD5E1; padding-bottom: 4px; margi          om           color: #0F172A; display: flex; justify-content: space-          n;">
+              <s        ${p        el}</span>
+              <span style=          : #0284C7;">${p.calls} calls</span>
             </div>
-            <div style="display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; font-family: var(--font-mono); font-size: 0.73rem;">
-              <div style="display: flex; align-items: center; gap: 6px;"><span style="width: 8px; height: 8px; background: #0284C7; display: inline-block;"></span> Total Calls</div>
-              <div style="font-weight: 700; text-align: right; color: #0284C7;">${p.calls} / 200</div>
+            <div style="display: grid; grid-template-columns: 1fr auto; gap: 4px 12px;           amily:            ont-mono); font-size: 0.73rem;">
+                  <div style="display: flex; align-items: center;               ><span style="widt              ight: 8p            roun            C7; display: in              ;"></span> Total Calls</div>
+              <div style="font-weight: 700; t            n:          ; color: #0284            .calls} / 200</div>
 
-              <div style="display: flex; align-items: center; gap: 6px;"><span style="width: 8px; height: 8px; background: #60A5FA; display: inline-block;"></span> Avg Total Latency</div>
-              <div style="font-weight: 700; text-align: right; color: #0284C7;">${p.totalTime} ms</div>
+              <div style="display: flex; align-items:          r;          6px;"><span style="width: 8px; height:           ackground: #60A5FA; d        ay:        ine-block;"></span> Avg        al Latency</div>
+              <div style="font-w           700; text-align: right; color: #0284C7;">${p.total            </div>
 
-              <div style="display: flex; align-items: center; gap: 6px;"><span style="width: 8px; height: 8px; background: #10B981; display: inline-block;"></span> BackEnd Time</div>
-              <div style="text-align: right; color: #10B981;">${p.backEndTime} ms</div>
+              <div style="display: flex; align-ite            er; gap:          ><          tyle="            px; height: 8p            round: #10B981; display: inline-b              pan> BackEnd Time</div>
+              <div styl            align: right; color: #10B981;">${p.backE              </div>
 
-              <div style="display: flex; align-items: center; gap: 6px;"><span style="width: 8px; height: 8px; background: #34D399; display: inline-block;"></span> Response Mediation</div>
-              <div style="text-align: right; color: #64748B;">${p.responseMediation} ms</div>
+              <div style="display: flex            items: ce               6px;"><span style="width: 8px; height:               round: #            di            nline-block;"></span> Response Mediation</div>
+              <div sty            -align: right; color: #64748B;">${p.responseMediation} ms</div>
 
-              <div style="display: flex; align-items: center; gap: 6px;"><span style="width: 8px; height: 8px; background: #EF4444; display: inline-block;"></span> Throttling</div>
-              <div style="text-align: right; color: #64748B;">${p.throttling} ms</div>
-            </div>
+                  <div style="display: flex; align-items: center; gap: 6px;"><sp            ="width: 8px; height           background: #            display: inline-block;"></span> Throttling<                        <div style="text-align: righ          or        474        >${p.throttling} ms</div>
+                   iv>
           `;
-            });
+                });
 
-            group.addEventListener('mouseleave', () => {
-              if (crosshair) crosshair.style.display = 'none';
-              tooltip.style.display = 'none';
+            group.addEventListener('mouseleave', () =                              cr          r) crosshair.style.display = 'none';
+              tooltip.style.display =           ;
             });
           });
         }
 
         function escapeHtml(str) {
-          return (str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-        }
-
-        async function handleCreateApiKey() {
-          const labelInput = document.getElementById('newKeyLabelInputPage') || document.getElementById('newKeyLabelInput');
-          const label = (labelInput?.value || '').trim() || 'New Secret Key';
-          const btn = document.getElementById('btnGenerateKeyPage') || document.getElementById('btnGenerateKey');
-
-          if (btn) {
-            btn.disabled = true;
-            btn.textContent = 'Generating...';
-          }
-
-          try {
-            const headers = await getAuthHeader();
-            const res = await fetch('/api/keys', {
-              method: 'POST',
-              headers,
-              body: JSON.stringify({ label })
-            });
-
-            let newKeyObj;
-            if (res.ok) {
-              newKeyObj = await res.json();
-              if (!currentDeveloperKeys.some(k => k.key === newKeyObj.key)) {
-                currentDeveloperKeys.unshift(newKeyObj);
-              }
-            } else {
-              const rawKey = 'el_live_' + Math.random().toString(36).substring(2, 12) + Math.random().toString(36).substring(2, 10);
-              newKeyObj = { key: rawKey, label, createdAt: new Date().toISOString().split('T')[0], lastUsed: 'Never', requestCount: 0, isActive: true };
-              currentDeveloperKeys.unshift(newKeyObj);
+              return (str || '').replace(            amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').r            "/g, '&q          ;
             }
 
-            const secretEl = document.getElementById('newKeySecretTextPage') || document.getElementById('newKeySecretText');
-            const alertBox = document.getElementById('newKeyAlertBoxPage') || document.getElementById('newKeyAlertBox');
-            if (secretEl) secretEl.textContent = newKeyObj.key;
-            if (alertBox) alertBox.style.display = 'block';
-            if (labelInput) labelInput.value = '';
+              ync funct            leCrea               {
+          const labelInput = document.getElementById('newKeyLabelIn            ) || document.getEleme              wKeyLabelInput');
+          const label = (labelInput?.value || '').trim() || 'New Secret Key';
+          const btn = document.getElementById('btnGener                 || document.getElementById('btnGenerateKey');
 
-            userApiKey = newKeyObj.key;
+          if (btn) {
+                   .disabled                         btn.text              'G            g.                   }
+
+          try {
+            const h             await getAuthHeader();
+            const res = await fetch('/ap             {
+              met          POST',
+                   eaders,
+              body: JSON.string            bel })
+            });
+
+            let newKeyObj                      i        es.ok) {
+              newKeyOb          ait res.json();
+              if (!curren            erKeys               k.key === newKeyObj.key)) {
+                        entDeveloperKeys.unshift(newKeyObj);
+                  }
+            } else {
+                          wKey = 'el_live_' + Math.              oS            ).substring(2,              h.random().toString(36).substring(2, 10);
+                         Ke         =         y: rawKey, label, createdAt:           te().toISOString().split('T')[0], lastUsed: 'Never',          stCount: 0, i             true };
+              currentDe          rK        uns        (newKeyObj);
+            }                  const secretEl = document.getElement          newKeySecretTextPage'          ocument.getElementById('n          ecretText');
+            const alertBox = document.g        eme        Id('newKeyAlertBoxPage')           ument.getElementById('newKeyAlertBox                    if (secretEl) secretEl.te        nte         newKeyObj.key;
+            if (alertBox          tBox.style.display = 'block';
+                     abelInput) labelInput.value = '';
+
+                      iKey = newKeyObj.key;
             localStorage.setItem('elegal_api_key', userApiKey);
 
             showToast('New API key generated successfully!');
@@ -2870,94 +2758,79 @@
           if (firebaseAuth && window._fbSignOut) {
             try {
               await window._fbSignOut(firebaseAuth);
-              showToast('Signed out successfully');
-              if (activeTopicKey === 'profile') {
-                switchTopic('overview');
-              }
+              showToast('        ed         successfully');
+              if (activeTop          === 'profile') {
+                switchTo          vervie                       }
             } catch (e) {
-              showToast(e.message || 'Sign out failed');
+                  showToast(e.message || 'Sign out failed');
             }
-          }
-        }
+                        }
 
-        function toggleAuthModal() {
-          const modal = document.getElementById('authModal');
+                  on toggleAuthModal() {
+          const modal =             .getElementById            dal');
           if (modal) {
-            modal.classList.toggle('show');
+                modal.clas            ggle('show');
           }
-        }
-
-        function showToast(msg) {
-          const t = document.getElementById('toast');
-          t.textContent = msg;
-          t.classList.add('show');
-          setTimeout(() => t.classList.remove('show'), 2500);
-        }
-
+                       function showToast(msg)                 const t = document.getElementById('toast');
+          t.textConten          g;                   t.classList.add('show');
+                  imeout(() => t.classList.remove('show'), 2500);
+              
         function copyText(txt) {
-          navigator.clipboard.writeText(txt);
-          showToast('Copied to clipboard!');
+          navigator.clipbo          iteText(txt);
+          showToast('Copied to cl          d!');
         }
 
-        function generateFullMarkdownForLLM() {
-          const activeKey = (typeof userApiKey !== 'undefined' && userApiKey) ? userApiKey : 'YOUR_SECRET_API_KEY';
-          const baseUrl = window.location.origin || 'http://localhost:3000';
+        function generateFullMar        nFo        () {
+          const activeKey =          of userApiKey !== 'undefined' && userApiKey) ? userA          : 'YOUR_SECRET_API_KEY';
+          const baseUrl = window.lo          .origin || 'http://localhost:3000';
 
-          return `# eLegal REST API & Legal Engine — Comprehensive Reference for LLMs & AI Agents
+                     `# eLegal REST API & Legal Engine — Comprehensiv        fer         for LLMs & AI Agents
 
-> **SYSTEM PROMPT DIRECTIVE FOR AI ASSISTANTS (ChatGPT, Claude, Cursor, Copilot, DeepSeek)**
-> You are an expert legal tech integration engineer. Use this document as the authoritative ground truth for the **eLegal Platform API**. 
+        SYSTEM PROMPT DIRECTIVE FOR AI A          NTS (ChatGPT, Claude,           , Copilot, DeepSeek)**            expert legal tech integration          eer. Use this document as the authoritative ground truth for the **eLegal Platform            
 > - All endpoints support **Zero-CORS** (\`Access-Control-Allow-Origin: *\`).
-> - Client-side browser code (HTML/JS) can call endpoints directly without backend proxies or CORS errors.
-> - Search and document retrieval endpoints do NOT strictly require API keys for prototyping, though \`X-API-Key\` can be provided for rate limit elevation.
-> - Always use the provided canonical properties (\`actualDocumentUrl\`, \`documentUrl\`, \`pdfUrl\`, \`contentUrl\`, \`readUrl\`) instead of hallucinating file paths.
+>          ent-side browser code (HTML/JS) can call endpoint          ctly without backen        oxi        r CORS errors.
+> - Search and document        rieval endpoints do NOT strict          uire API keys for prototyping, though \`X-API-Key\` can b          ided for rate limit elevation.
+> - Al          se the provided canonical properties (\`actualDocumen            \`documentUrl\`, \`pdfUrl\`, \`cont            , \`readUrl\`) instead of hallucinating file paths.
 
----
+--          1.        tem        rview & Core Capabilities
 
-## 1. System Overview & Core Capabilities
-
-| Feature | Specification |
+|           e | Specification |
 | :--- | :--- |
-| **Base URL** | \`${baseUrl}\` |
-| **Response Format** | JSON (\`application/json\`) or HTML UI (for \`/read\`) |
-| **CORS Policy** | Permissive \`*\` on all routes with automated \`OPTIONS\` preflight (200 OK) |
-| **Auth Header (Optional/Prod)** | \`X-API-Key: ${activeKey}\` |
-| **User Token Auth (Admin Keys)** | \`Authorization: Bearer <FIREBASE_ID_TOKEN>\` (only for \`/api/keys\`) |
-| **Default Rate Limits** | Public Tier: 100 req/min (Burst: 15 req/sec) · Pro Tier: 1,000 req/min |
-| **Live / Fresh Data Mode** | Append \`fresh=true\` or \`nocache=true\` to force fresh external fetches bypassing server cache |
+| **Base URL** | \`${ba          \` |
+| **Response Format** | JSON (\`application/json\`) or HTML           r \`/read\`) |
+| **CORS Policy** | P            e \`*\` on all routes with automated \`OPTIONS\` pr            (200 OK) |
+| **Auth Header (Optional/Prod)** | \`X-API            activeKey}\` |
+| **            en Auth            Keys)**             orization: Bearer <FIREBASE_ID_TOKEN>\` (only for \`            s\`) |
+| **Default Rate Limits** | Public Tier: 100 r           (B          15 req/sec) · Pro Tier: 1,000 req/min           Live / Fresh Data Mo           Append \`fresh=true\` or \`nocache=true\` to force fresh external          es bypassing server cache |
 
 ---
 
-## 2. Document Access URLs Schema Explanation
+## 2. Document Access URLs Sche          lanation
 
-Every search result item and document record returned by eLegal contains rich, verified document links:
+Every search result item and document record returned by eLeg          tains rich, verified document links:
 
-1. \`actualDocumentUrl\` *(string)*: Direct download URL for the original document (e.g. direct Kenya Law export PDF \`https://kenyalaw.org/caselaw/cases/export/109852/pdf\` or AKN source \`.../source\`).
-2. \`documentUrl\` *(string)*: Alias for \`actualDocumentUrl\`.
-3. \`pdfUrl\` *(string)*: Accessible PDF streaming link (either direct export URL or local proxy \`/api/pdf-proxy?sourceUrl=...\`).
-4. \`contentUrl\` *(string)*: REST API endpoint to retrieve verbatim text, clean HTML, and NLP legal brief (\`/api/document?sourceUrl=...\`).
-5. \`readUrl\` *(string)*: Visual document reader interface link (\`/read?title=...&sourceUrl=...\`).
-6. \`cached\` *(boolean)*: Indicates if full text is saved in local disk repository (\`true\`) or fetched afresh (\`false\`).
+1. \`actualDocumentUrl\` *(string)*: Direc          load URL for the original document (e.          ect Kenya Law export PDF \`https://kenyalaw.org/caselaw/cases/export/          /pdf\` or AKN source \`.            e\`).
+2. \`documentUrl\` *(string)*:             r \`actualDocumentUrl\`.
+3. \`pdfUrl\` *(string)*: Acce            DF streaming link (either direct exp            or local proxy \`/api/pdf-proxy?sourceUrl=...\`).
+4. \`contentUrl\` *(string)*: RE            ndpoint to retrieve verbatim text, clean HTML, and NLP legal b          \`/api/do            ourceUrl=...\`).
+5. \`readUrl\` *(st          : V          document reader interface li          /read?title=...&sourceUrl=...\`).
+6. \`cached\` *(boolean)*: Indicates if          text is saved in local disk repository (\`true\`) or fetched af          \`false\`).
 
 ---
 
-## 3. Complete REST Endpoints Reference
+## 3. Complete           ndpoints Reference
 
-### 3.1. Search Legal Precedents & Legislation
-- **Endpoint:** \`GET /api/search\` (or alias \`GET /api/v1/search\`)
-- **Description:** Executes high-density legal search across Kenya Law eKLR report archives, statutory Acts of Parliament, and global legal repositories with automatic Machine Learning jurisdiction classification.
+### 3.1. Search Legal Preceden            islation
+- **Endpoint:** \`GET /api          h\` (or a            ET /api/v1/search\`)
+- **Description            utes high-density legal sear              Kenya Law eKLR report archives, statutory A              liament, and global legal rep              with automatic Machine Learning jurisdiction classification.
 - **Headers (Optional):**
   - \`X-API-Key: ${activeKey}\`
   - \`Accept: application/json\`
 - **Query Parameters:**
-  - \`q\` *(string, required)*: Legal query, party names, statutory section, or citation (e.g. \`adverse possession 12 years land dispute\`).
-  - \`source\` *(string, optional)*: Jurisdiction filter: \`all\` (default), \`kenya\`, or \`international\`.
-  - \`fresh\` *(boolean/string, optional)*: Set to \`true\` or \`1\` to bypass local cache and fetch live uncached results from source registries.
-  - \`limit\` *(number, optional)*: Number of results (default: \`5\`, maximum: \`50\`).
-
-#### Example Request:
-\`\`\`bash
-curl -X GET "${baseUrl}/api/search?q=adverse%20possession&source=kenya&fresh=true&limit=2" \\
+  - \`q\` *(string, required)*: Legal quer              ames, statutory section, or citati             \`a           po          on 12 years land dispute\`)          \`source\` *(string, optional)*: Jurisdiction filter: \`all\`           lt), \`kenya\`, or \`international\`.
+  - \`fresh\` *(boolean/string, op          )*: Set to \`true\` or \`1\          ypass local cache and fetch live uncached results             rce registries.
+  - \`limit\` *(number,          nal)*: Nu            results (default: \`5\`, maximum: \`50\`             Example Request:
+\`\`\`bash              ET "${baseUrl}/api/search?q=adverse%20pos              urce=kenya&fresh=true&limit=2" \\
   -H "Accept: application/json" \\
   -H "X-API-Key: ${activeKey}"
 \`\`\`
@@ -2971,68 +2844,56 @@ curl -X GET "${baseUrl}/api/search?q=adverse%20possession&source=kenya&fresh=tru
     "jurisdiction": "kenya",
     "domain": "Land & Property Law",
     "confidence": 0.94
-  },
-  "results": [
+               ults": [
     {
-      "id": "limitation_of_actions_act_cap_22",
-      "title": "Limitation of Actions Act (Cap 22, Laws of Kenya) - Section 7 & 38 Adverse Possession",
-      "label": "Limitation of Actions Act Cap 22",
+      "id":             ion_          ion          cap_22",
+      "title": "Limitatio          ctions Act (Cap 22, Laws of Kenya) - Section 7 & 38           e Possession",
+      "label": "Limitation of Actions Act           ",
       "citation": "Cap 22 Laws of Kenya",
-      "year": 2012,
-      "type": "Legislation",
-      "source": "Kenya Law (eKLR)",
-      "url": "http://www.kenyalaw.org:8181/exist/kenyalex/actview.xql?actid=CAP.%2022",
-      "sourceUrl": "http://www.kenyalaw.org:8181/exist/kenyalex/actview.xql?actid=CAP.%2022",
-      "actualDocumentUrl": "http://www.kenyalaw.org:8181/exist/kenyalex/actview.xql?actid=CAP.%2022",
-      "documentUrl": "http://www.kenyalaw.org:8181/exist/kenyalex/actview.xql?actid=CAP.%2022",
-      "pdfUrl": "/api/pdf-proxy?sourceUrl=http%3A%2F%2Fwww.kenyalaw.org...",
-      "contentUrl": "/api/document?sourceUrl=http%3A%2F%2Fwww.kenyalaw.org...&title=Limitation...",
-      "readUrl": "/read?title=Limitation%20of%20Actions%20Act...&sourceUrl=http...",
-      "isPdf": true,
-      "cached": false,
+      "year":          
+      "type": "Leg            ",
+      "source": "Kenya Law (eKLR)",            url": "http://www.kenyalaw.org:8181/exist/kenyalex/actview.xql?actid=CAP.%2022",
+      "source          "http://w            law.org:8181/exist/kenyalex/actview            id=CAP.%2022",
+      "actualDocumentUrl": "http://www.kenyalaw.org:8          ist          lex/actview.xql?actid=CAP.%2022",
+                 ntUrl": "http://www.kenyalaw.org:8181/            nyalex/actview.xql?actid=CAP.%2022",
+      "pdfUrl": "/api/pdf-proxy?sourceUrl=http%3A%2F%2Fww          alaw.org.               "contentUrl": "/api/document?sou            ttp%3A%2F%2Fwww.kenyalaw.org...&title=Limitation...",
+      "rea           "/          itle=Limitation%20of%        tio        0Act...&sourceUrl=http...",
+           isPdf": true,
+               ed": false,
       "score": 98,
       "snippets": [
-        "Under Section 7 & 38 of the Limitation of Actions Act (Cap 22), an action to recover land is barred after 12 years of open, continuous, and adverse possession."
-      ],
-      "ratioDecidendi": "Uninterrupted adverse possession of land for 12 years extinguishes the title of the registered proprietor."
+        "Under Section 7 & 38 of          imitation of Actions Act (Cap 22), an action to recover land is barred after          ars of open, continuous, and adverse possession."
+          ],
+      "ratioDecide        : "        terrupted adverse possession          nd for 12 years ext          hes the title of the registered proprietor."
     }
   ],
-  "total": 1
-}
-\`\`\`
+  "total":           \`\`
 
 ---
 
-### 3.2. Get Full Document Content & Legal Brief
-- **Endpoint:** \`GET /api/document\` (or alias \`GET /api/document-content\`, \`GET /api/v1/document\`)
-- **Description:** Fetches full verbatim text, structured HTML body, ratio decidendi, and NLP case briefs for any cached or uncached legal document URL.
-- **Query Parameters:**
-  - \`sourceUrl\` *(string, required)*: Canonical URL of the legal document (e.g. Kenya Law / AKN / web URL).
-  - \`title\` *(string, optional)*: Document title override.
-  - \`fresh\` *(boolean/string, optional)*: Set to \`true\` to force a live fetch from the remote server.
+### 3.            ull Document Content & Legal Brief
+- **Endpoint:** \`GET /api/               (or alias \`GET /api/document-content\`, \`GET /api/v1/document\`                ption:** Fetches full verbatim text, structured HT              at            endi          NL           briefs for any        hed        uncached legal document UR          *Query Parameters:**
+  - \`sourceUrl\`          ing, required)*: Canonical URL of the legal document (e          nya Law / AKN / web URL).
+  - \`t           *(string, optional)*: Document title overrid           \`fresh\` *(boolean/string, optional)*: Set to            ` to force a live fetch from the remote server.
 
-#### Example Request:
-\`\`\`bash
-curl -X GET "${baseUrl}/api/document?sourceUrl=https%3A%2F%2Fkenyalaw.org%2Fakn%2Fke%2Fact%2F1968%2F21%2Feng%402022-12-31&title=Limitation+Act" \\
-  -H "Accept: application/json"
-\`\`\`
+#### Exampl          es          `\`bash
+curl -X GET "${baseUrl}/api/document?          Url=https%3A%2F%2Fkenyalaw.org%2Fakn%2Fke%2Fact%2F1968%2F21%2Feng%402          -31&title=Li        tio        t" \\
+  -H "Accept: application/json"          `
 
 #### Response JSON Schema (200 OK):
-\`\`\`json
-{
-  "title": "Limitation of Actions Act Cap 22",
+\`\`\`json          title": "Limitation of Actions Ac          22",
   "label": "Limitation of Actions Act",
-  "citation": "Cap 22 Laws of Kenya",
+  "citatio          ap 22 Laws of Kenya",
   "year": "2022",
   "type": "Statute",
-  "source": "Kenya Law (Parliament)",
-  "url": "https://kenyalaw.org/akn/ke/act/1968/21/eng@2022-12-31",
-  "sourceUrl": "https://kenyalaw.org/akn/ke/act/1968/21/eng@2022-12-31",
-  "actualDocumentUrl": "https://kenyalaw.org/akn/ke/act/1968/21/eng@2022-12-31/source",
+  "source": "K         La        arliament)",
+  "url": "https://kenyalaw.org/a        e/act/1968/21/eng@2022-12-31",
+          rceUrl": "https://kenyalaw.org/akn/ke/          68/21/eng@2022-12-31",
+  "ac          cumentUrl": "https://kenyalaw          kn/ke/act/1968/21/eng@2022-12-31/source",
   "documentUrl": "https://kenyalaw.org/akn/ke/act/1968/21/eng@2022-12-31/source",
-  "pdfUrl": "/api/pdf-proxy?sourceUrl=https%3A%2F%2Fkenyalaw.org...",
-  "readUrl": "/read?title=Limitation%20Act&sourceUrl=https...",
-  "text": "AN ACT of Parliament to prescribe periods for the limitation of actions...",
+  "pdfUrl": "/api/pd          y?sourceUrl=https%3          Fkenyalaw.org...",
+  "readUrl            d?title=Limitation%20Act&sourceUrl=https...",
+  "text": "AN ACT of Parliament to pres              ods for the limitation of actions...",
   "html": "<div class=\\"legal-doc\\"><p>AN ACT of Parliament...</p></div>",
   "isPdf": false,
   "hasPdf": true,
@@ -3044,12 +2905,12 @@ curl -X GET "${baseUrl}/api/document?sourceUrl=https%3A%2F%2Fkenyalaw.org%2Fakn%
 
 ### 3.3. Document UI Reader & Iframe Renderer
 - **Endpoint:** \`GET /read\` (or \`GET /read.html\`, \`GET /read/:filename\`)
-- **Description:** Renders the interactive eLegal document reader UI with adjustable font sizing, search in document, and AI summary drawer. Suitable for direct browser links or \`<iframe>\` embedding.
+- **Description:** Rende            nteractiv              ocument reader UI with adjustable font sizing, search in document, and AI summary drawer. Suitable for direct browser links or \`<iframe>\` embedding.
 - **Query Parameters:**
   - \`sourceUrl\` *(string, required)*: Document source link.
-  - \`title\` *(string, optional)*: Title displayed on the header.
+  - \`title\` *(string, optional)*: Titl            ye          h           .
   - \`format\` *(string, optional)*:
-    - \`html\` (default): Serves interactive reader UI.
+             tml\` (default): Serves interactive reader UI.
     - \`json\`: Redirects to \`/api/document\` structured JSON.
     - \`pdf\` or \`raw=1\`: Redirects to direct PDF binary stream.
 
@@ -3068,7 +2929,7 @@ curl -X GET "${baseUrl}/api/document?sourceUrl=https%3A%2F%2Fkenyalaw.org%2Fakn%
 
 ### 3.4. Resolve Case & Export PDF URL
 - **Endpoint:** \`GET /api/resolve\` (or alias \`GET /api/v1/resolve\`)
-- **Description:** Resolves Kenya Law HTML caselaw view URLs into direct PDF download links (\`/export/<id>/pdf\`) and scrapes metadata.
+- **Descrip          *           es Kenya Law HTML caselaw view URLs into            PDF download links (\`/export/<id>/pdf\`) and scrapes metadata.
 - **Query Parameters:**
   - \`url\` *(string, required)*: Kenya Law caselaw URL (e.g. \`http://kenyalaw.org/caselaw/cases/view/109852/\`).
   - \`title\` *(string, optional)*: Custom case title override.
@@ -3083,21 +2944,20 @@ curl -X GET "${baseUrl}/api/resolve?url=http%3A%2F%2Fkenyalaw.org%2Fcaselaw%2Fca
 {
   "success": true,
   "title": "Mtana Lewa v Kahindi Ngala [2015] eKLR",
-  "label": "Mtana Lewa v Kahindi Ngala",
-  "citation": "[2015] eKLR / Civil Appeal 56 of 2014",
+  "label"          na          v Kahindi Ngala",
+  "citation": "[2015]             ivil Appeal 56 of 2014",
   "actualDocumentUrl": "https://kenyalaw.org/caselaw/cases/export/109852/pdf",
   "documentUrl": "https://kenyalaw.org/caselaw/cases/export/109852/pdf",
   "pdfUrl": "https://kenyalaw.org/caselaw/cases/export/109852/pdf",
   "readUrl": "/read?title=Mtana%20Lewa&sourceUrl=http...",
   "source": "Kenya Law (Court of Appeal)",
-  "isPdf": true,
-  "cached": false
+  "isPdf": true          ac          false
 }
 \`\`\`
 
 ---
 
-### 3.5. List Offline Library Precedents & Statutes
+### 3.5. Li            ne Library Precedents & Statutes
 - **Endpoint:** \`GET /api/library\` (or aliases \`GET /api/v1/cases\`, \`GET /api/v1/statutes\`)
 - **Description:** Retrieves all offline statutes and precedents cached on the local server repository.
 - **Response JSON Schema (200 OK):**
@@ -3125,7 +2985,7 @@ curl -X GET "${baseUrl}/api/resolve?url=http%3A%2F%2Fkenyalaw.org%2Fcaselaw%2Fca
 
 ### 3.6. System Health Probe
 - **Endpoint:** \`GET /api/health\`
-- **Description:** Public health probe for uptime checkers and load balancers.
+- **Descr          :*          ic health probe for uptime checke            oad balancers.
 - **Response (200 OK):** \`{ "status": "ok", "service": "eLegal Intelligence REST Engine", "timestamp": "..." }\`
 
 ---
@@ -3141,8 +3001,8 @@ curl -X GET "${baseUrl}/api/resolve?url=http%3A%2F%2Fkenyalaw.org%2Fcaselaw%2Fca
   <title>eLegal Search Demo</title>
 </head>
 <body>
-  <h2>Kenya Legal Precedent Search</h2>
-  <input type="text" id="queryInput" value="adverse possession land" style="width: 300px;">
+  <h          a           Precedent Search</h2>
+  <input typ             id="queryInput" value="adverse possession land" style="width: 300px;">
   <button onclick="performSearch()">Search</button>
   <div id="resultsContainer" style="margin-top: 20px;"></div>
 
@@ -3153,34 +3013,33 @@ curl -X GET "${baseUrl}/api/resolve?url=http%3A%2F%2Fkenyalaw.org%2Fcaselaw%2Fca
       const data = await res.json();
       
       const container = document.getElementById('resultsContainer');
-      container.innerHTML = data.results.map(doc => \`
-        <div style="border: 1px solid #ccc; padding: 12px; margin-bottom: 10px; border-radius: 6px;">
-          <h3>\${doc.title} (\${doc.year})</h3>
-          <p><em>\${doc.citation}</em></p>
-          <p>\${doc.snippets ? doc.snippets[0] : ''}</p>
-          <a href="\${doc.actualDocumentUrl}" target="_blank" style="margin-right: 12px;">📥 Download PDF / Source</a>
-          <a href="\${doc.readUrl}" target="_blank">📖 Open in Reader</a>
+      container.innerHTML = data.results.          c =                 <div style="border: 1px solid #ccc; padding: 12px; margi          om: 10px; border-radius: 6px;">
+          <h3>\${doc.tit        (\$        .year})</h3>
+          <p><em>\${doc.citatio          ></p>
+          <p>\${doc.snippets ? doc.snippets[0] : '          
+          <a href="\${doc.actualDocumentUrl          get="_blank" style="ma          ight: 12px;">📥 Download PDF / Sour                     <a href="\${doc.re          "           ="_blank">📖 Open in Reader</a>
         </div>
-      \`).join('');
+      \`)        n('');
     }
-  </script>
+      </script>
 </body>
+
 </html>
 \`\`\`
 
 ### 4.2. Node.js (Fetch with async/await)
 \`\`\`javascript
 const res = await fetch('${baseUrl}/api/search?q=unfair+termination+employment&fresh=true', {
-  headers: {
-    'Accept': 'application/json',
-    'X-API-Key': '${activeKey}'
-  }
+headers: {
+'Accept': 'application/json',
+'X-API-Key': '${activeKey}'
+}
 });
 const { results } = await res.json();
 for (const doc of results) {
-  console.log('Case Title:', doc.title);
-  console.log('Direct Document URL:', doc.actualDocumentUrl);
-  console.log('Reader URL:', doc.readUrl);
+console.log('Case Title:', doc.title);
+console.log('Direct Document URL:', doc.actualDocumentUrl);
+console.log('Reader URL:', doc.readUrl);
 }
 \`\`\`
 
@@ -3190,448 +3049,374 @@ import requests
 
 url = "${baseUrl}/api/search"
 params = {
-    "q": "Constitution Article 47 fair administrative action",
-    "fresh": "true",
-    "limit": 5
+"q": "Constitution Article 47 fair administrative action",
+"fresh": "true",
+"limit": 5
 }
 headers = {
-    "X-API-Key": "${activeKey}",
-    "Accept": "application/json"
+"X-API-Key": "${activeKey}",
+"Accept": "application/json"
 }
 
 response = requests.get(url, params=params, headers=headers)
 data = response.json()
 
 for case in data.get("results", []):
-    print(f"[{case['year']}] {case['title']}")
-    print(f"  PDF URL: {case['actualDocumentUrl']}")
-    print(f"  Reader:  {case['readUrl']}")
+print(f"[{case['year']}] {case['title']}")
+print(f" PDF URL: {case['actualDocumentUrl']}")
+print(f" Reader: {case['readUrl']}")
 \`\`\`
 
 ---
 
 ## 5. Golden Rules for AI Coding Assistants (LLM Guardrails)
 
-1. **NEVER Hallucinate Document Paths:** Always use the \`actualDocumentUrl\`, \`pdfUrl\`, or \`readUrl\` properties returned in API payloads. Do not craft hypothetical \`/pdf/case_xyz.pdf\` paths.
-2. **Zero-CORS Confirmation:** When writing frontend web applications, do NOT add proxy servers or backend wrappers solely for CORS — eLegal allows direct browser fetches from any origin.
-3. **Use \`fresh=true\` For Live Legal Checks:** When real-time accuracy against newly delivered court judgments or external registries is required, always specify \`fresh=true\`.
-4. **Iframe Integration:** When asked to render or display court judgments inside a web UI, recommend embedding \`${baseUrl}/read?sourceUrl=...\` in an iframe.
+1. **NEVER Hallucinate Document Paths:** Always use the \`actualDocumentUrl\`, \`pdfUrl\`, or \`readUrl\` properties
+returned in API payloads. Do not craft hypothetical \`/pdf/case_xyz.pdf\` paths.
+2. **Zero-CORS Confirmation:** When writing frontend web applications, do NOT add proxy servers or backend wrappers
+solely for CORS — eLegal allows direct browser fetches from any origin.
+3. **Use \`fresh=true\` For Live Legal Checks:** When real-time accuracy against newly delivered court judgments or
+external registries is required, always specify \`fresh=true\`.
+4. **Iframe Integration:** When asked to render or display court judgments inside a web UI, recommend embedding
+\`${baseUrl}/read?sourceUrl=...\` in an iframe.
 `;
-        }
+}
 
-        async function copyDocAsMarkdownForLLM() {
-          const md = generateFullMarkdownForLLM();
-          try {
-            await navigator.clipboard.writeText(md);
-            showToast('Copied complete API documentation as Markdown for LLMs!');
-          } catch (e) {
-            const ta = document.createElement('textarea');
-            ta.value = md;
-            document.body.appendChild(ta);
-            ta.select();
-            document.execCommand('copy');
-            document.body.removeChild(ta);
-            showToast('Copied complete API documentation as Markdown for LLMs!');
-          }
-        }
+async function copyDocAsMarkdownForLLM() {
+const md = generateFullMarkdownForLLM();
+try {
+await navigator.clipboard.writeText(md);
+showToast('Copied complete API documentation as Markdown for LLMs!');
+} catch (e) {
+const ta = document.createElement('textarea');
+ta.value = md;
+document.body.appendChild(ta);
+ta.select();
+document.execCommand('copy');
+document.body.removeChild(ta);
+showToast('Copied complete API documentation as Markdown for LLMs!');
+}
+}
 
-        function toggleMobileSidebar() {
-          const sidebar = document.querySelector('.sidebar');
-          const backdrop = document.getElementById('mobileBackdrop');
-          if (sidebar) sidebar.classList.toggle('open');
-          if (backdrop) backdrop.classList.toggle('show');
-        }
+function toggleMobileSidebar() {
+const sidebar = document.querySelector('.sidebar');
+const backdrop = document.getElementById('mobileBackdrop');
+if (sidebar) sidebar.classList.toggle('open');
+if (backdrop) backdrop.classList.toggle('show');
+}
 
-        function closeMobileSidebar() {
-          const sidebar = document.querySelector('.sidebar');
-          const backdrop = document.getElementById('mobileBackdrop');
-          if (sidebar) sidebar.classList.remove('open');
-          if (backdrop) backdrop.classList.remove('show');
-        }
+function closeMobileSidebar() {
+const sidebar = document.querySelector('.sidebar');
+const backdrop = document.getElementById('mobileBackdrop');
+if (sidebar) sidebar.classList.remove('open');
+if (backdrop) backdrop.classList.remove('show');
+}
 
-        // Switch Active Topic
-        function switchTopic(key, el) {
-          closeMobileSidebar();
-          activeTopicKey = key;
+// Switch Active Topic
+function switchTopic(key, el) {
+closeMobileSidebar();
+activeTopicKey = key;
 
-          // Update Tree Active Styling
-          document.querySelectorAll('.nav-item').forEach(l => l.classList.remove('active'));
-          const activeEl = el || document.querySelector(`.nav-item[data-topic="${key}"]`);
-          if (activeEl) activeEl.classList.add('active');
+// Update Tree Active Styling
+document.querySelectorAll('.nav-item').forEach(l => l.classList.remove('active'));
+const activeEl = el || document.querySelector(`.nav-item[data-topic="${key}"]`);
+if (activeEl) activeEl.classList.add('active');
 
-          renderTopicView();
-        }
+renderTopicView();
+}
 
-        // Navigate to Previous or Next Topic
-        function navigateTopic(dir) {
-          const currentIndex = TOPIC_KEYS.indexOf(activeTopicKey);
-          const newIndex = currentIndex + dir;
-          if (newIndex >= 0 && newIndex < TOPIC_KEYS.length) {
-            switchTopic(TOPIC_KEYS[newIndex]);
-            document.querySelector('.main-content').scrollTop = 0;
-          }
-        }
+// Navigate to Previous or Next Topic
+function navigateTopic(dir) {
+const currentIndex = TOPIC_KEYS.indexOf(activeTopicKey);
+const newIndex = currentIndex + dir;
+if (newIndex >= 0 && newIndex < TOPIC_KEYS.length) { switchTopic(TOPIC_KEYS[newIndex]);
+  document.querySelector('.main-content').scrollTop=0; } } function renderTopicView() { const
+  docSection=document.querySelector('.doc-section'); const profileView=document.getElementById('profilePageView'); if
+  (activeTopicKey==='profile' ) { if (docSection) docSection.style.display='none' ; if (profileView)
+  profileView.style.display='block' ; openProfilePage(); return; } else { if (docSection)
+  docSection.style.display='block' ; if (profileView) profileView.style.display='none' ; } const
+  topic=TOPICS[activeTopicKey]; if (!topic) return; document.getElementById('displayTitle').textContent=topic.name;
+  document.getElementById('displayDesc').textContent=topic.desc;
+  document.getElementById('displayBadgeText').textContent=topic.badge;
+  document.getElementById('richDocContent').innerHTML=topic.detailsHtml || '' ; // Endpoint Pill Container Visibility
+  const epContainer=document.getElementById('endpointBarContainer'); if (topic.isEndpoint) {
+  epContainer.style.display='block' ; const pMethod=document.getElementById('pillMethod');
+  pMethod.textContent=topic.method; pMethod.className=`endpoint-pill-method m-badge ${topic.method.toLowerCase()}`;
+  document.getElementById('pillPath').textContent=topic.path; } else { epContainer.style.display='none' ; } // Render
+  Parameters Inputs const inputsContainer=document.getElementById('paramInputsContainer'); const
+  inputsCard=document.getElementById('paramInputsCard'); inputsContainer.innerHTML='' ; if (!topic.params ||
+  topic.params.length===0) { inputsCard.style.display='none' ; } else { inputsCard.style.display='block' ;
+  topic.params.forEach(p=> {
+  const row = document.createElement('div');
+  row.className = 'input-row';
+  row.innerHTML = `
+  <span class="input-label">${p.name}</span>
+  <input type="text" class="input-field" data-param="${p.name}" value="${p.default || ''}"
+    oninput="updateCodeSnippet()">
+  `;
+  inputsContainer.appendChild(row);
+  });
+  }
 
-        function renderTopicView() {
-          const docSection = document.querySelector('.doc-section');
-          const profileView = document.getElementById('profilePageView');
+  // Render Parameters Table
+  const tableBody = document.getElementById('paramsTableBody');
+  const tableContainer = document.getElementById('paramsTableContainer');
+  tableBody.innerHTML = '';
 
-          if (activeTopicKey === 'profile') {
-            if (docSection) docSection.style.display = 'none';
-            if (profileView) profileView.style.display = 'block';
-            openProfilePage();
-            return;
-          } else {
-            if (docSection) docSection.style.display = 'block';
-            if (profileView) profileView.style.display = 'none';
-          }
+  if (!topic.params || topic.params.length === 0) {
+  tableContainer.style.display = 'none';
+  } else {
+  tableContainer.style.display = 'block';
+  topic.params.forEach(p => {
+  const tr = document.createElement('tr');
+  tr.innerHTML = `
+  <td><span class="param-name">${p.name}</span>${p.req ? '<span class="param-req">REQUIRED</span>' : ''}</td>
+  <td><span class="param-type">${p.type}</span></td>
+  <td>${p.req ? 'Yes' : 'No'}</td>
+  <td style="color: var(--text-muted);">${p.desc}</td>
+  `;
+  tableBody.appendChild(tr);
+  });
+  }
 
-          const topic = TOPICS[activeTopicKey];
-          if (!topic) return;
-          document.getElementById('displayTitle').textContent = topic.name;
-          document.getElementById('displayDesc').textContent = topic.desc;
-          document.getElementById('displayBadgeText').textContent = topic.badge;
-          document.getElementById('richDocContent').innerHTML = topic.detailsHtml || '';
+  // Render Prev / Next Nav Buttons
+  const currIdx = TOPIC_KEYS.indexOf(activeTopicKey);
+  const prevBtn = document.getElementById('prevTopicBtn');
+  const nextBtn = document.getElementById('nextTopicBtn');
 
-          // Endpoint Pill Container Visibility
-          const epContainer = document.getElementById('endpointBarContainer');
-          if (topic.isEndpoint) {
-            epContainer.style.display = 'block';
-            const pMethod = document.getElementById('pillMethod');
-            pMethod.textContent = topic.method;
-            pMethod.className = `endpoint-pill-method m-badge ${topic.method.toLowerCase()}`;
-            document.getElementById('pillPath').textContent = topic.path;
-          } else {
-            epContainer.style.display = 'none';
-          }
+  if (currIdx > 0) {
+  prevBtn.classList.remove('disabled');
+  document.getElementById('prevTopicLabel').textContent = TOPICS[TOPIC_KEYS[currIdx - 1]].name;
+  } else {
+  prevBtn.classList.add('disabled');
+  document.getElementById('prevTopicLabel').textContent = 'Previous';
+  }
 
-          // Render Parameters Inputs
-          const inputsContainer = document.getElementById('paramInputsContainer');
-          const inputsCard = document.getElementById('paramInputsCard');
-          inputsContainer.innerHTML = '';
+  if (currIdx < TOPIC_KEYS.length - 1) { nextBtn.classList.remove('disabled');
+    document.getElementById('nextTopicLabel').textContent=TOPICS[TOPIC_KEYS[currIdx + 1]].name; } else {
+    nextBtn.classList.add('disabled'); document.getElementById('nextTopicLabel').textContent='Next' ; }
+    updateCodeSnippet(); } function setLanguage(lang) { activeLang=lang;
+    document.querySelectorAll('.lang-tab').forEach(t=> t.classList.remove('active'));
+    const activeBtn = document.querySelector(`.lang-tab[data-lang="${lang}"]`);
+    if (activeBtn) activeBtn.classList.add('active');
+    updateCodeSnippet();
+    }
 
-          if (!topic.params || topic.params.length === 0) {
-            inputsCard.style.display = 'none';
-          } else {
-            inputsCard.style.display = 'block';
-            topic.params.forEach(p => {
-              const row = document.createElement('div');
-              row.className = 'input-row';
-              row.innerHTML = `
-            <span class="input-label">${p.name}</span>
-            <input type="text" class="input-field" data-param="${p.name}" value="${p.default || ''}" oninput="updateCodeSnippet()">
-          `;
-              inputsContainer.appendChild(row);
-            });
-          }
+    function getParamValues() {
+    const values = {};
+    const container = document.getElementById('paramInputsContainer');
+    if (container) {
+    container.querySelectorAll('.input-field').forEach(input => {
+    if (input.dataset.param && input.dataset.param !== 'undefined') {
+    values[input.dataset.param] = input.value.trim();
+    }
+    });
+    }
+    return values;
+    }
 
-          // Render Parameters Table
-          const tableBody = document.getElementById('paramsTableBody');
-          const tableContainer = document.getElementById('paramsTableContainer');
-          tableBody.innerHTML = '';
+    function buildFullUrl() {
+    const topic = TOPICS[activeTopicKey];
+    let url = (window.location.origin || '') + topic.path;
+    const params = getParamValues();
+    const searchParams = new URLSearchParams();
 
-          if (!topic.params || topic.params.length === 0) {
-            tableContainer.style.display = 'none';
-          } else {
-            tableContainer.style.display = 'block';
-            topic.params.forEach(p => {
-              const tr = document.createElement('tr');
-              tr.innerHTML = `
-            <td><span class="param-name">${p.name}</span>${p.req ? '<span class="param-req">REQUIRED</span>' : ''}</td>
-            <td><span class="param-type">${p.type}</span></td>
-            <td>${p.req ? 'Yes' : 'No'}</td>
-            <td style="color: var(--text-muted);">${p.desc}</td>
-          `;
-              tableBody.appendChild(tr);
-            });
-          }
+    for (const [k, v] of Object.entries(params)) {
+    if (v && pTypeIsQuery(topic, k)) searchParams.append(k, v);
+    }
+    const queryString = searchParams.toString();
+    if (queryString && topic.method === 'GET') url += '?' + queryString;
+    return url;
+    }
 
-          // Render Prev / Next Nav Buttons
-          const currIdx = TOPIC_KEYS.indexOf(activeTopicKey);
-          const prevBtn = document.getElementById('prevTopicBtn');
-          const nextBtn = document.getElementById('nextTopicBtn');
+    function pTypeIsQuery(topic, name) {
+    if (!name || name === 'undefined') return false;
+    if (!topic.params) return false;
+    const found = topic.params.find(p => p.name === name);
+    return found ? (found.type !== 'header' && found.type !== 'body') : false;
+    }
 
-          if (currIdx > 0) {
-            prevBtn.classList.remove('disabled');
-            document.getElementById('prevTopicLabel').textContent = TOPICS[TOPIC_KEYS[currIdx - 1]].name;
-          } else {
-            prevBtn.classList.add('disabled');
-            document.getElementById('prevTopicLabel').textContent = 'Previous';
-          }
+    // Code Snippet Generator across 7 languages
+    function updateCodeSnippet() {
+    const topic = TOPICS[activeTopicKey];
+    const url = buildFullUrl();
+    const method = topic.method;
+    const key = (typeof userApiKey !== 'undefined' && userApiKey) ? userApiKey : (localStorage.getItem('elegal_api_key')
+    || 'YOUR_SECRET_API_KEY');
+    let snippet = '';
 
-          if (currIdx < TOPIC_KEYS.length - 1) {
-            nextBtn.classList.remove('disabled');
-            document.getElementById('nextTopicLabel').textContent = TOPICS[TOPIC_KEYS[currIdx + 1]].name;
-          } else {
-            nextBtn.classList.add('disabled');
-            document.getElementById('nextTopicLabel').textContent = 'Next';
-          }
-
-          updateCodeSnippet();
-        }
-
-        function setLanguage(lang) {
-          activeLang = lang;
-          document.querySelectorAll('.lang-tab').forEach(t => t.classList.remove('active'));
-          const activeBtn = document.querySelector(`.lang-tab[data-lang="${lang}"]`);
-          if (activeBtn) activeBtn.classList.add('active');
-          updateCodeSnippet();
-        }
-
-        function getParamValues() {
-          const values = {};
-          const container = document.getElementById('paramInputsContainer');
-          if (container) {
-            container.querySelectorAll('.input-field').forEach(input => {
-              if (input.dataset.param && input.dataset.param !== 'undefined') {
-                values[input.dataset.param] = input.value.trim();
-              }
-            });
-          }
-          return values;
-        }
-
-        function buildFullUrl() {
-          const topic = TOPICS[activeTopicKey];
-          let url = (window.location.origin || '') + topic.path;
-          const params = getParamValues();
-          const searchParams = new URLSearchParams();
-
-          for (const [k, v] of Object.entries(params)) {
-            if (v && pTypeIsQuery(topic, k)) searchParams.append(k, v);
-          }
-          const queryString = searchParams.toString();
-          if (queryString && topic.method === 'GET') url += '?' + queryString;
-          return url;
-        }
-
-        function pTypeIsQuery(topic, name) {
-          if (!name || name === 'undefined') return false;
-          if (!topic.params) return false;
-          const found = topic.params.find(p => p.name === name);
-          return found ? (found.type !== 'header' && found.type !== 'body') : false;
-        }
-
-        // Code Snippet Generator across 7 languages
-        function updateCodeSnippet() {
-          const topic = TOPICS[activeTopicKey];
-          const url = buildFullUrl();
-          const method = topic.method;
-          const key = (typeof userApiKey !== 'undefined' && userApiKey) ? userApiKey : (localStorage.getItem('elegal_api_key') || 'YOUR_SECRET_API_KEY');
-          let snippet = '';
-
-          if (activeLang === 'curl') {
-            if (topic.path === '/api/keys' && !topic.params.some(p => p.name === 'X-API-Key')) {
-              snippet = `<span class="tok-cmnt"># Terminal cURL Request (Developer Account Admin)</span>
-<span class="tok-fn">curl</span> -X ${method} \\
-  <span class="tok-str">"${url}"</span> \\
-  -H <span class="tok-str">"Accept: application/json"</span> \\
-  -H <span class="tok-str">"Authorization: Bearer &lt;FIREBASE_ID_TOKEN&gt;"</span>`;
-            } else {
-              snippet = `<span class="tok-cmnt"># Terminal cURL Request</span>
-<span class="tok-fn">curl</span> -X ${method} \\
-  <span class="tok-str">"${url}"</span> \\
-  -H <span class="tok-str">"Accept: application/json"</span> \\
-  -H <span class="tok-str">"X-API-Key: ${key}"</span>`;
-            }
-          }
-          else if (activeLang === 'node-fetch') {
-            snippet = `<span class="tok-cmnt">// Node.js Native Fetch</span>
-<span class="tok-kw">const</span> res = <span class="tok-kw">await</span> <span class="tok-fn">fetch</span>(<span class="tok-str">'${url}'</span>, {
-  method: <span class="tok-str">'${method}'</span>,
-  headers: {
+    if (activeLang === 'curl') {
+    if (topic.path === '/api/keys' && !topic.params.some(p => p.name === 'X-API-Key')) {
+    snippet = `<span class="tok-cmnt"># Terminal cURL Request (Developer Account Admin)</span>
+    <span class="tok-fn">curl</span> -X ${method} \\
+    <span class="tok-str">"${url}"</span> \\
+    -H <span class="tok-str">"Accept: application/json"</span> \\
+    -H <span class="tok-str">"Authorization: Bearer &lt;FIREBASE_ID_TOKEN&gt;"</span>`;
+    } else {
+    snippet = `<span class="tok-cmnt"># Terminal cURL Request</span>
+    <span class="tok-fn">curl</span> -X ${method} \\
+    <span class="tok-str">"${url}"</span> \\
+    -H <span class="tok-str">"Accept: application/json"</span> \\
+    -H <span class="tok-str">"X-API-Key: ${key}"</span>`;
+    }
+    }
+    else if (activeLang === 'node-fetch') {
+    snippet = `<span class="tok-cmnt">// Node.js Native Fetch</span>
+    <span class="tok-kw">const</span> res = <span class="tok-kw">await</span> <span class="tok-fn">fetch</span>(<span
+      class="tok-str">'${url}'</span>, {
+    method: <span class="tok-str">'${method}'</span>,
+    headers: {
     <span class="tok-prop">'Accept'</span>: <span class="tok-str">'application/json'</span>,
     <span class="tok-prop">'X-API-Key'</span>: <span class="tok-str">'${key}'</span>
-  }
-});
-<span class="tok-kw">const</span> data = <span class="tok-kw">await</span> res.<span class="tok-fn">json</span>();
-console.<span class="tok-fn">log</span>(data);`;
-          }
-          else if (activeLang === 'node-axios') {
-            snippet = `<span class="tok-cmnt">// Node.js / Browser Axios</span>
-<span class="tok-kw">const</span> axios = <span class="tok-fn">require</span>(<span class="tok-str">'axios'</span>);
+    }
+    });
+    <span class="tok-kw">const</span> data = <span class="tok-kw">await</span> res.<span class="tok-fn">json</span>();
+    console.<span class="tok-fn">log</span>(data);`;
+    }
+    else if (activeLang === 'node-axios') {
+    snippet = `<span class="tok-cmnt">// Node.js / Browser Axios</span>
+    <span class="tok-kw">const</span> axios = <span class="tok-fn">require</span>(<span class="tok-str">'axios'</span>);
 
-<span class="tok-kw">const</span> response = <span class="tok-kw">await</span> axios({
-  method: <span class="tok-str">'${method.toLowerCase()}'</span>,
-  url: <span class="tok-str">'${url}'</span>,
-  headers: { <span class="tok-prop">'X-API-Key'</span>: <span class="tok-str">'${key}'</span> }
-});
-console.<span class="tok-fn">log</span>(response.data);`;
-          }
-          else if (activeLang === 'python-req') {
-            snippet = `<span class="tok-cmnt"># Python Requests</span>
-<span class="tok-kw">import</span> requests
+    <span class="tok-kw">const</span> response = <span class="tok-kw">await</span> axios({
+    method: <span class="tok-str">'${method.toLowerCase()}'</span>,
+    url: <span class="tok-str">'${url}'</span>,
+    headers: { <span class="tok-prop">'X-API-Key'</span>: <span class="tok-str">'${key}'</span> }
+    });
+    console.<span class="tok-fn">log</span>(response.data);`;
+    }
+    else if (activeLang === 'python-req') {
+    snippet = `<span class="tok-cmnt"># Python Requests</span>
+    <span class="tok-kw">import</span> requests
 
-url = <span class="tok-str">"${url}"</span>
-headers = { <span class="tok-str">"X-API-Key"</span>: <span class="tok-str">"${key}"</span> }
+    url = <span class="tok-str">"${url}"</span>
+    headers = { <span class="tok-str">"X-API-Key"</span>: <span class="tok-str">"${key}"</span> }
 
-response = requests.<span class="tok-fn">${method.toLowerCase()}</span>(url, headers=headers)
-print(response.json())`;
-          }
-          else if (activeLang === 'go') {
-            snippet = `<span class="tok-cmnt">// Go Native net/http</span>
-<span class="tok-kw">package</span> main
+    response = requests.<span class="tok-fn">${method.toLowerCase()}</span>(url, headers=headers)
+    print(response.json())`;
+    }
+    else if (activeLang === 'go') {
+    snippet = `<span class="tok-cmnt">// Go Native net/http</span>
+    <span class="tok-kw">package</span> main
 
-<span class="tok-kw">import</span> (
-	<span class="tok-str">"fmt"</span>
-	<span class="tok-str">"net/http"</span>
-	<span class="tok-str">"io"</span>
-)
+    <span class="tok-kw">import</span> (
+    <span class="tok-str">"fmt"</span>
+    <span class="tok-str">"net/http"</span>
+    <span class="tok-str">"io"</span>
+    )
 
-<span class="tok-kw">func</span> <span class="tok-fn">main</span>() {
-	req, _ := http.<span class="tok-fn">NewRequest</span>(<span class="tok-str">"${method}"</span>, <span class="tok-str">"${url}"</span>, nil)
-	req.Header.<span class="tok-fn">Set</span>(<span class="tok-str">"X-API-Key"</span>, <span class="tok-str">"${key}"</span>)
+    <span class="tok-kw">func</span> <span class="tok-fn">main</span>() {
+    req, _ := http.<span class="tok-fn">NewRequest</span>(<span class="tok-str">"${method}"</span>, <span
+      class="tok-str">"${url}"</span>, nil)
+    req.Header.<span class="tok-fn">Set</span>(<span class="tok-str">"X-API-Key"</span>, <span
+      class="tok-str">"${key}"</span>)
 
-	res, _ := http.DefaultClient.<span class="tok-fn">Do</span>(req)
-	defer res.Body.<span class="tok-fn">Close</span>()
-	body, _ := io.<span class="tok-fn">ReadAll</span>(res.Body)
-	fmt.<span class="tok-fn">Println</span>(string(body))
-}`;
-          }
-          else if (activeLang === 'php') {
-            snippet = `<span class="tok-cmnt">&lt;?php // PHP cURL</span>
-$ch = curl_init();
-curl_setopt($ch, CURLOPT_URL, <span class="tok-str">"${url}"</span>);
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-curl_setopt($ch, CURLOPT_HTTPHEADER, [
+    res, _ := http.DefaultClient.<span class="tok-fn">Do</span>(req)
+    defer res.Body.<span class="tok-fn">Close</span>()
+    body, _ := io.<span class="tok-fn">ReadAll</span>(res.Body)
+    fmt.<span class="tok-fn">Println</span>(string(body))
+    }`;
+    }
+    else if (activeLang === 'php') {
+    snippet = `<span class="tok-cmnt">&lt;?php // PHP cURL</span>
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, <span class="tok-str">"${url}"</span>);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
     <span class="tok-str">"X-API-Key: ${key}"</span>
-]);
-$response = curl_exec($ch);
-curl_close($ch);
-echo $response;`;
-          }
-          else if (activeLang === 'ruby') {
-            snippet = `<span class="tok-cmnt"># Ruby Net::HTTP</span>
-require <span class="tok-str">'net/http'</span>
-require <span class="tok-str">'uri'</span>
+    ]);
+    $response = curl_exec($ch);
+    curl_close($ch);
+    echo $response;`;
+    }
+    else if (activeLang === 'ruby') {
+    snippet = `<span class="tok-cmnt"># Ruby Net::HTTP</span>
+    require <span class="tok-str">'net/http'</span>
+    require <span class="tok-str">'uri'</span>
 
-uri = URI.<span class="tok-fn">parse</span>(<span class="tok-str">"${url}"</span>)
-request = Net::HTTP::Get.<span class="tok-fn">new</span>(uri)
-request[<span class="tok-str">"X-API-Key"</span>] = <span class="tok-str">"${key}"</span>
+    uri = URI.<span class="tok-fn">parse</span>(<span class="tok-str">"${url}"</span>)
+    request = Net::HTTP::Get.<span class="tok-fn">new</span>(uri)
+    request[<span class="tok-str">"X-API-Key"</span>] = <span class="tok-str">"${key}"</span>
 
-response = Net::HTTP.<span class="tok-fn">start</span>(uri.hostname, uri.port) { |http| http.<span class="tok-fn">request</span>(request) }
-puts response.body`;
-          }
+    response = Net::HTTP.<span class="tok-fn">start</span>(uri.hostname, uri.port) { |http| http.<span
+      class="tok-fn">request</span>(request) }
+    puts response.body`;
+    }
 
-          document.getElementById('codeSnippetBox').innerHTML = snippet;
-          updateLineNumbers('codeSnippetBox', 'codeLineNumbers');
-        }
+    document.getElementById('codeSnippetBox').innerHTML = snippet;
+    updateLineNumbers('codeSnippetBox', 'codeLineNumbers');
+    }
 
-        function updateLineNumbers(codeId, numId) {
-          const text = document.getElementById(codeId).innerText;
-          const lines = text.split('\n').length || 1;
-          let numbersHtml = '';
-          for (let i = 1; i <= lines; i++) {
-            numbersHtml += i + '<br>';
-          }
-          document.getElementById(numId).innerHTML = numbersHtml;
-        }
+    function updateLineNumbers(codeId, numId) {
+    const text = document.getElementById(codeId).innerText;
+    const lines = text.split('\n').length || 1;
+    let numbersHtml = '';
+    for (let i = 1; i
+    <= lines; i++) { numbersHtml +=i + '<br>' ; } document.getElementById(numId).innerHTML=numbersHtml; } // Live
+      Request Execution async function executePlaygroundRequest() { const topic=TOPICS[activeTopicKey]; const
+      url=buildFullUrl(); const relativeUrl=url.replace('http://localhost:3000', '' ); const
+      respBox=document.getElementById('responseBox'); const statusEl=document.getElementById('respStatus');
+      respBox.innerHTML='<span class="tok-cmnt">// Executing eLegal API request...</span>' ;
+      recordApiKeyUsage(userApiKey); try { const headers={ 'Content-Type' : 'application/json' }; if (userApiKey)
+      headers['X-API-Key']=userApiKey; const res=await fetch(relativeUrl, { method: topic.method, headers }); let
+      data=await res.json(); // Enforce 5 results limit if present if (data && Array.isArray(data.results)) {
+      data.results=data.results.slice(0, 5); data.total=data.results.length; } else if (Array.isArray(data)) {
+      data=data.slice(0, 5); } statusEl.textContent=`${res.status} ${res.statusText || 'OK' }`;
+      statusEl.style.color=res.ok ? '#34D399' : '#F87171' ; respBox.innerHTML=syntaxHighlightJson(JSON.stringify(data,
+      null, 2)); } catch (e) { statusEl.textContent='200 OK' ; statusEl.style.color='#34D399' ; // Custom Payload
+      Response for each topic let mockPayload={}; if (activeTopicKey==='overview' ) { mockPayload={ status: "success" ,
+      platform: "eLegal Kenya Law AI Engine" , authStatus: "authenticated" , apiKey: userApiKey, version: "v1.0" }; }
+      else if (activeTopicKey==='keys_overview' || activeTopicKey==='list_keys' ) { mockPayload={ status: "success" ,
+      activeKeys: [ { id: "key_01" , label: "Production Backend" , prefix: "el_live_prod..." , createdAt: "2026-08-01" ,
+      isActive: true }, { id: "key_02" , label: "Staging Test App" , prefix: "el_live_stag..." , createdAt: "2026-08-10"
+      , isActive: true } ] }; } else { mockPayload={ status: "success" , platform: "eLegal Kenya Law AI Engine" ,
+      endpoint: topic.path, resultsCount: 5, results: [ { id: "eklr_2022_1045" ,
+      title: "Republic v National Land Commission [2022] eKLR" , citation: "[2022] eKLR 1045" ,
+      court: "High Court of Kenya" , isPdf: true, pdfUrl: "http://kenyalaw.org/caselaw/cases/export/210452/pdf" }, {
+      id: "eklr_2021_409" , title: "In re Estate of Peter Kamau Njuguna (Deceased) [2021] eKLR" ,
+      citation: "[2021] eKLR 409" , court: "Court of Appeal at Kisumu" , isPdf: true,
+      pdfUrl: "http://kenyalaw.org/caselaw/cases/export/209112/pdf" }, { id: "eklr_2020_881" ,
+      title: "Munyao v Kenya Revenue Authority [2020] eKLR" , citation: "[2020] eKLR 881" ,
+      court: "Tax Appeals Tribunal" , isPdf: false, pdfUrl: null }, { id: "eklr_2022_9012" ,
+      title: "Okiya Omtatah Okoiti v Attorney General & 3 others [2022] eKLR" , citation: "[2022] eKLR 9012" ,
+      court: "Supreme Court of Kenya" , isPdf: true, pdfUrl: "http://kenyalaw.org/caselaw/cases/export/224091/pdf" }, {
+      id: "eklr_2019_124" , title: "Wambui & 2 others v Mwangi [2019] eKLR" , citation: "[2019] eKLR 124" ,
+      court: "Environment & Land Court" , isPdf: true, pdfUrl: "http://kenyalaw.org/caselaw/cases/export/189201/pdf" } ]
+      }; } respBox.innerHTML=syntaxHighlightJson(JSON.stringify(mockPayload, null, 2)); }
+      updateLineNumbers('responseBox', 'respLineNumbers' ); } function syntaxHighlightJson(json) {
+      json=json.replace(/&/g, '&amp;' ).replace(/</g, '&lt;' ).replace( />/g, '&gt;');
+    return
+    json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g,
+    function (match) {
+    let cls = 'tok-str';
+    if (/^"/.test(match)) {
+    if (/:$/.test(match)) cls = 'tok-prop';
+    } else if (/true|false|null/.test(match)) {
+    cls = 'tok-kw';
+    } else {
+    cls = 'tok-num';
+    }
+    return '<span class="' + cls + '">' + match + '</span>';
+    });
+    }
 
-        // Live Request Execution
-        async function executePlaygroundRequest() {
-          const topic = TOPICS[activeTopicKey];
-          const url = buildFullUrl();
-          const relativeUrl = url.replace('http://localhost:3000', '');
-          const respBox = document.getElementById('responseBox');
-          const statusEl = document.getElementById('respStatus');
+    function copyCodeSnippet() {
+    const text = document.getElementById('codeSnippetBox').innerText;
+    navigator.clipboard.writeText(text);
+    showToast('Code snippet copied!');
+    }
 
-          respBox.innerHTML = '<span class="tok-cmnt">// Executing eLegal API request...</span>';
-          recordApiKeyUsage(userApiKey);
+    function filterNavEndpoints(val) {
+    const text = val.toLowerCase();
+    document.querySelectorAll('.nav-item').forEach(link => {
+    const matches = link.innerText.toLowerCase().includes(text);
+    link.style.display = matches ? 'flex' : 'none';
+    });
+    }
 
-          try {
-            const headers = { 'Content-Type': 'application/json' };
-            if (userApiKey) headers['X-API-Key'] = userApiKey;
+    // Boot Init
+    initFirebase();
+    renderTopicView();
+    </script>
+    </body>
 
-            const res = await fetch(relativeUrl, { method: topic.method, headers });
-            let data = await res.json();
-
-            // Enforce 5 results limit if present
-            if (data && Array.isArray(data.results)) {
-              data.results = data.results.slice(0, 5);
-              data.total = data.results.length;
-            } else if (Array.isArray(data)) {
-              data = data.slice(0, 5);
-            }
-
-            statusEl.textContent = `${res.status} ${res.statusText || 'OK'}`;
-            statusEl.style.color = res.ok ? '#34D399' : '#F87171';
-            respBox.innerHTML = syntaxHighlightJson(JSON.stringify(data, null, 2));
-          } catch (e) {
-            statusEl.textContent = '200 OK';
-            statusEl.style.color = '#34D399';
-
-            // Custom Payload Response for each topic
-            let mockPayload = {};
-            if (activeTopicKey === 'overview') {
-              mockPayload = {
-                status: "success",
-                platform: "eLegal Kenya Law AI Engine",
-                authStatus: "authenticated",
-                apiKey: userApiKey,
-                version: "v1.0"
-              };
-            } else if (activeTopicKey === 'keys_overview' || activeTopicKey === 'list_keys') {
-              mockPayload = {
-                status: "success",
-                activeKeys: [
-                  { id: "key_01", label: "Production Backend", prefix: "el_live_prod...", createdAt: "2026-08-01", isActive: true },
-                  { id: "key_02", label: "Staging Test App", prefix: "el_live_stag...", createdAt: "2026-08-10", isActive: true }
-                ]
-              };
-            } else {
-              mockPayload = {
-                status: "success",
-                platform: "eLegal Kenya Law AI Engine",
-                endpoint: topic.path,
-                resultsCount: 5,
-                results: [
-                  { id: "eklr_2022_1045", title: "Republic v National Land Commission [2022] eKLR", citation: "[2022] eKLR 1045", court: "High Court of Kenya", isPdf: true, pdfUrl: "http://kenyalaw.org/caselaw/cases/export/210452/pdf" },
-                  { id: "eklr_2021_409", title: "In re Estate of Peter Kamau Njuguna (Deceased) [2021] eKLR", citation: "[2021] eKLR 409", court: "Court of Appeal at Kisumu", isPdf: true, pdfUrl: "http://kenyalaw.org/caselaw/cases/export/209112/pdf" },
-                  { id: "eklr_2020_881", title: "Munyao v Kenya Revenue Authority [2020] eKLR", citation: "[2020] eKLR 881", court: "Tax Appeals Tribunal", isPdf: false, pdfUrl: null },
-                  { id: "eklr_2022_9012", title: "Okiya Omtatah Okoiti v Attorney General & 3 others [2022] eKLR", citation: "[2022] eKLR 9012", court: "Supreme Court of Kenya", isPdf: true, pdfUrl: "http://kenyalaw.org/caselaw/cases/export/224091/pdf" },
-                  { id: "eklr_2019_124", title: "Wambui & 2 others v Mwangi [2019] eKLR", citation: "[2019] eKLR 124", court: "Environment & Land Court", isPdf: true, pdfUrl: "http://kenyalaw.org/caselaw/cases/export/189201/pdf" }
-                ]
-              };
-            }
-
-            respBox.innerHTML = syntaxHighlightJson(JSON.stringify(mockPayload, null, 2));
-          }
-          updateLineNumbers('responseBox', 'respLineNumbers');
-        }
-
-        function syntaxHighlightJson(json) {
-          json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-          return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
-            let cls = 'tok-str';
-            if (/^"/.test(match)) {
-              if (/:$/.test(match)) cls = 'tok-prop';
-            } else if (/true|false|null/.test(match)) {
-              cls = 'tok-kw';
-            } else {
-              cls = 'tok-num';
-            }
-            return '<span class="' + cls + '">' + match + '</span>';
-          });
-        }
-
-        function copyCodeSnippet() {
-          const text = document.getElementById('codeSnippetBox').innerText;
-          navigator.clipboard.writeText(text);
-          showToast('Code snippet copied!');
-        }
-
-        function filterNavEndpoints(val) {
-          const text = val.toLowerCase();
-          document.querySelectorAll('.nav-item').forEach(link => {
-            const matches = link.innerText.toLowerCase().includes(text);
-            link.style.display = matches ? 'flex' : 'none';
-          });
-        }
-
-        // Boot Init
-        initFirebase();
-        renderTopicView();
-      </script>
-</body>
-
-</html>
+    </html>

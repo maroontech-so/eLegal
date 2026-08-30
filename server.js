@@ -1234,6 +1234,142 @@ app.get('/api/pdf-proxy', async (req, res) => {
   }
 });
 
+function formatLegalDocumentHtml(inputHtml) {
+  if (!inputHtml) return '';
+
+  let html = inputHtml;
+
+  // If input is plain text, normalize to standard paragraph tags
+  if (!html.includes('<p') && !html.includes('<div') && !html.includes('<h')) {
+    html = '<p>' + html.split(/\n\s*\n/).map(p => p.trim()).filter(Boolean).join('</p><p>') + '</p>';
+  }
+
+  // Replace breaks with paragraph tags
+  html = html.replace(/<br\s*\/?>/gi, '</p><p>');
+
+  // Split into individual block elements (<p>...</p>, <div>...</div>, <h1>...</h1>, etc.)
+  const blockRegex = /<([a-z0-9]+)([^>]*)>([\s\S]*?)<\/\1>/gi;
+  let match;
+  let blocks = [];
+
+  while ((match = blockRegex.exec(html)) !== null) {
+    const rawContent = match[3];
+    const textOnly = rawContent.replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
+    if (textOnly) {
+      blocks.push({
+        tag: match[1],
+        attrs: match[2],
+        content: rawContent,
+        text: textOnly
+      });
+    }
+  }
+
+  if (blocks.length === 0) {
+    const rawLines = html.split(/\n+/).map(l => l.trim()).filter(Boolean);
+    blocks = rawLines.map(l => ({ tag: 'p', attrs: '', content: l, text: l }));
+  }
+
+  // Identify the header boundary (encompasses title, citation, republic, court, case no, judges, dates, parties, application summary, up to RULING/JUDGMENT)
+  let headerEndIndex = -1;
+
+  for (let i = 0; i < Math.min(blocks.length, 45); i++) {
+    const t = blocks[i].text.trim();
+
+    // Check if this is the standalone heading like JUDGMENT, RULING, ORDER
+    if (/^(?:RULING|JUDGMENT|ORDER|DECREE|DECISION|SENTENCE|ADVISORY OPINION|RULING & ORDER|JUDGMENT & DECREE)$/i.test(t) ||
+        /^(?:JUDGMENT OF THE COURT|RULING OF THE COURT|ORDER OF THE COURT|DECISION OF THE COURT)$/i.test(t)) {
+      headerEndIndex = i;
+      break;
+    }
+
+    // Check if substantive numbered paragraphs or sections started (e.g. "1. ", "[1] ", "Introduction")
+    if (i > 3 && (/^(?:\[?\d+\]?[\.\)]\s+|[1-9]\s+[A-Z]|INTRODUCTION|BACKGROUND|THE CLAIM|THE DEFENCE|THE PETITION|REASONS FOR|PRELIMINARY OBJECTION)/i.test(t))) {
+      headerEndIndex = i - 1;
+      break;
+    }
+  }
+
+  // Fallback for parties listing if no explicit RULING/JUDGMENT heading
+  if (headerEndIndex === -1) {
+    let lastPartyIndex = -1;
+    for (let i = 0; i < Math.min(blocks.length, 35); i++) {
+      const t = blocks[i].text.toUpperCase();
+      if (/APPLICANT|RESPONDENT|PLAINTIFF|DEFENDANT|APPELLANT|PETITIONER|ACCUSED|CLAIMANT/i.test(t) ||
+          /^(?:AND|VERSUS|=VERSUS=|-VERSUS-|V\.?)$/i.test(t)) {
+        lastPartyIndex = i;
+      }
+    }
+    if (lastPartyIndex > 0) {
+      if (lastPartyIndex + 1 < blocks.length && blocks[lastPartyIndex + 1].text.trim().startsWith('(')) {
+        headerEndIndex = lastPartyIndex + 1;
+      } else {
+        headerEndIndex = lastPartyIndex;
+      }
+    }
+  }
+
+  // Fallback for Statutes (LAWS OF KENYA ... Assented to ... Commenced on ...)
+  if (headerEndIndex === -1) {
+    for (let i = 0; i < Math.min(blocks.length, 20); i++) {
+      const t = blocks[i].text;
+      if (/Assented to|Commenced on|Date of Assent|Revised Edition/i.test(t)) {
+        headerEndIndex = i;
+        break;
+      }
+    }
+  }
+
+  // Format blocks
+  return blocks.map((block, idx) => {
+    let rawText = block.text;
+    let cleanContent = block.content.trim();
+    if (!rawText) return '';
+
+    // If within header region: Bold & Center align!
+    if (headerEndIndex >= 0 && idx <= headerEndIndex) {
+      const innerText = cleanContent.replace(/<\/?(p|div|strong|b|h\d|span)[^>]*>/gi, '').trim();
+
+      if (/^(?:RULING|JUDGMENT|ORDER|DECREE|DECISION|SENTENCE|ADVISORY OPINION)$/i.test(innerText) ||
+          /^(?:JUDGMENT OF THE COURT|RULING OF THE COURT|ORDER OF THE COURT)$/i.test(innerText)) {
+        return `<h2 class="ql-align-center" style="text-align: center; font-weight: bold; margin: 1.5em 0 1em 0; font-size: 1.4em; text-transform: uppercase;"><strong>${innerText}</strong></h2>`;
+      }
+
+      if (/^(?:REPUBLIC OF KENYA|LAWS OF KENYA)$/i.test(innerText)) {
+        return `<p class="ql-align-center" style="text-align: center; font-weight: bold; margin: 0.6em 0; font-size: 1.2em; text-transform: uppercase;"><strong>${innerText}</strong></p>`;
+      }
+
+      if (/^(?:IN THE (?:COURT|SUPREME|HIGH|ENVIRONMENT|EMPLOYMENT|CHIEF MAGISTRATE))/i.test(innerText)) {
+        return `<p class="ql-align-center" style="text-align: center; font-weight: bold; margin: 0.5em 0; font-size: 1.1em;"><strong>${innerText}</strong></p>`;
+      }
+
+      // Statute title in header
+      if (/ACT,?\s*\d{4}|ACT\s+CAP|CONSTITUTION OF KENYA/i.test(innerText) && innerText.length < 80) {
+        return `<h1 class="ql-align-center" style="text-align: center; font-weight: bold; margin: 0.8em 0; font-size: 1.35em; text-transform: uppercase;"><strong>${innerText}</strong></h1>`;
+      }
+
+      return `<p class="ql-align-center" style="text-align: center; font-weight: bold; margin: 0.35em 0;"><strong>${innerText}</strong></p>`;
+    }
+
+    // Substantive Headings
+    if (/^(?:Introduction|Background|Issues for Determination|Analysis and Determination|Analysis & Determination|The Claim|The Defence|Conclusion|Final Orders?|Disposition|Ruling|Judgment|Orders?|PART\s+[IVXLCDM]+.*)\s*$/i.test(rawText)) {
+      if (/^PART\s+[IVXLCDM]+/i.test(rawText)) {
+        return `<h3 class="ql-align-center" style="text-align: center; font-weight: bold; margin: 1.8em 0 0.8em 0; font-size: 1.2em; text-transform: uppercase;"><strong>${rawText}</strong></h3>`;
+      }
+      return `<h3 style="font-weight: bold; margin: 1.5em 0 0.6em 0; font-size: 1.2em;"><strong>${rawText}</strong></h3>`;
+    }
+
+    // Numbered paragraphs / section items
+    if (/^(\d+[\.\)]\s+|\[\d+\]\s+)/.test(rawText)) {
+      const numMatch = rawText.match(/^(\d+[\.\)]\s+|\[\d+\]\s+)/);
+      const rest = rawText.substring(numMatch[0].length);
+      return `<p style="margin-bottom: 1em; line-height: 1.7;"><strong>${numMatch[0]}</strong>${rest}</p>`;
+    }
+
+    return `<p style="margin-bottom: 1em; line-height: 1.7;">${cleanContent}</p>`;
+  }).filter(Boolean).join('\n');
+}
+
 async function extractTextFromPdf(pdfBuffer) {
   try {
     let rawText = '';
@@ -1247,28 +1383,11 @@ async function extractTextFromPdf(pdfBuffer) {
     }
     if (!rawText.trim()) return { plainText: '', bodyHtml: '' };
 
-    // Break into clean paragraphs
-    const paragraphs = rawText
-      .split(/\n\s*\n/)
-      .map(p => p.trim())
-      .filter(p => p.length > 0);
-
-    const htmlParts = paragraphs.map(p => {
-      // Clean inline linebreaks inside a paragraph
-      const cleanP = p.replace(/\n+/g, ' ');
-      // Detect header-like structure or paragraph numbers
-      if (/^(?:IN THE|REPUBLIC OF|NEUTRAL CITATION|BETWEEN|AND|JUDGMENT|RULING|ORDER)/i.test(cleanP)) {
-        return `<p class="akn-heading" style="text-align: center; font-weight: bold; margin: 1.2em 0;">${cleanP}</p>`;
-      }
-      if (/^\d+[\.\)]\s/.test(cleanP)) {
-        return `<p class="akn-paragraph" style="margin-left: 2.5em; text-indent: -1.5em; margin-bottom: 1.8em; line-height: 1.7;">${cleanP}</p>`;
-      }
-      return `<p style="margin-bottom: 1.5em; line-height: 1.7;">${cleanP}</p>`;
-    });
+    const bodyHtml = formatLegalDocumentHtml(rawText);
 
     return {
       plainText: rawText,
-      bodyHtml: htmlParts.join('\n')
+      bodyHtml
     };
   } catch (e) {
     console.warn('[pdf-parse] Text extraction from PDF buffer failed:', e.message);
@@ -1305,19 +1424,9 @@ function cleanLegalDocumentContent(rawHtml = '') {
 
     let aknBody = containerMatch ? containerMatch[1] : clean;
 
-    // Convert AKN headers and centered items
-    aknBody = aknBody.replace(/<div[^>]*class=["'][^"']*(?:republic-head|doc-authority|akn-docTitle|tausi-header|akn-header)["'][^>]*>([\s\S]*?)<\/div>/gi, '<p class="ql-align-center"><strong>$1</strong></p>');
-    aknBody = aknBody.replace(/<div[^>]*class=["'][^"']*(?:parties-listing|party-listing|docket-number|judges|doc-date)["'][^>]*>([\s\S]*?)<\/div>/gi, '<p class="ql-align-center">$1</p>');
-    
-    // Convert headings
-    aknBody = aknBody.replace(/<div[^>]*class=["'][^"']*(?:akn-heading|doc-heading)["'][^>]*>([\s\S]*?)<\/div>/gi, '<h2>$1</h2>');
-    
-    // Convert paragraphs with numbering
-    aknBody = aknBody.replace(/<div[^>]*class=["'][^"']*akn-paragraph[^"']*["'][^>]*>([\s\S]*?)<\/div>/gi, '<p>$1</p>');
-    aknBody = aknBody.replace(/<span[^>]*class=["'][^"']*akn-num[^"']*["'][^>]*>([\s\S]*?)<\/span>/gi, '<strong>$1</strong> ');
-
     const plainText = aknBody.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
-    return { bodyHtml: aknBody, plainText };
+    const formattedHtml = formatLegalDocumentHtml(aknBody);
+    return { bodyHtml: formattedHtml, plainText };
   }
 
   // 2. Standard Web & Legal HTML parser
@@ -1374,7 +1483,8 @@ function cleanLegalDocumentContent(rawHtml = '') {
     plainText = rawHtml.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
   }
 
-  return { bodyHtml, plainText };
+  const formattedHtml = formatLegalDocumentHtml(bodyHtml);
+  return { bodyHtml: formattedHtml, plainText };
 }
 
 async function fetchRealLegalDocument(url, reqTitle = '', reqYear = '', reqType = '', reqSource = '') {
@@ -1421,6 +1531,7 @@ async function fetchRealLegalDocument(url, reqTitle = '', reqYear = '', reqType 
           const { value: html } = await mammoth.convertToHtml({ buffer: buf });
           const { value: text } = await mammoth.extractRawText({ buffer: buf });
           if (text && text.trim().length > 100) {
+            const formattedHtml = formatLegalDocumentHtml(html || text);
             return {
               success: true,
               format: 'docx',
@@ -1431,7 +1542,7 @@ async function fetchRealLegalDocument(url, reqTitle = '', reqYear = '', reqType 
               url: normSource,
               sourceUrl: normSource,
               text: text.trim(),
-              html: html,
+              html: formattedHtml,
               buffer: buf
             };
           }
@@ -1616,6 +1727,7 @@ app.get(['/api/document-content', '/api/document', '/api/v1/document', '/api/v1/
       const top = groundedResults[0];
       if (top.text || (top.snippets && top.snippets.length > 0)) {
         const fullContent = top.text || top.snippets.join('\n\n');
+        const formattedHtml = formatLegalDocumentHtml(fullContent);
         const docMeta = enrichDocumentMetadata({
           title: top.title || reqTitle,
           citation: top.citation || reqTitle,
@@ -1625,7 +1737,7 @@ app.get(['/api/document-content', '/api/document', '/api/v1/document', '/api/v1/
           type: top.type || reqType,
           source: top.source || 'Kenya Law Official Records',
           text: fullContent,
-          html: `<div class="legal-doc">${fullContent.split('\n\n').map(p => `<p>${p}</p>`).join('')}</div>`,
+          html: formattedHtml,
           cached: false
         });
         return res.json({
@@ -4059,5 +4171,6 @@ module.exports = {
   createApiKey,
   generateApiKey,
   fetchRealLegalDocument,
-  cleanLegalDocumentContent
+  cleanLegalDocumentContent,
+  formatLegalDocumentHtml
 };

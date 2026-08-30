@@ -5,17 +5,20 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes" />
     <title>eLegal | Kenya Judicial Document & Statute Reader</title>
-    <meta name="description" content="Read and edit Kenya eKLR court decisions, legal precedents, and Acts of Parliament with AI-grounded legal brief summarization and Word export." />
+    <meta name="description"
+        content="Read and edit Kenya eKLR court decisions, legal precedents, and Acts of Parliament with AI-grounded legal brief summarization and Word export." />
     <meta name="robots" content="index, follow" />
     <link rel="canonical" href="https://elegal.or.ke/read" />
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-    
+
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet" />
-    
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&display=swap"
+        rel="stylesheet" />
+
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-    
+
     <!-- Quill.js Rich Text Editor CSS -->
     <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet" />
 
@@ -88,13 +91,16 @@
             width: 6px;
             height: 6px;
         }
+
         ::-webkit-scrollbar-track {
             background: transparent;
         }
+
         ::-webkit-scrollbar-thumb {
             background: var(--border-color);
             border-radius: 3px;
         }
+
         ::-webkit-scrollbar-thumb:hover {
             background: var(--text-muted);
         }
@@ -148,6 +154,7 @@
             cursor: pointer;
             flex-shrink: 0;
         }
+
         .back-btn:hover {
             background: rgba(13, 92, 58, 0.18);
             transform: translateX(-2px);
@@ -185,16 +192,19 @@
             display: inline-flex;
             align-items: center;
         }
+
         .badge-year {
             background: var(--accent-gold-light);
             color: #7A5500;
             border-color: rgba(197, 160, 89, 0.25);
         }
+
         .badge-type {
             background: #EBF3FA;
             color: #0055A5;
             border-color: rgba(0, 85, 165, 0.15);
         }
+
         .badge-source {
             background: #F0F0F0;
             color: #4A4A4A;
@@ -220,6 +230,7 @@
             font-family: var(--font-body);
             line-height: 1.4;
         }
+
         .source-btn:hover,
         .btn-icon-text:hover {
             background: var(--accent-green-light);
@@ -241,6 +252,7 @@
             flex-shrink: 0;
             gap: 8px;
         }
+
         #action-bar.hidden {
             display: none !important;
         }
@@ -259,6 +271,7 @@
             border-radius: 6px;
             overflow: hidden;
         }
+
         .zoom-control-box button {
             background: transparent;
             border: none;
@@ -267,9 +280,11 @@
             cursor: pointer;
             transition: background 0.1s;
         }
+
         .zoom-control-box button:hover {
             background: #e2e8f0;
         }
+
         .zoom-control-box span {
             padding: 3px 8px;
             font-size: 0.75rem;
@@ -298,6 +313,7 @@
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
             gap: 4px;
         }
+
         #toolbar-container.hidden {
             display: none !important;
         }
@@ -306,6 +322,7 @@
             border: none !important;
             font-family: var(--font-body) !important;
         }
+
         .ql-snow .ql-picker-label {
             padding-left: 8px;
             font-weight: 500;
@@ -333,6 +350,7 @@
             padding: 24px 16px 100px 16px;
             transition: opacity 0.3s ease;
         }
+
         #editor-wrapper.hidden {
             display: none !important;
         }
@@ -342,7 +360,8 @@
             box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
             margin: 0 auto;
             width: 100%;
-            max-width: 850px; /* Standard A4 Page Look */
+            max-width: 850px;
+            /* Standard A4 Page Look */
             min-height: 1100px;
             padding: 50px 70px;
             font-family: 'Times New Roman', Times, 'Source Serif 4', Georgia, serif;
@@ -375,6 +394,7 @@
             color: #0f172a;
             letter-spacing: 0.02em;
         }
+
         .ql-editor h2 {
             font-size: 1.15em;
             font-weight: bold;
@@ -383,19 +403,34 @@
             margin-bottom: 0.8em;
             color: #0f172a;
         }
+
         .ql-editor p {
             margin-bottom: 1em;
             text-align: justify;
         }
+
         .ql-editor .center-text,
-        .ql-editor .ql-align-center {
-            text-align: center;
+        .ql-editor .ql-align-center,
+        .ql-editor p.ql-align-center,
+        .ql-editor h1.ql-align-center,
+        .ql-editor h2.ql-align-center,
+        .ql-editor h3.ql-align-center,
+        .ql-editor p[style*="text-align: center"],
+        .ql-editor p[style*="text-align:center"] {
+            text-align: center !important;
         }
+
+        .ql-editor strong,
+        .ql-editor b {
+            font-weight: 700 !important;
+        }
+
         .ql-editor .ql-align-right {
-            text-align: right;
+            text-align: right !important;
         }
+
         .ql-editor .ql-align-justify {
-            text-align: justify;
+            text-align: justify !important;
         }
 
         /* ============================================================
@@ -413,6 +448,7 @@
             z-index: 20;
             transition: opacity 0.3s ease;
         }
+
         #upload-state.hidden {
             display: none !important;
         }
@@ -441,6 +477,7 @@
             justify-content: center;
             margin-top: 20px;
         }
+
         .drop-zone-box:hover,
         .drop-zone-box.drag-active {
             border-color: var(--accent-green);
@@ -462,6 +499,7 @@
             backdrop-filter: blur(8px);
             z-index: 70;
         }
+
         #loading-state.hidden {
             display: none !important;
         }
@@ -474,9 +512,15 @@
             height: 44px;
             animation: spin 0.9s linear infinite;
         }
+
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
         }
 
         /* ============================================================
@@ -490,6 +534,7 @@
             gap: 20px;
             padding: 24px 16px 100px 16px;
         }
+
         .page-wrapper {
             background: white;
             border-radius: 4px;
@@ -500,6 +545,7 @@
             align-items: center;
             max-width: 100%;
         }
+
         .page-wrapper canvas {
             display: block;
             height: auto;
@@ -530,6 +576,7 @@
             cursor: pointer;
             transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
         }
+
         .fab-summary-btn:hover {
             transform: translateY(-3px) scale(1.03);
             background: #1e293b;
@@ -545,6 +592,7 @@
             display: none;
             justify-content: flex-end;
         }
+
         .summary-overlay.active {
             display: flex;
         }
@@ -559,9 +607,15 @@
             flex-direction: column;
             animation: slideLeft 0.25s cubic-bezier(0.16, 1, 0.3, 1);
         }
+
         @keyframes slideLeft {
-            from { transform: translateX(100%); }
-            to { transform: translateX(0); }
+            from {
+                transform: translateX(100%);
+            }
+
+            to {
+                transform: translateX(0);
+            }
         }
 
         .summary-header {
@@ -572,6 +626,7 @@
             align-items: center;
             background: #f8fafc;
         }
+
         .summary-title {
             font-weight: 700;
             font-size: 1rem;
@@ -580,6 +635,7 @@
             align-items: center;
             gap: 8px;
         }
+
         .summary-close-btn {
             background: transparent;
             border: none;
@@ -589,6 +645,7 @@
             padding: 4px;
             line-height: 1;
         }
+
         .summary-close-btn:hover {
             color: #0f172a;
         }
@@ -602,6 +659,7 @@
             line-height: 1.7;
             color: #334155;
         }
+
         .summary-footer {
             padding: 12px 20px;
             border-top: 1px solid #e2e8f0;
@@ -615,11 +673,39 @@
            PRINT STYLES
            ============================================================ */
         @media print {
-            body * { visibility: hidden; }
-            #editor-wrapper, #editor-wrapper * { visibility: visible; }
-            #editor-wrapper { position: absolute; left: 0; top: 0; width: 100%; padding: 0; margin: 0; }
-            #editor-container { box-shadow: none !important; margin: 0 !important; padding: 20px !important; transform: none !important; max-width: none !important; }
-            .toolbar, #action-bar, #toolbar-container, .fab-summary-btn, .summary-overlay { display: none !important; }
+            body * {
+                visibility: hidden;
+            }
+
+            #editor-wrapper,
+            #editor-wrapper * {
+                visibility: visible;
+            }
+
+            #editor-wrapper {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                padding: 0;
+                margin: 0;
+            }
+
+            #editor-container {
+                box-shadow: none !important;
+                margin: 0 !important;
+                padding: 20px !important;
+                transform: none !important;
+                max-width: none !important;
+            }
+
+            .toolbar,
+            #action-bar,
+            #toolbar-container,
+            .fab-summary-btn,
+            .summary-overlay {
+                display: none !important;
+            }
         }
     </style>
 </head>
@@ -639,23 +725,27 @@
             <span class="badge badge-type" id="badgeType" style="display:none;">Type</span>
             <span class="badge badge-source" id="badgeSource" style="display:none;">Source</span>
             <span class="badge" id="pageInfo">Rich Editor</span>
-            
-            <button id="btnToggleView" class="source-btn" title="Toggle between Interactive Rich Text Editor and Canvas PDF Viewer">
+
+            <button id="btnToggleView" class="source-btn"
+                title="Toggle between Interactive Rich Text Editor and Canvas PDF Viewer">
                 <i class="fa-regular fa-file-pdf"></i>
                 <span id="btnToggleViewText">PDF View</span>
             </button>
-            
-            <button id="btnDownloadPdf" class="source-btn" style="background: var(--accent-green); color: #ffffff; border-color: var(--accent-green);" title="Download original document PDF">
+
+            <button id="btnDownloadPdf" class="source-btn"
+                style="background: var(--accent-green); color: #ffffff; border-color: var(--accent-green);"
+                title="Download original document PDF">
                 <i class="fa-solid fa-download"></i>
                 <span id="btnDownloadPdfText">Download PDF</span>
             </button>
-            
+
             <button id="btnBookmark" class="source-btn" title="Save document to offline library">
                 <i class="fa-regular fa-bookmark"></i>
                 <span id="btnBookmarkText">Save</span>
             </button>
-            
-            <a href="#" id="externalLink" class="source-btn" style="display:none;" target="_blank" rel="noopener noreferrer" title="View on official registry">
+
+            <a href="#" id="externalLink" class="source-btn" style="display:none;" target="_blank"
+                rel="noopener noreferrer" title="View on official registry">
                 <span>Official Source</span>
                 <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 10px;"></i>
             </a>
@@ -669,24 +759,30 @@
                 <i class="fa-solid fa-folder-open" style="color: #2563eb;"></i>
                 <span>Open File</span>
             </button>
-            <span id="file-name-display" style="font-size: 0.8125rem; font-weight: 600; color: #475569; max-width: 220px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Document</span>
-            <span id="save-status" style="font-size: 0.75rem; color: #94a3b8; font-style: italic; margin-left: 4px;">Saved</span>
+            <span id="file-name-display"
+                style="font-size: 0.8125rem; font-weight: 600; color: #475569; max-width: 220px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Document</span>
+            <span id="save-status"
+                style="font-size: 0.75rem; color: #94a3b8; font-style: italic; margin-left: 4px;">Saved</span>
         </div>
 
         <div class="action-group">
             <!-- Zoom Controls -->
             <div class="zoom-control-box">
-                <button id="zoom-out-btn" title="Zoom Out (Reduce Size)"><i class="fa-solid fa-minus" style="font-size: 11px;"></i></button>
+                <button id="zoom-out-btn" title="Zoom Out (Reduce Size)"><i class="fa-solid fa-minus"
+                        style="font-size: 11px;"></i></button>
                 <span id="zoom-level">100%</span>
-                <button id="zoom-in-btn" title="Zoom In (Increase Size)"><i class="fa-solid fa-plus" style="font-size: 11px;"></i></button>
+                <button id="zoom-in-btn" title="Zoom In (Increase Size)"><i class="fa-solid fa-plus"
+                        style="font-size: 11px;"></i></button>
             </div>
-            
+
             <button id="print-btn" class="source-btn" title="Print document or Save as PDF">
                 <i class="fa-solid fa-print"></i>
                 <span>Print</span>
             </button>
-            
-            <button id="download-word-btn" class="source-btn" style="background: #eff6ff; color: #1d4ed8; border-color: #bfdbfe;" title="Download editable Word (.doc) file">
+
+            <button id="download-word-btn" class="source-btn"
+                style="background: #eff6ff; color: #1d4ed8; border-color: #bfdbfe;"
+                title="Download editable Word (.doc) file">
                 <i class="fa-solid fa-file-word" style="color: #2563eb;"></i>
                 <span>Export to Word</span>
             </button>
@@ -753,7 +849,8 @@
             <button class="ql-clean"></button>
         </span>
         <span class="ql-formats">
-            <button id="custom-find-btn" title="Find in document (Ctrl+F)"><i class="fa-solid fa-magnifying-glass" style="font-size: 13px;"></i></button>
+            <button id="custom-find-btn" title="Find in document (Ctrl+F)"><i class="fa-solid fa-magnifying-glass"
+                    style="font-size: 13px;"></i></button>
         </span>
     </div>
 
@@ -762,23 +859,30 @@
         <!-- Upload State -->
         <div id="upload-state" class="hidden">
             <div class="upload-card">
-                <div style="width: 60px; height: 60px; background: var(--accent-green-light); color: var(--accent-green); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px auto;">
+                <div
+                    style="width: 60px; height: 60px; background: var(--accent-green-light); color: var(--accent-green); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px auto;">
                     <i class="fa-solid fa-file-arrow-up" style="font-size: 26px;"></i>
                 </div>
-                <h2 style="font-size: 1.25rem; font-weight: 700; color: #0f172a; margin-bottom: 6px;">Open Legal Document</h2>
-                <p style="font-size: 0.875rem; color: #64748b; margin-bottom: 16px;">Upload a .docx or .pdf file to view, edit, and export.</p>
-                
+                <h2 style="font-size: 1.25rem; font-weight: 700; color: #0f172a; margin-bottom: 6px;">Open Legal
+                    Document</h2>
+                <p style="font-size: 0.875rem; color: #64748b; margin-bottom: 16px;">Upload a .docx or .pdf file to
+                    view, edit, and export.</p>
+
                 <div id="drop-zone" class="drop-zone-box">
                     <div style="display: flex; gap: 16px; margin-bottom: 12px;">
                         <i class="fa-regular fa-file-word" style="font-size: 32px; color: #2563eb;"></i>
                         <i class="fa-regular fa-file-pdf" style="font-size: 32px; color: #dc2626;"></i>
                     </div>
-                    <p style="font-size: 0.9375rem; font-weight: 600; color: #1e293b;">Drag & drop your document here</p>
+                    <p style="font-size: 0.9375rem; font-weight: 600; color: #1e293b;">Drag & drop your document here
+                    </p>
                     <p style="font-size: 0.8125rem; color: #94a3b8; margin-top: 4px;">or click to browse files</p>
-                    <input type="file" id="file-input" accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document,.pdf,application/pdf" style="display: none;" />
+                    <input type="file" id="file-input"
+                        accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document,.pdf,application/pdf"
+                        style="display: none;" />
                 </div>
-                
-                <div id="error-message" style="display: none; margin-top: 14px; padding: 10px 14px; background: #fef2f2; border: 1px solid #fecaca; color: #dc2626; border-radius: 8px; font-size: 0.8125rem; text-align: left;">
+
+                <div id="error-message"
+                    style="display: none; margin-top: 14px; padding: 10px 14px; background: #fef2f2; border: 1px solid #fecaca; color: #dc2626; border-radius: 8px; font-size: 0.8125rem; text-align: left;">
                     <i class="fa-solid fa-circle-exclamation" style="margin-right: 6px;"></i>
                     <span id="error-text">An error occurred.</span>
                 </div>
@@ -788,7 +892,8 @@
         <!-- Loading State -->
         <div id="loading-state">
             <div class="spinner" style="margin-bottom: 14px;"></div>
-            <p style="font-weight: 600; color: #334155; font-size: 1rem;" id="loading-text">Loading and formatting legal document...</p>
+            <p style="font-weight: 600; color: #334155; font-size: 1rem;" id="loading-text">Loading and formatting legal
+                document...</p>
         </div>
 
         <!-- Quill Editor Wrapper (Rich Document View) -->
@@ -819,8 +924,10 @@
             <div class="summary-body" id="summaryContent">
                 <div style="text-align: center; padding: 40px 0;">
                     <div class="spinner" style="margin: 0 auto 16px auto;"></div>
-                    <h3 style="font-size: 1.1rem; font-weight: 700; color: #0f172a; margin-bottom: 6px;">Generating Legal Brief</h3>
-                    <p style="font-size: 0.875rem; color: #64748b;">Analyzing holdings, facts, ratio decidendi, and statutory provisions...</p>
+                    <h3 style="font-size: 1.1rem; font-weight: 700; color: #0f172a; margin-bottom: 6px;">Generating
+                        Legal Brief</h3>
+                    <p style="font-size: 0.875rem; color: #64748b;">Analyzing holdings, facts, ratio decidendi, and
+                        statutory provisions...</p>
                 </div>
             </div>
             <div class="summary-footer">
@@ -915,7 +1022,7 @@
                         saveStatus.style.color = '#94a3b8';
                         try {
                             localStorage.setItem('elegal_editor_draft_' + (sourceUrl || displayTitle), quill.root.innerHTML);
-                        } catch (_) {}
+                        } catch (_) { }
                     }, 1000);
                 }
             });
@@ -1074,12 +1181,12 @@
             hideLoading();
             uploadState.classList.add('hidden');
             pagesContainer.style.display = 'none';
-            
+
             editorWrapper.classList.remove('hidden');
             toolbarContainer.classList.remove('hidden');
             actionBar.classList.remove('hidden');
             pageInfo.textContent = 'Rich Editor';
-            
+
             resetZoom();
         }
 
@@ -1118,6 +1225,128 @@
             reader.readAsArrayBuffer(file);
         }
 
+        function formatLegalDocumentHtml(inputHtml) {
+            if (!inputHtml) return '';
+            let html = inputHtml;
+
+            if (!html.includes('<p') && !html.includes('<div') && !html.includes('<h')) {
+                html = '<p>' + html.split(/\n\s*\n/).map(p => p.trim()).filter(Boolean).join('</p><p>') + '</p>';
+            }
+
+            html = html.replace(/<br\s*\/?>/gi, '</p><p>');
+
+            const blockRegex = /<([a-z0-9]+)([^>]*)>([\s\S]*?)<\/\1>/gi;
+            let match;
+            let blocks = [];
+
+            while ((match = blockRegex.exec(html)) !== null) {
+                const rawContent = match[3];
+                const textOnly = rawContent.replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
+                if (textOnly) {
+                    blocks.push({
+                        tag: match[1],
+                        attrs: match[2],
+                        content: rawContent,
+                        text: textOnly
+                    });
+                }
+            }
+
+            if (blocks.length === 0) {
+                const rawLines = html.split(/\n+/).map(l => l.trim()).filter(Boolean);
+                blocks = rawLines.map(l => ({ tag: 'p', attrs: '', content: l, text: l }));
+            }
+
+            let headerEndIndex = -1;
+
+            for (let i = 0; i < Math.min(blocks.length, 45); i++) {
+                const t = blocks[i].text.trim();
+
+                if (/^(?:RULING|JUDGMENT|ORDER|DECREE|DECISION|SENTENCE|ADVISORY OPINION|RULING & ORDER|JUDGMENT & DECREE)$/i.test(t) ||
+                    /^(?:JUDGMENT OF THE COURT|RULING OF THE COURT|ORDER OF THE COURT|DECISION OF THE COURT)$/i.test(t)) {
+                    headerEndIndex = i;
+                    break;
+                }
+
+                if (i > 3 && (/^(?:\[?\d+\]?[\.\)]\s+|[1-9]\s+[A-Z]|INTRODUCTION|BACKGROUND|THE CLAIM|THE DEFENCE|THE PETITION|REASONS FOR|PRELIMINARY OBJECTION)/i.test(t))) {
+                    headerEndIndex = i - 1;
+                    break;
+                }
+            }
+
+            if (headerEndIndex === -1) {
+                let lastPartyIndex = -1;
+                for (let i = 0; i < Math.min(blocks.length, 35); i++) {
+                    const t = blocks[i].text.toUpperCase();
+                    if (/APPLICANT|RESPONDENT|PLAINTIFF|DEFENDANT|APPELLANT|PETITIONER|ACCUSED|CLAIMANT/i.test(t) ||
+                        /^(?:AND|VERSUS|=VERSUS=|-VERSUS-|V\.?)$/i.test(t)) {
+                        lastPartyIndex = i;
+                    }
+                }
+                if (lastPartyIndex > 0) {
+                    if (lastPartyIndex + 1 < blocks.length && blocks[lastPartyIndex + 1].text.trim().startsWith('(')) {
+                        headerEndIndex = lastPartyIndex + 1;
+                    } else {
+                        headerEndIndex = lastPartyIndex;
+                    }
+                }
+            }
+
+            if (headerEndIndex === -1) {
+                for (let i = 0; i < Math.min(blocks.length, 20); i++) {
+                    const t = blocks[i].text;
+                    if (/Assented to|Commenced on|Date of Assent|Revised Edition/i.test(t)) {
+                        headerEndIndex = i;
+                        break;
+                    }
+                }
+            }
+
+            return blocks.map((block, idx) => {
+                let rawText = block.text;
+                let cleanContent = block.content.trim();
+                if (!rawText) return '';
+
+                if (headerEndIndex >= 0 && idx <= headerEndIndex) {
+                    const innerText = cleanContent.replace(/<\/?(p|div|strong|b|h\d|span)[^>]*>/gi, '').trim();
+
+                    if (/^(?:RULING|JUDGMENT|ORDER|DECREE|DECISION|SENTENCE|ADVISORY OPINION)$/i.test(innerText) ||
+                        /^(?:JUDGMENT OF THE COURT|RULING OF THE COURT|ORDER OF THE COURT)$/i.test(innerText)) {
+                        return `<h2 class="ql-align-center" style="text-align: center; font-weight: bold; margin: 1.5em 0 1em 0; font-size: 1.4em; text-transform: uppercase;"><strong>${innerText}</strong></h2>`;
+                    }
+
+                    if (/^(?:REPUBLIC OF KENYA|LAWS OF KENYA)$/i.test(innerText)) {
+                        return `<p class="ql-align-center" style="text-align: center; font-weight: bold; margin: 0.6em 0; font-size: 1.2em; text-transform: uppercase;"><strong>${innerText}</strong></p>`;
+                    }
+
+                    if (/^(?:IN THE (?:COURT|SUPREME|HIGH|ENVIRONMENT|EMPLOYMENT|CHIEF MAGISTRATE))/i.test(innerText)) {
+                        return `<p class="ql-align-center" style="text-align: center; font-weight: bold; margin: 0.5em 0; font-size: 1.1em;"><strong>${innerText}</strong></p>`;
+                    }
+
+                    if (/ACT,?\s*\d{4}|ACT\s+CAP|CONSTITUTION OF KENYA/i.test(innerText) && innerText.length < 80) {
+                        return `<h1 class="ql-align-center" style="text-align: center; font-weight: bold; margin: 0.8em 0; font-size: 1.35em; text-transform: uppercase;"><strong>${innerText}</strong></h1>`;
+                    }
+
+                    return `<p class="ql-align-center" style="text-align: center; font-weight: bold; margin: 0.35em 0;"><strong>${innerText}</strong></p>`;
+                }
+
+                if (/^(?:Introduction|Background|Issues for Determination|Analysis and Determination|Analysis & Determination|The Claim|The Defence|Conclusion|Final Orders?|Disposition|Ruling|Judgment|Orders?|PART\s+[IVXLCDM]+.*)\s*$/i.test(rawText)) {
+                    if (/^PART\s+[IVXLCDM]+/i.test(rawText)) {
+                        return `<h3 class="ql-align-center" style="text-align: center; font-weight: bold; margin: 1.8em 0 0.8em 0; font-size: 1.2em; text-transform: uppercase;"><strong>${rawText}</strong></h3>`;
+                    }
+                    return `<h3 style="font-weight: bold; margin: 1.5em 0 0.6em 0; font-size: 1.2em;"><strong>${rawText}</strong></h3>`;
+                }
+
+                if (/^(\d+[\.\)]\s+|\[\d+\]\s+)/.test(rawText)) {
+                    const numMatch = rawText.match(/^(\d+[\.\)]\s+|\[\d+\]\s+)/);
+                    const rest = rawText.substring(numMatch[0].length);
+                    return `<p style="margin-bottom: 1em; line-height: 1.7;"><strong>${numMatch[0]}</strong>${rest}</p>`;
+                }
+
+                return `<p style="margin-bottom: 1em; line-height: 1.7;">${cleanContent}</p>`;
+            }).filter(Boolean).join('\n');
+        }
+
         // Mammoth.js DOCX Converter
         function processDocx(arrayBuffer) {
             const options = {
@@ -1136,7 +1365,8 @@
 
             mammoth.convertToHtml({ arrayBuffer }, options)
                 .then((result) => {
-                    const cleanHtml = DOMPurify.sanitize(result.value);
+                    const formatted = formatLegalDocumentHtml(result.value);
+                    const cleanHtml = DOMPurify.sanitize(formatted);
                     quill.clipboard.dangerouslyPasteHTML(cleanHtml);
                     showEditor();
                 })
@@ -1152,7 +1382,6 @@
                 const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
                 let fullHtml = '';
                 let currentParagraph = '';
-                let passedHeading = false;
 
                 for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
                     const page = await pdf.getPage(pageNum);
@@ -1175,49 +1404,17 @@
                         if (!lineText) continue;
                         if (lineText.includes('kenyalaw.org') || lineText.match(/^\[Page \d+\]$/) || lineText === 'KENYA LAW' || lineText === 'THE NATIONAL COUNCIL FOR LAW REPORTING') continue;
 
-                        const isSectionHeading = lineText === 'RULING' || lineText === 'JUDGMENT' || lineText === 'Analysis and Determination' || lineText.startsWith('Whether ');
+                        const prevY = i > 0 ? sortedY[i - 1] : null;
+                        const lineSpacing = prevY ? Math.abs(prevY - y) : 0;
 
-                        if (isSectionHeading) {
-                            if (currentParagraph) {
-                                fullHtml += `<p>${currentParagraph}</p>`;
-                                currentParagraph = '';
-                            }
-                            passedHeading = true;
-                            fullHtml += (lineText === 'RULING' || lineText === 'JUDGMENT') ? `<h1>${lineText}</h1>` : `<h2>${lineText}</h2>`;
-                            continue;
-                        }
-
-                        // Centered Heading Heuristics
-                        const isLikelyHeaderPart = !passedHeading && lineText.length < 120 && !lineText.match(/^([0-9]+\.|[ivx]+\.)\s+(.*)/i);
-                        if (isLikelyHeaderPart) {
-                            if (currentParagraph) {
-                                fullHtml += `<p>${currentParagraph}</p>`;
-                                currentParagraph = '';
-                            }
-                            fullHtml += `<p class="ql-align-center"><strong>${lineText}</strong></p>`;
-                            continue;
-                        }
-
-                        const listMatch = lineText.match(/^([0-9]+\.|[ivx]+\.)\s+(.*)/i);
-                        if (listMatch) {
-                            passedHeading = true;
-                            if (currentParagraph) {
-                                fullHtml += `<p>${currentParagraph}</p>`;
-                            }
-                            currentParagraph = `<strong>${listMatch[1]}</strong> ${listMatch[2]}`;
+                        if (lineSpacing > 25 && currentParagraph) {
+                            fullHtml += `<p>${currentParagraph}</p>`;
+                            currentParagraph = lineText;
                         } else {
-                            const prevY = i > 0 ? sortedY[i - 1] : null;
-                            const lineSpacing = prevY ? Math.abs(prevY - y) : 0;
-
-                            if (lineSpacing > 25 && currentParagraph) {
-                                fullHtml += `<p>${currentParagraph}</p>`;
-                                currentParagraph = lineText;
+                            if (currentParagraph) {
+                                currentParagraph += (currentParagraph.endsWith('-') ? currentParagraph.slice(0, -1) : ' ') + lineText;
                             } else {
-                                if (currentParagraph) {
-                                    currentParagraph += (currentParagraph.endsWith('-') ? currentParagraph.slice(0, -1) : ' ') + lineText;
-                                } else {
-                                    currentParagraph = lineText;
-                                }
+                                currentParagraph = lineText;
                             }
                         }
                     }
@@ -1225,7 +1422,8 @@
 
                 if (currentParagraph) fullHtml += `<p>${currentParagraph}</p>`;
 
-                const cleanHtml = DOMPurify.sanitize(fullHtml);
+                const formatted = formatLegalDocumentHtml(fullHtml);
+                const cleanHtml = DOMPurify.sanitize(formatted);
                 quill.clipboard.dangerouslyPasteHTML(cleanHtml);
                 showEditor();
             } catch (err) {
@@ -1437,18 +1635,11 @@
 
                     // If clean text / HTML returned
                     if (data.html || data.text) {
-                        let cleanHtml = '';
-                        if (data.html && data.html.trim().length > 30) {
-                            cleanHtml = DOMPurify.sanitize(data.html);
-                        } else if (data.text) {
-                            const formatted = data.text.split(/\n\s*\n/).map(p => `<p>${p.trim()}</p>`).join('');
-                            cleanHtml = DOMPurify.sanitize(formatted);
-                        }
-                        if (cleanHtml) {
-                            quill.clipboard.dangerouslyPasteHTML(cleanHtml);
-                            showEditor();
-                            return;
-                        }
+                        const formatted = formatLegalDocumentHtml(data.html || data.text);
+                        const cleanHtml = DOMPurify.sanitize(formatted);
+                        quill.clipboard.dangerouslyPasteHTML(cleanHtml);
+                        showEditor();
+                        return;
                     }
                 }
             } catch (e) {

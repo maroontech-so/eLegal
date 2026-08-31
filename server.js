@@ -4143,6 +4143,7 @@ module.exports = {
   generateApiKey,
   fetchRealLegalDocument,
   cleanLegalDocumentContent,
+  formatLegalDocumentHtml
   formatLegalDocumentHtml,
   crawlDailyBulletins,
   runBulletinCrawlerIfNeeded

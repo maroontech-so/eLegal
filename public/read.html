@@ -1022,7 +1022,7 @@
                         saveStatus.style.color = '#94a3b8';
                         try {
                             localStorage.setItem('elegal_editor_draft_' + (sourceUrl || displayTitle), quill.root.innerHTML);
-                        } catch (_) { }
+                        }  catch (_) { }
                     }, 1000);
                 }
             });
@@ -1180,14 +1180,12 @@
         function showEditor() {
             hideLoading();
             uploadState.classList.add('hidden');
-            pagesContainer.style.display = 'none';
-
+            pagesContainer.style.displa
             editorWrapper.classList.remove('hidden');
             toolbarContainer.classList.remove('hidden');
             actionBar.classList.remove('hidden');
             pageInfo.textContent = 'Rich Editor';
-
-            resetZoom();
+ resetZoom();
         }
 
         function showUploadState() {
@@ -1690,7 +1688,7 @@
             }
 
             function isSaved() {
-                const key = (sourceUrl || displayTitle).toLowerCase().trim();
+                const keysou|| displayTitle).toLowerCase().trim();
                 const docs = getSavedDocs();
                 return docs.some(d => (d.readUrl || d.url || d.title || '').toLowerCase().trim() === key);
             }

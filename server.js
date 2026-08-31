@@ -36,6 +36,7 @@ const { v2: cloudinary } = require('cloudinary');
 const pdfParse = require('pdf-parse');
 const mammoth = require('mammoth');
 const { classifyQueryOpenSourceML } = require('./src/ml-classifier');
+const { crawlDailyBulletins, runBulletinCrawlerIfNeeded } = require('./src/bulletin-crawler');
 
 // Initialize Cloudinary safely
 function getCloudinary() {
@@ -1278,7 +1279,7 @@ function formatLegalDocumentHtml(inputHtml) {
 
     // Check if this is the standalone heading like JUDGMENT, RULING, ORDER
     if (/^(?:RULING|JUDGMENT|ORDER|DECREE|DECISION|SENTENCE|ADVISORY OPINION|RULING & ORDER|JUDGMENT & DECREE)$/i.test(t) ||
-        /^(?:JUDGMENT OF THE COURT|RULING OF THE COURT|ORDER OF THE COURT|DECISION OF THE COURT)$/i.test(t)) {
+      /^(?:JUDGMENT OF THE COURT|RULING OF THE COURT|ORDER OF THE COURT|DECISION OF THE COURT)$/i.test(t)) {
       headerEndIndex = i;
       break;
     }
@@ -1296,7 +1297,7 @@ function formatLegalDocumentHtml(inputHtml) {
     for (let i = 0; i < Math.min(blocks.length, 35); i++) {
       const t = blocks[i].text.toUpperCase();
       if (/APPLICANT|RESPONDENT|PLAINTIFF|DEFENDANT|APPELLANT|PETITIONER|ACCUSED|CLAIMANT/i.test(t) ||
-          /^(?:AND|VERSUS|=VERSUS=|-VERSUS-|V\.?)$/i.test(t)) {
+        /^(?:AND|VERSUS|=VERSUS=|-VERSUS-|V\.?)$/i.test(t)) {
         lastPartyIndex = i;
       }
     }
@@ -1331,7 +1332,7 @@ function formatLegalDocumentHtml(inputHtml) {
       const innerText = cleanContent.replace(/<\/?(p|div|strong|b|h\d|span)[^>]*>/gi, '').trim();
 
       if (/^(?:RULING|JUDGMENT|ORDER|DECREE|DECISION|SENTENCE|ADVISORY OPINION)$/i.test(innerText) ||
-          /^(?:JUDGMENT OF THE COURT|RULING OF THE COURT|ORDER OF THE COURT)$/i.test(innerText)) {
+        /^(?:JUDGMENT OF THE COURT|RULING OF THE COURT|ORDER OF THE COURT)$/i.test(innerText)) {
         return `<h2 class="ql-align-center" style="text-align: center; font-weight: bold; margin: 1.5em 0 1em 0; font-size: 1.4em; text-transform: uppercase;"><strong>${innerText}</strong></h2>`;
       }
 
@@ -1405,10 +1406,10 @@ function cleanLegalDocumentContent(rawHtml = '') {
 
   // 1. Specialized Akoma Ntoso (AKN) / Kenya Law parser
   const isAkn = rawHtml.includes('la-akoma-ntoso') ||
-                rawHtml.includes('akn-judgment') ||
-                rawHtml.includes('akn-act') ||
-                rawHtml.includes('content-and-enrichments') ||
-                rawHtml.includes('frbr-doctype-judgment');
+    rawHtml.includes('akn-judgment') ||
+    rawHtml.includes('akn-act') ||
+    rawHtml.includes('content-and-enrichments') ||
+    rawHtml.includes('frbr-doctype-judgment');
 
   if (isAkn) {
     let clean = rawHtml
@@ -1419,8 +1420,8 @@ function cleanLegalDocumentContent(rawHtml = '') {
       .replace(/<header class=["'](?:site-header|header)["'][\s\S]*?<\/header>/gi, '');
 
     const containerMatch = clean.match(/<div[^>]*class=["'][^"']*(?:content-and-enrichments|la-akoma-ntoso|akn-judgment|akn-act)[^"']*["'][^>]*>([\s\S]*?)<\/div>\s*<\/main>/i) ||
-                           clean.match(/<div[^>]*class=["']la-akoma-ntoso[\"'][^>]*>([\s\S]*?)<\/div>/i) ||
-                           clean.match(/<main[^>]*>([\s\S]*?)<\/main>/i);
+      clean.match(/<div[^>]*class=["']la-akoma-ntoso[\"'][^>]*>([\s\S]*?)<\/div>/i) ||
+      clean.match(/<main[^>]*>([\s\S]*?)<\/main>/i);
 
     let aknBody = containerMatch ? containerMatch[1] : clean;
 
@@ -3806,36 +3807,6 @@ function scheduleDailyBulletinUpdates() {
   }, 60 * 1000);
 }
 
-function runBulletinCrawlerIfNeeded(force = false) {
-  const crawledPath = path.join(__dirname, 'data', 'daily_legal_news.json');
-  let shouldRun = force;
-  if (!shouldRun) {
-    if (!fs.existsSync(crawledPath)) {
-      shouldRun = true;
-    } else {
-      try {
-        const stats = fs.statSync(crawledPath);
-        const ageMs = Date.now() - stats.mtimeMs;
-        if (ageMs > 6 * 60 * 60 * 1000) { // 6 hours
-          shouldRun = true;
-        }
-      } catch (e) {
-        shouldRun = true;
-      }
-    }
-  }
-  if (shouldRun) {
-    console.log('[bulletins] Running python live legal news crawler...');
-    execFile('python3', [path.join(__dirname, 'crawl_bulletins.py')], (err, stdout, stderr) => {
-      if (err) {
-        console.warn('[bulletins] Crawler execution note:', err.message);
-      } else {
-        console.log('[bulletins] Live legal news crawler finished successfully.');
-      }
-    });
-  }
-}
-
 app.post('/api/bulletins/refresh', (req, res) => {
   runBulletinCrawlerIfNeeded(true);
   res.json({ status: 'ok', message: 'Refreshing live legal bulletins feed...' });
@@ -4172,5 +4143,7 @@ module.exports = {
   generateApiKey,
   fetchRealLegalDocument,
   cleanLegalDocumentContent,
-  formatLegalDocumentHtml
+  formatLegalDocumentHtml,
+  crawlDailyBulletins,
+  runBulletinCrawlerIfNeeded
 };

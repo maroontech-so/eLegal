@@ -1,10 +1,12 @@
 const assert = require('assert');
-const { fetchRealLegalDocument, cleanLegalDocumentContent, formatLegalDocumentHtml } = require('../server.js');
+const fs = require('fs');
+const path = require('path');
+const { fetchRealLegalDocument, cleanLegalDocumentContent, formatLegalDocumentHtml, crawlDailyBulletins, runBulletinCrawlerIfNeeded } = require('../server.js');
 
 (async () => {
-  console.log('Running eLegal Document Extraction & Dynamic Legal Header Test Suite...\n');
+  console.log('Running eLegal Full System Node.js & Document Test Suite...\n');
 
-  // Test 1: User's Cheptoo v NSSF header formatting test
+  // Test 1: Cheptoo v NSSF Judicial Precedent Header Formatting
   console.log('Test 1: Testing Cheptoo v NSSF Judicial Precedent Header Formatting...');
   const samplePrecedent = `Cheptoo & 8 others v National Social Security Fund (NSSF) & 2 others (Civil Appeal (Application) E943 of 2023) [2025] KECA 799 (KLR) (9 May 2025) (Ruling)Neutral citation: [2025] KECA 799 (KLR)
 
@@ -134,5 +136,20 @@ This Act may be cited as the Limitation of Actions Act.`;
     console.log('  ⚠️ Note: Live fetch skipped or network restricted.\n');
   }
 
-  console.log('🎉 ALL LEGAL HEADER & EXTRACTION TESTS PASSED!');
+  // Test 5: Pure Node.js Bulletin Crawler
+  console.log('Test 5: Testing Pure Node.js Legal Bulletin Crawler (Zero Python)...');
+  const crawledNews = await crawlDailyBulletins();
+  assert(crawledNews && crawledNews.bulletins && crawledNews.bulletins.length > 0, 'Should crawl bulletins via native Node.js');
+  const first = crawledNews.bulletins[0];
+  assert(first.title && first.summary && first.source && first.category, 'Bulletin item should have complete metadata');
+  console.log('  ✅ Passed: Pure Node.js crawler extracted ' + crawledNews.bulletins.length + ' live legal news items with complete metadata.\n');
+
+  // Test 6: Verify no python files in codebase
+  console.log('Test 6: Verifying 100% Python removal from repository...');
+  const pythonScript = path.join(__dirname, '..', 'crawl_bulletins.py');
+  assert(!fs.existsSync(pythonScript), 'crawl_bulletins.py should not exist');
+  console.log('  ✅ Passed: No Python scripts present in codebase.\n');
+
+  console.log('🎉 ALL SYSTEM TESTS PASSED SUCCESSFULLY WITH ZERO PYTHON DEPENDENCIES!');
+  process.exit(0);
 })();

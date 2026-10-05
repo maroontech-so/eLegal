@@ -904,6 +904,21 @@
             color: var(--accent-emerald);
         }
 
+        .bulletin-category-tag.commercial {
+            background: #EFF6FF;
+            color: #1E40AF;
+        }
+
+        .bulletin-category-tag.land_labour {
+            background: #F0FDF4;
+            color: #166534;
+        }
+
+        .bulletin-category-tag.governance {
+            background: #FDF2F8;
+            color: #9D174D;
+        }
+
         .bulletin-category-tag.news {
             background: #F3E8FF;
             color: var(--accent-purple);
@@ -1444,8 +1459,24 @@
         }
 
         .case-badge-year,
-        .case-badge-type,
+        .case-badge-type {
+            background: transparent !important;
+            color: #64748b !important;
+        }
+
         .case-badge-pdf {
+            background: transparent !important;
+            color: #dc2626 !important;
+            font-weight: 700;
+        }
+
+        .case-badge-doc {
+            background: transparent !important;
+            color: #2563eb !important;
+            font-weight: 700;
+        }
+
+        .case-badge-web {
             background: transparent !important;
             color: #64748b !important;
         }
@@ -2365,7 +2396,15 @@
                             <button class="filter-chip" data-filter="saved">Saved (<span id="savedCountBadge2">0</span>)</button>
                         </div>
 
-                        <div style="display: flex; align-items: center; gap: 8px;">
+                        <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                            <select class="sort-select" id="searchLimitSelect" title="Max search results limit" onchange="executeRepoSearch()">
+                                <option value="15" selected>Limit: 15</option>
+                                <option value="25">Limit: 25</option>
+                                <option value="50">Limit: 50</option>
+                            </select>
+                            <button class="filter-chip" id="freshSearchBtn" type="button" title="Bypass cache and run simultaneous live fresh search" onclick="executeRepoSearch(undefined, { fresh: true })" style="display: inline-flex; align-items: center; gap: 4px;">
+                                <i data-lucide="refresh-cw" style="width: 13px; height: 13px;"></i> Live Fresh
+                            </button>
                             <select class="sort-select" id="sortSelect">
                                 <option value="relevance">Sort: Relevance</option>
                                 <option value="newest">Sort: Newest</option>
@@ -2498,10 +2537,12 @@
                     </div>
                     <div class="bulletins-filters">
                         <button class="bulletin-chip active" onclick="setBulletinCategory('all', this)">All Bulletins</button>
-                        <button class="bulletin-chip" onclick="setBulletinCategory('judiciary', this)">Judiciary</button>
+                        <button class="bulletin-chip" onclick="setBulletinCategory('judiciary', this)">Judiciary & Courts</button>
+                        <button class="bulletin-chip" onclick="setBulletinCategory('commercial', this)">Commercial & Tax</button>
+                        <button class="bulletin-chip" onclick="setBulletinCategory('land_labour', this)">Land & Labour</button>
                         <button class="bulletin-chip" onclick="setBulletinCategory('gazette', this)">Gazette</button>
                         <button class="bulletin-chip" onclick="setBulletinCategory('legislation', this)">Legislation</button>
-                        <button class="bulletin-chip" onclick="setBulletinCategory('news', this)">Precedent Alerts</button>
+                        <button class="bulletin-chip" onclick="setBulletinCategory('governance', this)">Bar & TechLaw</button>
                         <button class="bulletin-chip" style="background: var(--accent-blue); color: white; border: none; font-weight: 600;" onclick="refreshLiveBulletins(this)">
                             <i data-lucide="refresh-cw" style="width: 13px; height: 13px; margin-right: 4px;"></i> Refresh Live News
                         </button>
@@ -2524,6 +2565,21 @@
                         </button>
                     </div>
                 </div>
+
+                <!-- Newsletter Subscription Strip -->
+                <div id="bulletinNewsletterStrip" style="margin-top: 28px; background: linear-gradient(135deg, #0d5c3a 0%, #0a462c 100%); border-radius: 12px; padding: 26px 28px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 18px; color: #fff;">
+                    <div style="max-width: 480px;">
+                        <h3 style="margin: 0 0 6px; font-size: 1.15rem; font-weight: 800; display: flex; align-items: center; gap: 8px;">
+                            <i data-lucide="mail" style="width: 20px; height: 20px; color: #f4b860;"></i> Bulletin Alerts — straight to your inbox
+                        </h3>
+                        <p style="margin: 0; font-size: 0.88rem; color: #d7e8de;">Subscribe to receive every eLegal Bulletin the moment it hits — rulings, gazette notices, cause lists and judiciary news.</p>
+                    </div>
+                    <form id="bulletinNewsletterForm" style="display: flex; gap: 10px; flex-wrap: wrap;">
+                        <input type="email" id="bulletinNewsletterEmail" required placeholder="you@advocate.co.ke" style="padding: 12px 16px; border-radius: 8px; border: 1px solid #2e7d58; background: rgba(255,255,255,0.12); color: #fff; font-size: 0.9rem; min-width: 240px; outline: none;" />
+                        <button type="submit" id="bulletinNewsletterBtn" style="padding: 12px 22px; border: none; border-radius: 8px; background: #f4b860; color: #232323; font-weight: 800; font-size: 0.88rem; cursor: pointer;">Subscribe Free</button>
+                    </form>
+                </div>
+                <div id="bulletinNewsletterMsg" style="display: none; margin-top: 10px; font-size: 0.85rem; font-weight: 600;"></div>
             </section>
         </div>
 
@@ -2811,28 +2867,11 @@
             navigateTo(window.location.pathname, false);
         });
 
-        function executeMainSearch() {
+        function executeMainSearch(options = {}) {
             const input = document.getElementById('searchInput');
             const query = input ? input.value.trim() : '';
             if (!query) return;
-            navigateTo('/e-repository');
-            setTimeout(() => {
-                const repoInput = document.getElementById('repoSearchInput');
-                if (repoInput) repoInput.value = query;
-                executeRepoSearch(query);
-            }, 120);
-        }
-
-        function executeRepoSearch(customQuery) {
-            const repoInput = document.getElementById('repoSearchInput');
-            const mainInput = document.getElementById('searchInput');
-            const query = customQuery || (repoInput ? repoInput.value.trim() : '') || (mainInput ? mainInput.value.trim() : '');
-            if (!query) return;
-            handleSearchInput(query);
-        }
-
-        function handleRepoSearchInput(value) {
-            handleSearchInput(value);
+            executeRepoSearch(query, options);
         }
 
         async function loadHomePrecedentsPreview() {
@@ -2912,6 +2951,48 @@
                 setTimeout(() => { if (btnEl) btnEl.disabled = false; }, 2000);
             }
         }
+
+        /* ─── BULLETIN NEWSLETTER SUBSCRIPTION ─── */
+        (function setupBulletinNewsletter() {
+            document.addEventListener('DOMContentLoaded', () => {
+                const form = document.getElementById('bulletinNewsletterForm');
+                if (!form) return;
+                form.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const input = document.getElementById('bulletinNewsletterEmail');
+                    const btn = document.getElementById('bulletinNewsletterBtn');
+                    const msg = document.getElementById('bulletinNewsletterMsg');
+                    const email = (input && input.value || '').trim();
+                    if (!email) return;
+                    if (btn) { btn.disabled = true; btn.textContent = 'Subscribing...'; }
+                    if (msg) {
+                        msg.style.display = 'block';
+                        msg.style.color = 'var(--text-tertiary, #64748b)';
+                        msg.textContent = 'Subscribing...';
+                    }
+                    try {
+                        const res = await fetch('/api/newsletter/subscribe', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ email, source: 'bulletins-section' })
+                        });
+                        const data = await res.json();
+                        if (msg) {
+                            msg.textContent = res.ok && data.ok ? (data.message || 'Subscribed!') : (data.error || 'Subscription failed. Please try again.');
+                            msg.style.color = res.ok && data.ok ? '#16a34a' : '#dc2626';
+                        }
+                        if (res.ok && data.ok && input) input.value = '';
+                    } catch (err) {
+                        if (msg) {
+                            msg.textContent = 'Network error. Please try again.';
+                            msg.style.color = '#dc2626';
+                        }
+                    } finally {
+                        if (btn) { btn.disabled = false; btn.textContent = 'Subscribe Free'; }
+                    }
+                });
+            });
+        })();
 
         const DISTINCT_BULLETIN_IMAGES = [
             'https://upload.wikimedia.org/wikipedia/commons/0/07/Nairobi_Law_Courts.jpg',
@@ -3165,7 +3246,11 @@
             }
 
             if (precedents.length > 0 || matchingCases.length > 0) {
-                htmlContent += `<div style="font-weight: 700; font-size: 0.8rem; text-transform: uppercase; color: var(--accent-purple); margin-top: 10px;">Ground-Matched Case Citations</div>`;
+                const anyVerified = precedents.some(p => p.verified);
+                const heading = anyVerified
+                    ? 'Verified Case Citations'
+                    : (precedents.length === 0 && matchingCases.length > 0 ? 'Unverified Search Results' : 'Verified Case Citations');
+                htmlContent += `<div style="font-weight: 700; font-size: 0.8rem; text-transform: uppercase; color: var(--accent-purple); margin-top: 10px;">${heading}</div>`;
             }
 
             const aiMsgDiv = document.createElement('div');
@@ -3174,23 +3259,95 @@
             bubbleDiv.className = 'chat-bubble';
             bubbleDiv.innerHTML = htmlContent;
 
-            // Render Citation Cards
-            const citationsToRender = precedents.length > 0 ? precedents : matchingCases.slice(0, 4);
-            citationsToRender.forEach(c => {
+            // Provenance is explicit. Only a precedent the backend verified is
+            // ever rendered as a citation card. Raw search hits are NOT
+            // promoted into citations just because nothing verified was found:
+            // they are keyword matches, and labelling them "verified" asserted
+            // an authority that was never confirmed against a case record.
+            const verifiedPrecedents = precedents.filter(p => p.verified);
+            const unverifiedHits = (matchingCases || []).filter(c => !c.verified);
+
+            verifiedPrecedents.forEach(c => {
                 const caseTitle = c.case || c.title || c.citation || 'Kenyan Case Citation';
-                const principle = c.principle || c.summary || c.subject || 'Ground-matched judicial precedent';
+                const principle = c.principle || c.summary || c.subject || 'Retrieved judicial record';
+                const basis = c.verificationBasis || c.urlSource || 'search';
+                const basisLabel = basis === 'repository'
+                    ? 'Verified in eLegal repository'
+                    : 'Verified via live search result';
+                const directLink = c.url ? `
+                    <a class="chat-citation-act-btn" style="text-decoration:none;" href="${escapeHtml(c.url)}" target="_blank" rel="noopener noreferrer">
+                        <i data-lucide="external-link" style="width: 11px; height: 11px;"></i> Open Source Record
+                    </a>` : '';
 
                 const citCard = document.createElement('div');
                 citCard.className = 'chat-citation-card';
                 citCard.innerHTML = `
+                    <div style="display:flex; align-items:center; gap:5px; margin-bottom:4px; font-size:0.66rem; font-weight:700; text-transform:uppercase; letter-spacing:0.03em; color:#047857;">
+                        <i data-lucide="shield-check" style="width:11px; height:11px;"></i>${basisLabel}
+                    </div>
                     <div class="chat-citation-title">${escapeHtml(caseTitle)}</div>
                     <div class="chat-citation-principle">${escapeHtml(principle)}</div>
                     <button class="chat-citation-act-btn" onclick="searchCitationFromChat('${escapeJsString(caseTitle)}')">
                         <i data-lucide="search" style="width: 11px; height: 11px;"></i> Search in Repository
                     </button>
+                    ${directLink}
                 `;
                 bubbleDiv.appendChild(citCard);
             });
+
+            // Unverified search hits are shown separately, never as citations.
+            // They are candidate leads for the user to check, not authority.
+            if (verifiedPrecedents.length === 0 && unverifiedHits.length > 0) {
+                const notice = document.createElement('div');
+                notice.className = 'chat-citation-card';
+                notice.style.borderColor = '#FCD34D';
+                notice.innerHTML = `
+                    <div style="display:flex; align-items:center; gap:5px; margin-bottom:4px; font-size:0.66rem; font-weight:700; text-transform:uppercase; letter-spacing:0.03em; color:#92400E;">
+                        <i data-lucide="shield-alert" style="width:11px; height:11px;"></i> No verified case law for these facts
+                    </div>
+                    <div class="chat-citation-principle" style="margin-bottom:0;">
+                        No judgment could be verified against the eLegal repository or a case database as answering
+                        these facts, so nothing is cited. The records below are keyword search hits only &mdash; they are
+                        <strong>not</strong> confirmed as relevant authority. Open them and check the ratio before relying on any of them.
+                    </div>
+                `;
+                bubbleDiv.appendChild(notice);
+
+                unverifiedHits.slice(0, 4).forEach(c => {
+                    const card = document.createElement('div');
+                    card.className = 'chat-citation-card';
+                    card.style.borderColor = '#FDE68A';
+                    card.innerHTML = `
+                        <div style="font-size:0.66rem; font-weight:700; text-transform:uppercase; letter-spacing:0.03em; color:#92400E; margin-bottom:4px;">
+                            Unverified search hit
+                        </div>
+                        <div class="chat-citation-title">${escapeHtml(c.title || c.citation || 'Unnamed record')}</div>
+                        <button class="chat-citation-act-btn" onclick="searchCitationFromChat('${escapeJsString(c.title || '')}')">
+                            <i data-lucide="search" style="width: 11px; height: 11px;"></i> Search in Repository
+                        </button>
+                    `;
+                    bubbleDiv.appendChild(card);
+                });
+            }
+
+            // When the backend found nothing verifiable, say so plainly instead
+            // of implying the scenario has been fully researched.
+            if (verifiedPrecedents.length === 0 && precedents.length === 0) {
+                const notice = document.createElement('div');
+                notice.className = 'chat-citation-card';
+                notice.style.borderColor = '#FCD34D';
+                notice.innerHTML = `
+                    <div style="display:flex; align-items:center; gap:5px; margin-bottom:4px; font-size:0.66rem; font-weight:700; text-transform:uppercase; letter-spacing:0.03em; color:#92400E;">
+                        <i data-lucide="shield-alert" style="width:11px; height:11px;"></i> No verified case law
+                    </div>
+                    <div class="chat-citation-principle" style="margin-bottom:0;">
+                        No judgment could be verified against the eLegal repository or a live case database for these facts.
+                        Nothing has been cited rather than risk quoting an authority that does not exist.
+                        Search the repository for the case by name or docket number to check coverage.
+                    </div>
+                `;
+                bubbleDiv.appendChild(notice);
+            }
 
             // Action to run search for all matching cases
             if (recQuery) {
@@ -3589,24 +3746,29 @@
             if (repoInput && repoInput.value !== value) repoInput.value = value;
         }
 
-        function handleRepoSearchInput(value) {
-            syncSearchInputs(value);
-            if (typeof handleSearchInput === 'function') handleSearchInput(value);
-        }
-
-        async function executeRepoSearch(customQuery) {
+        async function executeRepoSearch(customQuery, options = {}) {
             const query = (customQuery !== undefined ? customQuery : (document.getElementById('repoSearchInput')?.value || document.getElementById('searchInput')?.value || '')).trim();
             if (!query) return;
+
+            const limitSelect = document.getElementById('searchLimitSelect');
+            const limit = options.limit || (limitSelect ? limitSelect.value : '15') || '15';
+            const fresh = options.fresh === true || options.forceFresh === true;
 
             syncSearchInputs(query);
             navigateTo('/e-repository');
             setSearchLoading(true);
             renderSkeleton();
             document.getElementById('workspaceTitle').textContent = `Search Results: "${query}"`;
+            const subtitle = document.getElementById('workspaceSubtitle');
+            if (subtitle) {
+                subtitle.textContent = fresh 
+                    ? 'Executing simultaneous live external search & local cache update...'
+                    : 'Simultaneous local cache and live legal index search...';
+            }
             if (typeof startStatusTicker === 'function') startStatusTicker(query);
 
             try {
-                const url = `${API_BASE}/search?q=${encodeURIComponent(query)}&source=all`;
+                const url = `${API_BASE}/search?q=${encodeURIComponent(query)}&limit=${encodeURIComponent(limit)}&fresh=${fresh ? 'true' : 'false'}&source=all`;
                 const res = await fetchApi(url);
                 if (!res.ok) throw new Error(`Search failed (${res.status})`);
                 lastResult = await res.json();
@@ -3614,6 +3776,7 @@
                 repoState.page = 1;
                 syncFilterButtons();
                 renderCurrent();
+                if (typeof lucide !== 'undefined') lucide.createIcons();
             } catch (e) {
                 renderEmpty('Search Error', e.message);
             } finally {
@@ -3650,6 +3813,13 @@
         }
 
         function viewBulletinDetail(bulletinId) {
+            // Open the full news-style story page (expanded story, sidebar, newsletter)
+            if (bulletinId) {
+                window.location.href = '/bulletin/' + encodeURIComponent(bulletinId);
+            }
+        }
+
+        function viewBulletinDetailLegacy(bulletinId) {
             const item = bulletinsState.items.find(b => b.id === bulletinId);
             if (!item) return;
 
@@ -3850,30 +4020,9 @@
         }
 
         /* ─── SEARCH ─── */
-        async function doSearch() {
-            const query = document.getElementById('searchInput').value.trim();
-            if (!query) return;
-
-            setSearchLoading(true);
-            renderSkeleton();
-            document.getElementById('workspaceTitle').textContent = `Search Results: "${query}"`;
-            startStatusTicker(query);
-
-            try {
-                const url = `${API_BASE}/search?q=${encodeURIComponent(query)}&source=all`;
-                const res = await fetchApi(url);
-                if (!res.ok) throw new Error(`Search failed (${res.status})`);
-                lastResult = await res.json();
-                currentFilter = 'all';
-                repoState.page = 1;
-                syncFilterButtons();
-                renderCurrent();
-            } catch (e) {
-                renderEmpty('Search Error', e.message);
-            } finally {
-                stopStatusTicker();
-                setSearchLoading(false);
-            }
+        async function doSearch(customQuery, options = {}) {
+            const query = customQuery !== undefined ? customQuery : (document.getElementById('searchInput')?.value || document.getElementById('repoSearchInput')?.value || '').trim();
+            return executeRepoSearch(query, options);
         }
 
         /* ─── SAVED DOCS ─── */
@@ -4242,8 +4391,21 @@
             if (typeof lucide !== 'undefined') lucide.createIcons();
         }
 
+        function isActualDocOrPdf(item) {
+            if (!item) return false;
+            if (item.isActualPdfOrDoc !== undefined) return Boolean(item.isActualPdfOrDoc);
+            if (item.fileType === 'PDF' || item.fileType === 'DOC') return true;
+            if (item.fileType === 'WEB') return false;
+            if (item.isPdf || item.isDoc || item.hasPdf || item.pdfUrl) return true;
+            const url = (item.url || item.sourceUrl || '').toLowerCase();
+            if (url.includes('kenyalaw.org')) return true;
+            if (url.endsWith('.pdf') || url.includes('.pdf?') || url.endsWith('.docx') || url.endsWith('.doc')) return true;
+            return false;
+        }
+
         function createResultItem(item) {
             const title = item.title || item.label || item.citation || 'Untitled Document';
+            const isActualDoc = isActualDocOrPdf(item);
             const targetUrl = item.readUrl || item.url || '/';
             const citation = item.citation || '';
             const yearStr = item.year || (citation.match(/\[(\d{4})\]/) || [])[1] || '';
@@ -4271,12 +4433,22 @@
                 badgesEl.appendChild(tb);
             }
 
-            if (item.isPdf || (targetUrl && targetUrl.toLowerCase().endsWith('.pdf'))) {
-                const pb = document.createElement('span');
-                pb.className = 'case-badge case-badge-pdf';
-                pb.textContent = 'PDF';
-                badgesEl.appendChild(pb);
+            // Format Badge (PDF, DOC, or WEBPAGE)
+            const isPdf = item.isPdf || item.fileType === 'PDF' || (targetUrl && targetUrl.toLowerCase().endsWith('.pdf'));
+            const isDoc = item.isDoc || item.fileType === 'DOC' || (targetUrl && (targetUrl.includes('kenyalaw.org') || targetUrl.toLowerCase().endsWith('.docx') || targetUrl.toLowerCase().endsWith('.doc')));
+
+            const formatBadge = document.createElement('span');
+            if (isPdf) {
+                formatBadge.className = 'case-badge case-badge-pdf';
+                formatBadge.textContent = 'PDF';
+            } else if (isDoc) {
+                formatBadge.className = 'case-badge case-badge-doc';
+                formatBadge.textContent = 'DOC';
+            } else {
+                formatBadge.className = 'case-badge case-badge-web';
+                formatBadge.textContent = 'WEBPAGE';
             }
+            badgesEl.appendChild(formatBadge);
 
             const saved = isDocSaved(item);
             const saveBtn = document.createElement('button');
@@ -4299,6 +4471,14 @@
 
             card.addEventListener('click', (e) => {
                 if (e.target.closest('a') || e.target.closest('button')) return;
+                // If not an actual PDF/DOC document, do not open in read mode; navigate directly to exact webpage!
+                if (!isActualDoc) {
+                    const directUrl = item.url || item.sourceUrl || targetUrl;
+                    if (directUrl && /^https?:\/\//i.test(directUrl)) {
+                        window.open(directUrl, '_blank', 'noopener,noreferrer');
+                        return;
+                    }
+                }
                 renderPreview(item);
             });
             return card;
@@ -4306,19 +4486,57 @@
 
         function renderPreview(item) {
             const title = item.title || item.label || item.citation || 'Untitled';
+            const isActualDoc = isActualDocOrPdf(item);
+            const rawUrl = item.url || item.sourceUrl || '';
+            const pdfDownloadUrl = item.pdfUrl || (rawUrl ? `/api/pdf-proxy?sourceUrl=${encodeURIComponent(rawUrl)}` : null);
+            const readUrl = item.readUrl || `/read?title=${encodeURIComponent(title)}&sourceUrl=${encodeURIComponent(rawUrl)}`;
+
             const panel = document.getElementById('previewPanel');
-            panel.innerHTML = `
-                <div style="font-size: 0.75rem; font-weight: 700; color: var(--text-tertiary); text-transform: uppercase; margin-bottom: 6px;">Document Inspector</div>
-                <h3 style="font-size: 1.15rem; font-weight: 800; line-height: 1.3; margin-bottom: 12px; color: var(--text-primary);">${escapeHtml(title)}</h3>
-                <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 20px; line-height: 1.5;">
-                    ${item.citation ? `<strong>Citation:</strong> ${escapeHtml(item.citation)}<br>` : ''}
-                    ${item.type ? `<strong>Category:</strong> ${escapeHtml(item.type)}<br>` : ''}
-                    ${item.source ? `<strong>Source:</strong> ${escapeHtml(item.source)}` : ''}
-                </div>
-                <button class="ai-submit-btn" style="width: 100%; justify-content: center;" onclick="window.location.href='${item.readUrl || `/read.html?title=${encodeURIComponent(title)}&sourceUrl=${encodeURIComponent(item.url || '')}`}'">
-                    Read Full Document
-                </button>
-            `;
+
+            if (isActualDoc) {
+                panel.innerHTML = `
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+                        <span style="font-size: 0.75rem; font-weight: 700; color: var(--text-tertiary); text-transform: uppercase;">Official Legal Document</span>
+                        <span class="case-badge case-badge-pdf" style="font-size: 0.72rem; padding: 2px 8px; border-radius: 4px; background: rgba(220,38,38,0.1) !important; color: #dc2626 !important;">PDF Accessible</span>
+                    </div>
+                    <h3 style="font-size: 1.15rem; font-weight: 800; line-height: 1.3; margin-bottom: 12px; color: var(--text-primary);">${escapeHtml(title)}</h3>
+                    <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 20px; line-height: 1.6;">
+                        ${item.citation ? `<strong>Citation:</strong> ${escapeHtml(item.citation)}<br>` : ''}
+                        ${item.type ? `<strong>Category:</strong> ${escapeHtml(item.type)}<br>` : ''}
+                        ${item.source ? `<strong>Source:</strong> ${escapeHtml(item.source)}<br>` : ''}
+                        ${item.year ? `<strong>Year:</strong> ${escapeHtml(item.year)}` : ''}
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 10px;">
+                        <button class="ai-submit-btn" style="width: 100%; justify-content: center; gap: 8px;" onclick="window.open('${readUrl}', '_blank', 'noopener,noreferrer')">
+                            <i data-lucide="book-open" style="width: 16px; height: 16px;"></i> Read Clean Document
+                        </button>
+                        ${pdfDownloadUrl ? `
+                        <a href="${pdfDownloadUrl}" target="_blank" rel="noopener noreferrer" class="secondary-btn" style="display: flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 16px; border-radius: 8px; font-weight: 600; font-size: 0.875rem; text-decoration: none; border: 1px solid var(--border-subtle); color: var(--text-primary); background: var(--bg-surface);">
+                            <i data-lucide="file-down" style="width: 16px; height: 16px; color: #dc2626;"></i> Open / Download PDF
+                        </a>
+                        ` : ''}
+                    </div>
+                `;
+            } else {
+                panel.innerHTML = `
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+                        <span style="font-size: 0.75rem; font-weight: 700; color: var(--text-tertiary); text-transform: uppercase;">External Webpage</span>
+                        <span class="case-badge case-badge-web" style="font-size: 0.72rem; padding: 2px 8px; border-radius: 4px; background: rgba(100,116,139,0.1) !important; color: #64748b !important;">Plain HTML</span>
+                    </div>
+                    <h3 style="font-size: 1.15rem; font-weight: 800; line-height: 1.3; margin-bottom: 12px; color: var(--text-primary);">${escapeHtml(title)}</h3>
+                    <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 16px; line-height: 1.5;">
+                        This search result is an external webpage rather than an official PDF/DOC court record. To avoid webpage clutter and maintain clean legal reading, reader mode is bypassed.
+                    </p>
+                    <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 20px; line-height: 1.6;">
+                        ${item.source ? `<strong>Source:</strong> ${escapeHtml(item.source)}<br>` : ''}
+                        ${rawUrl ? `<strong>URL:</strong> <span style="font-family: monospace; font-size: 0.8rem; word-break: break-all;">${escapeHtml(rawUrl)}</span>` : ''}
+                    </div>
+                    <button class="ai-submit-btn" style="width: 100%; justify-content: center; gap: 8px;" onclick="window.open('${rawUrl || targetUrl}', '_blank', 'noopener,noreferrer')">
+                        <i data-lucide="external-link" style="width: 16px; height: 16px;"></i> Open Exact Webpage
+                    </button>
+                `;
+            }
+
             openModal('previewModalOverlay');
             if (typeof lucide !== 'undefined') lucide.createIcons();
         }
@@ -4393,6 +4611,8 @@
             repoState.page = 1;
             const inputEl = document.getElementById('searchInput');
             if (inputEl) inputEl.value = '';
+            const repoInputEl = document.getElementById('repoSearchInput');
+            if (repoInputEl) repoInputEl.value = '';
             const titleEl = document.getElementById('workspaceTitle');
             if (titleEl) titleEl.textContent = 'Legal E-Repository';
             const subTitleEl = document.getElementById('workspaceSubtitle');

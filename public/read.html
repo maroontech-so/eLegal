@@ -531,25 +531,50 @@
             display: none;
             flex-direction: column;
             align-items: center;
-            gap: 20px;
+            gap: 24px;
             padding: 24px 16px 100px 16px;
+            box-sizing: border-box;
+            transform-origin: top center;
+            transition: transform 0.15s ease-out;
         }
 
         .page-wrapper {
             background: white;
             border-radius: 4px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12);
             overflow: hidden;
-            display: inline-flex;
+            display: flex;
             justify-content: center;
             align-items: center;
             max-width: 100%;
+            box-sizing: border-box;
+            transition: width 0.2s ease, max-width 0.2s ease;
         }
 
         .page-wrapper canvas {
             display: block;
             height: auto;
             max-width: 100%;
+            width: 100%;
+        }
+
+        /* Lazy-render placeholder shown until a page's canvas is rendered */
+        .page-placeholder {
+            background: #f8fafc;
+            border: 1px dashed #cbd5e1;
+        }
+
+        .page-placeholder-inner {
+            width: 100%;
+            height: 100%;
+            min-height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #94a3b8;
+            font-size: 0.85rem;
+            font-weight: 600;
+            letter-spacing: 0.03em;
         }
 
         /* ============================================================
@@ -678,11 +703,14 @@
             }
 
             #editor-wrapper,
-            #editor-wrapper * {
+            #editor-wrapper *,
+            #pagesContainer,
+            #pagesContainer * {
                 visibility: visible;
             }
 
-            #editor-wrapper {
+            #editor-wrapper,
+            #pagesContainer {
                 position: absolute;
                 left: 0;
                 top: 0;
@@ -697,6 +725,14 @@
                 padding: 20px !important;
                 transform: none !important;
                 max-width: none !important;
+            }
+
+            .page-wrapper {
+                box-shadow: none !important;
+                margin: 0 0 20px 0 !important;
+                padding: 0 !important;
+                page-break-after: always;
+                break-after: page;
             }
 
             .toolbar,
@@ -724,12 +760,12 @@
             <span class="badge badge-year" id="badgeYear" style="display:none;">Year</span>
             <span class="badge badge-type" id="badgeType" style="display:none;">Type</span>
             <span class="badge badge-source" id="badgeSource" style="display:none;">Source</span>
-            <span class="badge" id="pageInfo">Rich Editor</span>
+            <span class="badge" id="pageInfo">PDF View</span>
 
             <button id="btnToggleView" class="source-btn"
                 title="Toggle between Interactive Rich Text Editor and Canvas PDF Viewer">
-                <i class="fa-regular fa-file-pdf"></i>
-                <span id="btnToggleViewText">PDF View</span>
+                <i class="fa-solid fa-pen-to-square" id="btnToggleViewIcon"></i>
+                <span id="btnToggleViewText">Rich Editor</span>
             </button>
 
             <button id="btnDownloadPdf" class="source-btn"
@@ -775,6 +811,11 @@
                         style="font-size: 11px;"></i></button>
             </div>
 
+            <button id="fit-width-btn" class="source-btn" title="Fit PDF to Viewport Width">
+                <i class="fa-solid fa-arrows-left-right-to-line"></i>
+                <span id="fit-width-text">Fit Width</span>
+            </button>
+
             <button id="print-btn" class="source-btn" title="Print document or Save as PDF">
                 <i class="fa-solid fa-print"></i>
                 <span>Print</span>
@@ -789,19 +830,19 @@
         </div>
     </div>
 
-    <!-- Quill Sticky Toolbar -->
+    <!-- Quill Sticky Toolbar Container -->
     <div id="toolbar-container" class="hidden">
         <span class="ql-formats">
-            <select class="ql-font">
-                <option selected>Times New Roman</option>
+            <select class="ql-font" title="Font Family">
+                <option value="Times New Roman" selected>Times New Roman</option>
                 <option value="arial">Arial</option>
-                <option value="comic-sans">Comic Sans</option>
-                <option value="courier-new">Courier New</option>
                 <option value="georgia">Georgia</option>
                 <option value="helvetica">Helvetica</option>
+                <option value="courier-new">Courier New</option>
+                <option value="comic-sans">Comic Sans</option>
                 <option value="lucida">Lucida</option>
             </select>
-            <select class="ql-size">
+            <select class="ql-size" title="Font Size">
                 <option value="small">Small</option>
                 <option selected>Normal</option>
                 <option value="large">Large</option>
@@ -809,48 +850,30 @@
             </select>
         </span>
         <span class="ql-formats">
-            <select class="ql-header">
-                <option value="1">Heading 1</option>
-                <option value="2">Heading 2</option>
-                <option value="3">Heading 3</option>
-                <option value="4">Heading 4</option>
-                <option selected>Normal</option>
-            </select>
+            <button class="ql-bold" title="Bold"></button>
+            <button class="ql-italic" title="Italic"></button>
+            <button class="ql-underline" title="Underline"></button>
+            <button class="ql-strike" title="Strikethrough"></button>
         </span>
         <span class="ql-formats">
-            <button class="ql-bold"></button>
-            <button class="ql-italic"></button>
-            <button class="ql-underline"></button>
-            <button class="ql-strike"></button>
+            <select class="ql-color" title="Text Color"></select>
+            <select class="ql-background" title="Highlight Color"></select>
         </span>
         <span class="ql-formats">
-            <select class="ql-color"></select>
-            <select class="ql-background"></select>
+            <button class="ql-header" value="1" title="Heading 1"></button>
+            <button class="ql-header" value="2" title="Heading 2"></button>
+            <button class="ql-blockquote" title="Blockquote"></button>
+            <button class="ql-code-block" title="Code Block"></button>
         </span>
         <span class="ql-formats">
-            <button class="ql-script" value="sub"></button>
-            <button class="ql-script" value="super"></button>
+            <button class="ql-list" value="ordered" title="Numbered List"></button>
+            <button class="ql-list" value="bullet" title="Bullet List"></button>
+            <select class="ql-align" title="Text Alignment"></select>
         </span>
         <span class="ql-formats">
-            <button class="ql-blockquote"></button>
-            <button class="ql-code-block"></button>
-        </span>
-        <span class="ql-formats">
-            <button class="ql-list" value="ordered"></button>
-            <button class="ql-list" value="bullet"></button>
-            <button class="ql-indent" value="-1"></button>
-            <button class="ql-indent" value="+1"></button>
-        </span>
-        <span class="ql-formats">
-            <select class="ql-align"></select>
-        </span>
-        <span class="ql-formats">
-            <button class="ql-link"></button>
-            <button class="ql-clean"></button>
-        </span>
-        <span class="ql-formats">
-            <button id="custom-find-btn" title="Find in document (Ctrl+F)"><i class="fa-solid fa-magnifying-glass"
-                    style="font-size: 13px;"></i></button>
+            <button class="ql-link" title="Insert Link"></button>
+            <button class="ql-clean" title="Clear Formatting"></button>
+            <button id="custom-find-btn" type="button" title="Find in document (Ctrl+F)"><i class="fa-solid fa-magnifying-glass" style="font-size: 12px;"></i></button>
         </span>
     </div>
 
@@ -903,6 +926,29 @@
 
         <!-- Native High-DPI Canvas PDF Container (PDF View Mode) -->
         <div id="pagesContainer"></div>
+
+        <!-- External Webpage Redirect State -->
+        <div id="redirect-state" class="hidden">
+            <div class="upload-card" style="max-width: 520px; text-align: center; margin: 40px auto;">
+                <div style="width: 60px; height: 60px; background: var(--accent-green-light); color: var(--accent-green); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px auto;">
+                    <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 24px;"></i>
+                </div>
+                <h2 style="font-size: 1.25rem; font-weight: 700; color: #0f172a; margin-bottom: 6px;">External Webpage Opened</h2>
+                <p style="font-size: 0.875rem; color: #64748b; margin-bottom: 20px; line-height: 1.6;">
+                    This record is an external web page rather than an official court PDF/DOC document. It has been opened in a new browser tab to maintain clean document reading.
+                </p>
+                <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+                    <a href="#" id="redirect-open-again-btn" target="_blank" rel="noopener noreferrer" class="source-btn" style="background: var(--accent-green); color: #ffffff; border-color: var(--accent-green); padding: 8px 16px;">
+                        <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                        <span>Open in New Tab</span>
+                    </a>
+                    <a href="/" class="source-btn" style="padding: 8px 16px;">
+                        <i class="fa-solid fa-arrow-left"></i>
+                        <span>Back to Search</span>
+                    </a>
+                </div>
+            </div>
+        </div>
     </main>
 
     <!-- Floating Action Button for Legal AI Summary -->
@@ -962,7 +1008,7 @@
         let loadedDocData = null;
         let cachedSummaryHtml = null;
         let cachedPdfArrayBuffer = null;
-        let currentViewMode = 'text'; // 'text' (Quill) or 'pdf' (Canvas)
+        let currentViewMode = 'pdf'; // Default to 'pdf' (Canvas) instead of 'text' (Quill)
 
         // URL Parameters
         const urlParams = new URLSearchParams(window.location.search);
@@ -985,6 +1031,8 @@
         const externalLink = document.getElementById('externalLink');
         const uploadState = document.getElementById('upload-state');
         const loadingState = document.getElementById('loading-state');
+        const redirectState = document.getElementById('redirect-state');
+        const redirectOpenAgainBtn = document.getElementById('redirect-open-again-btn');
         const editorWrapper = document.getElementById('editor-wrapper');
         const editorContainer = document.getElementById('editor-container');
         const toolbarContainer = document.getElementById('toolbar-container');
@@ -997,10 +1045,11 @@
         const pagesContainer = document.getElementById('pagesContainer');
 
         document.addEventListener('DOMContentLoaded', () => {
+            const tbEl = document.getElementById('toolbar-container');
             // Initialize Quill Editor
             quill = new Quill('#editor-container', {
                 modules: {
-                    toolbar: '#toolbar-container',
+                    toolbar: tbEl ? '#toolbar-container' : true,
                     history: {
                         delay: 2000,
                         maxStack: 500,
@@ -1058,103 +1107,149 @@
 
         function setupEventHandlers() {
             // Drop Zone & File Selection
-            dropZone.addEventListener('click', () => fileInput.click());
-            document.getElementById('open-new-btn').addEventListener('click', () => fileInput.click());
-
-            fileInput.addEventListener('change', (e) => {
-                if (e.target.files.length > 0) handleFile(e.target.files[0]);
-            });
-
-            dropZone.addEventListener('dragover', (e) => {
-                e.preventDefault();
-                dropZone.classList.add('drag-active');
-            });
-            dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-active'));
-            dropZone.addEventListener('drop', (e) => {
-                e.preventDefault();
-                dropZone.classList.remove('drag-active');
-                if (e.dataTransfer.files.length > 0) {
-                    const file = e.dataTransfer.files[0];
-                    const fn = file.name.toLowerCase();
-                    if (fn.endsWith('.docx') || fn.endsWith('.pdf')) {
-                        handleFile(file);
-                    } else {
-                        showErrorMsg('Please upload a valid .docx or .pdf file.');
+            if (dropZone && fileInput) {
+                dropZone.addEventListener('click', () => fileInput.click());
+                dropZone.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    dropZone.classList.add('drag-active');
+                });
+                dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-active'));
+                dropZone.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    dropZone.classList.remove('drag-active');
+                    if (e.dataTransfer && e.dataTransfer.files.length > 0) {
+                        const file = e.dataTransfer.files[0];
+                        const fn = file.name.toLowerCase();
+                        if (fn.endsWith('.docx') || fn.endsWith('.pdf')) {
+                            handleFile(file);
+                        } else {
+                            showErrorMsg('Please upload a valid .docx or .pdf file.');
+                        }
                     }
-                }
-            });
+                });
+            }
+
+            const openNewBtn = document.getElementById('open-new-btn');
+            if (openNewBtn && fileInput) {
+                openNewBtn.addEventListener('click', () => fileInput.click());
+            }
+
+            if (fileInput) {
+                fileInput.addEventListener('change', (e) => {
+                    if (e.target.files && e.target.files.length > 0) handleFile(e.target.files[0]);
+                });
+            }
 
             // Zoom Controls
-            document.getElementById('zoom-in-btn').addEventListener('click', () => {
-                if (currentZoom < MAX_ZOOM) {
-                    currentZoom = Math.min(MAX_ZOOM, Math.round((currentZoom + ZOOM_STEP) * 100) / 100);
-                    updateZoom();
-                }
-            });
-            document.getElementById('zoom-out-btn').addEventListener('click', () => {
-                if (currentZoom > MIN_ZOOM) {
-                    currentZoom = Math.max(MIN_ZOOM, Math.round((currentZoom - ZOOM_STEP) * 100) / 100);
-                    updateZoom();
-                }
-            });
+            const zoomInBtn = document.getElementById('zoom-in-btn');
+            if (zoomInBtn) {
+                zoomInBtn.addEventListener('click', () => {
+                    if (currentZoom < MAX_ZOOM) {
+                        currentZoom = Math.min(MAX_ZOOM, Math.round((currentZoom + ZOOM_STEP) * 100) / 100);
+                        updateZoom();
+                    }
+                });
+            }
+
+            const zoomOutBtn = document.getElementById('zoom-out-btn');
+            if (zoomOutBtn) {
+                zoomOutBtn.addEventListener('click', () => {
+                    if (currentZoom > MIN_ZOOM) {
+                        currentZoom = Math.max(MIN_ZOOM, Math.round((currentZoom - ZOOM_STEP) * 100) / 100);
+                        updateZoom();
+                    }
+                });
+            }
+
+            // Fit to Viewport Width
+            const fitWidthBtn = document.getElementById('fit-width-btn');
+            if (fitWidthBtn) {
+                fitWidthBtn.addEventListener('click', async () => {
+                    resetZoom();
+                    if (currentViewMode === 'pdf' && cachedPdfArrayBuffer) {
+                        showLoading('Fitting PDF to viewport width...');
+                        await renderCanvasPdf(cachedPdfArrayBuffer);
+                    }
+                });
+            }
 
             // Ctrl+Wheel Zoom
-            document.getElementById('main-workspace').addEventListener('wheel', (e) => {
-                if (e.ctrlKey || e.metaKey) {
-                    e.preventDefault();
-                    if (e.deltaY < 0) {
-                        if (currentZoom < MAX_ZOOM) {
-                            currentZoom = Math.min(MAX_ZOOM, Math.round((currentZoom + ZOOM_STEP) * 100) / 100);
-                            updateZoom();
-                        }
-                    } else {
-                        if (currentZoom > MIN_ZOOM) {
-                            currentZoom = Math.max(MIN_ZOOM, Math.round((currentZoom - ZOOM_STEP) * 100) / 100);
-                            updateZoom();
+            const mainWorkspace = document.getElementById('main-workspace');
+            if (mainWorkspace) {
+                mainWorkspace.addEventListener('wheel', (e) => {
+                    if (e.ctrlKey || e.metaKey) {
+                        e.preventDefault();
+                        if (e.deltaY < 0) {
+                            if (currentZoom < MAX_ZOOM) {
+                                currentZoom = Math.min(MAX_ZOOM, Math.round((currentZoom + ZOOM_STEP) * 100) / 100);
+                                updateZoom();
+                            }
+                        } else {
+                            if (currentZoom > MIN_ZOOM) {
+                                currentZoom = Math.max(MIN_ZOOM, Math.round((currentZoom - ZOOM_STEP) * 100) / 100);
+                                updateZoom();
+                            }
                         }
                     }
-                }
-            }, { passive: false });
+                }, { passive: false });
+            }
 
             // Find in Document
-            document.getElementById('custom-find-btn').addEventListener('click', () => {
-                const term = prompt('Find in document:');
-                if (term && term.trim()) {
-                    if (window.find) {
-                        window.find(term);
-                    } else {
-                        alert('Press Ctrl+F (or Cmd+F) to search within the document.');
+            const customFindBtn = document.getElementById('custom-find-btn');
+            if (customFindBtn) {
+                customFindBtn.addEventListener('click', () => {
+                    const term = prompt('Find in document:');
+                    if (term && term.trim()) {
+                        if (window.find) {
+                            window.find(term);
+                        } else {
+                            alert('Press Ctrl+F (or Cmd+F) to search within the document.');
+                        }
                     }
-                }
-            });
+                });
+            }
 
             // Print
-            document.getElementById('print-btn').addEventListener('click', () => window.print());
+            const printBtn = document.getElementById('print-btn');
+            if (printBtn) printBtn.addEventListener('click', () => window.print());
 
             // Export to Word (.doc)
-            document.getElementById('download-word-btn').addEventListener('click', exportToWord);
+            const downloadWordBtn = document.getElementById('download-word-btn');
+            if (downloadWordBtn) downloadWordBtn.addEventListener('click', exportToWord);
 
             // View Toggle (Rich Editor vs Canvas PDF)
-            document.getElementById('btnToggleView').addEventListener('click', toggleViewMode);
+            const toggleViewBtn = document.getElementById('btnToggleView');
+            if (toggleViewBtn) toggleViewBtn.addEventListener('click', toggleViewMode);
 
             // Download PDF
-            document.getElementById('btnDownloadPdf').addEventListener('click', downloadOriginalPdf);
+            const downloadPdfBtn = document.getElementById('btnDownloadPdf');
+            if (downloadPdfBtn) downloadPdfBtn.addEventListener('click', downloadOriginalPdf);
 
             // Bookmark / Save
-            setupBookmarkButton();
+            if (typeof setupBookmarkButton === 'function') setupBookmarkButton();
 
             // Legal AI Summary Drawer
-            setupSummaryDrawer();
+            if (typeof setupSummaryDrawer === 'function') setupSummaryDrawer();
         }
 
         function updateZoom() {
-            editorContainer.style.transform = `scale(${currentZoom})`;
-            if (currentZoom > 1) {
-                editorContainer.style.marginBottom = `${(currentZoom - 1) * 1100}px`;
-            } else {
-                editorContainer.style.marginBottom = '20px';
+            if (currentViewMode === 'pdf' && pagesContainer) {
+                pagesContainer.style.transform = currentZoom === 1 ? 'none' : `scale(${currentZoom})`;
+                pagesContainer.style.transformOrigin = 'top center';
+                if (currentZoom > 1) {
+                    pagesContainer.style.marginBottom = `${(currentZoom - 1) * (pagesContainer.offsetHeight || 1000)}px`;
+                } else {
+                    pagesContainer.style.marginBottom = '0px';
+                }
+            } else if (editorContainer) {
+                editorContainer.style.transform = `scale(${currentZoom})`;
+                if (currentZoom > 1) {
+                    editorContainer.style.marginBottom = `${(currentZoom - 1) * 1100}px`;
+                } else {
+                    editorContainer.style.marginBottom = '20px';
+                }
             }
-            zoomLevelDisplay.textContent = `${Math.round(currentZoom * 100)}%`;
+            if (zoomLevelDisplay) zoomLevelDisplay.textContent = `${Math.round(currentZoom * 100)}%`;
         }
 
         function resetZoom() {
@@ -1179,22 +1274,56 @@
 
         function showEditor() {
             hideLoading();
-            uploadState.classList.add('hidden');
-            pagesContainer.style.displa
-            editorWrapper.classList.remove('hidden');
-            toolbarContainer.classList.remove('hidden');
-            actionBar.classList.remove('hidden');
-            pageInfo.textContent = 'Rich Editor';
- resetZoom();
+            currentViewMode = 'text';
+            if (uploadState) uploadState.classList.add('hidden');
+            if (redirectState) redirectState.classList.add('hidden');
+            if (pagesContainer) pagesContainer.style.display = 'none';
+            if (editorWrapper) editorWrapper.classList.remove('hidden');
+            if (toolbarContainer) toolbarContainer.classList.remove('hidden');
+            if (actionBar) actionBar.classList.remove('hidden');
+            if (pageInfo) pageInfo.textContent = 'Rich Editor';
+            const toggleBtn = document.getElementById('btnToggleView');
+            if (toggleBtn) {
+                toggleBtn.innerHTML = '<i class="fa-regular fa-file-pdf" id="btnToggleViewIcon"></i> <span id="btnToggleViewText">PDF View</span>';
+            }
+            resetZoom();
+        }
+
+        function showPdf() {
+            hideLoading();
+            currentViewMode = 'pdf';
+            if (uploadState) uploadState.classList.add('hidden');
+            if (redirectState) redirectState.classList.add('hidden');
+            if (editorWrapper) editorWrapper.classList.add('hidden');
+            if (toolbarContainer) toolbarContainer.classList.add('hidden');
+            if (actionBar) actionBar.classList.remove('hidden');
+            if (pagesContainer) pagesContainer.style.display = 'flex';
+            if (pageInfo && !pageInfo.textContent.includes('page')) pageInfo.textContent = 'PDF View';
+            const toggleBtn = document.getElementById('btnToggleView');
+            if (toggleBtn) {
+                toggleBtn.innerHTML = '<i class="fa-solid fa-pen-to-square" id="btnToggleViewIcon"></i> <span id="btnToggleViewText">Rich Editor</span>';
+            }
+        }
+
+        function showRedirectState(targetUrl) {
+            hideLoading();
+            if (uploadState) uploadState.classList.add('hidden');
+            if (editorWrapper) editorWrapper.classList.add('hidden');
+            if (toolbarContainer) toolbarContainer.classList.add('hidden');
+            if (actionBar) actionBar.classList.add('hidden');
+            if (pagesContainer) pagesContainer.style.display = 'none';
+            if (redirectOpenAgainBtn && targetUrl) redirectOpenAgainBtn.href = targetUrl;
+            if (redirectState) redirectState.classList.remove('hidden');
         }
 
         function showUploadState() {
             hideLoading();
-            editorWrapper.classList.add('hidden');
-            toolbarContainer.classList.add('hidden');
-            actionBar.classList.add('hidden');
-            pagesContainer.style.display = 'none';
-            uploadState.classList.remove('hidden');
+            if (editorWrapper) editorWrapper.classList.add('hidden');
+            if (toolbarContainer) toolbarContainer.classList.add('hidden');
+            if (actionBar) actionBar.classList.add('hidden');
+            if (pagesContainer) pagesContainer.style.display = 'none';
+            if (redirectState) redirectState.classList.add('hidden');
+            if (uploadState) uploadState.classList.remove('hidden');
         }
 
         // Handle File Processing (Mammoth for DOCX, PDF.js for PDF)
@@ -1205,13 +1334,15 @@
             docTitleEl.textContent = file.name.replace(/\.[^/.]+$/, "");
 
             const reader = new FileReader();
-            reader.onload = (loadEvent) => {
+            reader.onload = async (loadEvent) => {
                 const arrayBuffer = loadEvent.target.result;
                 const fn = file.name.toLowerCase();
 
                 if (fn.endsWith('.pdf') || file.type === 'application/pdf') {
                     cachedPdfArrayBuffer = arrayBuffer;
-                    processPdf(arrayBuffer);
+                    processPdfToQuillBackground(arrayBuffer);
+                    await renderCanvasPdf(arrayBuffer);
+                    showPdf();
                 } else {
                     processDocx(arrayBuffer);
                 }
@@ -1374,10 +1505,10 @@
                 });
         }
 
-        // PDF.js Structured Text Converter
-        async function processPdf(arrayBuffer) {
+        // PDF.js Structured Text Converter into Quill Background
+        async function processPdfToQuillBackground(arrayBuffer) {
             try {
-                const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+                const pdf = await pdfjsLib.getDocument({ data: arrayBuffer.slice(0) }).promise;
                 let fullHtml = '';
                 let currentParagraph = '';
 
@@ -1420,9 +1551,20 @@
 
                 if (currentParagraph) fullHtml += `<p>${currentParagraph}</p>`;
 
-                const formatted = formatLegalDocumentHtml(fullHtml);
-                const cleanHtml = DOMPurify.sanitize(formatted);
-                quill.clipboard.dangerouslyPasteHTML(cleanHtml);
+                if (fullHtml) {
+                    const formatted = formatLegalDocumentHtml(fullHtml);
+                    const cleanHtml = DOMPurify.sanitize(formatted);
+                    quill.clipboard.dangerouslyPasteHTML(cleanHtml);
+                }
+            } catch (err) {
+                console.warn('[reader] Background PDF text extraction note:', err.message);
+            }
+        }
+
+        // PDF.js Structured Text Converter
+        async function processPdf(arrayBuffer) {
+            try {
+                await processPdfToQuillBackground(arrayBuffer);
                 showEditor();
             } catch (err) {
                 hideLoading();
@@ -1472,76 +1614,195 @@
 
         // Toggle View Mode (Rich Text Editor vs High-DPI Canvas PDF)
         async function toggleViewMode() {
-            const toggleText = document.getElementById('btnToggleViewText');
-
-            if (currentViewMode === 'text') {
-                currentViewMode = 'pdf';
-                toggleText.textContent = 'Rich Editor';
-                pageInfo.textContent = 'PDF View';
-
-                editorWrapper.classList.add('hidden');
-                toolbarContainer.classList.add('hidden');
-                actionBar.classList.add('hidden');
-                pagesContainer.style.display = 'flex';
-
+            if (currentViewMode === 'pdf') {
+                showEditor();
+            } else {
                 if (cachedPdfArrayBuffer) {
-                    await renderCanvasPdf(cachedPdfArrayBuffer);
-                } else if (sourceUrl) {
+                    showPdf();
+                    if (!pagesContainer.hasChildNodes()) {
+                        await renderCanvasPdf(cachedPdfArrayBuffer);
+                    }
+                } else {
                     showLoading('Loading PDF stream...');
                     try {
-                        const pdfProxyUrl = `/api/pdf-proxy?sourceUrl=${encodeURIComponent(sourceUrl)}`;
+                        const pdfProxyUrl = loadedDocData?.pdfUrl || (sourceUrl ? `/api/pdf-proxy?sourceUrl=${encodeURIComponent(sourceUrl)}` : null);
+                        if (!pdfProxyUrl) throw new Error('No PDF URL available');
                         const res = await fetch(pdfProxyUrl);
                         if (res.ok) {
                             cachedPdfArrayBuffer = await res.arrayBuffer();
                             await renderCanvasPdf(cachedPdfArrayBuffer);
+                            showPdf();
                         } else {
                             alert('PDF file binary is not directly available.');
-                            toggleViewMode(); // revert
                         }
                     } catch (e) {
                         alert('Could not load PDF: ' + e.message);
-                        toggleViewMode(); // revert
                     } finally {
                         hideLoading();
                     }
-                } else {
-                    alert('No PDF binary loaded. Use Open File to load a PDF.');
-                    toggleViewMode();
                 }
+            }
+        }
+
+        let isRenderingPdf = false;
+        let lastRenderedWidth = 0;
+        let pdfRenderObserver = null;
+        const pendingPageRenders = new Set();
+
+        function scheduleIdleWork(fn) {
+            if (window.requestIdleCallback) {
+                window.requestIdleCallback(fn, { timeout: 4000 });
             } else {
-                currentViewMode = 'text';
-                toggleText.textContent = 'PDF View';
-                showEditor();
+                setTimeout(fn, 2500);
             }
         }
 
-        // Render PDF onto high-resolution Canvas elements
+        function destroyPdfObserver() {
+            if (pdfRenderObserver) {
+                pdfRenderObserver.disconnect();
+                pdfRenderObserver = null;
+            }
+        }
+
+        // Render PDF lazily: sized placeholders for every page up-front, with
+        // high-DPI canvas rendering only for pages near the viewport. Rendering all
+        // pages of a long judgment at 2x scale upfront consumes gigabytes of bitmap
+        // memory and freezes the tab — the cause of "documents take forever to render".
         async function renderCanvasPdf(arrayBuffer) {
-            pagesContainer.innerHTML = '';
-            const pdfDoc = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-            const outputScale = Math.max(window.devicePixelRatio || 1, 2.0);
+            if (isRenderingPdf) return;
+            isRenderingPdf = true;
+            destroyPdfObserver();
 
-            for (let i = 1; i <= pdfDoc.numPages; i++) {
-                const page = await pdfDoc.getPage(i);
-                const viewport = page.getViewport({ scale: 1.25 });
+            try {
+                pagesContainer.innerHTML = '';
+                const pdfDoc = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
 
-                const wrapper = document.createElement('div');
-                wrapper.className = 'page-wrapper';
+                // Cap the output scale so canvas bitmaps stay memory-safe
+                const dpr = window.devicePixelRatio || 1;
+                const baseOutputScale = Math.min(Math.max(dpr, 1.5), 2);
 
-                const canvas = document.createElement('canvas');
-                canvas.width = Math.floor(viewport.width * outputScale);
-                canvas.height = Math.floor(viewport.height * outputScale);
-                canvas.style.width = Math.floor(viewport.width) + 'px';
-                canvas.style.height = Math.floor(viewport.height) + 'px';
+                if (pageInfo && pdfDoc.numPages) {
+                    pageInfo.textContent = `PDF View (${pdfDoc.numPages} ${pdfDoc.numPages === 1 ? 'page' : 'pages'})`;
+                }
 
-                wrapper.appendChild(canvas);
-                pagesContainer.appendChild(wrapper);
+                const ws = document.getElementById('main-workspace');
+                const wsWidth = ws ? ws.clientWidth : window.innerWidth;
+                lastRenderedWidth = wsWidth;
 
-                const ctx = canvas.getContext('2d');
-                const transform = [outputScale, 0, 0, outputScale, 0, 0];
-                await page.render({ canvasContext: ctx, viewport, transform }).promise;
+                // Comfortable edge padding: 48px on wide screens, 32px tablets, 16px mobile
+                const edgePadding = wsWidth >= 1024 ? 48 : (wsWidth >= 640 ? 32 : 16);
+                const availableWidth = Math.max(300, wsWidth - edgePadding);
+
+                // Use page 1 for reference dimensions of the placeholders
+                const firstPage = await pdfDoc.getPage(1);
+                const firstUnscaled = firstPage.getViewport({ scale: 1.0 });
+                const fitScale = firstUnscaled.width > 0 ? availableWidth / firstUnscaled.width : 1.25;
+                const refViewport = firstPage.getViewport({ scale: fitScale });
+
+                const wrappers = [];
+                for (let i = 1; i <= pdfDoc.numPages; i++) {
+                    const wrapper = document.createElement('div');
+                    wrapper.className = 'page-wrapper page-placeholder';
+                    wrapper.style.width = Math.floor(refViewport.width) + 'px';
+                    wrapper.style.maxWidth = '100%';
+                    wrapper.style.height = Math.floor(refViewport.height) + 'px';
+                    wrapper.dataset.pageIndex = String(i);
+
+                    const ph = document.createElement('div');
+                    ph.className = 'page-placeholder-inner';
+                    ph.textContent = `Page ${i} of ${pdfDoc.numPages}`;
+                    wrapper.appendChild(ph);
+
+                    pagesContainer.appendChild(wrapper);
+                    wrappers.push(wrapper);
+                }
+
+                const renderPage = async (pageIndex) => {
+                    const wrapper = wrappers[pageIndex - 1];
+                    if (!wrapper || wrapper.dataset.rendered === '1' || pendingPageRenders.has(pageIndex)) return;
+                    pendingPageRenders.add(pageIndex);
+                    try {
+                        const page = await pdfDoc.getPage(pageIndex);
+                        const unscaled = page.getViewport({ scale: 1.0 });
+                        const pageFitScale = unscaled.width > 0 ? availableWidth / unscaled.width : fitScale;
+                        const viewport = page.getViewport({ scale: pageFitScale });
+
+                        let scaleOut = baseOutputScale;
+                        if (viewport.width * scaleOut > 2400) {
+                            scaleOut = Math.max(1, 2400 / viewport.width);
+                        }
+
+                        const canvas = document.createElement('canvas');
+                        canvas.width = Math.floor(viewport.width * scaleOut);
+                        canvas.height = Math.floor(viewport.height * scaleOut);
+                        canvas.style.width = Math.floor(viewport.width) + 'px';
+                        canvas.style.height = Math.floor(viewport.height) + 'px';
+
+                        wrapper.innerHTML = '';
+                        wrapper.classList.remove('page-placeholder');
+                        wrapper.style.height = Math.floor(viewport.height) + 'px';
+                        wrapper.appendChild(canvas);
+
+                        const ctx = canvas.getContext('2d');
+                        const transform = [scaleOut, 0, 0, scaleOut, 0, 0];
+                        await page.render({ canvasContext: ctx, viewport, transform }).promise;
+                        wrapper.dataset.rendered = '1';
+                    } catch (err) {
+                        console.warn('[reader] Page render note:', err.message);
+                    } finally {
+                        pendingPageRenders.delete(pageIndex);
+                    }
+                };
+
+                // Render the first page immediately for instant display
+                await renderPage(1);
+                showPdf();
+
+                // Lazily render remaining pages as they approach the viewport
+                if ('IntersectionObserver' in window) {
+                    pdfRenderObserver = new IntersectionObserver((entries) => {
+                        for (const entry of entries) {
+                            if (!entry.isIntersecting) continue;
+                            const idx = parseInt(entry.target.dataset.pageIndex || '0', 10);
+                            if (idx > 0 && entry.target.dataset.rendered !== '1') {
+                                renderPage(idx);
+                            }
+                        }
+                    }, { rootMargin: '800px 0px' });
+                    wrappers.forEach(w => {
+                        if (w.dataset.rendered !== '1') pdfRenderObserver.observe(w);
+                    });
+                } else {
+                    for (let i = 2; i <= pdfDoc.numPages; i++) {
+                        await renderPage(i);
+                    }
+                }
+            } catch (err) {
+                console.error('[reader] Canvas PDF rendering error:', err);
+                showErrorMsg('Failed to render PDF pages: ' + err.message);
+            } finally {
+                isRenderingPdf = false;
+                hideLoading();
             }
         }
+
+        // Window resize listener to automatically re-fit PDF to viewport width on screen change
+        let resizeDebounce = null;
+        window.addEventListener('resize', () => {
+            if (currentViewMode === 'pdf' && cachedPdfArrayBuffer && !isRenderingPdf) {
+                const ws = document.getElementById('main-workspace');
+                const curWidth = ws ? ws.clientWidth : window.innerWidth;
+                if (Math.abs(curWidth - lastRenderedWidth) < 25) return; // avoid jitter
+                clearTimeout(resizeDebounce);
+                resizeDebounce = setTimeout(async () => {
+                    const scrollFraction = ws && ws.scrollHeight > 0 ? ws.scrollTop / ws.scrollHeight : 0;
+                    await renderCanvasPdf(cachedPdfArrayBuffer);
+                    if (ws && scrollFraction > 0) {
+                        ws.scrollTop = Math.round(scrollFraction * ws.scrollHeight);
+                    }
+                }, 200);
+            }
+        });
 
         // Download Original PDF File
         async function downloadOriginalPdf() {
@@ -1559,13 +1820,15 @@
 
                 if (cachedPdfArrayBuffer) {
                     blob = new Blob([cachedPdfArrayBuffer], { type: 'application/pdf' });
-                } else if (sourceUrl) {
-                    const pdfProxyUrl = `/api/pdf-proxy?sourceUrl=${encodeURIComponent(sourceUrl)}`;
-                    const res = await fetch(pdfProxyUrl);
-                    if (res.ok) {
-                        const buffer = await res.arrayBuffer();
-                        cachedPdfArrayBuffer = buffer;
-                        blob = new Blob([buffer], { type: 'application/pdf' });
+                } else {
+                    const targetPdfFetchUrl = loadedDocData?.pdfUrl || (sourceUrl ? `/api/pdf-proxy?sourceUrl=${encodeURIComponent(sourceUrl)}` : null);
+                    if (targetPdfFetchUrl) {
+                        const res = await fetch(targetPdfFetchUrl);
+                        if (res.ok) {
+                            const buffer = await res.arrayBuffer();
+                            cachedPdfArrayBuffer = buffer;
+                            blob = new Blob([buffer], { type: 'application/pdf' });
+                        }
                     }
                 }
 
@@ -1588,6 +1851,15 @@
             }
         }
 
+        // Only warm the PDF proxy in parallel for sources the proxy can serve as an
+        // actual document (eKLR records & direct PDF/DOC links). For other external
+        // pages the proxy would just redirect to the origin website.
+        function directPdfEligible(url) {
+            if (!url || !/^https?:\/\//i.test(url)) return false;
+            const u = url.toLowerCase();
+            return u.includes('kenyalaw.org') || u.endsWith('.pdf') || u.includes('.pdf?') || u.endsWith('.docx') || u.endsWith('.doc') || u.includes('.docx?');
+        }
+
         // Auto-Load Initial Document from Query Parameters / APIs
         async function loadInitialDocument() {
             if (!sourceUrl && (!filename || filename === 'document.pdf')) {
@@ -1597,16 +1869,34 @@
 
             showLoading('Fetching legal document from repository & Kenya Law...');
 
+            // Fetch the PDF stream IN PARALLEL with the document metadata API — the
+            // proxy resolves the same source document, so waiting sequentially doubles load time.
+            const directProxyUrl = sourceUrl ? `/api/pdf-proxy?sourceUrl=${encodeURIComponent(sourceUrl)}` : null;
+            const parallelPdfPromise = directPdfEligible(sourceUrl)
+                ? fetch(directProxyUrl).then(r => (r.ok ? r.arrayBuffer() : null)).catch(() => null)
+                : Promise.resolve(null);
+
             try {
                 // Fetch document content & structured brief
                 const apiUrl = sourceUrl
                     ? `/api/document?sourceUrl=${encodeURIComponent(sourceUrl)}&title=${encodeURIComponent(displayTitle)}&year=${encodeURIComponent(reqYear)}&type=${encodeURIComponent(reqType)}&source=${encodeURIComponent(reqSource)}`
                     : `/read/${encodeURIComponent(filename)}?raw=1`;
 
-                const res = await fetch(apiUrl);
+                const [res, parallelPdfBuffer] = await Promise.all([fetch(apiUrl), parallelPdfPromise]);
                 if (res.ok) {
                     const data = await res.json();
                     loadedDocData = data;
+
+                    // If not an actual PDF/DOC, do NOT open in reader: redirect directly to exact webpage in a new tab!
+                    if (data.isActualPdfOrDoc === false || (data.redirectUrl && data.success === false)) {
+                        const targetRedirect = data.redirectUrl || data.url || data.sourceUrl || sourceUrl;
+                        if (targetRedirect && /^https?:\/\//i.test(targetRedirect)) {
+                            hideLoading();
+                            window.open(targetRedirect, '_blank', 'noopener,noreferrer');
+                            showRedirectState(targetRedirect);
+                            return;
+                        }
+                    }
 
                     if (data.title) {
                         docTitleEl.textContent = data.title;
@@ -1631,11 +1921,33 @@
                         externalLink.style.display = 'inline-flex';
                     }
 
-                    // If clean text / HTML returned
+                    // Populate Quill editor in background so it is instantly ready if toggled
                     if (data.html || data.text) {
                         const formatted = formatLegalDocumentHtml(data.html || data.text);
                         const cleanHtml = DOMPurify.sanitize(formatted);
                         quill.clipboard.dangerouslyPasteHTML(cleanHtml);
+                    }
+
+                    // DEFAULT VIEW: render the high-DPI Canvas PDF from the buffer that was
+                    // fetched in parallel with the metadata request
+                    loadedDocData.pdfUrl = loadedDocData.pdfUrl || directProxyUrl;
+                    if (parallelPdfBuffer) {
+                        const bytes = new Uint8Array(parallelPdfBuffer.slice(0, 5));
+                        const header = String.fromCharCode.apply(null, Array.from(bytes));
+                        if (header.startsWith('%PDF')) {
+                            cachedPdfArrayBuffer = parallelPdfBuffer;
+                            showLoading('Rendering high-definition PDF view...');
+                            if (!data.html && !data.text) {
+                                scheduleIdleWork(() => processPdfToQuillBackground(parallelPdfBuffer));
+                            }
+                            await renderCanvasPdf(parallelPdfBuffer);
+                            showPdf();
+                            return;
+                        }
+                    }
+
+                    // If PDF stream could not be rendered, show editor if text is available
+                    if (data.html || data.text) {
                         showEditor();
                         return;
                     }
@@ -1647,7 +1959,7 @@
             // Fallback: Fetch direct PDF / DOCX proxy buffer
             if (sourceUrl) {
                 try {
-                    const pdfProxyUrl = `/api/pdf-proxy?sourceUrl=${encodeURIComponent(sourceUrl)}`;
+                    const pdfProxyUrl = loadedDocData?.pdfUrl || `/api/pdf-proxy?sourceUrl=${encodeURIComponent(sourceUrl)}`;
                     const res = await fetch(pdfProxyUrl);
                     if (res.ok) {
                         const buffer = await res.arrayBuffer();
@@ -1656,7 +1968,9 @@
 
                         if (header.startsWith('%PDF')) {
                             cachedPdfArrayBuffer = buffer;
-                            await processPdf(buffer);
+                            scheduleIdleWork(() => processPdfToQuillBackground(buffer));
+                            await renderCanvasPdf(buffer);
+                            showPdf();
                             return;
                         } else {
                             processDocx(buffer);
@@ -1668,6 +1982,14 @@
                 }
             }
 
+            // If this is an external URL that cannot be opened as a real document, open webpage in a new tab!
+            if (sourceUrl && /^https?:\/\//i.test(sourceUrl) && !sourceUrl.includes('kenyalaw.org')) {
+                hideLoading();
+                window.open(sourceUrl, '_blank', 'noopener,noreferrer');
+                showRedirectState(sourceUrl);
+                return;
+            }
+
             hideLoading();
             showUploadState();
         }
@@ -1677,6 +1999,7 @@
         function setupBookmarkButton() {
             const btnBookmark = document.getElementById('btnBookmark');
             const btnBookmarkText = document.getElementById('btnBookmarkText');
+            if (!btnBookmark) return;
 
             function getSavedDocs() {
                 try {
@@ -1688,12 +2011,13 @@
             }
 
             function isSaved() {
-                const keysou|| displayTitle).toLowerCase().trim();
+                const key = (sourceUrl || displayTitle).toLowerCase().trim();
                 const docs = getSavedDocs();
                 return docs.some(d => (d.readUrl || d.url || d.title || '').toLowerCase().trim() === key);
             }
 
             function updateUI() {
+                if (!btnBookmarkText) return;
                 if (isSaved()) {
                     btnBookmarkText.textContent = 'Saved';
                     btnBookmark.style.background = '#eff6ff';
@@ -1741,19 +2065,23 @@
             const btnCloseDrawer = document.getElementById('btnCloseDrawer');
             const btnCopySummary = document.getElementById('btnCopySummary');
 
+            if (!fabSummaryBtn || !summaryOverlay) return;
+
             const closeDrawer = () => summaryOverlay.classList.remove('active');
-            summaryCloseBtn.addEventListener('click', closeDrawer);
-            btnCloseDrawer.addEventListener('click', closeDrawer);
+            if (summaryCloseBtn) summaryCloseBtn.addEventListener('click', closeDrawer);
+            if (btnCloseDrawer) btnCloseDrawer.addEventListener('click', closeDrawer);
             summaryOverlay.addEventListener('click', (e) => {
                 if (e.target === summaryOverlay) closeDrawer();
             });
 
-            btnCopySummary.addEventListener('click', () => {
-                if (summaryContent) {
-                    navigator.clipboard.writeText(summaryContent.innerText);
-                    alert('Legal brief copied to clipboard!');
-                }
-            });
+            if (btnCopySummary) {
+                btnCopySummary.addEventListener('click', () => {
+                    if (summaryContent) {
+                        navigator.clipboard.writeText(summaryContent.innerText);
+                        alert('Legal brief copied to clipboard!');
+                    }
+                });
+            }
 
             fabSummaryBtn.addEventListener('click', async () => {
                 summaryOverlay.classList.add('active');

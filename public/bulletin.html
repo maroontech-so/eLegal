@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Bulletin | eLegal Bulletin — Kenya Legal News</title>
+    <meta name="description" content="In-depth Kenyan legal news, court rulings, gazette notices and judiciary developments from the eLegal Bulletin.">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js"></script>
+    <style>
+        :root {
+            --ink: #111318;
+            --ink-soft: #3d4451;
+            --ink-faint: #6b7280;
+            --paper: #ffffff;
+            --bg: #f4f4f2;
+            --accent-green: #0d5c3a;
+            --accent-orange: #e8590c;
+            --accent-blue: #1e5eff;
+            --border: #e4e4e0;
+            --serif: 'Georgia', 'Times New Roman', serif;
+            --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: var(--ink);
+            font-family: var(--sans);
+            line-height: 1.6;
+        }
+
+        a { color: inherit; text-decoration: none; }
+
+        /* ── Masthead ─────────────────────────────── */
+        .topbar {
+            background: #0c1116;
+            color: #fff;
+            padding: 8px 20px;
+            font-size: 0.72rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .topbar a { color: #cfd6dd; margin-left: 16px; }
+        .topbar a:hover { color: #fff; }
+
+        .masthead {
+            background: var(--paper);
+            border-bottom: 3px double #111318;
+            padding: 18px 20px 14px;
+            text-align: center;
+        }
+        .masthead .brand {
+            font-family: var(--serif);
+            font-weight: 900;
+            font-size: 2rem;
+            letter-spacing: 0.02em;
+            color: var(--ink);
+        }
+        .masthead .brand .accent { color: var(--accent-green); }
+        .masthead .dateline {
+            margin-top: 4px;
+            font-size: 0.72rem;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--ink-faint);
+            display: flex;
+            justify-content: center;
+            gap: 18px;
+            flex-wrap: wrap;
+        }
+        .section-nav {
+            background: var(--paper);
+            border-bottom: 1px solid var(--border);
+            padding: 8px 20px;
+            display: flex;
+            justify-content: center;
+            gap: 22px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+        .section-nav a { color: var(--ink-soft); text-transform: uppercase; letter-spacing: 0.04em; padding: 4px 2px; border-bottom: 2px solid transparent; }
+        .section-nav a.active, .section-nav a:hover { color: var(--accent-green); border-bottom-color: var(--accent-green); }
+
+        /* ── Layout ───────────────────────────────── */
+        .page {
+            max-width: 1180px;
+            margin: 0 auto;
+            padding: 26px 20px 60px;
+        }
+        .layout {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 320px;
+            gap: 34px;
+            align-items: start;
+        }
+        @media (max-width: 980px) {
+            .layout { grid-template-columns: 1fr; }
+        }
+
+        /* ── Article ──────────────────────────────── */
+        .article-card {
+            background: var(--paper);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 30px 34px 34px;
+        }
+        @media (max-width: 640px) { .article-card { padding: 22px 18px 26px; } }
+
+        .kicker {
+            color: var(--accent-orange);
+            font-size: 0.75rem;
+            font-weight: 800;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+        h1.headline {
+            font-family: var(--serif);
+            font-size: clamp(1.6rem, 4vw, 2.4rem);
+            line-height: 1.2;
+            margin: 0 0 14px;
+            font-weight: 800;
+        }
+        .byline {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.82rem;
+            color: var(--ink-faint);
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 18px;
+        }
+        .byline .source { font-weight: 700; color: var(--ink-soft); }
+        .byline .dot { width: 3px; height: 3px; border-radius: 50%; background: #c4c4c0; }
+
+        .hero {
+            width: 100%;
+            border-radius: 3px;
+            overflow: hidden;
+            background: #e9e9e5;
+            margin-bottom: 8px;
+        }
+        .hero img {
+            width: 100%;
+            max-height: 480px;
+            object-fit: cover;
+            display: block;
+        }
+        .hero-caption {
+            font-size: 0.74rem;
+            color: var(--ink-faint);
+            margin-bottom: 22px;
+        }
+        .hero-caption a { color: var(--accent-blue); }
+
+        .story-body { font-size: 1.02rem; color: #191d24; }
+        .story-body p { margin: 0 0 1.1em; }
+        .story-body p:first-of-type::first-letter {
+            font-family: var(--serif);
+            font-size: 3.2em;
+            font-weight: 700;
+            float: left;
+            line-height: 0.85;
+            padding-right: 8px;
+            color: var(--ink);
+        }
+        .story-body h2 {
+            font-family: var(--serif);
+            font-size: 1.35rem;
+            margin: 1.6em 0 0.6em;
+            line-height: 1.3;
+        }
+        .story-body h3 { font-size: 1.1rem; margin: 1.4em 0 0.5em; }
+        .story-body ul, .story-body ol { padding-left: 22px; margin: 0 0 1.1em; }
+        .story-body blockquote {
+            border-left: 3px solid var(--accent-green);
+            margin: 1.2em 0;
+            padding: 6px 18px;
+            color: var(--ink-soft);
+            font-style: italic;
+            background: #faf9f6;
+        }
+        .story-body a { color: var(--accent-blue); }
+        .story-body img { max-width: 100%; height: auto; }
+
+        .source-note {
+            margin-top: 22px;
+            background: #f6f9f7;
+            border: 1px solid #dbe7e0;
+            border-left: 4px solid var(--accent-green);
+            border-radius: 4px;
+            padding: 14px 18px;
+            font-size: 0.86rem;
+            color: var(--ink-soft);
+        }
+        .source-note a { color: var(--accent-green); font-weight: 700; }
+
+        .tag-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
+        .tag-row span {
+            background: #f0f0ec;
+            border: 1px solid var(--border);
+            color: var(--ink-soft);
+            font-size: 0.72rem;
+            font-weight: 600;
+            padding: 4px 12px;
+            border-radius: 99px;
+        }
+
+        /* ── Read next ────────────────────────────── */
+        .read-next {
+            margin-top: 26px;
+            background: linear-gradient(135deg, #0c1116 0%, #17242e 100%);
+            color: #fff;
+            border-radius: 6px;
+            overflow: hidden;
+            display: grid;
+            grid-template-columns: 200px 1fr;
+            cursor: pointer;
+        }
+        @media (max-width: 640px) { .read-next { grid-template-columns: 1fr; } }
+        .read-next img { width: 100%; height: 100%; min-height: 140px; object-fit: cover; display: block; }
+        .read-next .rn-body { padding: 20px 24px; }
+        .read-next .rn-label { font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase; color: #f4b860; font-weight: 800; margin-bottom: 8px; }
+        .read-next .rn-title { font-family: var(--serif); font-size: 1.15rem; font-weight: 700; line-height: 1.35; }
+        .read-next .rn-meta { margin-top: 10px; font-size: 0.78rem; color: #9fb0bd; }
+        .read-next:hover .rn-title { text-decoration: underline; }
+
+        /* ── Suggested stories ────────────────────── */
+        .suggested { margin-top: 30px; }
+        .section-heading {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 0 0 16px;
+            font-family: var(--serif);
+            font-size: 1.25rem;
+            font-weight: 800;
+        }
+        .section-heading::after { content: ''; flex: 1; height: 3px; background: var(--ink); }
+        .suggested-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+        @media (max-width: 800px) { .suggested-grid { grid-template-columns: 1fr; } }
+        .story-card {
+            background: var(--paper);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: box-shadow 0.2s ease, transform 0.2s ease;
+        }
+        .story-card:hover { box-shadow: 0 8px 22px rgba(0,0,0,0.1); transform: translateY(-2px); }
+        .story-card img { width: 100%; height: 130px; object-fit: cover; display: block; background: #e9e9e5; }
+        .story-card .sc-body { padding: 12px 14px 14px; }
+        .story-card .sc-cat { font-size: 0.66rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent-orange); }
+        .story-card .sc-title { font-family: var(--serif); font-size: 0.95rem; font-weight: 700; line-height: 1.35; margin-top: 4px; }
+        .story-card .sc-meta { margin-top: 8px; font-size: 0.72rem; color: var(--ink-faint); }
+
+        /* ── Sidebar ──────────────────────────────── */
+        .sidebar { display: flex; flex-direction: column; gap: 24px; position: sticky; top: 18px; }
+        @media (max-width: 980px) { .sidebar { position: static; } }
+        .side-panel {
+            background: var(--paper);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .side-panel .sp-head {
+            background: #0c1116;
+            color: #fff;
+            font-size: 0.78rem;
+            font-weight: 800;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            padding: 10px 16px;
+        }
+        .side-list { display: flex; flex-direction: column; }
+        .side-item {
+            display: grid;
+            grid-template-columns: 72px 1fr;
+            gap: 12px;
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+            cursor: pointer;
+        }
+        .side-item:last-child { border-bottom: none; }
+        .side-item:hover { background: #fafaf7; }
+        .side-item img { width: 72px; height: 54px; object-fit: cover; border-radius: 3px; background: #e9e9e5; }
+        .side-item .si-title {
+            font-size: 0.82rem;
+            font-weight: 700;
+            line-height: 1.35;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .side-item .si-meta { font-size: 0.7rem; color: var(--ink-faint); margin-top: 3px; }
+
+        /* ── Newsletter ───────────────────────────── */
+        .newsletter-panel {
+            background: linear-gradient(160deg, #0d5c3a 0%, #0a462c 100%);
+            color: #fff;
+            border-radius: 6px;
+            padding: 22px 20px;
+        }
+        .newsletter-panel h3 { margin: 0 0 6px; font-family: var(--serif); font-size: 1.15rem; }
+        .newsletter-panel p { margin: 0 0 14px; font-size: 0.84rem; color: #d7e8de; }
+        .newsletter-form { display: flex; flex-direction: column; gap: 10px; }
+        .newsletter-form input {
+            padding: 11px 14px;
+            border-radius: 6px;
+            border: 1px solid #2e7d58;
+            background: rgba(255,255,255,0.12);
+            color: #fff;
+            font-size: 0.9rem;
+            outline: none;
+        }
+        .newsletter-form input::placeholder { color: #b9d4c6; }
+        .newsletter-form input:focus { border-color: #7fc7a4; }
+        .newsletter-form button {
+            padding: 11px 14px;
+            border: none;
+            border-radius: 6px;
+            background: #f4b860;
+            color: #232323;
+            font-weight: 800;
+            font-size: 0.88rem;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+        .newsletter-form button:hover { background: #ffc97e; }
+        .newsletter-form button:disabled { opacity: 0.6; cursor: wait; }
+        .newsletter-msg { font-size: 0.8rem; margin-top: 10px; min-height: 1em; color: #d7e8de; }
+        .newsletter-msg.err { color: #ffc4c4; }
+        .newsletter-msg.ok { color: #b6f0cf; }
+
+        /* ── Footer ───────────────────────────────── */
+        footer {
+            background: #0c1116;
+            color: #8d9aa5;
+            font-size: 0.78rem;
+            padding: 26px 20px;
+            text-align: center;
+        }
+        footer a { color: #cfd6dd; }
+
+        /* ── Loading / error states ───────────────── */
+        .state-box {
+            max-width: 560px;
+            margin: 60px auto;
+            background: var(--paper);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 40px 30px;
+            text-align: center;
+        }
+        .spinner {
+            width: 34px; height: 34px;
+            border: 3px solid #dfe3e8;
+            border-top-color: var(--accent-green);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 14px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+    <div class="topbar">
+        <span>Kenya&rsquo;s Legal Intelligence Digest</span>
+        <span>
+            <a href="/bulletins"><i class="fa-solid fa-newspaper"></i> All Bulletins</a>
+            <a href="/"><i class="fa-solid fa-scale-balanced"></i> eLegal Repository</a>
+        </span>
+    </div>
+
+    <header class="masthead">
+        <a href="/bulletins" class="brand">eLegal <span class="accent">BULLETIN</span></a>
+        <div class="dateline">
+            <span id="todayLine"></span>
+            <span>&bull;</span>
+            <span>Courts &amp; Legal Affairs</span>
+        </div>
+    </header>
+
+    <nav class="section-nav">
+        <a href="/bulletins?category=judiciary">Judiciary</a>
+        <a href="/bulletins?category=commercial">Commercial &amp; Tax</a>
+        <a href="/bulletins?category=land_labour">Land &amp; Labour</a>
+        <a href="/bulletins?category=legislation">Legislation</a>
+        <a href="/bulletins?category=gazette">Gazette</a>
+        <a href="/bulletins?category=governance">Governance</a>
+    </nav>
+
+    <main class="page" id="pageRoot">
+        <div class="state-box" id="loadingState">
+            <div class="spinner"></div>
+            <h2 style="font-family: var(--serif); margin: 0 0 6px;">Loading the full story&hellip;</h2>
+            <p style="color: var(--ink-faint); font-size: 0.9rem; margin: 0;">Fetching the original report and expanding it into a complete legal news article.</p>
+        </div>
+
+        <div class="state-box" id="errorState" style="display: none;">
+            <h2 style="font-family: var(--serif); margin: 0 0 6px;">Bulletin not found</h2>
+            <p style="color: var(--ink-faint); font-size: 0.9rem;">This bulletin may have been refreshed out of the daily digest.</p>
+            <a href="/bulletins" class="source-btn" style="display:inline-block; margin-top: 10px; background: var(--accent-green); color: #fff; padding: 10px 18px; border-radius: 6px; font-weight: 700; font-size: 0.85rem;">Back to all bulletins</a>
+        </div>
+
+        <div class="layout" id="contentLayout" style="display: none;">
+            <article>
+                <div class="article-card">
+                    <div class="kicker" id="artKicker"></div>
+                    <h1 class="headline" id="artHeadline"></h1>
+                    <div class="byline">
+                        <span class="source" id="artSource"></span>
+                        <span class="dot"></span>
+                        <span id="artDate"></span>
+                        <span class="dot"></span>
+                        <span id="artReadTime"></span>
+                    </div>
+                    <div class="hero">
+                        <img id="artImage" alt="" />
+                    </div>
+                    <div class="hero-caption" id="artCaption"></div>
+                    <div class="story-body" id="artBody"></div>
+                    <div class="source-note" id="sourceNote"></div>
+                    <div class="tag-row" id="tagRow"></div>
+                </div>
+
+                <div class="read-next" id="readNext" style="display: none;">
+                    <img id="rnImage" alt="" />
+                    <div class="rn-body">
+                        <div class="rn-label"><i class="fa-solid fa-arrow-right-long"></i> Read Next</div>
+                        <div class="rn-title" id="rnTitle"></div>
+                        <div class="rn-meta" id="rnMeta"></div>
+                    </div>
+                </div>
+
+                <section class="suggested">
+                    <h2 class="section-heading">More Legal News</h2>
+                    <div class="suggested-grid" id="suggestedGrid"></div>
+                </section>
+            </article>
+
+            <aside class="sidebar">
+                <div class="side-panel">
+                    <div class="sp-head"><i class="fa-solid fa-layer-group"></i> Latest Bulletins</div>
+                    <div class="side-list" id="sideList"></div>
+                </div>
+
+                <div class="newsletter-panel">
+                    <h3><i class="fa-regular fa-envelope-open"></i> Bulletin Alerts</h3>
+                    <p>Get the eLegal Bulletin in your inbox the moment a new legal development breaks &mdash; rulings, gazette notices, and judiciary news.</p>
+                    <form class="newsletter-form" data-source="sidebar">
+                        <input type="email" required placeholder="you@advocate.co.ke" aria-label="Email address" />
+                        <button type="submit"><i class="fa-solid fa-bell"></i> Subscribe Free</button>
+                    </form>
+                    <div class="newsletter-msg" aria-live="polite"></div>
+                </div>
+            </aside>
+        </div>
+    </main>
+
+    <footer>
+        <div>&copy; <span id="year"></span> eLegal &mdash; Kenya&rsquo;s Modern Legal E-Repository &amp; AI Intelligence Engine</div>
+        <div style="margin-top: 6px;"><a href="/bulletins">Bulletins &amp; Digest</a> &bull; <a href="/e-repository">E-Repository</a> &bull; <a href="/ai-case-finder">AI Case Finder</a> &bull; <a href="/privacy">Privacy</a></div>
+    </footer>
+
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const bulletinId = decodeURIComponent(window.location.pathname.replace(/^\/bulletins?\//, '').replace(/\/$/, '')) || params.get('id') || '';
+
+        const LANDMARKS = [
+            'https://upload.wikimedia.org/wikipedia/commons/0/07/Nairobi_Law_Courts.jpg',
+            'https://upload.wikimedia.org/wikipedia/commons/0/0a/Supreme_Court_of_Kenya.JPG',
+            'https://upload.wikimedia.org/wikipedia/commons/b/bd/Parliament_Buildings%2C_Nairobi%2C_Kenya_-entrance-15April2010.jpg',
+            'https://upload.wikimedia.org/wikipedia/commons/0/0f/Chief_Justice_Martha_K._Koome_and_Deputy_Chief_Justice_Philomena_Mwilu.jpg',
+            'https://upload.wikimedia.org/wikipedia/commons/6/61/Old_law_courst_mombasa.JPG',
+            'https://upload.wikimedia.org/wikipedia/commons/thumb/4/49/Coat_of_arms_of_Kenya_%28Heraldry%29.svg/800px-Coat_of_arms_of_Kenya_%28Heraldry%29.svg.png'
+        ];
+
+        function escapeHtml(s) {
+            return String(s || '')
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+        }
+
+        function landmarkFor(i) { return LANDMARKS[Math.abs(Number(i) || 0) % LANDMARKS.length]; }
+
+        function fmtDate(d) {
+            try {
+                return new Date(d).toLocaleDateString('en-KE', { year: 'numeric', month: 'long', day: 'numeric' });
+            } catch (_) { return d || ''; }
+        }
+
+        function openBulletin(id) {
+            window.location.href = '/bulletin/' + encodeURIComponent(id);
+        }
+
+        async function loadBulletin() {
+            document.getElementById('todayLine').textContent = new Date().toLocaleDateString('en-KE', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            document.getElementById('year').textContent = new Date().getFullYear();
+
+            if (!bulletinId) { showError(); return; }
+
+            try {
+                const res = await fetch('/api/bulletins/' + encodeURIComponent(bulletinId));
+                if (!res.ok) { showError(); return; }
+                const data = await res.json();
+                renderStory(data);
+                renderSidebar(data.sidebar || []);
+                renderSuggested(data.suggested || []);
+                renderNext(data.next);
+            } catch (e) {
+                console.warn('[bulletin] Load error:', e);
+                showError();
+            }
+        }
+
+        function showError() {
+            document.getElementById('loadingState').style.display = 'none';
+            document.getElementById('errorState').style.display = 'block';
+        }
+
+        function renderStory(data) {
+            const b = data.bulletin || {};
+            document.getElementById('loadingState').style.display = 'none';
+            document.getElementById('contentLayout').style.display = '';
+
+            document.title = (b.title || 'Bulletin') + ' | eLegal Bulletin';
+            document.getElementById('artKicker').textContent = b.categoryLabel || b.category || 'Legal News';
+            document.getElementById('artHeadline').textContent = b.title || 'Untitled Bulletin';
+            document.getElementById('artSource').textContent = 'By ' + (data.sourceName || b.source || 'eLegal Reporter');
+            document.getElementById('artDate').textContent = fmtDate(b.date);
+            document.getElementById('artReadTime').textContent = b.readTime || '4 min read';
+
+            const img = document.getElementById('artImage');
+            img.src = b.imageUrl || landmarkFor(b.date ? String(b.date).length : 0);
+            img.alt = b.title || 'Bulletin cover';
+            img.onerror = function () { this.onerror = null; this.src = landmarkFor(1); };
+
+            const caption = document.getElementById('artCaption');
+            const isLandmark = (b.imageSource === 'landmark');
+            if (b.imageOrigin && !isLandmark) {
+                caption.innerHTML = 'Image sourced from the original story coverage.';
+            } else if (b.imageSource === 'origin') {
+                caption.innerHTML = 'Image sourced from the original story coverage.';
+            } else if (isLandmark) {
+                caption.textContent = 'Photo: Kenyan judiciary landmark archive';
+            } else {
+                caption.innerHTML = 'Illustrative image matched to this story' + (b.imageOrigin ? ' &mdash; <a href="' + escapeHtml(b.imageOrigin) + '" target="_blank" rel="noopener noreferrer">view source</a>' : '') + '.';
+            }
+
+            const bodyEl = document.getElementById('artBody');
+            const rawHtml = data.storyHtml || '<p>' + escapeHtml(b.summary || b.content || '') + '</p>';
+            bodyEl.innerHTML = (window.DOMPurify ? DOMPurify.sanitize(rawHtml, { ADD_ATTR: ['target'] }) : rawHtml);
+
+            const note = document.getElementById('sourceNote');
+            const srcName = escapeHtml(data.sourceName || b.source || 'the original publisher');
+            if (data.sourceUrl && /^https?:\/\//.test(data.sourceUrl)) {
+                note.innerHTML = '<i class="fa-solid fa-circle-info"></i> This story is based on and expands upon the original report by ' + srcName + '. <a href="' + escapeHtml(data.sourceUrl) + '" target="_blank" rel="noopener noreferrer">Read the original report &rarr;</a>';
+            } else {
+                note.innerHTML = '<i class="fa-solid fa-circle-info"></i> Compiled from the eLegal daily bulletin digest.';
+            }
+
+            const tagRow = document.getElementById('tagRow');
+            tagRow.innerHTML = (Array.isArray(b.tags) ? b.tags : []).map(t => '<span>' + escapeHtml(t) + '</span>').join('');
+        }
+
+        function renderSidebar(list) {
+            const el = document.getElementById('sideList');
+            if (!list.length) {
+                el.innerHTML = '<div style="padding: 18px; color: var(--ink-faint); font-size: 0.84rem;">No other bulletins available.</div>';
+                return;
+            }
+            el.innerHTML = list.map((b, i) => `
+                <div class="side-item" onclick="openBulletin('${escapeHtml(b.id)}')">
+                    <img src="${escapeHtml(b.imageUrl || landmarkFor(i))}" alt="" loading="lazy" onerror="this.onerror=null;this.src='${landmarkFor(i)}';" />
+                    <div>
+                        <div class="si-title">${escapeHtml(b.title)}</div>
+                        <div class="si-meta">${escapeHtml(b.date || '')} &bull; ${escapeHtml(b.categoryLabel || b.category || 'News')}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderSuggested(list) {
+            const el = document.getElementById('suggestedGrid');
+            el.innerHTML = list.map((b, i) => `
+                <div class="story-card" onclick="openBulletin('${escapeHtml(b.id)}')">
+                    <img src="${escapeHtml(b.imageUrl || landmarkFor(i + 3))}" alt="" loading="lazy" onerror="this.onerror=null;this.src='${landmarkFor(i + 3)}';" />
+                    <div class="sc-body">
+                        <div class="sc-cat">${escapeHtml(b.categoryLabel || b.category || 'Legal News')}</div>
+                        <div class="sc-title">${escapeHtml(b.title)}</div>
+                        <div class="sc-meta">${escapeHtml(b.date || '')} &bull; ${escapeHtml(b.source || 'eLegal')}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderNext(next) {
+            if (!next || !next.id) return;
+            const el = document.getElementById('readNext');
+            el.style.display = 'grid';
+            el.onclick = () => openBulletin(next.id);
+            const img = document.getElementById('rnImage');
+            img.src = next.imageUrl || landmarkFor(4);
+            img.onerror = function () { this.onerror = null; this.src = landmarkFor(4); };
+            document.getElementById('rnTitle').textContent = next.title || '';
+            document.getElementById('rnMeta').textContent = (next.date || '') + ' \u2022 ' + (next.categoryLabel || next.category || 'Legal News');
+        }
+
+        // ── Newsletter subscriptions ──
+        document.querySelectorAll('.newsletter-form').forEach(form => {
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const input = form.querySelector('input');
+                const btn = form.querySelector('button');
+                const msg = form.parentElement.querySelector('.newsletter-msg');
+                const email = (input.value || '').trim();
+                if (!email) return;
+
+                btn.disabled = true;
+                msg.textContent = 'Subscribing...';
+                msg.className = 'newsletter-msg';
+                try {
+                    const res = await fetch('/api/newsletter/subscribe', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email, source: form.dataset.source || 'bulletin-page' })
+                    });
+                    const data = await res.json();
+                    if (res.ok && data.ok) {
+                        msg.textContent = data.message || 'Subscribed!';
+                        msg.className = 'newsletter-msg ok';
+                        input.value = '';
+                    } else {
+                        msg.textContent = data.error || 'Subscription failed. Please try again.';
+                        msg.className = 'newsletter-msg err';
+                    }
+                } catch (err) {
+                    msg.textContent = 'Network error. Please try again.';
+                    msg.className = 'newsletter-msg err';
+                } finally {
+                    btn.disabled = false;
+                }
+            });
+        });
+
+        loadBulletin();
+    </script>
+</body>
+</html>

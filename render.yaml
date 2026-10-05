@@ -5,8 +5,11 @@ services:
     dockerfilePath: Dockerfile
     dockerContext: .
     plan: free
+    healthCheckPath: /api/health
     envVars:
       - key: NODE_ENV
         value: production
       - key: PORT
         value: 3000
+      - key: NODE_OPTIONS
+        value: --max-old-space-size=384

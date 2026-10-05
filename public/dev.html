@@ -1910,20 +1910,21 @@
             method: 'GET',
             path: '/api/search',
             isEndpoint: true,
-            desc: 'Executes high-density legal search across Kenya Law eKLR report archives, local statutes, and international legal repositories. Returns ranked case citations with actual document URLs, direct PDF links, and structured brief APIs.',
+            desc: 'Executes high-density legal search across Kenya Law eKLR report archives, local statutes, and international legal repositories. All sources are mixed seamlessly and ranked strictly based on match relevance.',
             detailsHtml: `
-          <h3>Hybrid Machine Learning Search Pipeline</h3>
-          <p>The <code>/api/search</code> endpoint runs yo             through a              d <strong>Jurisdiction & Legal Domain Classifier</strong> before searching eKLR archives and legal databases:</p>
+          <h3>Simultaneous Unified Legal Search Pipeline</h3>
+          <p>The <code>/api/search</code> endpoint runs your query across Kenya Law eKLR archives, local repository cache, and international precedents simultaneously, ranking results purely by match relevance:</p>
           <ul>
-            <li><strong>Live & Fr              :</strong> Searches external databases and Kenya Law live. Uncached results are dynamically fetched and enriched so you never             s          ata.                                 rong>Direct Doc            Ls:</strong> Every item in t            >results</code> array include            actualDocumentU            >, <code>documentUrl</            code>pdfUrl</code>            ode>contentUrl</code> for immediate document access and rendering.</li>
-            <li><strong>Zero-CORS Browser Access:</strong> Permissive CORS all            to fetch search results directly from simple HTML/JS files without proxying or backend servers.</li>
+            <li><strong>Live & Fresh:</strong> Searches external sources, web index, and Kenya Law in parallel with the local cache. Uncached results are dynamically fetched and enriched so you always receive current data.</li>
+            <li><strong>Direct Document URLs:</strong> Every item in the <code>results</code> array includes <code>actualDocumentUrl</code>, <code>documentUrl</code>, <code>pdfUrl</code>, and <code>contentUrl</code> for immediate document access and rendering.</li>
+            <li><strong>Zero-CORS Browser Access:</strong> Permissive CORS allows you to fetch search results directly from client-side web applications without proxying.</li>
           </ul>
         `,
             params: [
               { name: 'q', type: 'string', req: true, desc: 'Legal topic, party names, statutory section, or case citation', default: 'adverse possession 12 years land dispute' },
-              { name: 'source', type: 'string', req: false, desc: 'Scope filter: all (default), kenya, or international', default: 'all' },
-                    name: 'fr              : 'string', req: false, desc: 'Set to "true" to force fresh live fetch from external sources bypassing cache', default: 'false' },
-                           limit', type: 'number', req: false, desc: 'Number of results to return (max 50, default 5)', default: '5' }
+              { name: 'source', type: 'string', req: false, desc: 'Scope filter: all (default, mixed sources), kenya, or international', default: 'all' },
+              { name: 'fresh', type: 'string', req: false, desc: 'Set to "true" to force fresh live fetch from external sources bypassing cache', default: 'false' },
+              { name: 'limit', type: 'number', req: false, desc: 'Number of results to return (1 to 100, default 15)', default: '15' }
             ]
           },
 

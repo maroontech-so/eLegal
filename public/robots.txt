@@ -17,4 +17,5 @@ Disallow:
 # Sitemaps
 Sitemap: https://www.lexshub.xyz/sitemap.xml
 Sitemap: https://lexshub.xyz/sitemap.xml
+Sitemap: https://ai.lexshub.xyz/sitemap.xml
 Sitemap: https://elegal.or.ke/sitemap.xml

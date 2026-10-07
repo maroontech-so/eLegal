@@ -12,22 +12,22 @@
     <meta name="keywords" content="Legal research tools, AI tools, TechLaw, Kenya Law, EKLR, case laws Search engine, Legal tools with ai, legal ai, ai tools for lawyers, study ai, research ai, law api, kenya law official api, constitution of kenya, kenya law system, kenyan precedents and statutes, law society of kenya, api calls, Search engine api, case law analyser, legal summary, ai in law, law in ai, Impact of ai on law, Supreme Court Kenya, High Court Kenya, Environment and Land Court, Employment and Labour Relations Court, Tax Appeals Tribunal">
     <meta name="author" content="eLegal Kenya Law AI Platform">
     <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
-    <link rel="canonical" href="https://elegal.or.ke/">
+    <link rel="canonical" href="https://lexshub.xyz/">
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://elegal.or.ke/">
+    <meta property="og:url" content="https://lexshub.xyz/">
     <meta property="og:title" content="eLegal | Official Kenya Law AI Platform & Case Law Search Engine">
     <meta property="og:description" content="Kenya's official research-grade legal AI platform. Access eKLR court rulings, statutes, daily court cause lists, Law Society of Kenya directives, and AI legal research tools.">
-    <meta property="og:image" content="https://elegal.or.ke/logo.png">
+    <meta property="og:image" content="https://lexshub.xyz/logo.png">
     <meta property="og:site_name" content="eLegal Kenya Law AI Platform">
 
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:url" content="https://elegal.or.ke/">
+    <meta name="twitter:url" content="https://lexshub.xyz/">
     <meta name="twitter:title" content="eLegal | Official Kenya Law AI Platform">
     <meta name="twitter:description" content="Access official Kenya eKLR judicial precedents, statutes, TechLaw tools, and AI legal research engines.">
-    <meta name="twitter:image" content="https://elegal.or.ke/logo.png">
+    <meta name="twitter:image" content="https://lexshub.xyz/logo.png">
 
     <!-- Structured Data JSON-LD for Google (WebSite, SoftwareApplication, LegalService, SearchAction) -->
     <script type="application/ld+json">
@@ -36,11 +36,11 @@
         "@context": "https://schema.org",
         "@type": "WebSite",
         "name": "eLegal Kenya Law AI Engine",
-        "url": "https://elegal.or.ke/",
+        "url": "https://lexshub.xyz/",
         "description": "Kenya Law AI search engine and legal intelligence platform providing eKLR precedents, statutory acts, and AI case law analysis.",
         "potentialAction": {
           "@type": "SearchAction",
-          "target": "https://elegal.or.ke/e-repository?q={search_term_string}",
+          "target": "https://lexshub.xyz/e-repository?q={search_term_string}",
           "query-input": "required name=search_term_string"
         }
       },
@@ -56,7 +56,7 @@
           "priceCurrency": "KES"
         },
         "description": "AI legal research tools, eKLR case law search engine, case law analyser, statutory database, and official law API for Kenya.",
-        "url": "https://elegal.or.ke"
+        "url": "https://lexshub.xyz"
       },
       {
         "@context": "https://schema.org",
@@ -75,7 +75,7 @@
           "Tax Appeals Tribunal Rulings",
           "Legal AI Tools & TechLaw"
         ],
-        "url": "https://elegal.or.ke"
+        "url": "https://lexshub.xyz"
       }
     ]
     </script>
@@ -84,6 +84,18 @@
     <link rel="apple-touch-icon" href="/logo.png">
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script>
+      const AI_BASE_URL = (function () {
+        const protocol = window.location.protocol;
+        const host = window.location.hostname;
+        if (!host || host === 'localhost' || host === '127.0.0.1') {
+          return window.location.origin + '/ai-case-finder';
+        }
+        const base = host.replace(/^www\./, '');
+        return protocol + '//ai.' + base;
+      })();
+    </script>
 
     <style>
         :root {
@@ -2231,7 +2243,7 @@
         <nav class="nav-links">
             <a href="/home" class="nav-link active" id="navHome" onclick="navigateTo('/home', event)">Home</a>
             <a href="/e-repository" class="nav-link" id="navRepo" onclick="navigateTo('/e-repository', event)">E-Repository</a>
-            <a href="/ai-case-finder" class="nav-link" id="navAi" onclick="navigateTo('/ai-case-finder', event)">AI Case Finder</a>
+            <a href="${AI_BASE_URL}" class="nav-link" id="navAi" target="_self">eLegal AI</a>
             <a href="/bulletins" class="nav-link" id="navBulletins" onclick="navigateTo('/bulletins', event)">Bulletins & Digest</a>
             <a href="/practice" class="nav-link" id="navPractice" onclick="navigateTo('/practice', event)">Practice Areas</a>
             <a href="/saved" class="nav-link" id="navSaved" onclick="navigateTo('/saved', event)">Saved (<span id="savedCountBadge">0</span>)</a>
@@ -2256,8 +2268,8 @@
                     <a href="/e-repository" class="mobile-nav-item" id="mobileNavRepo" onclick="mobileNavigateTo('/e-repository', event)">
                         <i data-lucide="database" style="width: 15px; height: 15px;"></i> E-Repository
                     </a>
-                    <a href="/ai-case-finder" class="mobile-nav-item" id="mobileNavAi" onclick="mobileNavigateTo('/ai-case-finder', event)">
-                        <i data-lucide="sparkles" style="width: 15px; height: 15px;"></i> AI Case Finder
+                    <a href="${AI_BASE_URL}" class="mobile-nav-item" id="mobileNavAi" target="_self">
+                        <i data-lucide="sparkles" style="width: 15px; height: 15px;"></i> eLegal AI
                     </a>
                     <a href="/bulletins" class="mobile-nav-item" id="mobileNavBulletins" onclick="mobileNavigateTo('/bulletins', event)">
                         <i data-lucide="newspaper" style="width: 15px; height: 15px;"></i> Bulletins & Digest
@@ -2458,7 +2470,7 @@
             <section style="margin-bottom: 24px;">
                 <div class="section-title-wrap" style="margin-bottom: 20px;">
                     <h1 class="section-title">
-                        <i data-lucide="cpu" style="color: var(--accent-blue);"></i> AI Case Finder & Case Law Analyser
+                        <i data-lucide="cpu" style="color: var(--accent-blue);"></i> eLegal AI & Case Law Analyser
                     </h1>
                     <p class="section-subtitle">
                         Paste client factual scenarios, legal disputes, contract terms, or constitutional issues to perform deep legal grounding, issue framing, statutory indexing, and binding precedent analysis.
@@ -2662,8 +2674,8 @@
     </footer>
 
     <!-- ─── AI CASE FINDER BLUE TEXT-ONLY FAB ─── -->
-    <button class="ai-fab-btn" id="aiFabBtn" onclick="openAiFabModal()" title="Open AI Case Finder Assistant">
-        <span>AI Case Finder</span>
+    <button class="ai-fab-btn" id="aiFabBtn" onclick="openAiFabModal()" title="Open eLegal AI Assistant">
+        <span>eLegal AI</span>
     </button>
 
     <!-- ─── AI CASE FINDER RIGHT CHATBOT DRAWER ─── -->
@@ -2675,7 +2687,7 @@
                         <i data-lucide="sparkles" style="width: 20px; height: 20px;"></i>
                     </div>
                     <div class="ai-chat-header-text">
-                        <h3>AI Judicial Case Finder</h3>
+                        <h3>eLegal AI Judicial Case Finder</h3>
                         <p><i data-lucide="shield-check" style="width: 12px; height: 12px;"></i> Google Grounded
                             Intelligence</p>
                     </div>
@@ -2779,7 +2791,7 @@
             '/': 'eLegal | Official Kenya Law AI Platform, Case Law Search Engine & Judicial Precedents',
             '/home': 'eLegal Home | Official Kenya Law AI Research Tools',
             '/e-repository': 'Legal E-Repository | Kenya Law Precedents & Statutory Search Engine',
-            '/ai-case-finder': 'AI Case Finder | TechLaw & Legal AI Case Law Analyser',
+            '/ai-case-finder': 'eLegal AI | TechLaw & Legal AI Case Law Analyser',
             '/bulletins': 'Official Bulletins & Cause Lists | Kenya Judiciary & Gazette Digest',
             '/practice': 'Practice Areas | Kenya Law Precedents by Legal Specialty',
             '/saved': 'Saved Legal Briefs & Bookmarks | eLegal Kenya'
@@ -2801,13 +2813,12 @@
 
             document.title = ROUTE_TITLES[cleanPath];
             const canonicalEl = document.querySelector('link[rel="canonical"]');
-            if (canonicalEl) canonicalEl.href = 'https://elegal.or.ke' + (cleanPath === '/home' ? '/' : cleanPath);
+            if (canonicalEl) canonicalEl.href = 'https://lexshub.xyz' + (cleanPath === '/home' ? '/' : cleanPath);
 
             document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active'));
             const linkIdMap = {
                 '/home': 'navHome',
                 '/e-repository': 'navRepo',
-                '/ai-case-finder': 'navAi',
                 '/bulletins': 'navBulletins',
                 '/practice': 'navPractice',
                 '/saved': 'navSaved'
@@ -3077,9 +3088,9 @@
                     throw new Error('AI Service Unavailable');
                 }
             } catch (e) {
-                console.warn('AI Case Finder error:', e);
+                console.warn('eLegal AI error:', e);
                 const advElErr = document.getElementById('aiAdviceText');
-                if (advElErr) advElErr.textContent = 'AI Case Finder encountered a temporary network delay. Showing fallback analysis.';
+                    if (advElErr) advElErr.textContent = 'eLegal AI encountered a temporary network delay. Showing fallback analysis.';
             }
         }
 
@@ -3187,7 +3198,7 @@
                 if (typing) typing.remove();
 
                 if (!res.ok || data.error) {
-                    throw new Error(data.message || data.error || 'AI Case Finder failed');
+                    throw new Error(data.message || data.error || 'eLegal AI failed');
                 }
 
                 renderAiChatResponse(data, userPrompt);
@@ -3878,7 +3889,7 @@
                     body: JSON.stringify({ query: scenario })
                 });
 
-                if (!res.ok) throw new Error(`AI Case Finder failed (${res.status})`);
+                if (!res.ok) throw new Error(`eLegal AI failed (${res.status})`);
                 const data = await res.json();
                 renderAiResult(data);
             } catch (e) {

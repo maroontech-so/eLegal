@@ -3,8 +3,8 @@
   "private": true,
   "version": "1.0.0",
   "scripts": {
-    "dev": "node server.js",
-    "start": "node server.js",
+    "dev": "node server.cjs",
+    "start": "node server.cjs",
     "build": "echo 'No build required for Express static app'",
     "clean": "rm -rf dist",
     "lint": "node -c server.js"
@@ -13,20 +13,22 @@
     "@google/genai": "^2.4.0",
     "@tailwindcss/vite": "^4.1.14",
     "@vitejs/plugin-react": "^5.0.4",
+    "better-sqlite3": "^13.0.3",
     "cheerio": "^1.2.0",
     "cloudinary": "^2.10.0",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "duck-duck-scrape": "^2.2.7",
-    "express": "^4.22.2",
+    "express": "^4.22.3",
     "express-rate-limit": "^8.6.2",
     "firebase": "^12.17.0",
     "firebase-admin": "^14.2.0",
     "helmet": "^8.3.0",
     "jsdom": "^29.1.1",
     "lucide-react": "^0.546.0",
-    "mammoth": "^1.12.0",
+    "mammoth": "^1.13.0",
     "motion": "^12.23.24",
+    "multer": "^2.4.0",
     "node-fetch": "^2.7.0",
     "pdf-parse": "^2.4.5",
     "react": "^19.0.1",
@@ -42,5 +44,22 @@
     "tsx": "^4.21.0",
     "typescript": "~5.8.2",
     "vite": "^6.2.3"
-  }
+  },
+  "description": "<p align=\"center\">   <img src=\"Screenshot from 2026-08-04 20-09-01.png\" alt=\"eLegal Modern Legal E-Repository Interface\" width=\"100%\" style=\"border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.12);\"> </p>",
+  "main": "caseAI.js",
+  "directories": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/maroontech-so/eLegal.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/maroontech-so/eLegal/issues"
+  },
+  "homepage": "https://github.com/maroontech-so/eLegal#readme"
 }

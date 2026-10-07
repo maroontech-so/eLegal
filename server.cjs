@@ -164,6 +164,7 @@ function trackApiKeyCall(key, req, res, owner) {
 }
 const RATE_LIMIT_WINDOW_MS = 60 * 1000;
 const RATE_LIMIT_MAX = 60;
+const AI_MODE = process.argv.includes('--ai');
 const app = express();
 const PORT = process.env.PORT || 3000;
 const INDEX_FILE = path.join(__dirname, 'search-index.json');
@@ -6041,8 +6042,7 @@ app.get('/sitemap.xml', (req, res) => {
 });
 
 app.get(['/', '/home', '/e-repository', '/bulletins', '/practice', '/saved', '/privacy', '/terms', '/PrivacyTerms'], (req, res) => {
-  const aiMode = String(process.env.APP_MODE || '').toLowerCase() === 'ai';
-  const file = aiMode ? 'ai.html' : 'index.html';
+  const file = AI_MODE ? 'ai.html' : 'index.html';
   res.sendFile(path.join(__dirname, 'public', file));
 });
 

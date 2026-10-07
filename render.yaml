@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: elegal-app
+    name: elegal-main
     env: docker
     dockerfilePath: Dockerfile
     dockerContext: .
@@ -13,3 +13,20 @@ services:
         value: 3000
       - key: NODE_OPTIONS
         value: --max-old-space-size=384
+    startCommand: npm start
+
+  - type: web
+    name: elelegal-ai
+    env: docker
+    dockerfilePath: Dockerfile
+    dockerContext: .
+    plan: free
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
+      - key: NODE_OPTIONS
+        value: --max-old-space-size=384
+    startCommand: npm start --ai

@@ -11,22 +11,22 @@
     <meta name="keywords" content="AI case finder, legal AI, Kenya Law AI, case law analyser, legal research AI, AI judicial assistant, Google Grounding, eKLR AI, precedent analysis, statutory analysis, legal scenario analyser, AI legal research, Kenya Law artificial intelligence">
     <meta name="author" content="eLegal Kenya Law AI Platform">
     <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
-    <link rel="canonical" href="${AI_BASE_URL}/">
+    <link rel="canonical" href="/ai-case-finder/">
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
-    <meta property="og:url" content="${AI_BASE_URL}/">
+    <meta property="og:url" content="/ai-case-finder/">
     <meta property="og:title" content="eLegal AI | eLegal Kenya Law AI Case Law Analyser">
     <meta property="og:description" content="Paste legal scenarios and client facts to perform deep legal grounding, issue framing, statutory indexing, and binding precedent analysis with Google Grounded Intelligence.">
-    <meta property="og:image" content="${AI_BASE_URL}/logo.png">
+    <meta property="og:image" content="/logo.png">
     <meta property="og:site_name" content="eLegal AI">
 
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:url" content="${AI_BASE_URL}/">
+    <meta name="twitter:url" content="/ai-case-finder/">
     <meta name="twitter:title" content="eLegal AI | eLegal Kenya Law AI Case Law Analyser">
     <meta name="twitter:description" content="Paste legal scenarios and client facts to perform deep legal grounding, issue framing, statutory indexing, and binding precedent analysis with Google Grounded Intelligence.">
-    <meta name="twitter:image" content="${AI_BASE_URL}/logo.png">
+    <meta name="twitter:image" content="/logo.png">
 
     <!-- Structured Data JSON-LD for Google -->
     <script type="application/ld+json">
@@ -35,11 +35,11 @@
         "@context": "https://schema.org",
         "@type": "WebSite",
         "name": "eLegal AI",
-        "url": "${AI_BASE_URL}/",
+        "url": "/ai-case-finder/",
         "description": "AI-powered legal case finder and case law analyser for Kenya Law. Uses Google Grounding to identify exact precedents, statutory provisions, and actionable case citations.",
         "potentialAction": {
           "@type": "SearchAction",
-          "target": "${AI_BASE_URL}/?q={search_term_string}",
+          "target": "/ai-case-finder/?q={search_term_string}",
           "query-input": "required name=search_term_string"
         }
       },
@@ -55,7 +55,7 @@
           "priceCurrency": "KES"
         },
         "description": "AI legal research tool for Kenya Law. Paste client factual scenarios to perform deep legal grounding, issue framing, statutory indexing, and binding precedent analysis.",
-        "url": "${AI_BASE_URL}"
+        "url": "/ai-case-finder"
       }
     ]
     </script>
@@ -64,18 +64,6 @@
     <link rel="apple-touch-icon" href="/logo.png">
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
-
-    <script>
-      const AI_BASE_URL = (function () {
-        const protocol = window.location.protocol;
-        const host = window.location.hostname;
-        if (!host || host === 'localhost' || host === '127.0.0.1') {
-          return window.location.origin + '/ai-case-finder';
-        }
-        const base = host.replace(/^www\./, '');
-        return protocol + '//ai.' + base;
-      })();
-    </script>
 
     <style>
         :root {
@@ -502,15 +490,15 @@
         </a>
 
         <nav class="nav-links">
-            <a href="https://lexshub.xyz/home" class="nav-link">Home</a>
-            <a href="https://lexshub.xyz/e-repository" class="nav-link">E-Repository</a>
-            <a href="${AI_BASE_URL}" class="nav-link active">eLegal AI</a>
-            <a href="https://lexshub.xyz/bulletins" class="nav-link">Bulletins</a>
-            <a href="https://lexshub.xyz/practice" class="nav-link">Practice Areas</a>
+            <a href="/home" class="nav-link">Home</a>
+            <a href="/e-repository" class="nav-link">E-Repository</a>
+            <a href="/ai-case-finder" class="nav-link active">eLegal AI</a>
+            <a href="/bulletins" class="nav-link">Bulletins</a>
+            <a href="/practice" class="nav-link">Practice Areas</a>
         </nav>
 
         <div class="nav-actions">
-            <a href="https://lexshub.xyz/dev" class="api-btn">&lt;API /&gt;</a>
+            <a href="/dev" class="api-btn">&lt;API /&gt;</a>
         </div>
     </header>
 

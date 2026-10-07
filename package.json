@@ -7,7 +7,7 @@
     "start": "node server.cjs",
     "build": "echo 'No build required for Express static app'",
     "clean": "rm -rf dist",
-    "lint": "node -c server.js"
+    "lint": "node -c server.cjs"
   },
   "dependencies": {
     "@google/genai": "^2.4.0",
@@ -46,7 +46,7 @@
     "vite": "^6.2.3"
   },
   "description": "<p align=\"center\">   <img src=\"Screenshot from 2026-08-04 20-09-01.png\" alt=\"eLegal Modern Legal E-Repository Interface\" width=\"100%\" style=\"border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.12);\"> </p>",
-  "main": "caseAI.js",
+  "main": "server.cjs",
   "directories": {
     "test": "test"
   },

@@ -85,18 +85,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
 
-    <script>
-      const AI_BASE_URL = (function () {
-        const protocol = window.location.protocol;
-        const host = window.location.hostname;
-        if (!host || host === 'localhost' || host === '127.0.0.1') {
-          return window.location.origin + '/ai-case-finder';
-        }
-        const base = host.replace(/^www\./, '');
-        return protocol + '//ai.' + base;
-      })();
-    </script>
-
     <style>
         :root {
             --app-bg: #F5F5F7;
@@ -2243,7 +2231,7 @@
         <nav class="nav-links">
             <a href="/home" class="nav-link active" id="navHome" onclick="navigateTo('/home', event)">Home</a>
             <a href="/e-repository" class="nav-link" id="navRepo" onclick="navigateTo('/e-repository', event)">E-Repository</a>
-            <a href="${AI_BASE_URL}" class="nav-link" id="navAi" target="_self">eLegal AI</a>
+            <a href="/ai-case-finder" class="nav-link" id="navAi" onclick="navigateTo('/ai-case-finder', event)">eLegal AI</a>
             <a href="/bulletins" class="nav-link" id="navBulletins" onclick="navigateTo('/bulletins', event)">Bulletins & Digest</a>
             <a href="/practice" class="nav-link" id="navPractice" onclick="navigateTo('/practice', event)">Practice Areas</a>
             <a href="/saved" class="nav-link" id="navSaved" onclick="navigateTo('/saved', event)">Saved (<span id="savedCountBadge">0</span>)</a>
@@ -2268,7 +2256,7 @@
                     <a href="/e-repository" class="mobile-nav-item" id="mobileNavRepo" onclick="mobileNavigateTo('/e-repository', event)">
                         <i data-lucide="database" style="width: 15px; height: 15px;"></i> E-Repository
                     </a>
-                    <a href="${AI_BASE_URL}" class="mobile-nav-item" id="mobileNavAi" target="_self">
+                    <a href="/ai-case-finder" class="mobile-nav-item" id="mobileNavAi" onclick="mobileNavigateTo('/ai-case-finder', event)">
                         <i data-lucide="sparkles" style="width: 15px; height: 15px;"></i> eLegal AI
                     </a>
                     <a href="/bulletins" class="mobile-nav-item" id="mobileNavBulletins" onclick="mobileNavigateTo('/bulletins', event)">
